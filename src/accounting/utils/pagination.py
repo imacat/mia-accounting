@@ -1,0 +1,240 @@
+# The Mia! Accounting Flask Project.
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
+
+#  Copyright (c) 2023 imacat.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+"""The pagination utilities.
+
+This module should not import any other module from the application.
+
+"""
+import typing as t
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
+    ParseResult
+
+from flask import request
+
+from accounting.locale import gettext
+
+
+class PageLink:
+    """A link in the pagination."""
+
+    def __init__(self, text: str, uri: str | None = None,
+                 is_current: bool = False, is_for_mobile: bool = False):
+        """Constructs the link.
+
+        :param text: The link text.
+        :param uri: The link URI, or None if there is no link.
+        :param is_current: True if the page is the current page, or False
+            otherwise.
+        :param is_for_mobile: True if the page should be shown on small
+            screens, or False otherwise.
+        """
+        self.text: str = text
+        """The link text"""
+        self.uri: str | None = uri
+        """The link URI, or None if there is no link."""
+        self.is_current: bool = is_current
+        """Whether the link is the current page."""
+        self.is_for_mobile: bool = is_for_mobile
+        """Whether the link should be shown on mobile screens."""
+
+
+T = t.TypeVar("T")
+
+
+class Pagination(t.Generic[T]):
+    """The pagination utilities"""
+    AVAILABLE_PAGE_SIZES: list[int] = [10, 100, 200]
+    """The available page sizes."""
+    DEFAULT_PAGE_SIZE: int = 10
+    """The default page size."""
+
+    def __init__(self, items: list[T], is_reversed: bool = False):
+        """Constructs the pagination.
+
+        :param items: The items.
+        :param is_reversed: True if the default page is the last page, or False
+            otherwise.
+        """
+        self.__items: list[T] = items
+        """All the items."""
+        self.__is_reversed: bool = is_reversed
+        """Whether the default page is the last page."""
+        self.page_size: int = int(request.args.get("page-size",
+                                                   self.DEFAULT_PAGE_SIZE))
+        """The number of items in a page."""
+        self.__total_pages: int = 0 if len(items) == 0 \
+            else int((len(items) - 1) / self.page_size) + 1
+        """The total number of pages."""
+        self.is_needed: bool = self.__total_pages > 1
+        """Whether there should be pagination."""
+        self.__default_page_no: int = 0
+        """The default page number."""
+        self.page_no: int = 0
+        """The current page number."""
+        self.list: list[T] = []
+        """The items shown in the list"""
+        if self.__total_pages > 0:
+            self.__set_list()
+        self.__current_uri: str = request.full_path if request.query_string \
+            else request.path
+        """The current URI."""
+        self.__base_uri_params: tuple[list[str], list[tuple[str, str]]] \
+            = self.__get_base_uri_params()
+        """The base URI parameters."""
+        self.page_links: list[PageLink] = self.__get_page_links()
+        """The pagination links."""
+        self.page_sizes: list[PageLink] = self.__get_page_sizes()
+        """The links to switch the number of items in a page."""
+
+    def __set_list(self) -> None:
+        """Sets the items to show in the list.
+
+        :return: None.
+        """
+        self.__default_page_no = self.__total_pages if self.__is_reversed \
+            else 1
+        self.page_no = int(request.args.get("page-no",
+                                            self.__default_page_no))
+        if self.page_no < 1:
+            self.page_no = 1
+        if self.page_no > self.__total_pages:
+            self.page_no = self.__total_pages
+        lower_bound: int = (self.page_no - 1) * self.page_size
+        upper_bound: int = lower_bound + self.page_size
+        if upper_bound > len(self.__items):
+            upper_bound = len(self.__items)
+        self.list = self.__items[lower_bound:upper_bound]
+
+    def __get_base_uri_params(self) -> tuple[list[str], list[tuple[str, str]]]:
+        """Returns the base URI and its parameters, with the "page-no" and
+        "page-size" parameters removed.
+
+        :return: The URI parts and the cleaned-up query parameters.
+        """
+        uri_p: ParseResult = urlparse(self.__current_uri)
+        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
+        params = [x for x in params if x[0] not in ["page-no", "page-size"]]
+        parts: list[str] = list(uri_p)
+        return parts, params
+
+    def __get_page_links(self) -> list[PageLink]:
+        """Returns the page links in the pagination navigation.
+
+        :return: The page links in the pagination navigation.
+        """
+        if self.__total_pages < 2:
+            return []
+        uri: str | None
+        links: list[PageLink] = []
+
+        # The previous page.
+        uri = None if self.page_no == 1 else self.__uri_page(self.page_no - 1)
+        links.append(PageLink(gettext("Previous"), uri, is_for_mobile=True))
+
+        # The first page.
+        if self.page_no > 1:
+            links.append(PageLink("1", self.__uri_page(1)))
+
+        # The eclipse of the previous pages.
+        if self.page_no - 3 == 2:
+            links.append(PageLink(str(self.page_no - 3),
+                                  self.__uri_page(self.page_no - 3)))
+        elif self.page_no - 3 > 2:
+            links.append(PageLink("…"))
+
+        # The previous two pages.
+        if self.page_no - 2 > 1:
+            links.append(PageLink(str(self.page_no - 2),
+                                  self.__uri_page(self.page_no - 2)))
+        if self.page_no - 1 > 1:
+            links.append(PageLink(str(self.page_no - 1),
+                                  self.__uri_page(self.page_no - 1)))
+
+        # The current page.
+        links.append(PageLink(str(self.page_no), self.__uri_page(self.page_no),
+                              is_current=True))
+
+        # The next two pages.
+        if self.page_no + 1 < self.__total_pages:
+            links.append(PageLink(str(self.page_no + 1),
+                                  self.__uri_page(self.page_no + 1)))
+        if self.page_no + 2 < self.__total_pages:
+            links.append(PageLink(str(self.page_no + 2),
+                                  self.__uri_page(self.page_no + 2)))
+
+        # The eclipse of the next pages.
+        if self.page_no + 3 == self.__total_pages - 1:
+            links.append(PageLink(str(self.page_no + 3),
+                                  self.__uri_page(self.page_no + 3)))
+        elif self.page_no + 3 < self.__total_pages - 1:
+            links.append(PageLink("…"))
+
+        # The last page.
+        if self.page_no < self.__total_pages:
+            links.append(PageLink(str(self.__total_pages),
+                                  self.__uri_page(self.__total_pages)))
+
+        # The next page.
+        uri = None if self.page_no == self.__total_pages \
+            else self.__uri_page(self.page_no + 1)
+        links.append(PageLink(gettext("Next"), uri, is_for_mobile=True))
+
+        return links
+
+    def __uri_page(self, page_no: int) -> str:
+        """Returns the URI of a page.
+
+        :param page_no: The page number.
+        :return: The URI of the page.
+        """
+        params: list[tuple[str, str]] = []
+        if page_no != self.__default_page_no:
+            params.append(("page-no", str(page_no)))
+        if self.page_size != self.DEFAULT_PAGE_SIZE:
+            params.append(("page-size", str(self.page_size)))
+        return self.__uri_set_params(params)
+
+    def __get_page_sizes(self) -> list[PageLink]:
+        """Returns the available page sizes.
+
+        :return: The available page sizes.
+        """
+        return [PageLink(str(x), self.__uri_size(x),
+                         is_current=x == self.page_size)
+                for x in self.AVAILABLE_PAGE_SIZES]
+
+    def __uri_size(self, page_size: int) -> str:
+        """Returns the URI of a page size.
+
+        :param page_size: The page size.
+        :return: The URI of the page size.
+        """
+        if page_size == self.page_size:
+            return self.__current_uri
+        return self.__uri_set_params([("page-size", str(page_size))])
+
+    def __uri_set_params(self, params: list[tuple[str, str]]) -> str:
+        """Returns the URI with the query parameters set.
+
+        :param params: The query parameters.
+        :return: The URI with the query parameters set.
+        """
+        cur_params: list[tuple[str, str]] = self.__base_uri_params[1].copy()
+        cur_params.extend(params)
+        parts: list[str] = self.__base_uri_params[0].copy()
+        parts[4] = urlencode(cur_params)
+        return urlunparse(parts)

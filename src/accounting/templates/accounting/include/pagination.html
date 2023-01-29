@@ -1,0 +1,56 @@
+{#
+The Mia! Accounting Flask Project
+pagination.html: The pagination navigation bar.
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/1/26
+#}
+{% if pagination.is_needed %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% for link in pagination.page_links %}
+        {% if link.uri is none %}
+          <li class="page-item disabled {% if not link.is_for_mobile %} d-none d-md-inline {% endif %}">
+            <span class="page-link">
+              {{ link.text }}
+            </span>
+          </li>
+        {% else %}
+        <li class="page-item {% if not link.is_for_mobile %} d-none d-md-inline {% endif %} {% if link.is_current %} active {% endif %}">
+          <a class="page-link" href="{{ link.uri }}">
+            {{ link.text }}
+          </a>
+        </li>
+        {% endif %}
+      {% endfor %}
+      <li class="page-item d-none d-md-inline active dropdown">
+        <div class="page-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ pagination.page_size }}
+        </div>
+        <ul class="dropdown-menu">
+          {% for link in pagination.page_sizes %}
+            <li>
+              <a class="dropdown-item {% if link.is_current %} active {% endif %}" href="{{ link.uri }}">
+                {{ link.text }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    </ul>
+  </nav>
+{% endif %}

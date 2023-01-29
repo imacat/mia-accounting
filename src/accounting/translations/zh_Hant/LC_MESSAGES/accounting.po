@@ -1,0 +1,46 @@
+# Chinese (Traditional) translations for the Mia! Accounting Flask project.
+# Copyright (C) 2023 imacat
+# This file is distributed under the same license as the Mia! Accounting
+# Flask project.
+# imacat <imacat@mail.imacat.idv.tw>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
+"Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
+"POT-Creation-Date: 2023-01-28 13:37+0800\n"
+"PO-Revision-Date: 2023-01-28 13:37+0800\n"
+"Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
+"Language: zh_Hant\n"
+"Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.11.0\n"
+
+#: src/accounting/base_account/templates/accounting/base-account/list.html:24
+#: src/accounting/templates/accounting/include/nav.html:32
+msgid "Base Accounts"
+msgstr "基本科目"
+
+#: src/accounting/base_account/templates/accounting/base-account/list.html:35
+msgid "Search"
+msgstr "搜尋"
+
+#: src/accounting/base_account/templates/accounting/base-account/list.html:53
+msgid "There is no data."
+msgstr "沒有資料。"
+
+#: src/accounting/templates/accounting/include/nav.html:26
+msgid "Accounting"
+msgstr "記帳"
+
+#: src/accounting/utils/pagination.py:146
+msgid "Previous"
+msgstr "前一頁"
+
+#: src/accounting/utils/pagination.py:194
+msgid "Next"
+msgstr "下一頁"
+

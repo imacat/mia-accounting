@@ -1,0 +1,54 @@
+# Chinese (Traditional) translations for the Mia! Accounting Flask
+# Demonstration website.
+# Copyright (C) 2023 imacat
+# This file is distributed under the same license as the Mia! Accounting
+# Flask Demonstration project.
+# imacat <imacat@mail.imacat.idv.tw>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Mia! Accounting Flask Demonstration 0.0.0\n"
+"Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
+"POT-Creation-Date: 2023-01-28 13:42+0800\n"
+"PO-Revision-Date: 2023-01-28 13:42+0800\n"
+"Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
+"Language: zh_Hant\n"
+"Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.11.0\n"
+
+#: tests/testsite/templates/base.html:23
+msgid "en"
+msgstr "zh-Hant"
+
+#: tests/testsite/templates/base.html:43 tests/testsite/templates/home.html:24
+msgid "Home"
+msgstr "首頁"
+
+#: tests/testsite/templates/base.html:68
+msgid "Log Out"
+msgstr ""
+
+#: tests/testsite/templates/base.html:78 tests/testsite/templates/login.html:24
+msgid "Log In"
+msgstr "登入"
+
+#: tests/testsite/templates/base.html:119
+msgid "Error:"
+msgstr "錯誤："
+
+#: tests/testsite/templates/login.html:30
+msgid "Viewer"
+msgstr "讀報表者"
+
+#: tests/testsite/templates/login.html:31
+msgid "Editor"
+msgstr "記帳者"
+
+#: tests/testsite/templates/login.html:32
+msgid "Nobody"
+msgstr "沒有權限者"
+
