@@ -25,36 +25,31 @@ First written: 2023/1/30
 
 {% block content %}
 
-{% if can_edit_accounting() %}
-  <div class="btn-group mb-3 d-none d-md-block">
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.create")|append_next }}">
+<div class="btn-group mb-2">
+  {% if can_edit_accounting() %}
+    <a class="btn btn-primary text-nowrap d-none d-md-block" href="{{ url_for("accounting.account.create")|append_next }}">
       <i class="fa-solid fa-user-plus"></i>
       {{ A_("New") }}
     </a>
-  </div>
+  {% endif %}
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search">
+    <input id="search-input" class="form-control form-control-sm search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+    <label for="search-input" class="search-label">
+      <button type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        {{ A_("Search") }}
+      </button>
+    </label>
+  </form>
+</div>
 
+{% if can_edit_accounting() %}
   <div class="d-md-none material-fab">
     <a class="btn btn-primary" href="{{ url_for("accounting.account.create")|append_next }}">
       <i class="fa-solid fa-plus"></i>
     </a>
   </div>
 {% endif %}
-
-<form action="{{ url_for("accounting.account.list") }}" method="get" role="search">
-  <div class="row">
-    <div class="col-sm-3">
-      <div class="input-group mb-2">
-        <input id="query" class="form-control form-control-sm" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
-        <button class="input-group-text" type="submit">
-          <label for="query">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            {{ A_("Search") }}
-          </label>
-        </button>
-      </div>
-    </div>
-  </div>
-</form>
 
 {% if list %}
   {% include "accounting/include/pagination.html" %}
