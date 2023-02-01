@@ -20,6 +20,7 @@
 import sqlalchemy as sa
 from flask import request
 
+from accounting.locale import gettext
 from accounting.models import Account, AccountL10n
 from accounting.utils.query import parse_query_keywords
 
@@ -41,10 +42,14 @@ def get_account_query() -> list[Account]:
         l10n: list[AccountL10n] = AccountL10n.query\
             .filter(AccountL10n.title.contains(k)).all()
         l10n_matches: set[str] = {x.account_id for x in l10n}
-        conditions.append(sa.or_(Account.base_code.contains(k),
-                                 Account.title_l10n.contains(k),
-                                 code.contains(k),
-                                 Account.id.in_(l10n_matches)))
+        sub_conditions: list[sa.BinaryExpression] \
+            = [Account.base_code.contains(k),
+               Account.title_l10n.contains(k),
+               code.contains(k),
+               Account.id.in_(l10n_matches)]
+        if k in gettext("Offset needed"):
+            sub_conditions.append(Account.is_offset_needed)
+        conditions.append(sa.or_(*sub_conditions))
 
     return Account.query.filter(*conditions)\
         .order_by(Account.base_code, Account.no).all()
