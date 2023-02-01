@@ -201,3 +201,44 @@ class AccountTestCase(unittest.TestCase):
         response = viewer.client.post("/accounting/accounts/1111-001/delete",
                                       data={"csrf_token": viewer.csrf_token})
         self.assertEqual(response.status_code, 403)
+
+    def test_editor(self) -> None:
+        """Test the permission as editor.
+
+        :return: None.
+        """
+        response: httpx.Response
+
+        response = self.client.get("/accounting/accounts")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/accounting/accounts/1111-001")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/accounting/accounts/create")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post("/accounting/accounts/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1113",
+                                          "title": "1113 title"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts/1113-001")
+
+        response = self.client.get("/accounting/accounts/1111-001/edit")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post("/accounting/accounts/1111-001/update",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1111",
+                                          "title": "1111 title #2"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts/1111-001")
+
+        response = self.client.post("/accounting/accounts/1111-001/delete",
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts")
