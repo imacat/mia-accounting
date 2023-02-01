@@ -39,3 +39,14 @@ def list_accounts() -> str:
     pagination: Pagination = Pagination[BaseAccount](accounts)
     return render_template("accounting/base-account/list.html",
                            list=pagination.list, pagination=pagination)
+
+
+@bp.get("/<baseAccount:account>", endpoint="detail")
+@has_permission(can_view)
+def show_account_detail(account: BaseAccount) -> str:
+    """Shows the account detail.
+
+    :return: The account detail.
+    """
+    return render_template("accounting/base-account/detail.html", obj=account)
+

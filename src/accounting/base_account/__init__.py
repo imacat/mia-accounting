@@ -27,6 +27,9 @@ def init_app(app: Flask, bp: Blueprint) -> None:
     :param app: The Flask application.
     :return: None.
     """
+    from .converters import BaseAccountConverter
+    app.url_map.converters["baseAccount"] = BaseAccountConverter
+
     from .views import bp as base_account_bp
     bp.register_blueprint(base_account_bp, url_prefix="/base-accounts")
 

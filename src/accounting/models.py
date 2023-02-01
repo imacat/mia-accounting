@@ -42,6 +42,8 @@ class BaseAccount(db.Model):
     l10n = db.relationship("BaseAccountL10n", back_populates="account",
                            lazy=False)
     """The localized titles."""
+    accounts = db.relationship("Account", back_populates="base")
+    """The descendant accounts under the base account."""
 
     def __str__(self) -> str:
         """Returns the string representation of the base account.
@@ -91,7 +93,7 @@ class Account(db.Model):
                                                    ondelete="CASCADE"),
                           nullable=False)
     """The code of the base account."""
-    base = db.relationship(BaseAccount)
+    base = db.relationship(BaseAccount, back_populates="accounts")
     """The base account."""
     no = db.Column(db.Integer, nullable=False, default=text("1"))
     """The account number under the base account."""

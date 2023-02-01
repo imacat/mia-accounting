@@ -44,13 +44,13 @@ First written: 2023/1/26
 {% if list %}
   {% include "accounting/include/pagination.html" %}
 
-  <ul class="list-group">
-  {% for item in list %}
-    <li class="list-group-item list-group-item-action">
-      {{ item }}
-    </li>
-  {% endfor %}
-  </ul>
+  <div class="list-group">
+    {% for item in list %}
+      <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.base-account.detail", account=item)|append_next }}">
+        {{ item }}
+      </a>
+    {% endfor %}
+  </div>
 {% else %}
   <p>{{ A_("There is no data.") }}</p>
 {% endif %}

@@ -1,0 +1,49 @@
+{#
+The Mia! Accounting Flask Project
+detail.html: The base account detail
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/1
+#}
+{% extends "accounting/base.html" %}
+
+{% block header %}{% block title %}{{ obj }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-3">
+  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|or_next }}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    {{ A_("Back") }}
+  </a>
+</div>
+
+<div class="account col-sm-6">
+  <div class="account-title">{{ obj.title }}</div>
+  <div class="account-code">{{ obj.code }}</div>
+  {% if obj.accounts %}
+    <div>
+    {% for account in obj.accounts %}
+      <a class="btn btn-primary" href="{{ url_for("accounting.account.detail", account=account)|append_next }}">
+        {{ account }}
+      </a>
+    {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
