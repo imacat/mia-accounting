@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-01-28 13:37+0800\n"
-"PO-Revision-Date: 2023-01-28 13:37+0800\n"
+"POT-Creation-Date: 2023-02-01 15:47+0800\n"
+"PO-Revision-Date: 2023-02-01 15:47+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -19,22 +19,145 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.11.0\n"
 
-#: src/accounting/base_account/templates/accounting/base-account/list.html:24
-#: src/accounting/templates/accounting/include/nav.html:32
-msgid "Base Accounts"
-msgstr "基本科目"
+#: src/accounting/account/forms.py:39
+msgid "The base account does not exist."
+msgstr "沒有這個基本科目。"
 
-#: src/accounting/base_account/templates/accounting/base-account/list.html:35
+#: src/accounting/account/forms.py:48
+#: src/accounting/static/js/account-form.js:110
+msgid "Please select the base account."
+msgstr "請選擇基本科目。"
+
+#: src/accounting/account/forms.py:53
+msgid "Please fill in the title"
+msgstr "請填上標題。"
+
+#: src/accounting/account/views.py:87
+msgid "The account is added successfully"
+msgstr "科目加好了。"
+
+#: src/accounting/account/views.py:137
+msgid "The account was not modified."
+msgstr "科目未異動。"
+
+#: src/accounting/account/views.py:141
+msgid "The account is updated successfully."
+msgstr "科目存好了。"
+
+#: src/accounting/account/views.py:158
+msgid "The account is deleted successfully."
+msgstr "科目刪掉了"
+
+#: src/accounting/static/js/account-form.js:130
+msgid "Please fill in the title."
+msgstr "請填上標題。"
+
+#: src/accounting/templates/accounting/account/create.html:24
+msgid "Add a New Account"
+msgstr "新增科目"
+
+#: src/accounting/templates/accounting/account/detail.html:31
+#: src/accounting/templates/accounting/account/include/form.html:33
+msgid "Back"
+msgstr "回上頁"
+
+#: src/accounting/templates/accounting/account/detail.html:36
+msgid "Settings"
+msgstr "設定"
+
+#: src/accounting/templates/accounting/account/detail.html:40
+msgid "Delete"
+msgstr "刪除"
+
+#: src/accounting/templates/accounting/account/detail.html:60
+msgid "Delete Account Confirmation"
+msgstr "科目刪除確認"
+
+#: src/accounting/templates/accounting/account/detail.html:64
+msgid "Do you really want to delete this account?"
+msgstr "你確定要刪掉這個科目嗎？"
+
+#: src/accounting/templates/accounting/account/detail.html:67
+#: src/accounting/templates/accounting/account/include/form.html:104
+msgid "Cancel"
+msgstr "取消"
+
+#: src/accounting/templates/accounting/account/detail.html:68
+msgid "Confirm"
+msgstr "確定"
+
+#: src/accounting/templates/accounting/account/detail.html:80
+msgid "Created"
+msgstr "建檔"
+
+#: src/accounting/templates/accounting/account/detail.html:81
+msgid "Updated"
+msgstr "更新"
+
+#: src/accounting/templates/accounting/account/edit.html:24
+#, python-format
+msgid "%(account)s Settings"
+msgstr "%(account)s設定"
+
+#: src/accounting/templates/accounting/account/list.html:24
+msgid "Account Management"
+msgstr "科目管理"
+
+#: src/accounting/templates/accounting/account/list.html:32
+msgid "New"
+msgstr "新增"
+
+#: src/accounting/templates/accounting/account/include/form.html:91
+#: src/accounting/templates/accounting/account/list.html:51
+#: src/accounting/templates/accounting/base-account/list.html:36
 msgid "Search"
 msgstr "搜尋"
 
-#: src/accounting/base_account/templates/accounting/base-account/list.html:53
+#: src/accounting/templates/accounting/account/list.html:70
+#: src/accounting/templates/accounting/base-account/list.html:55
 msgid "There is no data."
 msgstr "沒有資料。"
+
+#: src/accounting/templates/accounting/account/include/form.html:45
+msgid "Base account"
+msgstr "基本科目"
+
+#: src/accounting/templates/accounting/account/include/form.html:49
+msgid "(Unknown)"
+msgstr "（不明）"
+
+#: src/accounting/templates/accounting/account/include/form.html:61
+msgid "Title"
+msgstr "標題"
+
+#: src/accounting/templates/accounting/account/include/form.html:68
+msgid "Save"
+msgstr "儲存"
+
+#: src/accounting/templates/accounting/account/include/form.html:83
+msgid "Select Base Account"
+msgstr "選擇基本科目"
+
+#: src/accounting/templates/accounting/account/include/form.html:106
+#: src/accounting/templates/accounting/account/include/form.html:108
+msgid "Clear"
+msgstr "清除"
+
+#: src/accounting/templates/accounting/base-account/list.html:24
+msgid "Base Account Managements"
+msgstr "基本科目管理"
 
 #: src/accounting/templates/accounting/include/nav.html:26
 msgid "Accounting"
 msgstr "記帳"
+
+#: src/accounting/templates/accounting/include/nav.html:32
+msgid "Accounts"
+msgstr "科目"
+
+#: src/accounting/templates/accounting/include/nav.html:38
+msgid "Base Accounts"
+msgstr "基本科目"
 
 #: src/accounting/utils/pagination.py:146
 msgid "Previous"
