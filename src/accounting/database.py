@@ -22,17 +22,24 @@ initialized at compile time, but as a submodule it is only available at run
 time.
 
 """
+
 from flask_sqlalchemy import SQLAlchemy
+
+from accounting import AbstractUserUtils
 
 db: SQLAlchemy
 """The database instance."""
+user_utils: AbstractUserUtils
+"""The user utilities."""
 
 
-def set_db(new_db: SQLAlchemy) -> None:
+def set_db(new_db: SQLAlchemy, new_user_utils: AbstractUserUtils) -> None:
     """Sets the database instance.
 
     :param new_db: The database instance.
+    :param new_user_utils: The user utilities.
     :return: None.
     """
-    global db
+    global db, user_utils
     db = new_db
+    user_utils = new_user_utils

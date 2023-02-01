@@ -1,5 +1,5 @@
 # The Mia! Accounting Flask Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/30
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,23 +14,24 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The base account management.
+"""The random ID mixin for the data models.
+
+This module should not import any other module from the application.
 
 """
-from flask import Flask, Blueprint
+import typing as t
+from secrets import randbelow
 
-from .models import BaseAccount
+from accounting.database import db
 
 
-def init_app(app: Flask, bp: Blueprint) -> None:
-    """Initialize the application.
+def new_id(cls: t.Type):
+    """Returns a new random ID for the data model.
 
-    :param bp: The blueprint of the accounting application.
-    :param app: The Flask application.
-    :return: None.
+    :param cls: The data model.
+    :return: The generated new random ID.
     """
-    from .views import bp as base_account_bp
-    bp.register_blueprint(base_account_bp, url_prefix="/base-accounts")
-
-    from .commands import init_base_accounts_command
-    app.cli.add_command(init_base_accounts_command)
+    while True:
+        new: int = 100000000 + randbelow(900000000)
+        if db.session.get(cls, new) is None:
+            return new

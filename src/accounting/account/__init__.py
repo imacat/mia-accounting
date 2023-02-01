@@ -1,5 +1,5 @@
 # The Mia! Accounting Flask Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/30
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,12 +14,10 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The base account management.
+"""The account management.
 
 """
 from flask import Flask, Blueprint
-
-from .models import BaseAccount
 
 
 def init_app(app: Flask, bp: Blueprint) -> None:
@@ -29,8 +27,11 @@ def init_app(app: Flask, bp: Blueprint) -> None:
     :param app: The Flask application.
     :return: None.
     """
-    from .views import bp as base_account_bp
-    bp.register_blueprint(base_account_bp, url_prefix="/base-accounts")
+    from .converters import AccountConverter
+    app.url_map.converters["account"] = AccountConverter
 
-    from .commands import init_base_accounts_command
-    app.cli.add_command(init_base_accounts_command)
+    from .views import bp as account_bp
+    bp.register_blueprint(account_bp, url_prefix="/accounts")
+
+    from .commands import init_accounts_command
+    app.cli.add_command(init_accounts_command)

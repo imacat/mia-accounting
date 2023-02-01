@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Flask Project
-base.html: The application-wide base template.
+create.html: The account creation form
 
  Copyright (c) 2023 imacat.
 
@@ -17,15 +17,12 @@ base.html: The application-wide base template.
  limitations under the License.
 
 Author: imacat@mail.imacat.idv.tw (imacat)
-First written: 2023/1/27
+First written: 2023/2/1
 #}
-{% extends "base.html" %}
+{% extends "accounting/account/include/form.html" %}
 
-{% block styles %}
-  <link rel="stylesheet" type="text/css" href="{{ url_for("accounting.static", filename="css/style.css") }}">
-{% endblock %}
+{% block header %}{% block title %}{{ A_("Add a New Account") }}{% endblock %}{% endblock %}
 
-{% block scripts %}
-  <script src="{{ url_for("accounting.babel_catalog") }}"></script>
-  {% block accounting_scripts %}{% endblock %}
-{% endblock %}
+{% block back_url %}{{ request.args.get("next") or url_for("accounting.account.list") }}{% endblock %}
+
+{% block action_url %}{{ url_for("accounting.account.store") }}{% endblock %}

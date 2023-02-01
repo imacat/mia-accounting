@@ -1,5 +1,5 @@
 # The Mia! Accounting Flask Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/1
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,23 +14,19 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The base account management.
+"""The text stripper for the form fields.
+
+This module should not import any other module from the application.
 
 """
-from flask import Flask, Blueprint
-
-from .models import BaseAccount
 
 
-def init_app(app: Flask, bp: Blueprint) -> None:
-    """Initialize the application.
+def strip_text(s: str | None) -> str | None:
+    """The filter to strip the leading and trailing white spaces of text.
 
-    :param bp: The blueprint of the accounting application.
-    :param app: The Flask application.
-    :return: None.
+    :param s: The text input string.
+    :return: The filtered string.
     """
-    from .views import bp as base_account_bp
-    bp.register_blueprint(base_account_bp, url_prefix="/base-accounts")
-
-    from .commands import init_base_accounts_command
-    app.cli.add_command(init_base_accounts_command)
+    if s is None:
+        return None
+    return s.strip()

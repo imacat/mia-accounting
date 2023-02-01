@@ -1,0 +1,96 @@
+/* The Mia! Accounting Flask Project
+ * style.css: The style sheet for the accounting application.
+ */
+
+/*  Copyright (c) 2023 imacat.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+/* Author: imacat@mail.imacat.idv.tw (imacat)
+ * First written: 2023/2/1
+ */
+
+.clickable {
+    cursor: pointer;
+}
+
+/** The account management */
+.account {
+    padding: 2em 1.5em;
+    margin: 1em;
+    background-color: #E9ECEF;
+    border-radius: 0.3em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.account .account-title {
+    font-size: 1.8rem;
+    font-weight: bolder;
+}
+.account .account-code {
+    font-size: 1.4rem;
+    color: #373b3e;
+}
+.list-base-selector {
+    height: 20rem;
+    overflow-y: scroll;
+}
+
+/* The Material Design text field (floating form control in Bootstrap) */
+.material-text-field {
+    position: relative;
+    min-height: calc(3.5rem + 2px);
+    padding-top: 1.625rem;
+}
+.material-text-field > .form-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+}
+.material-text-field.not-empty > .form-label {
+    opacity: 0.65;
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+}
+
+/* The Material Design floating action buttons */
+.material-fab {
+    position: fixed;
+    right: 2rem;
+    bottom: 1rem;
+    z-index: 10;
+    flex-direction: column-reverse;
+}
+.material-fab .btn {
+    border-radius: 50%;
+    transform: scale(1.5);
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0,0,0,.12);
+    display: block;
+    margin-top: 2.5rem;
+}
+.material-fab .btn:hover, .material-fab .btn:focus {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0,0,0,.12);
+}
+
+/* The Material Design form switch */
+@media(max-width:767px) {
+    .form-switch {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        padding-left: 0;
+    }
+}

@@ -18,16 +18,65 @@
 
 """
 import typing as t
+from abc import ABC, abstractmethod
 
+import sqlalchemy as sa
 from flask import Flask, Blueprint
+from flask_sqlalchemy.model import Model
+
+T = t.TypeVar("T", bound=Model)
 
 
-def init_app(app: Flask, url_prefix: str = "/accounting",
+class AbstractUserUtils(t.Generic[T], ABC):
+    """The abstract user utilities."""
+
+    @property
+    @abstractmethod
+    def cls(self) -> t.Type[T]:
+        """Returns the user class.
+
+        :return: The user class.
+        """
+
+    @property
+    @abstractmethod
+    def pk_column(self) -> sa.Column:
+        """Returns the primary key column.
+
+        :return: The primary key column.
+        """
+
+    @property
+    @abstractmethod
+    def current_user(self) -> T:
+        """Returns the current user.
+
+        :return: The current user.
+        """
+
+    @abstractmethod
+    def get_by_username(self, username: str) -> T | None:
+        """Returns the user by her username.
+
+        :return: The user by her username, or None if the user was not found.
+        """
+
+    @abstractmethod
+    def get_pk(self, user: T) -> int:
+        """Returns the primary key of the user.
+
+        :return: The primary key of the user.
+        """
+
+
+def init_app(app: Flask, user_utils: AbstractUserUtils,
+             url_prefix: str = "/accounting",
              can_view_func: t.Callable[[], bool] | None = None,
              can_edit_func: t.Callable[[], bool] | None = None) -> None:
     """Initialize the application.
 
     :param app: The Flask application.
+    :param user_utils: The user utilities.
     :param url_prefix: The URL prefix of the accounting application.
     :param can_view_func: A callback that returns whether the current user can
         view the accounting data.
@@ -38,7 +87,7 @@ def init_app(app: Flask, url_prefix: str = "/accounting",
     # The database instance must be set before loading everything
     # in the application.
     from .database import set_db
-    set_db(app.extensions["sqlalchemy"])
+    set_db(app.extensions["sqlalchemy"], user_utils)
 
     bp: Blueprint = Blueprint("accounting", __name__,
                               url_prefix=url_prefix,
@@ -53,5 +102,8 @@ def init_app(app: Flask, url_prefix: str = "/accounting",
 
     from . import base_account
     base_account.init_app(app, bp)
+
+    from . import account
+    account.init_app(app, bp)
 
     app.register_blueprint(bp)

@@ -35,6 +35,13 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False, unique=True)
     """The username."""
 
+    def __str__(self) -> str:
+        """Returns the string representation of the user.
+
+        :return: The string representation of the user.
+        """
+        return self.username
+
 
 @bp.get("login", endpoint="login-form")
 def show_login_form() -> str:

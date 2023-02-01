@@ -26,6 +26,7 @@ from flask.cli import with_appcontext
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from sqlalchemy import Column
 
 bp: Blueprint = Blueprint("home", __name__)
 babel_js: BabelJS = BabelJS()
@@ -51,6 +52,7 @@ def create_app(is_testing: bool = False) -> Flask:
     })
     if is_testing:
         app.config["TESTING"] = True
+    app.config["SQLALCHEMY_ECHO"] = True
 
     babel_js.init_app(app)
     csrf.init_app(app)
@@ -65,11 +67,33 @@ def create_app(is_testing: bool = False) -> Flask:
     from . import auth
     auth.init_app(app)
 
+    class UserUtils(accounting.AbstractUserUtils[auth.User]):
+
+        @property
+        def cls(self) -> t.Type[auth.User]:
+            return auth.User
+
+        @property
+        def pk_column(self) -> Column:
+            return auth.User.id
+
+        @property
+        def current_user(self) -> auth.User:
+            return auth.current_user()
+
+        def get_by_username(self, username: str) -> auth.User | None:
+            return auth.User.query\
+                .filter(auth.User.username == username).first()
+
+        def get_pk(self, user: auth.User) -> int:
+            return user.id
+
     can_view: t.Callable[[], bool] = lambda: auth.current_user() is not None \
         and auth.current_user().username in ["viewer", "editor"]
     can_edit: t.Callable[[], bool] = lambda: auth.current_user() is not None \
         and auth.current_user().username == "editor"
-    accounting.init_app(app, can_view_func=can_view, can_edit_func=can_edit)
+    accounting.init_app(app, user_utils=UserUtils(),
+                        can_view_func=can_view, can_edit_func=can_edit)
 
     return app
 
