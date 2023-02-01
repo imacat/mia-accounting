@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-01 15:47+0800\n"
-"PO-Revision-Date: 2023-02-01 15:47+0800\n"
+"POT-Creation-Date: 2023-02-01 19:51+0800\n"
+"PO-Revision-Date: 2023-02-01 19:52+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -32,19 +32,19 @@ msgstr "請選擇基本科目。"
 msgid "Please fill in the title"
 msgstr "請填上標題。"
 
-#: src/accounting/account/views.py:87
+#: src/accounting/account/views.py:88
 msgid "The account is added successfully"
 msgstr "科目加好了。"
 
-#: src/accounting/account/views.py:137
+#: src/accounting/account/views.py:140
 msgid "The account was not modified."
 msgstr "科目未異動。"
 
-#: src/accounting/account/views.py:141
+#: src/accounting/account/views.py:145
 msgid "The account is updated successfully."
 msgstr "科目存好了。"
 
-#: src/accounting/account/views.py:158
+#: src/accounting/account/views.py:163
 msgid "The account is deleted successfully."
 msgstr "科目刪掉了"
 
@@ -58,6 +58,7 @@ msgstr "新增科目"
 
 #: src/accounting/templates/accounting/account/detail.html:31
 #: src/accounting/templates/accounting/account/include/form.html:33
+#: src/accounting/templates/accounting/base-account/detail.html:31
 msgid "Back"
 msgstr "回上頁"
 
@@ -69,28 +70,33 @@ msgstr "設定"
 msgid "Delete"
 msgstr "刪除"
 
-#: src/accounting/templates/accounting/account/detail.html:60
+#: src/accounting/templates/accounting/account/detail.html:63
 msgid "Delete Account Confirmation"
 msgstr "科目刪除確認"
 
-#: src/accounting/templates/accounting/account/detail.html:64
+#: src/accounting/templates/accounting/account/detail.html:67
 msgid "Do you really want to delete this account?"
 msgstr "你確定要刪掉這個科目嗎？"
 
-#: src/accounting/templates/accounting/account/detail.html:67
-#: src/accounting/templates/accounting/account/include/form.html:104
+#: src/accounting/templates/accounting/account/detail.html:70
+#: src/accounting/templates/accounting/account/include/form.html:111
 msgid "Cancel"
 msgstr "取消"
 
-#: src/accounting/templates/accounting/account/detail.html:68
+#: src/accounting/templates/accounting/account/detail.html:71
 msgid "Confirm"
 msgstr "確定"
 
-#: src/accounting/templates/accounting/account/detail.html:80
+#: src/accounting/templates/accounting/account/detail.html:84
+#: src/accounting/templates/accounting/account/list.html:62
+msgid "Offset needed"
+msgstr "逐筆核銷"
+
+#: src/accounting/templates/accounting/account/detail.html:88
 msgid "Created"
 msgstr "建檔"
 
-#: src/accounting/templates/accounting/account/detail.html:81
+#: src/accounting/templates/accounting/account/detail.html:89
 msgid "Updated"
 msgstr "更新"
 
@@ -107,14 +113,14 @@ msgstr "科目管理"
 msgid "New"
 msgstr "新增"
 
-#: src/accounting/templates/accounting/account/include/form.html:91
-#: src/accounting/templates/accounting/account/list.html:51
-#: src/accounting/templates/accounting/base-account/list.html:36
+#: src/accounting/templates/accounting/account/include/form.html:98
+#: src/accounting/templates/accounting/account/list.html:40
+#: src/accounting/templates/accounting/base-account/list.html:34
 msgid "Search"
 msgstr "搜尋"
 
-#: src/accounting/templates/accounting/account/list.html:70
-#: src/accounting/templates/accounting/base-account/list.html:55
+#: src/accounting/templates/accounting/account/list.html:68
+#: src/accounting/templates/accounting/base-account/list.html:51
 msgid "There is no data."
 msgstr "沒有資料。"
 
@@ -131,15 +137,19 @@ msgid "Title"
 msgstr "標題"
 
 #: src/accounting/templates/accounting/account/include/form.html:68
+msgid "The entries in the account need offsets."
+msgstr "帳目要逐筆核銷。"
+
+#: src/accounting/templates/accounting/account/include/form.html:75
 msgid "Save"
 msgstr "儲存"
 
-#: src/accounting/templates/accounting/account/include/form.html:83
+#: src/accounting/templates/accounting/account/include/form.html:90
 msgid "Select Base Account"
 msgstr "選擇基本科目"
 
-#: src/accounting/templates/accounting/account/include/form.html:106
-#: src/accounting/templates/accounting/account/include/form.html:108
+#: src/accounting/templates/accounting/account/include/form.html:113
+#: src/accounting/templates/accounting/account/include/form.html:115
 msgid "Clear"
 msgstr "清除"
 
