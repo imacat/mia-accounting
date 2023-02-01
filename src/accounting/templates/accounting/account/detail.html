@@ -26,12 +26,12 @@ First written: 2023/1/31
 {% block content %}
 
 <div class="btn-group mb-3">
-  <a class="btn btn-primary" href="{{ request.args.get("next") or url_for("accounting.account.list") }}">
+  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|or_next }}">
     <i class="fa-solid fa-circle-chevron-left"></i>
     {{ A_("Back") }}
   </a>
   {% if can_edit_accounting() %}
-    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.edit", account=obj) + ("?next=" + request.args["next"] if "next" in request.args else "") }}">
+    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.edit", account=obj)|inherit_next }}">
       <i class="fa-solid fa-gear"></i>
       {{ A_("Settings") }}
     </a>
@@ -44,7 +44,7 @@ First written: 2023/1/31
 
 {% if can_edit_accounting() %}
   <div class="d-md-none material-fab">
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.edit", account=obj) + ("?next=" + request.args["next"] if "next" in request.args else "") }}">
+    <a class="btn btn-primary" href="{{ url_for("accounting.account.edit", account=obj)|inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
     </a>
   </div>
@@ -53,6 +53,9 @@ First written: 2023/1/31
 {% if can_edit_accounting() %}
   <form id="delete-form" action="{{ url_for("accounting.account.delete", account=obj) }}" method="post">
     <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if "next" in request.args %}
+      <input type="hidden" name="next" value="{{ request.args["next"] }}">
+    {% endif %}
     <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-model-label" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">

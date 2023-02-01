@@ -26,6 +26,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from accounting.database import db
 from accounting.locale import lazy_gettext
 from accounting.models import Account, BaseAccount
+from accounting.utils.next_url import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
 from .forms import AccountForm, sort_accounts_in
@@ -79,13 +80,14 @@ def add_account() -> redirect:
             for error in form.errors[key]:
                 flash(error, "error")
         session["form"] = urlencode(list(request.form.items()))
-        return redirect(url_for("accounting.account.create"))
+        return redirect(inherit_next(url_for("accounting.account.create")))
     account: Account = Account()
     form.populate_obj(account)
     db.session.add(account)
     db.session.commit()
     flash(lazy_gettext("The account is added successfully"), "success")
-    return redirect(url_for("accounting.account.detail", account=account))
+    return redirect(inherit_next(url_for("accounting.account.detail",
+                                         account=account)))
 
 
 @bp.get("/<account:account>", endpoint="detail")
@@ -130,16 +132,19 @@ def update_account(account: Account) -> redirect:
             for error in form.errors[key]:
                 flash(error, "error")
         session["form"] = urlencode(list(request.form.items()))
-        return redirect(url_for("accounting.account.edit", account=account))
+        return redirect(inherit_next(url_for("accounting.account.edit",
+                                             account=account)))
     with db.session.no_autoflush:
         form.populate_obj(account)
     if not db.session.is_modified(account):
         flash(lazy_gettext("The account was not modified."), "success")
-        return redirect(url_for("accounting.account.detail", account=account))
+        return redirect(inherit_next(url_for("accounting.account.detail",
+                                             account=account)))
     form.post_update(account)
     db.session.commit()
     flash(lazy_gettext("The account is updated successfully."), "success")
-    return redirect(url_for("accounting.account.detail", account=account))
+    return redirect(inherit_next(url_for("accounting.account.detail",
+                                         account=account)))
 
 
 @bp.post("/<account:account>/delete", endpoint="delete")
@@ -156,4 +161,4 @@ def delete_account(account: Account) -> redirect:
     sort_accounts_in(account.base_code, account.id)
     db.session.commit()
     flash(lazy_gettext("The account is deleted successfully."), "success")
-    return redirect(url_for("accounting.account.list"))
+    return redirect(or_next(url_for("accounting.account.list")))

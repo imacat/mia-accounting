@@ -27,14 +27,14 @@ First written: 2023/1/30
 
 {% if can_edit_accounting() %}
   <div class="btn-group mb-3 d-none d-md-block">
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.create") }}">
+    <a class="btn btn-primary" href="{{ url_for("accounting.account.create")|append_next }}">
       <i class="fa-solid fa-user-plus"></i>
       {{ A_("New") }}
     </a>
   </div>
 
   <div class="d-md-none material-fab">
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.create") }}">
+    <a class="btn btn-primary" href="{{ url_for("accounting.account.create")|append_next }}">
       <i class="fa-solid fa-plus"></i>
     </a>
   </div>
@@ -61,7 +61,7 @@ First written: 2023/1/30
 
   <div class="list-group">
   {% for item in list %}
-    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.account.detail", account=item) }}">
+    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.account.detail", account=item)|append_next }}">
       {{ item }}
     </a>
   {% endfor %}
