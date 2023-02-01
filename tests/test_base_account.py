@@ -54,8 +54,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.models import BaseAccountL10n
-        from accounting.models import BaseAccount
+        from accounting.models import BaseAccount, BaseAccountL10n
         runner: FlaskCliRunner = self.app.test_cli_runner()
         result: Result = runner.invoke(args="accounting-init-base")
         self.assertEqual(result.exit_code, 0)
