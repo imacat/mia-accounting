@@ -55,7 +55,6 @@ def create_app(is_testing: bool = False) -> Flask:
     })
     if is_testing:
         app.config["TESTING"] = True
-    app.config["SQLALCHEMY_ECHO"] = True
 
     babel_js.init_app(app)
     csrf.init_app(app)
