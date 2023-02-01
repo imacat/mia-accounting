@@ -25,12 +25,12 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from testlib import get_csrf_token
+from testlib import UserClient, get_user_client
 from testsite import create_app
 
 
-class BaseAccountTestCase(unittest.TestCase):
-    """The base account test case."""
+class BaseAccountCommandTestCase(unittest.TestCase):
+    """The base account console command test case."""
 
     def setUp(self) -> None:
         """Sets up the test.
@@ -38,16 +38,15 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
+        from accounting.models import BaseAccount, BaseAccountL10n
         self.app: Flask = create_app(is_testing=True)
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             result: Result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
-        self.client: httpx.Client = httpx.Client(app=self.app,
-                                                 base_url="https://testserver")
-        self.client.headers["Referer"] = "https://testserver"
-        self.csrf_token: str = get_csrf_token(self, self.client, "/login")
+            BaseAccountL10n.query.delete()
+            BaseAccount.query.delete()
 
     def test_init(self) -> None:
         """Tests the "accounting-init-base" console command.
@@ -68,46 +67,69 @@ class BaseAccountTestCase(unittest.TestCase):
             self.assertIn(f"{account.code}-zh_Hant", l10n_keys)
             self.assertIn(f"{account.code}-zh_Hant", l10n_keys)
 
-        list_uri: str = "/accounting/base-accounts"
+
+class BaseAccountTestCase(unittest.TestCase):
+    """The base account test case."""
+
+    def setUp(self) -> None:
+        """Sets up the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        from accounting.models import BaseAccount
+        self.app: Flask = create_app(is_testing=True)
+
+        runner: FlaskCliRunner = self.app.test_cli_runner()
+        with self.app.app_context():
+            result: Result = runner.invoke(args="init-db")
+            self.assertEqual(result.exit_code, 0)
+            if BaseAccount.query.first() is None:
+                result = runner.invoke(args="accounting-init-base")
+                self.assertEqual(result.exit_code, 0)
+
+        self.viewer: UserClient = get_user_client(self, self.app, "viewer")
+        self.editor: UserClient = get_user_client(self, self.app, "editor")
+        self.nobody: UserClient = get_user_client(self, self.app, "nobody")
+
+    def test_nobody(self) -> None:
+        """Test the permission as nobody.
+
+        :return: None.
+        """
         response: httpx.Response
+        nobody: UserClient = get_user_client(self, self.app, "nobody")
 
-        self.__logout()
-        response = self.client.get(list_uri)
+        response = nobody.client.get("/accounting/base-accounts")
         self.assertEqual(response.status_code, 403)
 
-        self.__logout()
-        self.__login_as("viewer")
-        response = self.client.get(list_uri)
-        self.assertEqual(response.status_code, 200)
-
-        self.__logout()
-        self.__login_as("editor")
-        response = self.client.get(list_uri)
-        self.assertEqual(response.status_code, 200)
-
-        self.__logout()
-        self.__login_as("nobody")
-        response = self.client.get(list_uri)
+        response = nobody.client.get("/accounting/base-accounts/1111")
         self.assertEqual(response.status_code, 403)
 
-    def __logout(self) -> None:
-        """Logs out the currently logged-in user.
+    def test_viewer(self) -> None:
+        """Test the permission as viewer.
 
         :return: None.
         """
-        response: httpx.Response = self.client.post(
-            "/logout", data={"csrf_token": self.csrf_token})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/")
+        response: httpx.Response
+        viewer: UserClient = get_user_client(self, self.app, "viewer")
 
-    def __login_as(self, username: str) -> None:
-        """Logs in as a specific user.
+        response = viewer.client.get("/accounting/base-accounts")
+        self.assertEqual(response.status_code, 200)
 
-        :param username: The username.
+        response = viewer.client.get("/accounting/base-accounts/1111")
+        self.assertEqual(response.status_code, 200)
+
+    def test_editor(self) -> None:
+        """Test the permission as editor.
+
         :return: None.
         """
-        response: httpx.Response = self.client.post(
-            "/login", data={"csrf_token": self.csrf_token,
-                            "username": username})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/")
+        response: httpx.Response
+        editor: UserClient = get_user_client(self, self.app, "editor")
+
+        response = editor.client.get("/accounting/base-accounts")
+        self.assertEqual(response.status_code, 200)
+
+        response = editor.client.get("/accounting/base-accounts/1111")
+        self.assertEqual(response.status_code, 200)
