@@ -25,10 +25,8 @@ from flask import current_app
 from flask_babel import get_locale
 from sqlalchemy import text
 
-from accounting.database import db, user_utils
-
-user_cls: db.Model = user_utils.cls
-user_pk_column: db.Column = user_utils.pk_column
+from accounting.database import db
+from accounting.utils.user import user_cls, user_pk_column
 
 
 class BaseAccount(db.Model):

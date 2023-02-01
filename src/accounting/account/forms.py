@@ -22,11 +22,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.database import db, user_utils
+from accounting.database import db
 from accounting.locale import lazy_gettext
 from accounting.models import BaseAccount, Account
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_text
+from accounting.utils.user import get_current_user_pk
 
 
 class BaseAccountExists:
@@ -74,7 +75,7 @@ class AccountForm(FlaskForm):
         obj.title = self.title.data
         obj.is_offset_needed = self.is_offset_needed.data
         if is_new:
-            current_user_pk: int = user_utils.get_pk(user_utils.current_user)
+            current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk
             obj.updated_by_id = current_user_pk
         if prev_base_code is not None \
@@ -87,7 +88,7 @@ class AccountForm(FlaskForm):
 
         :return: None
         """
-        current_user_pk: int = user_utils.get_pk(user_utils.current_user)
+        current_user_pk: int = get_current_user_pk()
         obj.updated_by_id = current_user_pk
         obj.updated_at = sa.func.now()
         if hasattr(self, "__post_update"):

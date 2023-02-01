@@ -18,55 +18,11 @@
 
 """
 import typing as t
-from abc import ABC, abstractmethod
 
-import sqlalchemy as sa
 from flask import Flask, Blueprint
 from flask_sqlalchemy.model import Model
 
-T = t.TypeVar("T", bound=Model)
-
-
-class AbstractUserUtils(t.Generic[T], ABC):
-    """The abstract user utilities."""
-
-    @property
-    @abstractmethod
-    def cls(self) -> t.Type[T]:
-        """Returns the user class.
-
-        :return: The user class.
-        """
-
-    @property
-    @abstractmethod
-    def pk_column(self) -> sa.Column:
-        """Returns the primary key column.
-
-        :return: The primary key column.
-        """
-
-    @property
-    @abstractmethod
-    def current_user(self) -> T:
-        """Returns the current user.
-
-        :return: The current user.
-        """
-
-    @abstractmethod
-    def get_by_username(self, username: str) -> T | None:
-        """Returns the user by her username.
-
-        :return: The user by her username, or None if the user was not found.
-        """
-
-    @abstractmethod
-    def get_pk(self, user: T) -> int:
-        """Returns the primary key of the user.
-
-        :return: The primary key of the user.
-        """
+from accounting.utils.user import AbstractUserUtils
 
 
 def init_app(app: Flask, user_utils: AbstractUserUtils,
@@ -87,7 +43,9 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     # The database instance must be set before loading everything
     # in the application.
     from .database import set_db
-    set_db(app.extensions["sqlalchemy"], user_utils)
+    set_db(app.extensions["sqlalchemy"])
+    from .utils.user import init_user_utils
+    init_user_utils(user_utils)
 
     bp: Blueprint = Blueprint("accounting", __name__,
                               url_prefix=url_prefix,

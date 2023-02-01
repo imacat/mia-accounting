@@ -25,21 +25,15 @@ time.
 
 from flask_sqlalchemy import SQLAlchemy
 
-from accounting import AbstractUserUtils
-
 db: SQLAlchemy
 """The database instance."""
-user_utils: AbstractUserUtils
-"""The user utilities."""
 
 
-def set_db(new_db: SQLAlchemy, new_user_utils: AbstractUserUtils) -> None:
+def set_db(new_db: SQLAlchemy) -> None:
     """Sets the database instance.
 
     :param new_db: The database instance.
-    :param new_user_utils: The user utilities.
     :return: None.
     """
-    global db, user_utils
+    global db
     db = new_db
-    user_utils = new_user_utils

@@ -24,8 +24,9 @@ from secrets import randbelow
 import click
 from flask.cli import with_appcontext
 
-from accounting.database import db, user_utils
+from accounting.database import db
 from accounting.models import BaseAccount, Account, AccountL10n
+from accounting.utils.user import has_user, get_user_pk
 
 AccountData = tuple[int, str, int, str, str, str, bool]
 """The format of the account data, as a list of (ID, base account code, number,
@@ -45,8 +46,7 @@ def __validate_username(ctx: click.core.Context, param: click.core.Option,
     value = value.strip()
     if value == "":
         raise click.BadParameter("Username empty.")
-    user: user_utils.cls | None = user_utils.get_by_username(value)
-    if user is None:
+    if not has_user(value):
         raise click.BadParameter(f"User {value} does not exist.")
     return value
 
@@ -58,7 +58,7 @@ def __validate_username(ctx: click.core.Context, param: click.core.Option,
 @with_appcontext
 def init_accounts_command(username: str) -> None:
     """Initializes the accounts."""
-    creator_pk: int = user_utils.get_pk(user_utils.get_by_username(username))
+    creator_pk: int = get_user_pk(username)
 
     bases: list[BaseAccount] = BaseAccount.query\
         .filter(db.func.length(BaseAccount.code) == 4)\

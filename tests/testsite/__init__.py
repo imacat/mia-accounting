@@ -29,6 +29,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from sqlalchemy import Column
 
+import accounting.utils.user
+
 bp: Blueprint = Blueprint("home", __name__)
 babel_js: BabelJS = BabelJS()
 csrf: CSRFProtect = CSRFProtect()
@@ -68,7 +70,7 @@ def create_app(is_testing: bool = False) -> Flask:
     from . import auth
     auth.init_app(app)
 
-    class UserUtils(accounting.AbstractUserUtils[auth.User]):
+    class UserUtils(accounting.utils.user.AbstractUserUtils[auth.User]):
 
         @property
         def cls(self) -> t.Type[auth.User]:
