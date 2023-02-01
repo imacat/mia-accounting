@@ -27,7 +27,7 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from testlib import UserClient, get_user_client
-from testsite import create_app
+from test_site import create_app
 
 
 class AccountCommandTestCase(unittest.TestCase):

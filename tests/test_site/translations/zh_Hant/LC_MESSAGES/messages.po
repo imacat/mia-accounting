@@ -20,35 +20,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.11.0\n"
 
-#: tests/testsite/templates/base.html:23
+#: tests/test_site/templates/base.html:23
 msgid "en"
 msgstr "zh-Hant"
 
-#: tests/testsite/templates/base.html:43 tests/testsite/templates/home.html:24
+#: tests/test_site/templates/base.html:43
+#: tests/test_site/templates/home.html:24
 msgid "Home"
 msgstr "首頁"
 
-#: tests/testsite/templates/base.html:68
+#: tests/test_site/templates/base.html:68
 msgid "Log Out"
 msgstr ""
 
-#: tests/testsite/templates/base.html:78 tests/testsite/templates/login.html:24
+#: tests/test_site/templates/base.html:78
+#: tests/test_site/templates/login.html:24
 msgid "Log In"
 msgstr "登入"
 
-#: tests/testsite/templates/base.html:119
+#: tests/test_site/templates/base.html:119
 msgid "Error:"
 msgstr "錯誤："
 
-#: tests/testsite/templates/login.html:30
+#: tests/test_site/templates/login.html:30
 msgid "Viewer"
 msgstr "讀報表者"
 
-#: tests/testsite/templates/login.html:31
+#: tests/test_site/templates/login.html:31
 msgid "Editor"
 msgstr "記帳者"
 
-#: tests/testsite/templates/login.html:32
+#: tests/test_site/templates/login.html:32
 msgid "Nobody"
 msgstr "沒有權限者"
 

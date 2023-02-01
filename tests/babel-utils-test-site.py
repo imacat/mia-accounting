@@ -28,7 +28,7 @@ from babel.messages.frontend import CommandLineInterface
 from opencc import OpenCC
 
 root_dir: Path = Path(__file__).parent.parent
-translation_dir: Path = root_dir / "tests" / "testsite" / "translations"
+translation_dir: Path = root_dir / "tests" / "test_site" / "translations"
 domain: str = "messages"
 
 
@@ -49,7 +49,7 @@ def babel_extract() -> None:
         / f"{domain}.po"
     CommandLineInterface().run([
         "pybabel", "extract", "-F", str(cfg), "-k", "lazy_gettext", "-k", "A_",
-        "-o", str(pot), str(Path("tests") / "testsite")])
+        "-o", str(pot), str(Path("tests") / "test_site")])
     if not zh_hant.exists():
         zh_hant.touch()
     if not zh_hans.exists():
