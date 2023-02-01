@@ -28,10 +28,10 @@ class AccountConverter(BaseConverter):
     corresponding account in the routes."""
 
     def to_python(self, value: str) -> Account:
-        """Converts a username to a user account.
+        """Converts an account code to an account.
 
-        :param value: The username.
-        :return: The corresponding user account.
+        :param value: The account code.
+        :return: The corresponding account.
         """
         account: Account | None = Account.find_by_code(value)
         if account is None:
