@@ -79,6 +79,11 @@ First written: 2023/1/31
 <div class="account col-sm-6">
   <div class="account-title">{{ obj.title }}</div>
   <div class="account-code">{{ obj.code }}</div>
+  {% if obj.is_offset_needed %}
+    <div>
+      <span class="badge rounded-pill bg-info">{{ A_("Offset needed") }}</span>
+    </div>
+  {% endif %}
   <div class="small text-secondary fst-italic">
     <div>{{ A_("Created") }} {{ obj.created_at }} {{ obj.created_by }}</div>
     <div>{{ A_("Updated") }} {{ obj.updated_at }} {{ obj.updated_by }}</div>

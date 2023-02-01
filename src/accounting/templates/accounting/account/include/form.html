@@ -62,6 +62,13 @@ First written: 2023/2/1
     <div id="account-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
   </div>
 
+  <div class="form-check form-switch mb-3">
+    <input id="account-is-offset-needed" class="form-check-input" type="checkbox" name="is_offset_needed" value="1" {% if form.is_offset_needed.data %} checked="checked" {% endif %}>
+    <label class="form-check-label" for="account-is-offset-needed">
+      {{ A_("The entries in the account need offsets.") }}
+    </label>
+  </div>
+
   <div class="d-none d-md-block">
     <button class="btn btn-primary" type="submit">
       <i class="fa-solid fa-floppy-disk"></i>
