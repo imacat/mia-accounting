@@ -109,26 +109,23 @@ class AccountTestCase(unittest.TestCase):
             Account.query.delete()
             db.session.commit()
 
-        self.viewer: UserClient = get_user_client(self, self.app, "viewer")
-        self.editor: UserClient = get_user_client(self, self.app, "editor")
-        self.nobody: UserClient = get_user_client(self, self.app, "nobody")
-
-        client: httpx.Client = self.editor.client
-        csrf_token: str = self.editor.csrf_token
+        editor: UserClient = get_user_client(self, self.app, "editor")
+        self.client: httpx.Client = editor.client
+        self.csrf_token: str = editor.csrf_token
         response: httpx.Response
 
-        response = client.post("/accounting/accounts/store",
-                               data={"csrf_token": csrf_token,
-                                     "base_code": "1111",
-                                     "title": "1111 title"})
+        response = self.client.post("/accounting/accounts/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1111",
+                                          "title": "1111 title"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          "/accounting/accounts/1111-001")
 
-        response = client.post("/accounting/accounts/store",
-                               data={"csrf_token": csrf_token,
-                                     "base_code": "1112",
-                                     "title": "1112 title"})
+        response = self.client.post("/accounting/accounts/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1112",
+                                          "title": "1112 title"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          "/accounting/accounts/1112-001")
@@ -139,35 +136,34 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         response: httpx.Response
-        client: httpx.Client = self.nobody.client
-        csrf_token: str = self.nobody.csrf_token
+        nobody: UserClient = get_user_client(self, self.app, "nobody")
 
-        response = client.get("/accounting/accounts")
+        response = nobody.client.get("/accounting/accounts")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/1111-001")
+        response = nobody.client.get("/accounting/accounts/1111-001")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/create")
+        response = nobody.client.get("/accounting/accounts/create")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/store",
-                               data={"csrf_token": csrf_token,
-                                     "base_code": "1113",
-                                     "title": "1113 title"})
+        response = nobody.client.post("/accounting/accounts/store",
+                                      data={"csrf_token": nobody.csrf_token,
+                                            "base_code": "1113",
+                                            "title": "1113 title"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/1111-001/edit")
+        response = nobody.client.get("/accounting/accounts/1111-001/edit")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/update",
-                               data={"csrf_token": csrf_token,
-                                     "base_code": "1111",
-                                     "title": "1111 title #2"})
+        response = nobody.client.post("/accounting/accounts/1111-001/update",
+                                      data={"csrf_token": nobody.csrf_token,
+                                            "base_code": "1111",
+                                            "title": "1111 title #2"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/delete",
-                               data={"csrf_token": csrf_token})
+        response = nobody.client.post("/accounting/accounts/1111-001/delete",
+                                      data={"csrf_token": nobody.csrf_token})
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -176,33 +172,32 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         response: httpx.Response
-        client: httpx.Client = self.viewer.client
-        csrf_token: str = self.viewer.csrf_token
+        viewer: UserClient = get_user_client(self, self.app, "viewer")
 
-        response = client.get("/accounting/accounts")
+        response = viewer.client.get("/accounting/accounts")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/accounts/1111-001")
+        response = viewer.client.get("/accounting/accounts/1111-001")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/accounts/create")
+        response = viewer.client.get("/accounting/accounts/create")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/store",
-                               data={"csrf_token": csrf_token,
-                                     "base_code": "1113",
-                                     "title": "1113 title"})
+        response = viewer.client.post("/accounting/accounts/store",
+                                      data={"csrf_token": viewer.csrf_token,
+                                            "base_code": "1113",
+                                            "title": "1113 title"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/1111-001/edit")
+        response = viewer.client.get("/accounting/accounts/1111-001/edit")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/update",
-                               data={"csrf_token": csrf_token,
-                                     "base_code": "1111",
-                                     "title": "1111 title #2"})
+        response = viewer.client.post("/accounting/accounts/1111-001/update",
+                                      data={"csrf_token": viewer.csrf_token,
+                                            "base_code": "1111",
+                                            "title": "1111 title #2"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/delete",
-                               data={"csrf_token": csrf_token})
+        response = viewer.client.post("/accounting/accounts/1111-001/delete",
+                                      data={"csrf_token": viewer.csrf_token})
         self.assertEqual(response.status_code, 403)
