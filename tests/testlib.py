@@ -21,6 +21,40 @@ from html.parser import HTMLParser
 from unittest import TestCase
 
 import httpx
+from flask import Flask
+
+
+class UserClient:
+    """A user client."""
+
+    def __init__(self, client: httpx.Client, csrf_token: str):
+        """Constructs a user client.
+
+        :param client: The client.
+        :param csrf_token: The CSRF token.
+        """
+        self.client: httpx.Client = client
+        self.csrf_token: str = csrf_token
+
+
+def get_user_client(test_case: TestCase, app: Flask, username: str) \
+        -> UserClient:
+    """Returns a user client.
+
+    :param test_case: The test case.
+    :param app: The Flask application.
+    :param username: The username.
+    :return: The user client.
+    """
+    client: httpx.Client = httpx.Client(app=app, base_url="https://testserver")
+    client.headers["Referer"] = "https://testserver"
+    csrf_token: str = get_csrf_token(test_case, client, "/login")
+    response: httpx.Response = client.post("/login",
+                                           data={"csrf_token": csrf_token,
+                                                 "username": username})
+    test_case.assertEqual(response.status_code, 302)
+    test_case.assertEqual(response.headers["Location"], "/")
+    return UserClient(client, csrf_token)
 
 
 def get_csrf_token(test_case: TestCase, client: httpx.Client, uri: str) -> str:
