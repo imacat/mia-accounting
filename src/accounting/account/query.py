@@ -20,8 +20,8 @@
 import sqlalchemy as sa
 from flask import request
 
+from accounting.models import Account, AccountL10n
 from accounting.utils.query import parse_query_keywords
-from .models import Account, AccountL10n
 
 
 def get_account_query() -> list[Account]:

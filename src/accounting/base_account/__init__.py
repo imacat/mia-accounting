@@ -19,8 +19,6 @@
 """
 from flask import Flask, Blueprint
 
-from .models import BaseAccount
-
 
 def init_app(app: Flask, bp: Blueprint) -> None:
     """Initialize the application.

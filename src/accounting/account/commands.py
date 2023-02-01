@@ -25,8 +25,7 @@ import click
 from flask.cli import with_appcontext
 
 from accounting.database import db, user_utils
-from .models import Account, AccountL10n
-from ..base_account import BaseAccount
+from accounting.models import BaseAccount, Account, AccountL10n
 
 AccountData = tuple[int, str, int, str, str, str, bool]
 """The format of the account data, as a list of (ID, base account code, number,

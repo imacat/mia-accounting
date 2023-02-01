@@ -22,12 +22,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.base_account import BaseAccount
 from accounting.database import db, user_utils
 from accounting.locale import lazy_gettext
+from accounting.models import BaseAccount, Account
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_text
-from .models import Account
 
 
 class BaseAccountExists:

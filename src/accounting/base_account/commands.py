@@ -21,7 +21,7 @@ import click
 from flask.cli import with_appcontext
 
 from accounting.database import db
-from .models import BaseAccount, BaseAccountL10n
+from accounting.models import BaseAccount, BaseAccountL10n
 
 BaseAccountData = tuple[int, str, str, str]
 """The format of the base account data, as a list of (code, English,

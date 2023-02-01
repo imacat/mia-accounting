@@ -19,6 +19,7 @@
 """
 from flask import Blueprint, render_template
 
+from accounting.models import BaseAccount
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view
 
@@ -33,7 +34,6 @@ def list_accounts() -> str:
 
     :return: The account list.
     """
-    from .models import BaseAccount
     from .query import get_base_account_query
     accounts: list[BaseAccount] = get_base_account_query()
     pagination: Pagination = Pagination[BaseAccount](accounts)

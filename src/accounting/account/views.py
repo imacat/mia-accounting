@@ -25,10 +25,10 @@ from werkzeug.datastructures import ImmutableMultiDict
 
 from accounting.database import db
 from accounting.locale import lazy_gettext
+from accounting.models import Account, BaseAccount
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
 from .forms import AccountForm, sort_accounts_in
-from .models import Account
 
 bp: Blueprint = Blueprint("account", __name__)
 """The view blueprint for the account management."""
@@ -41,7 +41,6 @@ def list_accounts() -> str:
 
     :return: The account list.
     """
-    from .models import BaseAccount
     from .query import get_account_query
     accounts: list[BaseAccount] = get_account_query()
     pagination: Pagination = Pagination[BaseAccount](accounts)

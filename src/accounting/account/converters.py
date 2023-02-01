@@ -20,7 +20,7 @@
 from flask import abort
 from werkzeug.routing import BaseConverter
 
-from .models import Account
+from accounting.models import Account
 
 
 class AccountConverter(BaseConverter):
