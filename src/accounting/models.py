@@ -118,7 +118,6 @@ class Account(db.Model):
     l10n = db.relationship("AccountL10n", back_populates="account",
                            lazy=False)
     """The localized titles."""
-    db.UniqueConstraint(base_code, no)
 
     __CASH = "1111-001"
     """The code of the cash account,"""
