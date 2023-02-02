@@ -23,7 +23,7 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
-    initializeBaseAccountSelector()
+    initializeBaseAccountSelector();
     document.getElementById("account-base-code")
         .onchange = validateBase;
     document.getElementById("account-title")
