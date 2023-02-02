@@ -32,6 +32,6 @@ def new_id(cls: t.Type):
     :return: The generated new random ID.
     """
     while True:
-        new: int = 100000000 + randbelow(900000000)
-        if db.session.get(cls, new) is None:
-            return new
+        obj_id: int = 100000000 + randbelow(900000000)
+        if db.session.get(cls, obj_id) is None:
+            return obj_id
