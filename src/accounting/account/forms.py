@@ -68,10 +68,10 @@ class AccountForm(FlaskForm):
             obj.id = new_id(Account)
         obj.base_code = self.base_code.data
         if prev_base_code != self.base_code.data:
-            last_same_base: Account = Account.query\
-                .filter(Account.base_code == self.base_code.data)\
-                .order_by(Account.base_code.desc()).first()
-            obj.no = 1 if last_same_base is None else last_same_base.no + 1
+            max_no: int = db.session.scalars(
+                sa.select(sa.func.max(Account.no))
+                .filter(Account.base_code == self.base_code.data)).one()
+            obj.no = 1 if max_no is None else max_no + 1
         obj.title = self.title.data
         obj.is_offset_needed = self.is_offset_needed.data
         if is_new:
