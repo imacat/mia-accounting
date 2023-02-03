@@ -95,7 +95,8 @@ def add_account() -> redirect:
 def show_account_detail(account: Account) -> str:
     """Shows the account detail.
 
-    :return: The account detail.
+    :param account: The account.
+    :return: The detail.
     """
     return render_template("accounting/account/detail.html", obj=account)
 
@@ -105,7 +106,8 @@ def show_account_detail(account: Account) -> str:
 def show_account_edit_form(account: Account) -> str:
     """Shows the form to edit an account.
 
-    :return: The form to edit an account.
+    :param account: The account.
+    :return: The form to edit the account.
     """
     form: AccountForm
     if "form" in session:
@@ -123,6 +125,7 @@ def show_account_edit_form(account: Account) -> str:
 def update_account(account: Account) -> redirect:
     """Updates an account.
 
+    :param account: The account.
     :return: The redirection to the account detail on success, or the account
         edit form on error.
     """
@@ -152,6 +155,7 @@ def update_account(account: Account) -> redirect:
 def delete_account(account: Account) -> redirect:
     """Deletes an account.
 
+    :param account: The account.
     :return: The redirection to the account list on success, or the account
         detail on error.
     """
@@ -182,7 +186,8 @@ def sort_accounts(base: BaseAccount) -> redirect:
     """Sorts the accounts under a base account.
 
     :param base: The base account.
-    :return: Sorts the accounts under the base account.
+    :return: The redirection to the incoming account or the account list.  The
+        sorting operation does not fail.
     """
     form: AccountSortForm = AccountSortForm(base)
     form.save_order()

@@ -46,7 +46,8 @@ def list_accounts() -> str:
 def show_account_detail(account: BaseAccount) -> str:
     """Shows the account detail.
 
-    :return: The account detail.
+    :param account: The account.
+    :return: The detail.
     """
     return render_template("accounting/base-account/detail.html", obj=account)
 
