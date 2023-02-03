@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Flask Project
-sort.html: The account sorting form
+order.html: The order of the accounts under a same base account
 
  Copyright (c) 2023 imacat.
 
@@ -22,11 +22,11 @@ First written: 2023/2/2
 {% extends "accounting/account/include/form.html" %}
 
 {% block accounting_scripts %}
-  <script src="{{ url_for("accounting.static", filename="js/drag-and-drop-sorting.js") }}"></script>
-  <script src="{{ url_for("accounting.static", filename="js/account-sort.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/drag-and-drop-reorder.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/account-order.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ A_("Sort the Accounts of %(base)s", base=base) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("The Accounts of %(base)s", base=base) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -42,18 +42,15 @@ First written: 2023/2/2
   {% if "next" in request.args %}
     <input type="hidden" name="next" value="{{ request.args["next"] }}">
   {% endif %}
-  <ul id="sort-account-list" class="list-group mb-3" data-base-code="{{ base.code }}">
+  <ul id="account-order-list" class="list-group mb-3" data-base-code="{{ base.code }}">
     {% for account in base.accounts|sort(attribute="no") %}
       <li class="list-group-item d-flex justify-content-between" data-id="{{ account.id }}">
-        <input id="sort-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
+        <input id="account-order-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
         <div>
-          <span id="sort-{{ account.id }}-code">{{ account.code }}</span>
+          <span id="account-order-{{ account.id }}-code">{{ account.code }}</span>
           {{ account.title }}
         </div>
-        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-          <path d="M0 0h24v24H0z" fill="none"/>
-          <path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/>
-        </svg>
+        <i class="fa-solid fa-bars"></i>
       </li>
     {% endfor %}
   </ul>

@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * account-sort.js: The JavaScript for the account sorting form
+ * account-order.js: The JavaScript for the account order
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -23,15 +23,15 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
-    const list = document.getElementById("sort-account-list");
+    const list = document.getElementById("account-order-list");
     const onReorder = function () {
         const accounts = Array.from(list.children);
         for (let i = 0; i < accounts.length; i++) {
-            const input = document.getElementById("sort-" + accounts[i].dataset.id + "-no");
-            const code = document.getElementById("sort-" + accounts[i].dataset.id + "-code");
-            input.value = i + 1;
+            const no = document.getElementById("account-order-" + accounts[i].dataset.id + "-no");
+            const code = document.getElementById("account-order-" + accounts[i].dataset.id + "-code");
+            no.value = String(i + 1);
             code.innerText = list.dataset.baseCode + "-" + ("000" + (i + 1)).slice(-3);
         }
     };
-    initializeDragAndDropSorting(list, onReorder);
+    initializeDragAndDropReordering(list, onReorder);
 });

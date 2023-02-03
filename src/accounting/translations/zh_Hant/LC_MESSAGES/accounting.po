@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-03 07:40+0800\n"
-"PO-Revision-Date: 2023-02-03 07:42+0800\n"
+"POT-Creation-Date: 2023-02-03 10:15+0800\n"
+"PO-Revision-Date: 2023-02-03 10:16+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -42,23 +42,23 @@ msgstr "逐筆核銷"
 msgid "The account is added successfully"
 msgstr "科目加好了。"
 
-#: src/accounting/account/views.py:140
+#: src/accounting/account/views.py:143
 msgid "The account was not modified."
 msgstr "科目未異動。"
 
-#: src/accounting/account/views.py:145
+#: src/accounting/account/views.py:148
 msgid "The account is updated successfully."
 msgstr "科目存好了。"
 
-#: src/accounting/account/views.py:163
+#: src/accounting/account/views.py:167
 msgid "The account is deleted successfully."
 msgstr "科目刪掉了"
 
-#: src/accounting/account/views.py:190
+#: src/accounting/account/views.py:194
 msgid "The order was not modified."
 msgstr "順序未異動。"
 
-#: src/accounting/account/views.py:193
+#: src/accounting/account/views.py:197
 msgid "The order is updated successfully."
 msgstr "順序存好了。"
 
@@ -72,7 +72,7 @@ msgstr "新增科目"
 
 #: src/accounting/templates/accounting/account/detail.html:31
 #: src/accounting/templates/accounting/account/include/form.html:33
-#: src/accounting/templates/accounting/account/sort.html:35
+#: src/accounting/templates/accounting/account/order.html:36
 #: src/accounting/templates/accounting/base-account/detail.html:31
 msgid "Back"
 msgstr "回上頁"
@@ -82,8 +82,8 @@ msgid "Settings"
 msgstr "設定"
 
 #: src/accounting/templates/accounting/account/detail.html:40
-msgid "Sort"
-msgstr "排序"
+msgid "Order"
+msgstr "次序"
 
 #: src/accounting/templates/accounting/account/detail.html:44
 msgid "Delete"
@@ -138,13 +138,13 @@ msgstr "搜尋"
 msgid "There is no data."
 msgstr "沒有資料。"
 
-#: src/accounting/templates/accounting/account/sort.html:28
+#: src/accounting/templates/accounting/account/order.html:29
 #, python-format
-msgid "Sort the Accounts of %(base)s"
-msgstr "%(base)s下的科目排序"
+msgid "The Accounts of %(base)s"
+msgstr "%(base)s下的科目"
 
 #: src/accounting/templates/accounting/account/include/form.html:75
-#: src/accounting/templates/accounting/account/sort.html:67
+#: src/accounting/templates/accounting/account/order.html:61
 msgid "Save"
 msgstr "儲存"
 

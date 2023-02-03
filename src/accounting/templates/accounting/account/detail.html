@@ -35,9 +35,9 @@ First written: 2023/1/31
       <i class="fa-solid fa-gear"></i>
       {{ A_("Settings") }}
     </a>
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.sort-form", base=obj.base)|append_next }}">
-      <i class="fa-solid fa-sort"></i>
-      {{ A_("Sort") }}
+    <a class="btn btn-primary" href="{{ url_for("accounting.account.order", base=obj.base)|append_next }}">
+      <i class="fa-solid fa-bars-staggered"></i>
+      {{ A_("Order") }}
     </a>
     <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#delete-modal">
       <i class="fa-solid fa-trash"></i>

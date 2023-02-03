@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * drag-and-drop-sorting.js: The JavaScript for the sorting with drag-and-drop
+ * drag-and-drop-reorder.js: The JavaScript for the reorder a list with drag-and-drop
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -22,24 +22,24 @@
  */
 
 /**
- * Initializes the drag-and-drop sorting on a list.
+ * Initializes the drag-and-drop reordering on a list.
  *
- * @param list {HTMLElement} the list to be sorted
+ * @param list {HTMLElement} the list to be reordered
  * @param onReorder {(function())|*} The callback to reorder the items
  */
-function initializeDragAndDropSorting(list, onReorder) {
-    initializeMouseDragAndDropSorting(list, onReorder);
-    initializeTouchDragAndDropSorting(list, onReorder);
+function initializeDragAndDropReordering(list, onReorder) {
+    initializeMouseDragAndDropReordering(list, onReorder);
+    initializeTouchDragAndDropReordering(list, onReorder);
 }
 
 /**
- * Initializes the drag-and-drop sorting with mouse.
+ * Initializes the drag-and-drop reordering with mouse.
  *
- * @param list {HTMLElement} the list to be sorted
+ * @param list {HTMLElement} the list to be reordered
  * @param onReorder {(function())|*} The callback to reorder the items
  * @private
  */
-function initializeMouseDragAndDropSorting(list, onReorder) {
+function initializeMouseDragAndDropReordering(list, onReorder) {
     const items = Array.from(list.children);
     let dragged = null;
     items.forEach(function (item) {
@@ -60,13 +60,13 @@ function initializeMouseDragAndDropSorting(list, onReorder) {
 }
 
 /**
- * Initializes the drag-and-drop sorting with touch devices.
+ * Initializes the drag-and-drop reordering with touch devices.
  *
- * @param list {HTMLElement} the list to be sorted
+ * @param list {HTMLElement} the list to be reordered
  * @param onReorder {(function())|*} The callback to reorder the items
  * @private
  */
-function initializeTouchDragAndDropSorting(list, onReorder) {
+function initializeTouchDragAndDropReordering(list, onReorder) {
     const items = Array.from(list.children);
     items.forEach(function (item) {
         item.addEventListener("touchstart", function () {

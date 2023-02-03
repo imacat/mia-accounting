@@ -131,11 +131,11 @@ def sort_accounts_in(base_code: str, exclude: int) -> None:
             accounts[i].no = i + 1
 
 
-class AccountSortForm:
-    """The form to sort the accounts."""
+class AccountReorderForm:
+    """The form to reorder the accounts."""
 
     def __init__(self, base: BaseAccount):
-        """Constructs the form to sort the accounts under a base account.
+        """Constructs the form to reorder the accounts under a base account.
 
         :param base: The base account.
         """
