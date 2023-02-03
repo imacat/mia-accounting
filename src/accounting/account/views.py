@@ -168,7 +168,7 @@ def delete_account(account: Account) -> redirect:
     return redirect(or_next(url_for("accounting.account.list")))
 
 
-@bp.get("/base/<baseAccount:base>", endpoint="order")
+@bp.get("/bases/<baseAccount:base>", endpoint="order")
 @has_permission(can_edit)
 def show_account_order(base: BaseAccount) -> str:
     """Shows the order of the accounts under a same base account.
@@ -179,7 +179,7 @@ def show_account_order(base: BaseAccount) -> str:
     return render_template("accounting/account/order.html", base=base)
 
 
-@bp.post("/base/<baseAccount:base>", endpoint="sort")
+@bp.post("/bases/<baseAccount:base>", endpoint="sort")
 @has_permission(can_edit)
 def sort_accounts(base: BaseAccount) -> redirect:
     """Reorders the accounts under a base account.
