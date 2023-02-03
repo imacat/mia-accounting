@@ -297,3 +297,72 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual(db.session.get(Account, id_3).code, "1111-002")
             self.assertEqual(db.session.get(Account, id_4).code, "1112-001")
             self.assertEqual(db.session.get(Account, id_5).code, "1112-002")
+
+    def test_reorder(self) -> None:
+        """Tests to reorder the accounts under a same base account.
+
+        :return: None.
+        """
+        from accounting.database import db
+        from accounting.models import Account
+        response: httpx.Response
+
+        for i in range(2, 6):
+            response = self.client.post("/accounting/accounts/store",
+                                        data={"csrf_token": self.csrf_token,
+                                              "base_code": "1111",
+                                              "title": "Title"})
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.headers["Location"],
+                             f"/accounting/accounts/1111-00{i}")
+
+        # Normal reorder
+        with self.app.app_context():
+            id_1: int = Account.find_by_code("1111-001").id
+            id_2: int = Account.find_by_code("1111-002").id
+            id_3: int = Account.find_by_code("1111-003").id
+            id_4: int = Account.find_by_code("1111-004").id
+            id_5: int = Account.find_by_code("1111-005").id
+
+        response = self.client.post("/accounting/accounts/bases/1111",
+                                    data={"csrf_token": self.csrf_token,
+                                          "next": "/next",
+                                          f"{id_1}-no": "4",
+                                          f"{id_2}-no": "1",
+                                          f"{id_3}-no": "5",
+                                          f"{id_4}-no": "2",
+                                          f"{id_5}-no": "3"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], f"/next")
+
+        with self.app.app_context():
+            self.assertEqual(db.session.get(Account, id_1).code, "1111-004")
+            self.assertEqual(db.session.get(Account, id_2).code, "1111-001")
+            self.assertEqual(db.session.get(Account, id_3).code, "1111-005")
+            self.assertEqual(db.session.get(Account, id_4).code, "1111-002")
+            self.assertEqual(db.session.get(Account, id_5).code, "1111-003")
+
+        # Malformed orders
+        with self.app.app_context():
+            db.session.get(Account, id_1).no = 3
+            db.session.get(Account, id_2).no = 4
+            db.session.get(Account, id_3).no = 6
+            db.session.get(Account, id_4).no = 8
+            db.session.get(Account, id_5).no = 9
+            db.session.commit()
+
+        response = self.client.post("/accounting/accounts/bases/1111",
+                                    data={"csrf_token": self.csrf_token,
+                                          "next": "/next",
+                                          f"{id_2}-no": "3a",
+                                          f"{id_3}-no": "5",
+                                          f"{id_4}-no": "2"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], f"/next")
+
+        with self.app.app_context():
+            self.assertEqual(db.session.get(Account, id_1).code, "1111-003")
+            self.assertEqual(db.session.get(Account, id_2).code, "1111-004")
+            self.assertEqual(db.session.get(Account, id_3).code, "1111-002")
+            self.assertEqual(db.session.get(Account, id_4).code, "1111-001")
+            self.assertEqual(db.session.get(Account, id_5).code, "1111-005")
