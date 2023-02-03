@@ -37,3 +37,4 @@ excludes
 *.pot
 *.mo
 zh_Hans
+test_temp.py
