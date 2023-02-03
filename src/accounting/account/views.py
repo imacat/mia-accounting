@@ -169,7 +169,7 @@ def delete_account(account: Account) -> redirect:
 
 
 @bp.get("/bases/<baseAccount:base>", endpoint="order")
-@has_permission(can_edit)
+@has_permission(can_view)
 def show_account_order(base: BaseAccount) -> str:
     """Shows the order of the accounts under a same base account.
 

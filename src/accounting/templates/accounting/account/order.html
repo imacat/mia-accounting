@@ -37,7 +37,7 @@ First written: 2023/2/2
   </a>
 </div>
 
-{% if base.accounts|length > 1 %}
+{% if base.accounts|length > 1 and can_edit_accounting() %}
   <form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
     <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if "next" in request.args %}
@@ -69,11 +69,13 @@ First written: 2023/2/2
       </button>
     </div>
   </form>
-{% elif base.accounts|length == 1 %}
+{% elif base.accounts %}
   <ul class="list-group mb-3">
-    <li class="list-group-item">
-      {{ base.accounts[0] }}
-    </li>
+    {% for account in base.accounts|sort(attribute="no") %}
+      <li class="list-group-item">
+        {{ account }}
+      </li>
+    {% endfor %}
   </ul>
 {% else %}
   <p>{{ A_("There is no data.") }}</p>
