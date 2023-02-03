@@ -135,6 +135,7 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
+        from accounting.models import Account
         response: httpx.Response
         nobody: UserClient = get_user_client(self, self.app, "nobody")
 
@@ -166,11 +167,24 @@ class AccountTestCase(unittest.TestCase):
                                       data={"csrf_token": nobody.csrf_token})
         self.assertEqual(response.status_code, 403)
 
+        response = nobody.client.get("/accounting/accounts/bases/1111")
+        self.assertEqual(response.status_code, 403)
+
+        with self.app.app_context():
+            account_id: int = Account.find_by_code("1112-001").id
+
+        response = nobody.client.post("/accounting/accounts/bases/1112",
+                                      data={"csrf_token": nobody.csrf_token,
+                                            "next": "/next",
+                                            f"{account_id}-no": "5"})
+        self.assertEqual(response.status_code, 403)
+
     def test_viewer(self) -> None:
         """Test the permission as viewer.
 
         :return: None.
         """
+        from accounting.models import Account
         response: httpx.Response
         viewer: UserClient = get_user_client(self, self.app, "viewer")
 
@@ -202,11 +216,24 @@ class AccountTestCase(unittest.TestCase):
                                       data={"csrf_token": viewer.csrf_token})
         self.assertEqual(response.status_code, 403)
 
+        response = viewer.client.get("/accounting/accounts/bases/1111")
+        self.assertEqual(response.status_code, 200)
+
+        with self.app.app_context():
+            account_id: int = Account.find_by_code("1112-001").id
+
+        response = viewer.client.post("/accounting/accounts/bases/1112",
+                                      data={"csrf_token": viewer.csrf_token,
+                                            "next": "/next",
+                                            f"{account_id}-no": "5"})
+        self.assertEqual(response.status_code, 403)
+
     def test_editor(self) -> None:
         """Test the permission as editor.
 
         :return: None.
         """
+        from accounting.models import Account
         response: httpx.Response
 
         response = self.client.get("/accounting/accounts")
@@ -242,6 +269,19 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          "/accounting/accounts")
+
+        response = self.client.get("/accounting/accounts/bases/1111")
+        self.assertEqual(response.status_code, 200)
+
+        with self.app.app_context():
+            account_id: int = Account.find_by_code("1112-001").id
+
+        response = self.client.post("/accounting/accounts/bases/1112",
+                                    data={"csrf_token": self.csrf_token,
+                                          "next": "/next",
+                                          f"{account_id}-no": "5"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/next")
 
     def test_change_base(self) -> None:
         """Tests to change the base account.
