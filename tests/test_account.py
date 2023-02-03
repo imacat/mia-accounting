@@ -242,3 +242,63 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          "/accounting/accounts")
+
+    def test_change_base(self) -> None:
+        """Tests to change the base account.
+
+        :return: None.
+        """
+        from accounting.database import db
+        from accounting.models import Account
+        response: httpx.Response
+
+        response = self.client.post("/accounting/accounts/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1111",
+                                          "title": "Title #1"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts/1111-002")
+
+        response = self.client.post("/accounting/accounts/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1111",
+                                          "title": "Title #1"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts/1111-003")
+
+        response = self.client.post("/accounting/accounts/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1112",
+                                          "title": "Title #1"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts/1112-002")
+
+        with self.app.app_context():
+            account_1_id: int = Account.find_by_code("1111-001").id
+            account_2_id: int = Account.find_by_code("1111-002").id
+            account_3_id: int = Account.find_by_code("1111-003").id
+            account_4_id: int = Account.find_by_code("1112-001").id
+            account_5_id: int = Account.find_by_code("1112-002").id
+
+        response = self.client.post("/accounting/accounts/1111-002/update",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1112",
+                                          "title": "Account #1"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/accounts/1112-003")
+
+        with self.app.app_context():
+            self.assertEqual(db.session.get(Account, account_1_id).code,
+                             "1111-001")
+            self.assertEqual(db.session.get(Account, account_2_id).code,
+                             "1112-003")
+            self.assertEqual(db.session.get(Account, account_3_id).code,
+                             "1111-002")
+            self.assertEqual(db.session.get(Account, account_4_id).code,
+                             "1112-001")
+            self.assertEqual(db.session.get(Account, account_5_id).code,
+                             "1112-002")
