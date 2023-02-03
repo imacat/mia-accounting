@@ -69,8 +69,10 @@ class BaseAccountL10n(db.Model):
     """A localized base account title."""
     __tablename__ = "accounting_base_accounts_l10n"
     """The table name."""
-    account_code = db.Column(db.String, db.ForeignKey(BaseAccount.code,
-                                                      ondelete="CASCADE"),
+    account_code = db.Column(db.String,
+                             db.ForeignKey(BaseAccount.code,
+                                           onupdate="CASCADE",
+                                           ondelete="CASCADE"),
                              nullable=False, primary_key=True)
     """The code of the account."""
     account = db.relationship(BaseAccount, back_populates="l10n")
@@ -88,8 +90,9 @@ class Account(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True,
                    autoincrement=False)
     """The account ID."""
-    base_code = db.Column(db.String, db.ForeignKey(BaseAccount.code,
-                                                   ondelete="CASCADE"),
+    base_code = db.Column(db.String,
+                          db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
+                                        ondelete="CASCADE"),
                           nullable=False)
     """The code of the base account."""
     base = db.relationship(BaseAccount, back_populates="accounts")
@@ -103,7 +106,9 @@ class Account(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
     """The time of creation."""
-    created_by_id = db.Column(db.Integer, db.ForeignKey(user_pk_column),
+    created_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
                               nullable=False)
     """The ID of the creator."""
     created_by = db.relationship(user_cls, foreign_keys=created_by_id)
@@ -111,7 +116,9 @@ class Account(db.Model):
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
     """The time of last update."""
-    updated_by_id = db.Column(db.Integer, db.ForeignKey(user_pk_column),
+    updated_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
                               nullable=False)
     """The ID of the updator."""
     updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
@@ -299,8 +306,9 @@ class Account(db.Model):
 class AccountL10n(db.Model):
     """A localized account title."""
     __tablename__ = "accounting_accounts_l10n"
-    account_id = db.Column(db.Integer, db.ForeignKey(Account.id,
-                                                     ondelete="CASCADE"),
+    account_id = db.Column(db.Integer,
+                           db.ForeignKey(Account.id, onupdate="CASCADE",
+                                         ondelete="CASCADE"),
                            nullable=False, primary_key=True)
     account = db.relationship(Account, back_populates="l10n")
     locale = db.Column(db.String, nullable=False, primary_key=True)
