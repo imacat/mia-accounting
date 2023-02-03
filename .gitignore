@@ -37,4 +37,3 @@ excludes
 *.pot
 *.mo
 zh_Hans
-node_modules
