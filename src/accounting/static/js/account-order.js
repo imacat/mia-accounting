@@ -24,14 +24,16 @@
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
     const list = document.getElementById("account-order-list");
-    const onReorder = function () {
-        const accounts = Array.from(list.children);
-        for (let i = 0; i < accounts.length; i++) {
-            const no = document.getElementById("account-order-" + accounts[i].dataset.id + "-no");
-            const code = document.getElementById("account-order-" + accounts[i].dataset.id + "-code");
-            no.value = String(i + 1);
-            code.innerText = list.dataset.baseCode + "-" + ("000" + (i + 1)).slice(-3);
-        }
-    };
-    initializeDragAndDropReordering(list, onReorder);
+    if (list !== null) {
+        const onReorder = function () {
+            const accounts = Array.from(list.children);
+            for (let i = 0; i < accounts.length; i++) {
+                const no = document.getElementById("account-order-" + accounts[i].dataset.id + "-no");
+                const code = document.getElementById("account-order-" + accounts[i].dataset.id + "-code");
+                no.value = String(i + 1);
+                code.innerText = list.dataset.baseCode + "-" + ("000" + (i + 1)).slice(-3);
+            }
+        };
+        initializeDragAndDropReordering(list, onReorder);
+    }
 });

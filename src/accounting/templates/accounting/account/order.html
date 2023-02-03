@@ -37,36 +37,46 @@ First written: 2023/2/2
   </a>
 </div>
 
-<form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
-  <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  {% if "next" in request.args %}
-    <input type="hidden" name="next" value="{{ request.args["next"] }}">
-  {% endif %}
-  <ul id="account-order-list" class="list-group mb-3" data-base-code="{{ base.code }}">
-    {% for account in base.accounts|sort(attribute="no") %}
-      <li class="list-group-item d-flex justify-content-between" data-id="{{ account.id }}">
-        <input id="account-order-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
-        <div>
-          <span id="account-order-{{ account.id }}-code">{{ account.code }}</span>
-          {{ account.title }}
-        </div>
-        <i class="fa-solid fa-bars"></i>
-      </li>
-    {% endfor %}
+{% if base.accounts|length > 1 %}
+  <form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
+    <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if "next" in request.args %}
+      <input type="hidden" name="next" value="{{ request.args["next"] }}">
+    {% endif %}
+    <ul id="account-order-list" class="list-group mb-3" data-base-code="{{ base.code }}">
+      {% for account in base.accounts|sort(attribute="no") %}
+        <li class="list-group-item d-flex justify-content-between" data-id="{{ account.id }}">
+          <input id="account-order-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
+          <div>
+            <span id="account-order-{{ account.id }}-code">{{ account.code }}</span>
+            {{ account.title }}
+          </div>
+          <i class="fa-solid fa-bars"></i>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="d-none d-md-block">
+      <button class="btn btn-primary" type="submit">
+        <i class="fa-solid fa-floppy-disk"></i>
+        {{ A_("Save") }}
+      </button>
+    </div>
+
+    <div class="d-md-none material-fab">
+      <button class="btn btn-primary" type="submit">
+        <i class="fa-solid fa-floppy-disk"></i>
+      </button>
+    </div>
+  </form>
+{% elif base.accounts|length == 1 %}
+  <ul class="list-group mb-3">
+    <li class="list-group-item">
+      {{ base.accounts[0] }}
+    </li>
   </ul>
-
-  <div class="d-none d-md-block">
-    <button class="btn btn-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      {{ A_("Save") }}
-    </button>
-  </div>
-
-  <div class="d-md-none material-fab">
-    <button class="btn btn-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-    </button>
-  </div>
-</form>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
 
 {% endblock %}
