@@ -29,7 +29,7 @@ from accounting.models import Account, BaseAccount
 from accounting.utils.next_url import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
-from .forms import AccountForm, sort_accounts_in
+from .forms import AccountForm, sort_accounts_in, AccountSortForm
 
 bp: Blueprint = Blueprint("account", __name__)
 """The view blueprint for the account management."""
@@ -161,4 +161,34 @@ def delete_account(account: Account) -> redirect:
     sort_accounts_in(account.base_code, account.id)
     db.session.commit()
     flash(lazy_gettext("The account is deleted successfully."), "success")
+    return redirect(or_next(url_for("accounting.account.list")))
+
+
+@bp.get("/sort/<baseAccount:base>", endpoint="sort-form")
+@has_permission(can_edit)
+def show_sort_form(base: BaseAccount) -> str:
+    """Shows the form to sort the accounts under a base account.
+
+    :param base: The base account.
+    :return: The form to sort the accounts under the base account.
+    """
+    return render_template("accounting/account/sort.html",
+                           base=base)
+
+
+@bp.post("/sort/<baseAccount:base>", endpoint="sort")
+@has_permission(can_edit)
+def sort_accounts(base: BaseAccount) -> redirect:
+    """Sorts the accounts under a base account.
+
+    :param base: The base account.
+    :return: Sorts the accounts under the base account.
+    """
+    form: AccountSortForm = AccountSortForm(base)
+    form.save_order()
+    if not form.is_modified:
+        flash(lazy_gettext("The order was not modified."), "success")
+        return redirect(or_next(url_for("accounting.account.list")))
+    db.session.commit()
+    flash(lazy_gettext("The order is updated successfully."), "success")
     return redirect(or_next(url_for("accounting.account.list")))

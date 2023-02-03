@@ -18,6 +18,7 @@
 
 """
 import sqlalchemy as sa
+from flask import request
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
@@ -128,3 +129,48 @@ def sort_accounts_in(base_code: str, exclude: int) -> None:
     for i in range(len(accounts)):
         if accounts[i].no != i + 1:
             accounts[i].no = i + 1
+
+
+class AccountSortForm:
+    """The form to sort the accounts."""
+
+    def __init__(self, base: BaseAccount):
+        """Constructs the form to sort the accounts under a base account.
+
+        :param base: The base account.
+        """
+        self.base: BaseAccount = base
+        self.is_modified: bool = False
+
+    def save_order(self) -> None:
+        """Saves the order of the account.
+
+        :return:
+        """
+        accounts: list[Account] = self.base.accounts
+
+        # Collects the specified order.
+        orders: dict[Account, int] = {}
+        for account in accounts:
+            if f"{account.id}-no" in request.form:
+                try:
+                    orders[account] = int(request.form[f"{account.id}-no"])
+                except ValueError:
+                    pass
+
+        # Missing and invalid orders are appended to the end.
+        missing: list[Account] = [x for x in accounts if x not in orders]
+        if len(missing) > 0:
+            next_no: int = 1 if len(orders) == 0 else max(orders.values()) + 1
+            for account in missing:
+                orders[account] = next_no
+
+        # Sort by the specified order first, and their original order.
+        accounts = sorted(accounts, key=lambda x: (orders[x], x.no, x.code))
+
+        # Update the orders.
+        with db.session.no_autoflush:
+            for i in range(len(accounts)):
+                if accounts[i].no != i + 1:
+                    accounts[i].no = i + 1
+                    self.is_modified = True

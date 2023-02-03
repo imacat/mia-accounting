@@ -1,0 +1,75 @@
+{#
+The Mia! Accounting Flask Project
+sort.html: The account sorting form
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/2
+#}
+{% extends "accounting/account/include/form.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/drag-and-drop-sorting.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/account-sort.js") }}"></script>
+{% endblock %}
+
+{% block header %}{% block title %}{{ A_("Sort the Accounts of %(base)s", base=base) }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-3">
+  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|or_next }}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    {{ A_("Back") }}
+  </a>
+</div>
+
+<form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
+  <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if "next" in request.args %}
+    <input type="hidden" name="next" value="{{ request.args["next"] }}">
+  {% endif %}
+  <ul id="sort-account-list" class="list-group mb-3" data-base-code="{{ base.code }}">
+    {% for account in base.accounts|sort(attribute="no") %}
+      <li class="list-group-item d-flex justify-content-between" data-id="{{ account.id }}">
+        <input id="sort-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
+        <div>
+          <span id="sort-{{ account.id }}-code">{{ account.code }}</span>
+          {{ account.title }}
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/>
+        </svg>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="d-none d-md-block">
+    <button class="btn btn-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      {{ A_("Save") }}
+    </button>
+  </div>
+
+  <div class="d-md-none material-fab">
+    <button class="btn btn-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+    </button>
+  </div>
+</form>
+
+{% endblock %}
