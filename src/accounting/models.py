@@ -85,7 +85,8 @@ class Account(db.Model):
     """An account."""
     __tablename__ = "accounting_accounts"
     """The table name."""
-    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    id = db.Column(db.Integer, nullable=False, primary_key=True,
+                   autoincrement=False)
     """The account ID."""
     base_code = db.Column(db.String, db.ForeignKey(BaseAccount.code,
                                                    ondelete="CASCADE"),
