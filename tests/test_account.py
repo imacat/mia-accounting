@@ -277,11 +277,11 @@ class AccountTestCase(unittest.TestCase):
                          "/accounting/accounts/1112-002")
 
         with self.app.app_context():
-            account_1_id: int = Account.find_by_code("1111-001").id
-            account_2_id: int = Account.find_by_code("1111-002").id
-            account_3_id: int = Account.find_by_code("1111-003").id
-            account_4_id: int = Account.find_by_code("1112-001").id
-            account_5_id: int = Account.find_by_code("1112-002").id
+            id_1: int = Account.find_by_code("1111-001").id
+            id_2: int = Account.find_by_code("1111-002").id
+            id_3: int = Account.find_by_code("1111-003").id
+            id_4: int = Account.find_by_code("1112-001").id
+            id_5: int = Account.find_by_code("1112-002").id
 
         response = self.client.post("/accounting/accounts/1111-002/update",
                                     data={"csrf_token": self.csrf_token,
@@ -292,13 +292,8 @@ class AccountTestCase(unittest.TestCase):
                          "/accounting/accounts/1112-003")
 
         with self.app.app_context():
-            self.assertEqual(db.session.get(Account, account_1_id).code,
-                             "1111-001")
-            self.assertEqual(db.session.get(Account, account_2_id).code,
-                             "1112-003")
-            self.assertEqual(db.session.get(Account, account_3_id).code,
-                             "1111-002")
-            self.assertEqual(db.session.get(Account, account_4_id).code,
-                             "1112-001")
-            self.assertEqual(db.session.get(Account, account_5_id).code,
-                             "1112-002")
+            self.assertEqual(db.session.get(Account, id_1).code, "1111-001")
+            self.assertEqual(db.session.get(Account, id_2).code, "1112-003")
+            self.assertEqual(db.session.get(Account, id_3).code, "1111-002")
+            self.assertEqual(db.session.get(Account, id_4).code, "1112-001")
+            self.assertEqual(db.session.get(Account, id_5).code, "1112-002")
