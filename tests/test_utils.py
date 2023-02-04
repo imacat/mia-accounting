@@ -111,6 +111,8 @@ class QueryKeywordParserTestCase(unittest.TestCase):
                          ["coffee", "tea cake"])
         self.assertEqual(parse_query_keywords("coffee te\"a ca\"ke"),
                          ["coffee", "te\"a", "ca\"ke"])
+        self.assertEqual(parse_query_keywords("coffee\" tea cake\""),
+                         ["coffee\"", "tea", "cake\""])
 
     def test_empty(self) -> None:
         """Tests the empty query.
