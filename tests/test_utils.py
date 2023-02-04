@@ -154,10 +154,10 @@ class PaginationTestCase(unittest.TestCase):
             """The test view with the pagination."""
             pagination: Pagination
             if self.params.is_reversed is not None:
-                pagination = Pagination(self.params.items,
-                                        is_reversed=self.params.is_reversed)
+                pagination = Pagination[int](
+                    self.params.items, is_reversed=self.params.is_reversed)
             else:
-                pagination = Pagination(self.params.items)
+                pagination = Pagination[int](self.params.items)
             self.assertEqual(pagination.is_paged, self.params.is_paged)
             self.assertEqual(pagination.list, self.params.result)
             return ""
