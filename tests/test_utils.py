@@ -166,9 +166,9 @@ class PaginationTestCase(unittest.TestCase):
         self.client = httpx.Client(app=self.app, base_url="https://testserver")
         self.client.headers["Referer"] = "https://testserver"
 
-    def __test_pagination(self, query: str, items: range,
-                          result: range, is_needed: bool = True,
-                          is_reversed: bool | None = None) -> None:
+    def __test_success(self, query: str, items: range,
+                       result: range, is_needed: bool = True,
+                       is_reversed: bool | None = None) -> None:
         """Tests the pagination.
 
         :param query: The query string.
@@ -186,17 +186,34 @@ class PaginationTestCase(unittest.TestCase):
         response: httpx.Response = self.client.get(target)
         self.assertEqual(response.status_code, 200)
 
+    def __test_malformed(self, query: str, items: range, redirect_to: str,
+                         is_reversed: bool | None = None) -> None:
+        """Tests the pagination.
+
+        :param query: The query string.
+        :param items: The original items.
+        :param redirect_to: The expected target query of the redirection.
+        :param is_reversed: Whether the list is reversed.
+        :return: None.
+        """
+        target: str = "/test-pagination"
+        self.params = self.Params(list(items), is_reversed, [], True)
+        response: httpx.Response = self.client.get(f"{target}?{query}")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{target}?{redirect_to}")
+
     def test_default(self) -> None:
         """Tests the default pagination.
 
         :return: None.
         """
         # The default first page
-        self.__test_pagination("", range(1, 687), range(1, 11))
+        self.__test_success("", range(1, 687), range(1, 11))
         # Some page in the middle
-        self.__test_pagination("page-no=37", range(1, 687), range(361, 371))
+        self.__test_success("page-no=37", range(1, 687), range(361, 371))
         # The last page
-        self.__test_pagination("page-no=69", range(1, 687), range(681, 687))
+        self.__test_success("page-no=69", range(1, 687), range(681, 687))
 
     def test_page_size(self) -> None:
         """Tests the pagination with a different page size.
@@ -204,13 +221,13 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         # The default page with a different page size
-        self.__test_pagination("page-size=15", range(1, 687), range(1, 16))
+        self.__test_success("page-size=15", range(1, 687), range(1, 16))
         # Some page with a different page size
-        self.__test_pagination("page-no=37&page-size=15", range(1, 687),
-                               range(541, 556))
+        self.__test_success("page-no=37&page-size=15", range(1, 687),
+                            range(541, 556))
         # The last page with a different page size.
-        self.__test_pagination("page-no=46&page-size=15", range(1, 687),
-                               range(676, 687))
+        self.__test_success("page-no=46&page-size=15", range(1, 687),
+                            range(676, 687))
 
     def test_not_needed(self) -> None:
         """Tests the pagination that is not needed.
@@ -218,12 +235,12 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         # Empty list
-        self.__test_pagination("", range(0, 0), range(0, 0), is_needed=False)
+        self.__test_success("", range(0, 0), range(0, 0), is_needed=False)
         # A list that fits in one page
-        self.__test_pagination("", range(1, 4), range(1, 4), is_needed=False)
+        self.__test_success("", range(1, 4), range(1, 4), is_needed=False)
         # A large page size that fits in everything
-        self.__test_pagination("page-size=1000", range(1, 687), range(1, 687),
-                               is_needed=False)
+        self.__test_success("page-size=1000", range(1, 687), range(1, 687),
+                            is_needed=False)
 
     def test_reversed(self) -> None:
         """Tests the default page on a reversed list.
@@ -231,11 +248,11 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         # The default page
-        self.__test_pagination("", range(1, 687), range(681, 687),
-                               is_reversed=True)
+        self.__test_success("", range(1, 687), range(681, 687),
+                            is_reversed=True)
         # The default page with a different page size
-        self.__test_pagination("page-size=15", range(1, 687), range(676, 687),
-                               is_reversed=True)
+        self.__test_success("page-size=15", range(1, 687), range(676, 687),
+                            is_reversed=True)
 
     def test_last_page(self) -> None:
         """Tests the calculation of the items on the last page.
@@ -243,6 +260,35 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         # The last page that fits in one page
-        self.__test_pagination("page-no=69", range(1, 691), range(681, 691))
+        self.__test_success("page-no=69", range(1, 691), range(681, 691))
         # A danging item in the last page
-        self.__test_pagination("page-no=70", range(1, 692), range(691, 692))
+        self.__test_success("page-no=70", range(1, 692), range(691, 692))
+
+    def test_malformed(self) -> None:
+        """Tests the malformed pagination parameters.
+
+        :return: None.
+        """
+        # A malformed page size
+        self.__test_malformed("q=word&page-size=100a&page-no=37&next=%2F",
+                              range(1, 691), "q=word&page-no=37&next=%2F")
+        # A malformed page number
+        self.__test_malformed("q=word&page-size=15&page-no=37a&next=%2F",
+                              range(1, 691), "q=word&page-size=15&next=%2F")
+        # A page number beyond the last page
+        self.__test_malformed("q=word&page-size=15&page-no=100&next=%2F",
+                              range(1, 691),
+                              "q=word&page-size=15&page-no=46&next=%2F")
+        # A page number beyond the last page, on a reversed list
+        self.__test_malformed("q=word&page-size=15&page-no=100&next=%2F",
+                              range(1, 691),
+                              "q=word&page-size=15&next=%2F", is_reversed=True)
+        # A page number before the first page
+        self.__test_malformed("q=word&page-size=15&page-no=0&next=%2F",
+                              range(1, 691),
+                              "q=word&page-size=15&next=%2F")
+        # A page number before the first page, on a reversed list
+        self.__test_malformed("q=word&page-size=15&page-no=0&next=%2F",
+                              range(1, 691),
+                              "q=word&page-size=15&page-no=1&next=%2F",
+                              is_reversed=True)

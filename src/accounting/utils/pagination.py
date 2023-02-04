@@ -24,6 +24,7 @@ from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
     ParseResult
 
 from flask import request
+from werkzeug.routing import RequestRedirect
 
 from accounting.locale import gettext
 
@@ -52,6 +53,12 @@ class PageLink:
         """Whether the link should be shown on mobile screens."""
 
 
+class Redirection(RequestRedirect):
+    """The redirection."""
+    code = 302
+    """The HTTP code."""
+
+
 T = t.TypeVar("T")
 
 
@@ -69,12 +76,14 @@ class Pagination(t.Generic[T]):
         :param is_reversed: True if the default page is the last page, or False
             otherwise.
         """
+        self.__current_uri: str = request.full_path if request.query_string \
+            else request.path
+        """The current URI."""
         self.__items: list[T] = items
         """All the items."""
         self.__is_reversed: bool = is_reversed
         """Whether the default page is the last page."""
-        self.page_size: int = int(request.args.get("page-size",
-                                                   self.DEFAULT_PAGE_SIZE))
+        self.page_size: int = self.__get_page_size()
         """The number of items in a page."""
         self.__total_pages: int = 0 if len(items) == 0 \
             else int((len(items) - 1) / self.page_size) + 1
@@ -89,9 +98,6 @@ class Pagination(t.Generic[T]):
         """The items shown in the list"""
         if self.__total_pages > 0:
             self.__set_list()
-        self.__current_uri: str = request.full_path if request.query_string \
-            else request.path
-        """The current URI."""
         self.__base_uri_params: tuple[list[str], list[tuple[str, str]]] \
             = self.__get_base_uri_params()
         """The base URI parameters."""
@@ -100,6 +106,19 @@ class Pagination(t.Generic[T]):
         self.page_sizes: list[PageLink] = self.__get_page_sizes()
         """The links to switch the number of items in a page."""
 
+    def __get_page_size(self) -> int:
+        """Returns the page size.
+
+        :return: The page size.
+        :raise Redirection: When the page size is malformed.
+        """
+        if "page-size" not in request.args:
+            return self.DEFAULT_PAGE_SIZE
+        try:
+            return int(request.args["page-size"])
+        except ValueError:
+            raise Redirection(self.__uri_set("page-size", None))
+
     def __set_list(self) -> None:
         """Sets the items to show in the list.
 
@@ -107,8 +126,7 @@ class Pagination(t.Generic[T]):
         """
         self.__default_page_no = self.__total_pages if self.__is_reversed \
             else 1
-        self.page_no = int(request.args.get("page-no",
-                                            self.__default_page_no))
+        self.page_no = self.__get_page_no()
         if self.page_no < 1:
             self.page_no = 1
         if self.page_no > self.__total_pages:
@@ -118,6 +136,54 @@ class Pagination(t.Generic[T]):
         if upper_bound > len(self.__items):
             upper_bound = len(self.__items)
         self.list = self.__items[lower_bound:upper_bound]
+
+    def __get_page_no(self) -> int:
+        """Returns the page number.
+
+        :return: The page number.
+        :raise Redirection: When the page number is malformed.
+        """
+        if "page-no" not in request.args:
+            return self.__default_page_no
+        try:
+            page_no: int = int(request.args["page-no"])
+        except ValueError:
+            raise Redirection(self.__uri_set("page-no", None))
+        if page_no < 1:
+            if not self.__is_reversed:
+                raise Redirection(self.__uri_set("page-no", None))
+            raise Redirection(self.__uri_set("page-no", "1"))
+        if page_no > self.__total_pages:
+            if self.__is_reversed:
+                raise Redirection(self.__uri_set("page-no", None))
+            raise Redirection(self.__uri_set("page-no",
+                                             str(self.__total_pages)))
+        return page_no
+
+    def __uri_set(self, name: str, value: str | None) -> str:
+        """Raises current URI with a parameter set.
+
+        :param name: The name of the parameter.
+        :param value: The value, or None to remove the parameter.
+        :return: The URI with the parameter set.
+        """
+        uri_p: ParseResult = urlparse(self.__current_uri)
+        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
+
+        # Try to keep the position of the parameter.
+        i: int = 0
+        is_found: bool = False
+        while i < len(params):
+            if params[i][0] == name:
+                if is_found or value is None:
+                    params = params[:i] + params[i + 1:]
+                    continue
+                params[i] = (name, value)
+            i = i + 1
+
+        parts: list[str] = list(uri_p)
+        parts[4] = urlencode(params)
+        return urlunparse(parts)
 
     def __get_base_uri_params(self) -> tuple[list[str], list[tuple[str, str]]]:
         """Returns the base URI and its parameters, with the "page-no" and
