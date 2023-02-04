@@ -26,8 +26,7 @@ from flask import Flask, request
 from accounting.utils.next_url import append_next, inherit_next, or_next
 from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
-from test_site import create_app
-from testlib import get_csrf_token
+from test_site import create_app, csrf
 
 
 class NextUriTestCase(unittest.TestCase):
@@ -42,6 +41,7 @@ class NextUriTestCase(unittest.TestCase):
         target: str = "/target"
 
         @app.route("/test-next", methods=["GET", "POST"])
+        @csrf.exempt
         def test_next_view() -> str:
             """The test view with the next URI."""
             current_uri: str = request.full_path if request.query_string \
@@ -56,6 +56,7 @@ class NextUriTestCase(unittest.TestCase):
             return ""
 
         @app.route("/test-no-next", methods=["GET", "POST"])
+        @csrf.exempt
         def test_no_next_view() -> str:
             """The test view without the next URI."""
             current_uri: str = request.full_path if request.query_string \
@@ -69,22 +70,19 @@ class NextUriTestCase(unittest.TestCase):
         client: httpx.Client = httpx.Client(app=app,
                                             base_url="https://testserver")
         client.headers["Referer"] = "https://testserver"
-        csrf_token: str = get_csrf_token(self, client, "/login")
         response: httpx.Response
 
         # With the next URI
         response = client.get("/test-next?next=/next&q=abc&page-no=4")
         self.assertEqual(response.status_code, 200)
-        response = client.post("/test-next", data={"csrf_token": csrf_token,
-                                                   "next": "/next",
+        response = client.post("/test-next", data={"next": "/next",
                                                    "name": "viewer"})
         self.assertEqual(response.status_code, 200)
 
         # Without the next URI
         response = client.get("/test-no-next?q=abc&page-no=4")
         self.assertEqual(response.status_code, 200)
-        response = client.post("/test-no-next", data={"csrf_token": csrf_token,
-                                                      "name": "viewer"})
+        response = client.post("/test-no-next", data={"name": "viewer"})
         self.assertEqual(response.status_code, 200)
 
 
