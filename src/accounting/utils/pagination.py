@@ -129,10 +129,6 @@ class Pagination(t.Generic[T]):
         self.__default_page_no = self.__total_pages if self.__is_reversed \
             else 1
         self.page_no = self.__get_page_no()
-        if self.page_no < 1:
-            self.page_no = 1
-        if self.page_no > self.__total_pages:
-            self.page_no = self.__total_pages
         lower_bound: int = (self.page_no - 1) * self.page_size
         upper_bound: int = lower_bound + self.page_size
         if upper_bound > len(self.__items):
