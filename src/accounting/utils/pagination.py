@@ -164,7 +164,7 @@ class Pagination(t.Generic[T]):
 
         :return: The page links in the pagination navigation.
         """
-        if self.__total_pages < 2:
+        if not self.is_paged:
             return []
         uri: str | None
         links: list[Link] = []
