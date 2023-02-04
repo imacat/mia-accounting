@@ -29,8 +29,8 @@ from werkzeug.routing import RequestRedirect
 from accounting.locale import gettext
 
 
-class PageLink:
-    """A link in the pagination."""
+class Link:
+    """A link."""
 
     def __init__(self, text: str, uri: str | None = None,
                  is_current: bool = False, is_for_mobile: bool = False):
@@ -101,9 +101,9 @@ class Pagination(t.Generic[T]):
         self.__base_uri_params: tuple[list[str], list[tuple[str, str]]] \
             = self.__get_base_uri_params()
         """The base URI parameters."""
-        self.page_links: list[PageLink] = self.__get_page_links()
+        self.page_links: list[Link] = self.__get_page_links()
         """The pagination links."""
-        self.page_sizes: list[PageLink] = self.__get_page_sizes()
+        self.page_sizes: list[Link] = self.__get_page_sizes()
         """The links to switch the number of items in a page."""
 
     def __get_page_size(self) -> int:
@@ -197,7 +197,7 @@ class Pagination(t.Generic[T]):
         parts: list[str] = list(uri_p)
         return parts, params
 
-    def __get_page_links(self) -> list[PageLink]:
+    def __get_page_links(self) -> list[Link]:
         """Returns the page links in the pagination navigation.
 
         :return: The page links in the pagination navigation.
@@ -205,59 +205,59 @@ class Pagination(t.Generic[T]):
         if self.__total_pages < 2:
             return []
         uri: str | None
-        links: list[PageLink] = []
+        links: list[Link] = []
 
         # The previous page.
         uri = None if self.page_no == 1 else self.__uri_page(self.page_no - 1)
-        links.append(PageLink(gettext("Previous"), uri, is_for_mobile=True))
+        links.append(Link(gettext("Previous"), uri, is_for_mobile=True))
 
         # The first page.
         if self.page_no > 1:
-            links.append(PageLink("1", self.__uri_page(1)))
+            links.append(Link("1", self.__uri_page(1)))
 
         # The eclipse of the previous pages.
         if self.page_no - 3 == 2:
-            links.append(PageLink(str(self.page_no - 3),
-                                  self.__uri_page(self.page_no - 3)))
+            links.append(Link(str(self.page_no - 3),
+                              self.__uri_page(self.page_no - 3)))
         elif self.page_no - 3 > 2:
-            links.append(PageLink("…"))
+            links.append(Link("…"))
 
         # The previous two pages.
         if self.page_no - 2 > 1:
-            links.append(PageLink(str(self.page_no - 2),
-                                  self.__uri_page(self.page_no - 2)))
+            links.append(Link(str(self.page_no - 2),
+                              self.__uri_page(self.page_no - 2)))
         if self.page_no - 1 > 1:
-            links.append(PageLink(str(self.page_no - 1),
-                                  self.__uri_page(self.page_no - 1)))
+            links.append(Link(str(self.page_no - 1),
+                              self.__uri_page(self.page_no - 1)))
 
         # The current page.
-        links.append(PageLink(str(self.page_no), self.__uri_page(self.page_no),
-                              is_current=True))
+        links.append(Link(str(self.page_no), self.__uri_page(self.page_no),
+                          is_current=True))
 
         # The next two pages.
         if self.page_no + 1 < self.__total_pages:
-            links.append(PageLink(str(self.page_no + 1),
-                                  self.__uri_page(self.page_no + 1)))
+            links.append(Link(str(self.page_no + 1),
+                              self.__uri_page(self.page_no + 1)))
         if self.page_no + 2 < self.__total_pages:
-            links.append(PageLink(str(self.page_no + 2),
-                                  self.__uri_page(self.page_no + 2)))
+            links.append(Link(str(self.page_no + 2),
+                              self.__uri_page(self.page_no + 2)))
 
         # The eclipse of the next pages.
         if self.page_no + 3 == self.__total_pages - 1:
-            links.append(PageLink(str(self.page_no + 3),
-                                  self.__uri_page(self.page_no + 3)))
+            links.append(Link(str(self.page_no + 3),
+                              self.__uri_page(self.page_no + 3)))
         elif self.page_no + 3 < self.__total_pages - 1:
-            links.append(PageLink("…"))
+            links.append(Link("…"))
 
         # The last page.
         if self.page_no < self.__total_pages:
-            links.append(PageLink(str(self.__total_pages),
-                                  self.__uri_page(self.__total_pages)))
+            links.append(Link(str(self.__total_pages),
+                              self.__uri_page(self.__total_pages)))
 
         # The next page.
         uri = None if self.page_no == self.__total_pages \
             else self.__uri_page(self.page_no + 1)
-        links.append(PageLink(gettext("Next"), uri, is_for_mobile=True))
+        links.append(Link(gettext("Next"), uri, is_for_mobile=True))
 
         return links
 
@@ -274,13 +274,13 @@ class Pagination(t.Generic[T]):
             params.append(("page-size", str(self.page_size)))
         return self.__uri_set_params(params)
 
-    def __get_page_sizes(self) -> list[PageLink]:
+    def __get_page_sizes(self) -> list[Link]:
         """Returns the available page sizes.
 
         :return: The available page sizes.
         """
-        return [PageLink(str(x), self.__uri_size(x),
-                         is_current=x == self.page_size)
+        return [Link(str(x), self.__uri_size(x),
+                     is_current=x == self.page_size)
                 for x in self.AVAILABLE_PAGE_SIZES]
 
     def __uri_size(self, page_size: int) -> str:
