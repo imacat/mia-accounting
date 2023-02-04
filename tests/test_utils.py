@@ -98,6 +98,9 @@ class QueryKeywordParserTestCase(unittest.TestCase):
         self.assertEqual(parse_query_keywords("coffee tea"), ["coffee", "tea"])
         self.assertEqual(parse_query_keywords("\"coffee\" \"tea cake\""),
                          ["coffee", "tea cake"])
+        self.assertEqual(parse_query_keywords("\"coffee tea\" cheese "
+                                              "\"cake candy\" sugar"),
+                         ["coffee tea", "cheese", "cake candy", "sugar"])
 
     def test_malformed(self) -> None:
         """Tests the malformed query.
