@@ -98,8 +98,6 @@ class Pagination(t.Generic[T]):
         """The items shown in the list"""
         if self.__total_pages > 0:
             self.__set_list()
-        self.__base_uri_params: tuple[list[str], list[tuple[str, str]]] \
-            = self.__get_base_uri_params()
         """The base URI parameters."""
         self.page_links: list[Link] = self.__get_page_links()
         """The pagination links."""
@@ -164,43 +162,6 @@ class Pagination(t.Generic[T]):
             raise Redirection(self.__uri_set("page-no",
                                              str(self.__total_pages)))
         return page_no
-
-    def __uri_set(self, name: str, value: str | None) -> str:
-        """Raises current URI with a parameter set.
-
-        :param name: The name of the parameter.
-        :param value: The value, or None to remove the parameter.
-        :return: The URI with the parameter set.
-        """
-        uri_p: ParseResult = urlparse(self.__current_uri)
-        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
-
-        # Try to keep the position of the parameter.
-        i: int = 0
-        is_found: bool = False
-        while i < len(params):
-            if params[i][0] == name:
-                if is_found or value is None:
-                    params = params[:i] + params[i + 1:]
-                    continue
-                params[i] = (name, value)
-            i = i + 1
-
-        parts: list[str] = list(uri_p)
-        parts[4] = urlencode(params)
-        return urlunparse(parts)
-
-    def __get_base_uri_params(self) -> tuple[list[str], list[tuple[str, str]]]:
-        """Returns the base URI and its parameters, with the "page-no" and
-        "page-size" parameters removed.
-
-        :return: The URI parts and the cleaned-up query parameters.
-        """
-        uri_p: ParseResult = urlparse(self.__current_uri)
-        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
-        params = [x for x in params if x[0] not in ["page-no", "page-size"]]
-        parts: list[str] = list(uri_p)
-        return parts, params
 
     def __get_page_links(self) -> list[Link]:
         """Returns the page links in the pagination navigation.
@@ -272,12 +233,11 @@ class Pagination(t.Generic[T]):
         :param page_no: The page number.
         :return: The URI of the page.
         """
-        params: list[tuple[str, str]] = []
-        if page_no != self.__default_page_no:
-            params.append(("page-no", str(page_no)))
-        if self.page_size != self.DEFAULT_PAGE_SIZE:
-            params.append(("page-size", str(self.page_size)))
-        return self.__uri_set_params(params)
+        if page_no == self.page_no:
+            return self.__current_uri
+        if page_no == self.__default_page_no:
+            return self.__uri_set("page-no", None)
+        return self.__uri_set("page-no", str(page_no))
 
     def __get_page_sizes(self) -> list[Link]:
         """Returns the available page sizes.
@@ -296,16 +256,31 @@ class Pagination(t.Generic[T]):
         """
         if page_size == self.page_size:
             return self.__current_uri
-        return self.__uri_set_params([("page-size", str(page_size))])
+        if page_size == self.DEFAULT_PAGE_SIZE:
+            return self.__uri_set("page-size", None)
+        return self.__uri_set("page-size", str(page_size))
 
-    def __uri_set_params(self, params: list[tuple[str, str]]) -> str:
-        """Returns the URI with the query parameters set.
+    def __uri_set(self, name: str, value: str | None) -> str:
+        """Raises current URI with a parameter set.
 
-        :param params: The query parameters.
-        :return: The URI with the query parameters set.
+        :param name: The name of the parameter.
+        :param value: The value, or None to remove the parameter.
+        :return: The URI with the parameter set.
         """
-        cur_params: list[tuple[str, str]] = self.__base_uri_params[1].copy()
-        cur_params.extend(params)
-        parts: list[str] = self.__base_uri_params[0].copy()
-        parts[4] = urlencode(cur_params)
+        uri_p: ParseResult = urlparse(self.__current_uri)
+        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
+
+        # Try to keep the position of the parameter.
+        i: int = 0
+        is_found: bool = False
+        while i < len(params):
+            if params[i][0] == name:
+                if is_found or value is None:
+                    params = params[:i] + params[i + 1:]
+                    continue
+                params[i] = (name, value)
+            i = i + 1
+
+        parts: list[str] = list(uri_p)
+        parts[4] = urlencode(params)
         return urlunparse(parts)
