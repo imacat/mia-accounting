@@ -62,7 +62,6 @@ class Redirection(RequestRedirect):
 DEFAULT_PAGE_SIZE: int = 10
 """The default page size."""
 
-
 T = t.TypeVar("T")
 
 
