@@ -75,6 +75,7 @@ class Pagination(t.Generic[T]):
         :param items: The items.
         :param is_reversed: True if the default page is the last page, or False
             otherwise.
+        :raise Redirection: When the pagination parameters are malformed.
         """
         self.__current_uri: str = request.full_path if request.query_string \
             else request.path
