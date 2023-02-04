@@ -115,9 +115,12 @@ class Pagination(t.Generic[T]):
         if "page-size" not in request.args:
             return self.DEFAULT_PAGE_SIZE
         try:
-            return int(request.args["page-size"])
+            page_size: int = int(request.args["page-size"])
         except ValueError:
             raise Redirection(self.__uri_set("page-size", None))
+        if page_size == self.DEFAULT_PAGE_SIZE:
+            raise Redirection(self.__uri_set("page-size", None))
+        return page_size
 
     def __set_list(self) -> None:
         """Sets the items to show in the list.
@@ -148,6 +151,8 @@ class Pagination(t.Generic[T]):
         try:
             page_no: int = int(request.args["page-no"])
         except ValueError:
+            raise Redirection(self.__uri_set("page-no", None))
+        if page_no == self.__default_page_no:
             raise Redirection(self.__uri_set("page-no", None))
         if page_no < 1:
             if not self.__is_reversed:

@@ -271,9 +271,21 @@ class PaginationTestCase(unittest.TestCase):
         # A malformed page size
         self.__test_malformed("q=word&page-size=100a&page-no=37&next=%2F",
                               range(1, 691), "q=word&page-no=37&next=%2F")
+        # A default page size
+        self.__test_malformed("q=word"
+                              f"&page-size={Pagination.DEFAULT_PAGE_SIZE}"
+                              "&page-no=37&next=%2F",
+                              range(1, 691), "q=word&page-no=37&next=%2F")
         # A malformed page number
         self.__test_malformed("q=word&page-size=15&page-no=37a&next=%2F",
                               range(1, 691), "q=word&page-size=15&next=%2F")
+        # A default page number
+        self.__test_malformed("q=word&page-size=15&page-no=1&next=%2F",
+                              range(1, 691), "q=word&page-size=15&next=%2F")
+        # A default page number, on a reversed list
+        self.__test_malformed("q=word&page-size=15&page-no=46&next=%2F",
+                              range(1, 691), "q=word&page-size=15&next=%2F",
+                              is_reversed=True)
         # A page number beyond the last page
         self.__test_malformed("q=word&page-size=15&page-no=100&next=%2F",
                               range(1, 691),
