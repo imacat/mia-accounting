@@ -88,7 +88,7 @@ class Pagination(t.Generic[T]):
         self.__total_pages: int = 0 if len(items) == 0 \
             else int((len(items) - 1) / self.page_size) + 1
         """The total number of pages."""
-        self.is_needed: bool = self.__total_pages > 1
+        self.is_paged: bool = self.__total_pages > 1
         """Whether there should be pagination."""
         self.__default_page_no: int = 0
         """The default page number."""

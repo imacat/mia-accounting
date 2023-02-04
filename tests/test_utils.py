@@ -127,18 +127,18 @@ class PaginationTestCase(unittest.TestCase):
         """The testing parameters."""
 
         def __init__(self, items: list[int], is_reversed: bool | None,
-                     result: list[int], is_needed: bool):
+                     result: list[int], is_paged: bool):
             """Constructs the expected pagination.
 
             :param items: All the items in the list.
             :param is_reversed: Whether the default page is the last page.
             :param result: The expected items on the page.
-            :param is_needed: Whether the pagination is needed.
+            :param is_paged: Whether the pagination is needed.
             """
             self.items: list[int] = items
             self.is_reversed: bool | None = is_reversed
             self.result: list[int] = result
-            self.is_needed: bool = is_needed
+            self.is_paged: bool = is_paged
 
     def setUp(self) -> None:
         """Sets up the test.
@@ -158,7 +158,7 @@ class PaginationTestCase(unittest.TestCase):
                                         is_reversed=self.params.is_reversed)
             else:
                 pagination = Pagination(self.params.items)
-            self.assertEqual(pagination.is_needed, self.params.is_needed)
+            self.assertEqual(pagination.is_paged, self.params.is_paged)
             self.assertEqual(pagination.list, self.params.result)
             return ""
 
@@ -166,14 +166,14 @@ class PaginationTestCase(unittest.TestCase):
         self.client.headers["Referer"] = "https://testserver"
 
     def __test_success(self, query: str, items: range,
-                       result: range, is_needed: bool = True,
+                       result: range, is_paged: bool = True,
                        is_reversed: bool | None = None) -> None:
         """Tests the pagination.
 
         :param query: The query string.
         :param items: The original items.
         :param result: The expected page content.
-        :param is_needed: Whether the pagination is needed.
+        :param is_paged: Whether the pagination is needed.
         :param is_reversed: Whether the list is reversed.
         :return: None.
         """
@@ -181,7 +181,7 @@ class PaginationTestCase(unittest.TestCase):
         if query != "":
             target = f"{target}?{query}"
         self.params = self.Params(list(items), is_reversed,
-                                  list(result), is_needed)
+                                  list(result), is_paged)
         response: httpx.Response = self.client.get(target)
         self.assertEqual(response.status_code, 200)
 
@@ -234,12 +234,12 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         # Empty list
-        self.__test_success("", range(0, 0), range(0, 0), is_needed=False)
+        self.__test_success("", range(0, 0), range(0, 0), is_paged=False)
         # A list that fits in one page
-        self.__test_success("", range(1, 4), range(1, 4), is_needed=False)
+        self.__test_success("", range(1, 4), range(1, 4), is_paged=False)
         # A large page size that fits in everything
         self.__test_success("page-size=1000", range(1, 687), range(1, 687),
-                            is_needed=False)
+                            is_paged=False)
 
     def test_reversed(self) -> None:
         """Tests the default page on a reversed list.
