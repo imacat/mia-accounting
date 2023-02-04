@@ -26,7 +26,7 @@ from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
 from flask import request
 from werkzeug.routing import RequestRedirect
 
-from accounting.locale import gettext
+from accounting.locale import gettext, pgettext
 
 
 class Link:
@@ -203,7 +203,8 @@ class NonEmptyPagination(AbstractPagination[T]):
         # The previous page.
         uri = None if self.__page_no == 1 \
             else self.__uri_page(self.__page_no - 1)
-        links.append(Link(gettext("Previous"), uri, is_for_mobile=True))
+        links.append(Link(pgettext("Pagination|", "Previous"), uri,
+                          is_for_mobile=True))
 
         # The first page.
         if self.__page_no > 1:
@@ -251,7 +252,8 @@ class NonEmptyPagination(AbstractPagination[T]):
         # The next page.
         uri = None if self.__page_no == self.__total_pages \
             else self.__uri_page(self.__page_no + 1)
-        links.append(Link(gettext("Next"), uri, is_for_mobile=True))
+        links.append(Link(pgettext("Pagination|", "Next"), uri,
+                          is_for_mobile=True))
 
         return links
 
