@@ -84,10 +84,10 @@ class Pagination(t.Generic[T]):
         """Whether there should be pagination."""
         self.list: list[T] = pagination.list
         """The items shown in the list"""
-        self.page_links: list[Link] = pagination.page_links
-        """The pagination links."""
-        self.page_sizes: list[Link] = pagination.page_sizes
-        """The links to switch the number of items in a page."""
+        self.pages: list[Link] = pagination.pages
+        """The pages."""
+        self.page_size_options: list[Link] = pagination.page_size_options
+        """The options to the number of items in a page."""
 
 
 class AbstractPagination(t.Generic[T]):
@@ -99,10 +99,10 @@ class AbstractPagination(t.Generic[T]):
         """Whether there should be pagination."""
         self.list: list[T] = []
         """The items shown in the list"""
-        self.page_links: list[Link] = []
-        """The pagination links."""
-        self.page_sizes: list[Link] = []
-        """The links to switch the number of items in a page."""
+        self.pages: list[Link] = []
+        """The pages."""
+        self.page_size_options: list[Link] = []
+        """The options to the number of items in a page."""
 
 
 class EmptyPagination(AbstractPagination[T]):
@@ -112,8 +112,8 @@ class EmptyPagination(AbstractPagination[T]):
 
 class NonEmptyPagination(AbstractPagination[T]):
     """The pagination with real data."""
-    AVAILABLE_PAGE_SIZES: list[int] = [10, 100, 200]
-    """The available page sizes."""
+    PAGE_SIZE_OPTIONS: list[int] = [10, 100, 200]
+    """The page size options."""
 
     def __init__(self, items: list[T], is_reversed: bool = False):
         """Constructs the pagination.
@@ -144,8 +144,8 @@ class NonEmptyPagination(AbstractPagination[T]):
         if upper_bound > len(items):
             upper_bound = len(items)
         self.list = items[lower_bound:upper_bound]
-        self.page_links = self.__get_page_links()
-        self.page_sizes = self.__get_page_sizes()
+        self.pages = self.__get_pages()
+        self.page_size_options = self.__get_page_size_options()
 
     def __get_page_size(self) -> int:
         """Returns the page size.
@@ -188,7 +188,7 @@ class NonEmptyPagination(AbstractPagination[T]):
                                              str(self.__total_pages)))
         return page_no
 
-    def __get_page_links(self) -> list[Link]:
+    def __get_pages(self) -> list[Link]:
         """Returns the page links in the pagination navigation.
 
         :return: The page links in the pagination navigation.
@@ -265,16 +265,16 @@ class NonEmptyPagination(AbstractPagination[T]):
             return self.__uri_set("page-no", None)
         return self.__uri_set("page-no", str(page_no))
 
-    def __get_page_sizes(self) -> list[Link]:
-        """Returns the available page sizes.
+    def __get_page_size_options(self) -> list[Link]:
+        """Returns the page size options.
 
-        :return: The available page sizes.
+        :return: The page size options.
         """
         if not self.is_paged:
             return []
         return [Link(str(x), self.__uri_size(x),
                      is_current=x == self.__page_size)
-                for x in self.AVAILABLE_PAGE_SIZES]
+                for x in self.PAGE_SIZE_OPTIONS]
 
     def __uri_size(self, page_size: int) -> str:
         """Returns the URI of a page size.
