@@ -117,7 +117,7 @@ class Pagination(t.Generic[T]):
             page_size: int = int(request.args["page-size"])
         except ValueError:
             raise Redirection(self.__uri_set("page-size", None))
-        if page_size == self.DEFAULT_PAGE_SIZE:
+        if page_size == self.DEFAULT_PAGE_SIZE or page_size < 1:
             raise Redirection(self.__uri_set("page-size", None))
         return page_size
 

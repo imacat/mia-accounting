@@ -276,6 +276,9 @@ class PaginationTestCase(unittest.TestCase):
                               f"&page-size={Pagination.DEFAULT_PAGE_SIZE}"
                               "&page-no=37&next=%2F",
                               range(1, 691), "q=word&page-no=37&next=%2F")
+        # An invalid page size
+        self.__test_malformed("q=word&page-size=0&page-no=37&next=%2F",
+                              range(1, 691), "q=word&page-no=37&next=%2F")
         # A malformed page number
         self.__test_malformed("q=word&page-size=15&page-no=37a&next=%2F",
                               range(1, 691), "q=word&page-size=15&next=%2F")
