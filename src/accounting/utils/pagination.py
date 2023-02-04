@@ -276,6 +276,7 @@ class Pagination(t.Generic[T]):
                     params = params[:i] + params[i + 1:]
                     continue
                 params[i] = (name, value)
+                is_found = True
             i = i + 1
 
         parts: list[str] = list(uri_p)
