@@ -241,6 +241,8 @@ class Pagination(t.Generic[T]):
 
         :return: The available page sizes.
         """
+        if not self.is_paged:
+            return []
         return [Link(str(x), self.__uri_size(x),
                      is_current=x == self.__page_size)
                 for x in self.AVAILABLE_PAGE_SIZES]
