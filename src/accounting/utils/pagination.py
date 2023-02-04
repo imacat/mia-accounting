@@ -86,6 +86,8 @@ class Pagination(t.Generic[T]):
         """The items shown in the list"""
         self.pages: list[Link] = pagination.pages
         """The pages."""
+        self.page_size: int = pagination.page_size
+        """The number of items in a page."""
         self.page_size_options: list[Link] = pagination.page_size_options
         """The options to the number of items in a page."""
 
@@ -95,6 +97,8 @@ class AbstractPagination(t.Generic[T]):
 
     def __init__(self):
         """Constructs an empty pagination."""
+        self.page_size: int = DEFAULT_PAGE_SIZE
+        """The number of items in a page."""
         self.is_paged: bool = False
         """Whether there should be pagination."""
         self.list: list[T] = []
@@ -129,9 +133,8 @@ class NonEmptyPagination(AbstractPagination[T]):
         """The current URI."""
         self.__is_reversed: bool = is_reversed
         """Whether the default page is the last page."""
-        self.__page_size: int = self.__get_page_size()
-        """The number of items in a page."""
-        self.__total_pages: int = int((len(items) - 1) / self.__page_size) + 1
+        self.page_size = self.__get_page_size()
+        self.__total_pages: int = int((len(items) - 1) / self.page_size) + 1
         """The total number of pages."""
         self.is_paged = self.__total_pages > 1
         self.__default_page_no: int = self.__total_pages \
@@ -139,8 +142,8 @@ class NonEmptyPagination(AbstractPagination[T]):
         """The default page number."""
         self.__page_no: int = self.__get_page_no()
         """The current page number."""
-        lower_bound: int = (self.__page_no - 1) * self.__page_size
-        upper_bound: int = lower_bound + self.__page_size
+        lower_bound: int = (self.__page_no - 1) * self.page_size
+        upper_bound: int = lower_bound + self.page_size
         if upper_bound > len(items):
             upper_bound = len(items)
         self.list = items[lower_bound:upper_bound]
@@ -273,7 +276,7 @@ class NonEmptyPagination(AbstractPagination[T]):
         if not self.is_paged:
             return []
         return [Link(str(x), self.__uri_size(x),
-                     is_current=x == self.__page_size)
+                     is_current=x == self.page_size)
                 for x in self.PAGE_SIZE_OPTIONS]
 
     def __uri_size(self, page_size: int) -> str:
@@ -282,7 +285,7 @@ class NonEmptyPagination(AbstractPagination[T]):
         :param page_size: The page size.
         :return: The URI of the page size.
         """
-        if page_size == self.__page_size:
+        if page_size == self.page_size:
             return self.__current_uri
         if page_size == DEFAULT_PAGE_SIZE:
             return self.__uri_set("page-size", None)
