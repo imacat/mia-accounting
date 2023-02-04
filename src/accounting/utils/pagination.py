@@ -99,7 +99,6 @@ class Pagination(t.Generic[T]):
         """The items shown in the list"""
         if self.__total_pages > 0:
             self.__set_list()
-        """The base URI parameters."""
         self.page_links: list[Link] = self.__get_page_links()
         """The pagination links."""
         self.page_sizes: list[Link] = self.__get_page_sizes()
