@@ -24,7 +24,7 @@ import httpx
 from flask import Flask, request
 
 from accounting.utils.next_url import append_next, inherit_next, or_next
-from accounting.utils.pagination import Pagination
+from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
 from test_site import create_app
 from testlib import get_csrf_token
@@ -272,8 +272,7 @@ class PaginationTestCase(unittest.TestCase):
         self.__test_malformed("q=word&page-size=100a&page-no=37&next=%2F",
                               range(1, 691), "q=word&page-no=37&next=%2F")
         # A default page size
-        self.__test_malformed("q=word"
-                              f"&page-size={Pagination.DEFAULT_PAGE_SIZE}"
+        self.__test_malformed(f"q=word&page-size={DEFAULT_PAGE_SIZE}"
                               "&page-no=37&next=%2F",
                               range(1, 691), "q=word&page-no=37&next=%2F")
         # An invalid page size

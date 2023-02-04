@@ -59,15 +59,15 @@ class Redirection(RequestRedirect):
     """The HTTP code."""
 
 
+DEFAULT_PAGE_SIZE: int = 10
+"""The default page size."""
+
+
 T = t.TypeVar("T")
 
 
 class Pagination(t.Generic[T]):
-    """The pagination utilities"""
-    AVAILABLE_PAGE_SIZES: list[int] = [10, 100, 200]
-    """The available page sizes."""
-    DEFAULT_PAGE_SIZE: int = 10
-    """The default page size."""
+    """The pagination utility."""
 
     def __init__(self, items: list[T], is_reversed: bool = False):
         """Constructs the pagination.
@@ -77,32 +77,75 @@ class Pagination(t.Generic[T]):
             otherwise.
         :raise Redirection: When the pagination parameters are malformed.
         """
+        pagination: AbstractPagination[T] = EmptyPagination[T]() \
+            if len(items) == 0 \
+            else NonEmptyPagination[T](items, is_reversed)
+        self.is_paged: bool = pagination.is_paged
+        """Whether there should be pagination."""
+        self.list: list[T] = pagination.list
+        """The items shown in the list"""
+        self.page_links: list[Link] = pagination.page_links
+        """The pagination links."""
+        self.page_sizes: list[Link] = pagination.page_sizes
+        """The links to switch the number of items in a page."""
+
+
+class AbstractPagination(t.Generic[T]):
+    """An abstract pagination."""
+
+    def __init__(self):
+        """Constructs an empty pagination."""
+        self.is_paged: bool = False
+        """Whether there should be pagination."""
+        self.list: list[T] = []
+        """The items shown in the list"""
+        self.page_links: list[Link] = []
+        """The pagination links."""
+        self.page_sizes: list[Link] = []
+        """The links to switch the number of items in a page."""
+
+
+class EmptyPagination(AbstractPagination[T]):
+    """The pagination from empty data."""
+    pass
+
+
+class NonEmptyPagination(AbstractPagination[T]):
+    """The pagination with real data."""
+    AVAILABLE_PAGE_SIZES: list[int] = [10, 100, 200]
+    """The available page sizes."""
+
+    def __init__(self, items: list[T], is_reversed: bool = False):
+        """Constructs the pagination.
+
+        :param items: The items.
+        :param is_reversed: True if the default page is the last page, or False
+            otherwise.
+        :raise Redirection: When the pagination parameters are malformed.
+        """
+        super().__init__()
         self.__current_uri: str = request.full_path if request.query_string \
             else request.path
         """The current URI."""
-        self.__items: list[T] = items
-        """All the items."""
         self.__is_reversed: bool = is_reversed
         """Whether the default page is the last page."""
         self.__page_size: int = self.__get_page_size()
         """The number of items in a page."""
-        self.__total_pages: int = 0 if len(items) == 0 \
-            else int((len(items) - 1) / self.__page_size) + 1
+        self.__total_pages: int = int((len(items) - 1) / self.__page_size) + 1
         """The total number of pages."""
-        self.is_paged: bool = self.__total_pages > 1
-        """Whether there should be pagination."""
-        self.__default_page_no: int = 0
+        self.is_paged = self.__total_pages > 1
+        self.__default_page_no: int = self.__total_pages \
+            if self.__is_reversed else 1
         """The default page number."""
-        self.__page_no: int = 0
+        self.__page_no: int = self.__get_page_no()
         """The current page number."""
-        self.list: list[T] = []
-        """The items shown in the list"""
-        if self.__total_pages > 0:
-            self.__set_list()
-        self.page_links: list[Link] = self.__get_page_links()
-        """The pagination links."""
-        self.page_sizes: list[Link] = self.__get_page_sizes()
-        """The links to switch the number of items in a page."""
+        lower_bound: int = (self.__page_no - 1) * self.__page_size
+        upper_bound: int = lower_bound + self.__page_size
+        if upper_bound > len(items):
+            upper_bound = len(items)
+        self.list = items[lower_bound:upper_bound]
+        self.page_links = self.__get_page_links()
+        self.page_sizes = self.__get_page_sizes()
 
     def __get_page_size(self) -> int:
         """Returns the page size.
@@ -111,28 +154,14 @@ class Pagination(t.Generic[T]):
         :raise Redirection: When the page size is malformed.
         """
         if "page-size" not in request.args:
-            return self.DEFAULT_PAGE_SIZE
+            return DEFAULT_PAGE_SIZE
         try:
             page_size: int = int(request.args["page-size"])
         except ValueError:
             raise Redirection(self.__uri_set("page-size", None))
-        if page_size == self.DEFAULT_PAGE_SIZE or page_size < 1:
+        if page_size == DEFAULT_PAGE_SIZE or page_size < 1:
             raise Redirection(self.__uri_set("page-size", None))
         return page_size
-
-    def __set_list(self) -> None:
-        """Sets the items to show in the list.
-
-        :return: None.
-        """
-        self.__default_page_no = self.__total_pages if self.__is_reversed \
-            else 1
-        self.__page_no = self.__get_page_no()
-        lower_bound: int = (self.__page_no - 1) * self.__page_size
-        upper_bound: int = lower_bound + self.__page_size
-        if upper_bound > len(self.__items):
-            upper_bound = len(self.__items)
-        self.list = self.__items[lower_bound:upper_bound]
 
     def __get_page_no(self) -> int:
         """Returns the page number.
@@ -255,7 +284,7 @@ class Pagination(t.Generic[T]):
         """
         if page_size == self.__page_size:
             return self.__current_uri
-        if page_size == self.DEFAULT_PAGE_SIZE:
+        if page_size == DEFAULT_PAGE_SIZE:
             return self.__uri_set("page-size", None)
         return self.__uri_set("page-size", str(page_size))
 
