@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-03 10:15+0800\n"
-"PO-Revision-Date: 2023-02-03 10:16+0800\n"
+"POT-Creation-Date: 2023-02-04 13:24+0800\n"
+"PO-Revision-Date: 2023-02-04 13:25+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -33,7 +33,7 @@ msgid "Please fill in the title"
 msgstr "請填上標題。"
 
 #: src/accounting/account/query.py:50
-#: src/accounting/templates/accounting/account/detail.html:88
+#: src/accounting/templates/accounting/account/detail.html:90
 #: src/accounting/templates/accounting/account/list.html:62
 msgid "Offset needed"
 msgstr "逐筆核銷"
@@ -81,36 +81,36 @@ msgstr "回上頁"
 msgid "Settings"
 msgstr "設定"
 
-#: src/accounting/templates/accounting/account/detail.html:40
+#: src/accounting/templates/accounting/account/detail.html:41
 msgid "Order"
 msgstr "次序"
 
-#: src/accounting/templates/accounting/account/detail.html:44
+#: src/accounting/templates/accounting/account/detail.html:46
 msgid "Delete"
 msgstr "刪除"
 
-#: src/accounting/templates/accounting/account/detail.html:67
+#: src/accounting/templates/accounting/account/detail.html:69
 msgid "Delete Account Confirmation"
 msgstr "科目刪除確認"
 
-#: src/accounting/templates/accounting/account/detail.html:71
+#: src/accounting/templates/accounting/account/detail.html:73
 msgid "Do you really want to delete this account?"
 msgstr "你確定要刪掉這個科目嗎？"
 
-#: src/accounting/templates/accounting/account/detail.html:74
+#: src/accounting/templates/accounting/account/detail.html:76
 #: src/accounting/templates/accounting/account/include/form.html:111
 msgid "Cancel"
 msgstr "取消"
 
-#: src/accounting/templates/accounting/account/detail.html:75
+#: src/accounting/templates/accounting/account/detail.html:77
 msgid "Confirm"
 msgstr "確定"
 
-#: src/accounting/templates/accounting/account/detail.html:92
+#: src/accounting/templates/accounting/account/detail.html:94
 msgid "Created"
 msgstr "建檔"
 
-#: src/accounting/templates/accounting/account/detail.html:93
+#: src/accounting/templates/accounting/account/detail.html:95
 msgid "Updated"
 msgstr "更新"
 
@@ -134,6 +134,7 @@ msgid "Search"
 msgstr "搜尋"
 
 #: src/accounting/templates/accounting/account/list.html:68
+#: src/accounting/templates/accounting/account/order.html:81
 #: src/accounting/templates/accounting/base-account/list.html:51
 msgid "There is no data."
 msgstr "沒有資料。"
@@ -144,7 +145,7 @@ msgid "The Accounts of %(base)s"
 msgstr "%(base)s下的科目"
 
 #: src/accounting/templates/accounting/account/include/form.html:75
-#: src/accounting/templates/accounting/account/order.html:61
+#: src/accounting/templates/accounting/account/order.html:62
 msgid "Save"
 msgstr "儲存"
 
@@ -189,11 +190,13 @@ msgstr "科目"
 msgid "Base Accounts"
 msgstr "基本科目"
 
-#: src/accounting/utils/pagination.py:146
+#: src/accounting/utils/pagination.py:206
+msgctxt "Pagination|"
 msgid "Previous"
-msgstr "前一頁"
+msgstr "上一頁"
 
-#: src/accounting/utils/pagination.py:194
+#: src/accounting/utils/pagination.py:255
+msgctxt "Pagination|"
 msgid "Next"
 msgstr "下一頁"
 
