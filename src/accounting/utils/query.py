@@ -34,11 +34,22 @@ def parse_query_keywords(q: str | None) -> list[str]:
     if q == "":
         return []
     keywords: list[str] = []
-    while q is not None:
-        m: re.Match = re.match(r"(?:\"([^\"]+)\"|(\S+))(?:\s+(.+)|)$", q)
-        if m.group(1) is not None:
+    while True:
+        m: re.Match
+        m = re.match(r"\"([^\"]+)\"\s+(.+)$", q)
+        if m is not None:
             keywords.append(m.group(1))
-        else:
-            keywords.append(m.group(2))
-        q = m.group(3)
+            q = m.group(2)
+            continue
+        m = re.match(r"\"([^\"]+)\"?$", q)
+        if m is not None:
+            keywords.append(m.group(1))
+            break
+        m = re.match(r"(\S+)\s+(.+)$", q)
+        if m is not None:
+            keywords.append(m.group(1))
+            q = m.group(2)
+            continue
+        keywords.append(q)
+        break
     return keywords
