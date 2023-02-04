@@ -39,6 +39,17 @@ def gettext(string, **variables) -> str:
     return domain.gettext(string, **variables)
 
 
+def pgettext(context, string, **variables) -> str:
+    """A replacement of the Babel gettext() function..
+
+    :param context: The context.
+    :param string: The message to translate.
+    :param variables: The variable substitution.
+    :return: The translated message.
+    """
+    return domain.pgettext(context, string, **variables)
+
+
 def lazy_gettext(string, **variables) -> LazyString:
     """A replacement of the Babel lazy_gettext() function..
 
