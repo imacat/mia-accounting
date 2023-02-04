@@ -278,6 +278,8 @@ class Pagination(t.Generic[T]):
                 params[i] = (name, value)
                 is_found = True
             i = i + 1
+        if not is_found and value is not None:
+            params.append((name, value))
 
         parts: list[str] = list(uri_p)
         parts[4] = urlencode(params)
