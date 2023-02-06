@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask Demonstration 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-01-28 13:42+0800\n"
-"PO-Revision-Date: 2023-01-28 13:42+0800\n"
+"POT-Creation-Date: 2023-02-06 23:25+0800\n"
+"PO-Revision-Date: 2023-02-06 23:26+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -51,6 +51,10 @@ msgid "Editor"
 msgstr "記帳者"
 
 #: tests/test_site/templates/login.html:32
+msgid "Editor2"
+msgstr "記帳者2"
+
+#: tests/test_site/templates/login.html:33
 msgid "Nobody"
 msgstr "沒有權限者"
 

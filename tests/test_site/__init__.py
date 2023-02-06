@@ -91,9 +91,9 @@ def create_app(is_testing: bool = False) -> Flask:
             return user.id
 
     can_view: t.Callable[[], bool] = lambda: auth.current_user() is not None \
-        and auth.current_user().username in ["viewer", "editor"]
+        and auth.current_user().username in ["viewer", "editor", "editor2"]
     can_edit: t.Callable[[], bool] = lambda: auth.current_user() is not None \
-        and auth.current_user().username == "editor"
+        and auth.current_user().username in ["editor", "editor2"]
     accounting.init_app(app, user_utils=UserUtils(),
                         can_view_func=can_view, can_edit_func=can_edit)
 
@@ -106,7 +106,7 @@ def init_db_command() -> None:
     """Initializes the database."""
     db.create_all()
     from .auth import User
-    for username in ["viewer", "editor", "nobody"]:
+    for username in ["viewer", "editor", "editor2", "nobody"]:
         if User.query.filter(User.username == username).first() is None:
             db.session.add(User(username=username))
     db.session.commit()

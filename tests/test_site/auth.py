@@ -58,7 +58,8 @@ def login() -> redirect:
 
     :return: The redirection to the home page.
     """
-    if request.form.get("username") not in ["viewer", "editor", "nobody"]:
+    if request.form.get("username") not in ["viewer", "editor", "editor2",
+                                            "nobody"]:
         return redirect(url_for("auth.login"))
     session["user"] = request.form.get("username")
     return redirect(url_for("home.home"))
