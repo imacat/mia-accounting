@@ -187,8 +187,7 @@ class Account(db.Model):
             if l10n.locale == current_locale:
                 l10n.title = value
                 return
-        self.l10n.append(AccountL10n(
-            locale=current_locale, title=value))
+        self.l10n.append(AccountL10n(locale=current_locale, title=value))
 
     @classmethod
     def find_by_code(cls, code: str) -> t.Self | None:
