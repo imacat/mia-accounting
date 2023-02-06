@@ -28,7 +28,7 @@ First written: 2023/1/30
 <div class="btn-group mb-2">
   {% if can_edit_accounting() %}
     <a class="btn btn-primary text-nowrap d-none d-md-block" href="{{ url_for("accounting.account.create")|append_next }}">
-      <i class="fa-solid fa-user-plus"></i>
+      <i class="fa-solid fa-plus"></i>
       {{ A_("New") }}
     </a>
   {% endif %}
