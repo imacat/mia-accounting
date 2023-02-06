@@ -17,6 +17,7 @@
 """The common test libraries.
 
 """
+import typing as t
 from html.parser import HTMLParser
 from unittest import TestCase
 
@@ -75,3 +76,21 @@ def get_csrf_token(test_case: TestCase, client: httpx.Client, uri: str) -> str:
     parser.feed(response.text)
     test_case.assertIsNotNone(parser.csrf_token)
     return parser.csrf_token
+
+
+def set_locale(test_case: TestCase, client: httpx.Client, csrf_token: str,
+               locale: t.Literal["en", "zh_Hant", "zh_Hans"]) -> None:
+    """Sets the current locale.
+
+    :param test_case: The test case.
+    :param client: The test client.
+    :param csrf_token: The CSRF token.
+    :param locale: The locale.
+    :return: None.
+    """
+    response: httpx.Response = client.post("/locale",
+                                           data={"csrf_token": csrf_token,
+                                                 "locale": locale,
+                                                 "next": "/next"})
+    test_case.assertEqual(response.status_code, 302)
+    test_case.assertEqual(response.headers["Location"], "/next")

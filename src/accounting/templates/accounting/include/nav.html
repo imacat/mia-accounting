@@ -38,6 +38,12 @@ First written: 2023/1/26
           {{ A_("Base Accounts") }}
         </a>
       </li>
+      <li>
+        <a class="dropdown-item {% if request.endpoint.startswith("accounting.currency.") %} active {% endif %}" href="{{ url_for("accounting.currency.list") }}">
+          <i class="fa-solid fa-list"></i>
+          {{ A_("Currencies") }}
+        </a>
+      </li>
     </ul>
   </li>
 {% endif %}

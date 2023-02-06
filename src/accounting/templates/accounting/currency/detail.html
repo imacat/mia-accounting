@@ -1,0 +1,90 @@
+{#
+The Mia! Accounting Flask Project
+detail.html: The currency detail
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/6
+#}
+{% extends "accounting/base.html" %}
+
+{% block header %}{% block title %}{{ obj }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-3">
+  <a class="btn btn-primary" href="{{ url_for("accounting.currency.list")|or_next }}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    {{ A_("Back") }}
+  </a>
+  {% if can_edit_accounting() %}
+    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.currency.edit", currency=obj)|inherit_next }}">
+      <i class="fa-solid fa-gear"></i>
+      {{ A_("Settings") }}
+    </a>
+  {% endif %}
+  {% if can_edit_accounting() %}
+    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#delete-modal">
+      <i class="fa-solid fa-trash"></i>
+      {{ A_("Delete") }}
+    </button>
+  {% endif %}
+</div>
+
+{% if can_edit_accounting() %}
+  <div class="d-md-none material-fab">
+    <a class="btn btn-primary" href="{{ url_for("accounting.currency.edit", currency=obj)|inherit_next }}">
+      <i class="fa-solid fa-pen-to-square"></i>
+    </a>
+  </div>
+{% endif %}
+
+{% if can_edit_accounting() %}
+  <form id="delete-form" action="{{ url_for("accounting.currency.delete", currency=obj) }}" method="post">
+    <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if "next" in request.args %}
+      <input type="hidden" name="next" value="{{ request.args["next"] }}">
+    {% endif %}
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-model-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="delete-model-label">{{ A_("Delete Currency Confirmation") }}</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {{ A_("Do you really want to delete this currency?") }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>
+            <button type="submit" class="btn btn-danger">{{ A_("Confirm") }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+{% endif %}
+
+<div class="currency col-sm-6">
+  <div class="currency-name">{{ obj.name }}</div>
+  <div class="currency-code">{{ obj.code }}</div>
+  <div class="small text-secondary fst-italic">
+    <div>{{ A_("Created") }} {{ obj.created_at }} {{ obj.created_by }}</div>
+    <div>{{ A_("Updated") }} {{ obj.updated_at }} {{ obj.updated_by }}</div>
+  </div>
+</div>
+
+{% endblock %}

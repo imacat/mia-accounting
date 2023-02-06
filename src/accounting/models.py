@@ -313,3 +313,117 @@ class AccountL10n(db.Model):
     locale = db.Column(db.String, nullable=False, primary_key=True)
     title = db.Column(db.String, nullable=False)
     db.UniqueConstraint(account_id, locale)
+
+
+class Currency(db.Model):
+    """A currency."""
+    __tablename__ = "accounting_currencies"
+    """The table name."""
+    code = db.Column(db.String, nullable=False, primary_key=True)
+    """The code."""
+    name_l10n = db.Column("name", db.String, nullable=False)
+    """The name."""
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
+                           server_default=db.func.now())
+    """The time of creation."""
+    created_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
+                              nullable=False)
+    """The ID of the creator."""
+    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    """The creator."""
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
+                           server_default=db.func.now())
+    """The time of last update."""
+    updated_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
+                              nullable=False)
+    """The ID of the updator."""
+    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    """The updator."""
+    l10n = db.relationship("CurrencyL10n", back_populates="currency",
+                           lazy=False)
+    """The localized names."""
+
+    def __str__(self) -> str:
+        """Returns the string representation of the currency.
+
+        :return: The string representation of the currency.
+        """
+        return F"{self.name} ({self.code})"
+
+    @property
+    def name(self) -> str:
+        """Returns the name in the current locale.
+
+        :return: The name in the current locale.
+        """
+        current_locale = str(get_locale())
+        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+            return self.name_l10n
+        for l10n in self.l10n:
+            if l10n.locale == current_locale:
+                return l10n.name
+        return self.name_l10n
+
+    @name.setter
+    def name(self, value: str) -> None:
+        """Sets the name in the current locale.
+
+        :param value: The new name.
+        :return: None.
+        """
+        if self.name_l10n is None:
+            self.name_l10n = value
+            return
+        current_locale = str(get_locale())
+        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+            self.name_l10n = value
+            return
+        for l10n in self.l10n:
+            if l10n.locale == current_locale:
+                l10n.name = value
+                return
+        self.l10n.append(CurrencyL10n(locale=current_locale, name=value))
+
+    @property
+    def is_modified(self) -> bool:
+        """Returns whether a product account was modified.
+
+        :return: True if modified, or False otherwise.
+        """
+        if db.session.is_modified(self):
+            return True
+        for l10n in self.l10n:
+            if db.session.is_modified(l10n):
+                return True
+        return False
+
+    def delete(self) -> None:
+        """Deletes the currency.
+
+        :return: None.
+        """
+        CurrencyL10n.query.filter(CurrencyL10n.currency == self).delete()
+        cls: t.Type[t.Self] = self.__class__
+        cls.query.filter(cls.code == self.code).delete()
+
+
+class CurrencyL10n(db.Model):
+    """A localized currency name."""
+    __tablename__ = "accounting_currencies_l10n"
+    """The table name."""
+    currency_code = db.Column(db.String,
+                              db.ForeignKey(Currency.code, onupdate="CASCADE",
+                                            ondelete="CASCADE"),
+                              nullable=False, primary_key=True)
+    """The currency code."""
+    currency = db.relationship(Currency, back_populates="l10n")
+    """The currency."""
+    locale = db.Column(db.String, nullable=False, primary_key=True)
+    """The locale."""
+    name = db.Column(db.String, nullable=False)
+    """The localized name."""
+    db.UniqueConstraint(currency_code, locale)

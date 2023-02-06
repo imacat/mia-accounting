@@ -63,6 +63,9 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     from . import account
     account.init_app(app, bp)
 
+    from . import currency
+    currency.init_app(app, bp)
+
     from .utils.next_url import append_next, inherit_next, or_next
     bp.add_app_template_filter(append_next, "append_next")
     bp.add_app_template_filter(inherit_next, "inherit_next")

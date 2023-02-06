@@ -1,0 +1,68 @@
+{#
+The Mia! Accounting Flask Project
+form.html: The currency form
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/6
+#}
+{% extends "accounting/base.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/currency-form.js") }}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="btn-group btn-actions mb-3">
+  <a class="btn btn-primary" role="button" href="{% block back_url %}{% endblock %}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    {{ A_("Back") }}
+  </a>
+</div>
+
+<form id="currency-form" action="{% block action_url %}{% endblock %}" method="post">
+  {{ form.csrf_token }}
+  {% if "next" in request.args %}
+    <input type="hidden" name="next" value="{{ request.args["next"] }}">
+  {% endif %}
+  <div class="form-floating mb-3">
+    <input id="currency-code" class="form-control {% if form.code.errors %} is-invalid {% endif %}" type="text" name="code" value="{{ "" if form.code.data is none else form.code.data }}" placeholder=" " required="required" data-exists-url="{{ url_for("accounting.currency-api.exists") }}" data-original="{% block original_code %}{% endblock %}" data-blocklist="{{ form.CODE_BLOCKLIST|tojson|forceescape }}">
+    <label class="form-label" for="currency-code">{{ A_("Code") }}</label>
+    <div id="currency-code-error" class="invalid-feedback">{% if form.code.errors %}{{ form.code.errors[0] }}{% endif %}</div>
+  </div>
+
+  <div class="form-floating mb-3">
+    <input id="currency-name" class="form-control {% if form.name.errors %} is-invalid {% endif %}" type="text" name="name" value="{{ "" if form.name.data is none else form.name.data }}" placeholder=" " required="required">
+    <label class="form-label" for="currency-name">{{ A_("Name") }}</label>
+    <div id="currency-name-error" class="invalid-feedback">{% if form.name.errors %}{{ form.name.errors[0] }}{% endif %}</div>
+  </div>
+
+  <div class="d-none d-md-block">
+    <button class="btn btn-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      {{ A_("Save") }}
+    </button>
+  </div>
+
+  <div class="d-md-none material-fab">
+    <button class="btn btn-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+    </button>
+  </div>
+</form>
+
+{% endblock %}

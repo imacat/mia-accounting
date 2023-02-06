@@ -56,6 +56,23 @@
     overflow-y: scroll;
 }
 
+/** The currency management. */
+.currency {
+    padding: 2em 1.5em;
+    margin: 1em;
+    background-color: #E9ECEF;
+    border-radius: 0.3em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.currency .currency-name {
+    font-size: 1.8rem;
+    font-weight: bolder;
+}
+.currency .currency-code {
+    font-size: 1.4rem;
+    color: #373b3e;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .material-text-field {
     position: relative;
