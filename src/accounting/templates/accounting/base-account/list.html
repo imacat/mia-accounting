@@ -21,7 +21,7 @@ First written: 2023/1/26
 #}
 {% extends "accounting/base.html" %}
 
-{% block header %}{% block title %}{{ A_("Base Account Managements") }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if "q" in request.args %}{{ A_("Search Result for \"%(query)s\"", query=request.args["q"]) }}{% else %}{{ A_("Base Account Managements") }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
