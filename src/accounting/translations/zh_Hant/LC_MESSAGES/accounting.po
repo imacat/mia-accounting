@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-04 13:24+0800\n"
-"PO-Revision-Date: 2023-02-04 13:25+0800\n"
+"POT-Creation-Date: 2023-02-06 09:47+0800\n"
+"PO-Revision-Date: 2023-02-06 09:48+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -118,6 +118,12 @@ msgstr "更新"
 #, python-format
 msgid "%(account)s Settings"
 msgstr "%(account)s設定"
+
+#: src/accounting/templates/accounting/account/list.html:24
+#: src/accounting/templates/accounting/base-account/list.html:24
+#, python-format
+msgid "Search Result for \"%(query)s\""
+msgstr "「%(query)s」搜尋結果"
 
 #: src/accounting/templates/accounting/account/list.html:24
 msgid "Account Management"
