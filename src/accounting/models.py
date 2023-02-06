@@ -317,7 +317,6 @@ class AccountL10n(db.Model):
     """The locale."""
     title = db.Column(db.String, nullable=False)
     """The localized title."""
-    db.UniqueConstraint(account_id, locale)
 
 
 class Currency(db.Model):
@@ -431,4 +430,3 @@ class CurrencyL10n(db.Model):
     """The locale."""
     name = db.Column(db.String, nullable=False)
     """The localized name."""
-    db.UniqueConstraint(currency_code, locale)
