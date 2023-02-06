@@ -469,6 +469,8 @@ class CurrencyTestCase(unittest.TestCase):
         from accounting.models import Currency
         from test_site import db
         zza_code, zza_name = "ZZA", "Testing Dollar #A"
+        detail_uri: str = f"/accounting/currencies/{zza_code}"
+        update_uri: str = f"/accounting/currencies/{zza_code}/update"
 
         with self.app.app_context():
             zza: Currency = db.session.get(Currency, zza_code)
@@ -477,14 +479,12 @@ class CurrencyTestCase(unittest.TestCase):
 
         set_locale(self, self.client, self.csrf_token, "zh_Hant")
 
-        response = self.client.post(
-            f"/accounting/currencies/{zza_code}/update",
-            data={"csrf_token": self.csrf_token,
-                  "code": zza_code,
-                  "name": f"{zza_name}-zh_Hant"})
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "code": zza_code,
+                                          "name": f"{zza_name}-zh_Hant"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zza_code}")
+        self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
             zza: Currency = db.session.get(Currency, zza_code)
@@ -494,14 +494,12 @@ class CurrencyTestCase(unittest.TestCase):
 
         set_locale(self, self.client, self.csrf_token, "en")
 
-        response = self.client.post(
-            f"/accounting/currencies/{zza_code}/update",
-            data={"csrf_token": self.csrf_token,
-                  "code": zza_code,
-                  "name": f"{zza_name}-2"})
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "code": zza_code,
+                                          "name": f"{zza_name}-2"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zza_code}")
+        self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
             zza: Currency = db.session.get(Currency, zza_code)
@@ -511,14 +509,12 @@ class CurrencyTestCase(unittest.TestCase):
 
         set_locale(self, self.client, self.csrf_token, "zh_Hant")
 
-        response = self.client.post(
-            f"/accounting/currencies/{zza_code}/update",
-            data={"csrf_token": self.csrf_token,
-                  "code": zza_code,
-                  "name": f"{zza_name}-zh_Hant-2"})
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "code": zza_code,
+                                          "name": f"{zza_name}-zh_Hant-2"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zza_code}")
+        self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
             zza: Currency = db.session.get(Currency, zza_code)
