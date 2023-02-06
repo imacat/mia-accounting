@@ -305,13 +305,18 @@ class Account(db.Model):
 class AccountL10n(db.Model):
     """A localized account title."""
     __tablename__ = "accounting_accounts_l10n"
+    """The table name."""
     account_id = db.Column(db.Integer,
                            db.ForeignKey(Account.id, onupdate="CASCADE",
                                          ondelete="CASCADE"),
                            nullable=False, primary_key=True)
+    """The account ID."""
     account = db.relationship(Account, back_populates="l10n")
+    """The account."""
     locale = db.Column(db.String, nullable=False, primary_key=True)
+    """The locale."""
     title = db.Column(db.String, nullable=False)
+    """The localized title."""
     db.UniqueConstraint(account_id, locale)
 
 
