@@ -87,10 +87,6 @@ class BaseAccountTestCase(unittest.TestCase):
                 result = runner.invoke(args="accounting-init-base")
                 self.assertEqual(result.exit_code, 0)
 
-        self.viewer: UserClient = get_user_client(self, self.app, "viewer")
-        self.editor: UserClient = get_user_client(self, self.app, "editor")
-        self.nobody: UserClient = get_user_client(self, self.app, "nobody")
-
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
