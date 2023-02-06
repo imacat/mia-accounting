@@ -38,7 +38,7 @@ bp: Blueprint = Blueprint("account", __name__)
 @bp.get("", endpoint="list")
 @has_permission(can_view)
 def list_accounts() -> str:
-    """Lists the base accounts.
+    """Lists the accounts.
 
     :return: The account list.
     """
