@@ -25,8 +25,8 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from testlib import get_client
 from test_site import create_app
+from testlib import get_client
 
 
 class AccountCommandTestCase(unittest.TestCase):
