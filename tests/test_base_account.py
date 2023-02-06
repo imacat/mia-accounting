@@ -24,7 +24,7 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from testlib import UserClient, get_user_client
+from testlib import get_client
 from test_site import create_app
 
 
@@ -92,13 +92,13 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
+        client, csrf_token = get_client(self, self.app, "nobody")
         response: httpx.Response
-        nobody: UserClient = get_user_client(self, self.app, "nobody")
 
-        response = nobody.client.get("/accounting/base-accounts")
+        response = client.get("/accounting/base-accounts")
         self.assertEqual(response.status_code, 403)
 
-        response = nobody.client.get("/accounting/base-accounts/1111")
+        response = client.get("/accounting/base-accounts/1111")
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -106,13 +106,13 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
+        client, csrf_token = get_client(self, self.app, "viewer")
         response: httpx.Response
-        viewer: UserClient = get_user_client(self, self.app, "viewer")
 
-        response = viewer.client.get("/accounting/base-accounts")
+        response = client.get("/accounting/base-accounts")
         self.assertEqual(response.status_code, 200)
 
-        response = viewer.client.get("/accounting/base-accounts/1111")
+        response = client.get("/accounting/base-accounts/1111")
         self.assertEqual(response.status_code, 200)
 
     def test_editor(self) -> None:
@@ -120,11 +120,11 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
+        client, csrf_token = get_client(self, self.app, "editor")
         response: httpx.Response
-        editor: UserClient = get_user_client(self, self.app, "editor")
 
-        response = editor.client.get("/accounting/base-accounts")
+        response = client.get("/accounting/base-accounts")
         self.assertEqual(response.status_code, 200)
 
-        response = editor.client.get("/accounting/base-accounts/1111")
+        response = client.get("/accounting/base-accounts/1111")
         self.assertEqual(response.status_code, 200)
