@@ -159,9 +159,7 @@ def delete_account(account: Account) -> redirect:
     :return: The redirection to the account list on success, or the account
         detail on error.
     """
-    for l10n in account.l10n:
-        db.session.delete(l10n)
-    db.session.delete(account)
+    account.delete()
     sort_accounts_in(account.base_code, account.id)
     db.session.commit()
     flash(lazy_gettext("The account is deleted successfully."), "success")
