@@ -20,7 +20,6 @@
 import typing as t
 
 from flask import Flask, Blueprint
-from flask_sqlalchemy.model import Model
 
 from accounting.utils.user import AbstractUserUtils
 
