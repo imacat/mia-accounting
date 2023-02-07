@@ -139,7 +139,7 @@ def update_account(account: Account) -> redirect:
                                              account=account)))
     with db.session.no_autoflush:
         form.populate_obj(account)
-    if not db.session.is_modified(account):
+    if not account.is_modified:
         flash(lazy_gettext("The account was not modified."), "success")
         return redirect(inherit_next(url_for("accounting.account.detail",
                                              account=account)))

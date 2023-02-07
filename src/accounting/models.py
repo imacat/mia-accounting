@@ -292,6 +292,19 @@ class Account(db.Model):
         """
         return cls.find_by_code(cls.__NET_CHANGE)
 
+    @property
+    def is_modified(self) -> bool:
+        """Returns whether a product account was modified.
+
+        :return: True if modified, or False otherwise.
+        """
+        if db.session.is_modified(self):
+            return True
+        for l10n in self.l10n:
+            if db.session.is_modified(l10n):
+                return True
+        return False
+
     def delete(self) -> None:
         """Deletes this accounting account.
 
