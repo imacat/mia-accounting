@@ -43,6 +43,14 @@ First written: 2023/2/6
   </form>
 </div>
 
+{% if can_edit_accounting() %}
+  <div class="d-md-none material-fab">
+    <a class="btn btn-primary" href="{{ url_for("accounting.currency.create")|append_next }}">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+  </div>
+{% endif %}
+
 {% if list %}
   {% include "accounting/include/pagination.html" %}
 
