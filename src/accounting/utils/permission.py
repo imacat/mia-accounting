@@ -104,5 +104,5 @@ def init_app(bp: Blueprint,
         __can_view_func = can_view_func
     if can_edit_func is not None:
         __can_edit_func = can_edit_func
-    bp.add_app_template_global(can_view, "can_view_accounting")
-    bp.add_app_template_global(can_edit, "can_edit_accounting")
+    bp.add_app_template_global(can_view, "accounting_can_view")
+    bp.add_app_template_global(can_edit, "accounting_can_edit")

@@ -19,7 +19,7 @@ nav.html: The navigation menu for the accounting application.
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/1/26
 #}
-{% if can_view_accounting() %}
+{% if accounting_can_view() %}
   <li class="nav-item dropdown">
     <span class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
       <i class="fa-solid fa-gear"></i>

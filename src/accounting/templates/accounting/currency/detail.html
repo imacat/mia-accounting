@@ -30,13 +30,13 @@ First written: 2023/2/6
     <i class="fa-solid fa-circle-chevron-left"></i>
     {{ A_("Back") }}
   </a>
-  {% if can_edit_accounting() %}
+  {% if accounting_can_edit() %}
     <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.currency.edit", currency=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-gear"></i>
       {{ A_("Settings") }}
     </a>
   {% endif %}
-  {% if can_edit_accounting() %}
+  {% if accounting_can_edit() %}
     <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#delete-modal">
       <i class="fa-solid fa-trash"></i>
       {{ A_("Delete") }}
@@ -44,7 +44,7 @@ First written: 2023/2/6
   {% endif %}
 </div>
 
-{% if can_edit_accounting() %}
+{% if accounting_can_edit() %}
   <div class="d-md-none material-fab">
     <a class="btn btn-primary" href="{{ url_for("accounting.currency.edit", currency=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
@@ -52,7 +52,7 @@ First written: 2023/2/6
   </div>
 {% endif %}
 
-{% if can_edit_accounting() %}
+{% if accounting_can_edit() %}
   <form id="delete-form" action="{{ url_for("accounting.currency.delete", currency=obj) }}" method="post">
     <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if "next" in request.args %}

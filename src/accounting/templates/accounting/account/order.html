@@ -37,7 +37,7 @@ First written: 2023/2/2
   </a>
 </div>
 
-{% if base.accounts|length > 1 and can_edit_accounting() %}
+{% if base.accounts|length > 1 and accounting_can_edit() %}
   <form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
     <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if "next" in request.args %}
