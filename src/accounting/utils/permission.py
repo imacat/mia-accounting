@@ -23,6 +23,8 @@ import typing as t
 
 from flask import Flask, abort
 
+from accounting.utils.user import get_current_user
+
 
 def has_permission(rule: t.Callable[[], bool]) -> t.Callable:
     """The permission decorator to check whether the current user is allowed.
@@ -75,9 +77,13 @@ def can_view() -> bool:
 def can_edit() -> bool:
     """Returns whether the current user can edit the account data.
 
+    The user has to log in.
+
     :return: True if the current user can edit the accounting data, or False
         otherwise.
     """
+    if get_current_user() is None:
+        return False
     return __can_edit_func()
 
 
