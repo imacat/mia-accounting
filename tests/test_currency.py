@@ -480,6 +480,27 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual(zza_currency.created_by.username, editor_username)
             self.assertEqual(zza_currency.updated_by.username, editor2_username)
 
+    def test_api_exists(self) -> None:
+        """Tests the API to check if a code exists.
+
+        :return: None.
+        """
+        response: httpx.Response
+
+        response = self.client.get(
+            f"/accounting/api/currencies/exists-code?q={zza.code}")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(set(data.keys()), {"exists"})
+        self.assertTrue(data["exists"])
+
+        response = self.client.get(
+            f"/accounting/api/currencies/exists-code?q={zza.code}-1")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(set(data.keys()), {"exists"})
+        self.assertFalse(data["exists"])
+
     def test_l10n(self) -> None:
         """Tests the localization.
 
