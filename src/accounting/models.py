@@ -191,11 +191,10 @@ class Account(db.Model):
 
     @classmethod
     def find_by_code(cls, code: str) -> t.Self | None:
-        """Finds an accounting account by its code.
+        """Finds an account by its code.
 
         :param code: The code.
-        :return: The accounting account, or None if this account does not
-            exist.
+        :return: The account, or None if this account does not exist.
         """
         m = re.match("^([1-9]{4})-([0-9]{3})$", code)
         if m is None:
@@ -306,7 +305,7 @@ class Account(db.Model):
         return False
 
     def delete(self) -> None:
-        """Deletes this accounting account.
+        """Deletes this account.
 
         :return: None.
         """
