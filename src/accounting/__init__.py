@@ -55,7 +55,7 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     locale.init_app(app, bp)
 
     from .utils import permission
-    permission.init_app(app, can_view_func, can_edit_func)
+    permission.init_app(bp, can_view_func, can_edit_func)
 
     from . import base_account
     base_account.init_app(app, bp)

@@ -21,7 +21,7 @@ This module should not import any other module from the application.
 """
 import typing as t
 
-from flask import Flask, abort
+from flask import abort, Blueprint
 
 from accounting.utils.user import get_current_user
 
@@ -87,11 +87,12 @@ def can_edit() -> bool:
     return __can_edit_func()
 
 
-def init_app(app: Flask, can_view_func: t.Callable[[], bool] | None = None,
+def init_app(bp: Blueprint,
+             can_view_func: t.Callable[[], bool] | None = None,
              can_edit_func: t.Callable[[], bool] | None = None) -> None:
     """Initializes the application.
 
-    :param app: The Flask application.
+    :param bp: The blueprint of the accounting application.
     :param can_view_func: A callback that returns whether the current user can
         view the accounting data.
     :param can_edit_func: A callback that returns whether the current user can
@@ -103,5 +104,5 @@ def init_app(app: Flask, can_view_func: t.Callable[[], bool] | None = None,
         __can_view_func = can_view_func
     if can_edit_func is not None:
         __can_edit_func = can_edit_func
-    app.jinja_env.globals["can_view_accounting"] = can_view
-    app.jinja_env.globals["can_edit_accounting"] = can_edit
+    bp.add_app_template_global(can_view, "can_view_accounting")
+    bp.add_app_template_global(can_edit, "can_edit_accounting")
