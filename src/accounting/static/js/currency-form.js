@@ -133,7 +133,7 @@ function validateAsyncCodeIsDuplicated(isSubmission, key) {
             const result = JSON.parse(this.responseText);
             if (result["exists"]) {
                 field.classList.add("is-invalid");
-                error.innerText = _("Code conflicts with another currency.");
+                error.innerText = A_("Code conflicts with another currency.");
                 if (isSubmission) {
                     isAsyncValid[key] = false;
                 }
