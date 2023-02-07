@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
 "POT-Creation-Date: 2023-02-07 16:22+0800\n"
-"PO-Revision-Date: 2023-02-07 16:23+0800\n"
+"PO-Revision-Date: 2023-02-07 18:04+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -69,7 +69,7 @@ msgstr "順序存好了。"
 #: src/accounting/currency/forms.py:47
 #: src/accounting/static/js/currency-form.js:136
 msgid "Code conflicts with another currency."
-msgstr "代碼與其它貨幣重複"
+msgstr "代碼與其它貨幣重複。"
 
 #: src/accounting/currency/forms.py:52
 #: src/accounting/static/js/currency-form.js:92
