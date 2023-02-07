@@ -17,6 +17,7 @@
 """The test for the account management.
 
 """
+import time
 import unittest
 
 import httpx
@@ -26,7 +27,39 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import create_app
-from testlib import get_client
+from testlib import get_client, set_locale
+
+
+class AccountData:
+    """The account data."""
+
+    def __init__(self, base_code: str, no: int, title: str):
+        """Constructs the account data.
+
+        :param base_code: The base code.
+        :param no: The number.
+        :param title: The title.
+        """
+        self.base_code: str = base_code
+        """The base code."""
+        self.no: int = no
+        """The number."""
+        self.title: str = title
+        """The title."""
+        self.code: str = f"{self.base_code}-{self.no:03d}"
+        """The code."""
+
+
+cash: AccountData = AccountData("1111", 1, "Cash")
+"""The cash account."""
+bank: AccountData = AccountData("1113", 1, "Bank")
+"""The bank account."""
+stock: AccountData = AccountData("1121", 1, "Stock")
+"""The stock account."""
+loan: AccountData = AccountData("2112", 1, "Loan")
+"""The loan account."""
+PREFIX: str = "/accounting/accounts"
+"""The URL prefix of the currency management."""
 
 
 class AccountCommandTestCase(unittest.TestCase):
@@ -111,21 +144,21 @@ class AccountTestCase(unittest.TestCase):
         self.client, self.csrf_token = get_client(self, self.app, "editor")
         response: httpx.Response
 
-        response = self.client.post("/accounting/accounts/store",
+        response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,
-                                          "base_code": "1111",
-                                          "title": "1111 title"})
+                                          "base_code": cash.base_code,
+                                          "title": cash.title})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1111-001")
+                         f"{PREFIX}/{cash.code}")
 
-        response = self.client.post("/accounting/accounts/store",
+        response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,
-                                          "base_code": "1112",
-                                          "title": "1112 title"})
+                                          "base_code": bank.base_code,
+                                          "title": bank.title})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1112-001")
+                         f"{PREFIX}/{bank.code}")
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
@@ -136,44 +169,44 @@ class AccountTestCase(unittest.TestCase):
         client, csrf_token = get_client(self, self.app, "nobody")
         response: httpx.Response
 
-        response = client.get("/accounting/accounts")
+        response = client.get(PREFIX)
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/1111-001")
+        response = client.get(f"{PREFIX}/{cash.code}")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/create")
+        response = client.get(f"{PREFIX}/create")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/store",
+        response = client.post(f"{PREFIX}/store",
                                data={"csrf_token": csrf_token,
-                                     "base_code": "1113",
-                                     "title": "1113 title"})
+                                     "base_code": stock.base_code,
+                                     "title": stock.title})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/1111-001/edit")
+        response = client.get(f"{PREFIX}/{cash.code}/edit")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/update",
+        response = client.post(f"{PREFIX}/{cash.code}/update",
                                data={"csrf_token": csrf_token,
-                                     "base_code": "1111",
-                                     "title": "1111 title #2"})
+                                     "base_code": cash.base_code,
+                                     "title": f"{cash.title}-2"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/delete",
+        response = client.post(f"{PREFIX}/{cash.code}/delete",
                                data={"csrf_token": csrf_token})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/bases/1111")
+        response = client.get(f"{PREFIX}/bases/{cash.base_code}")
         self.assertEqual(response.status_code, 403)
 
         with self.app.app_context():
-            account_id: int = Account.find_by_code("1112-001").id
+            bank_id: int = Account.find_by_code(bank.code).id
 
-        response = client.post("/accounting/accounts/bases/1112",
+        response = client.post(f"{PREFIX}/bases/{bank.base_code}",
                                data={"csrf_token": csrf_token,
                                      "next": "/next",
-                                     f"{account_id}-no": "5"})
+                                     f"{bank_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -185,44 +218,44 @@ class AccountTestCase(unittest.TestCase):
         client, csrf_token = get_client(self, self.app, "viewer")
         response: httpx.Response
 
-        response = client.get("/accounting/accounts")
+        response = client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/accounts/1111-001")
+        response = client.get(f"{PREFIX}/{cash.code}")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/accounts/create")
+        response = client.get(f"{PREFIX}/create")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/store",
+        response = client.post(f"{PREFIX}/store",
                                data={"csrf_token": csrf_token,
-                                     "base_code": "1113",
-                                     "title": "1113 title"})
+                                     "base_code": stock.base_code,
+                                     "title": stock.title})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/1111-001/edit")
+        response = client.get(f"{PREFIX}/{cash.code}/edit")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/update",
+        response = client.post(f"{PREFIX}/{cash.code}/update",
                                data={"csrf_token": csrf_token,
-                                     "base_code": "1111",
-                                     "title": "1111 title #2"})
+                                     "base_code": cash.base_code,
+                                     "title": f"{cash.title}-2"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/accounts/1111-001/delete",
+        response = client.post(f"{PREFIX}/{cash.code}/delete",
                                data={"csrf_token": csrf_token})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/accounts/bases/1111")
+        response = client.get(f"{PREFIX}/bases/{cash.base_code}")
         self.assertEqual(response.status_code, 200)
 
         with self.app.app_context():
-            account_id: int = Account.find_by_code("1112-001").id
+            bank_id: int = Account.find_by_code(bank.code).id
 
-        response = client.post("/accounting/accounts/bases/1112",
+        response = client.post(f"{PREFIX}/bases/{bank.base_code}",
                                data={"csrf_token": csrf_token,
                                      "next": "/next",
-                                     f"{account_id}-no": "5"})
+                                     f"{bank_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
     def test_editor(self) -> None:
@@ -233,107 +266,382 @@ class AccountTestCase(unittest.TestCase):
         from accounting.models import Account
         response: httpx.Response
 
-        response = self.client.get("/accounting/accounts")
+        response = self.client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/accounting/accounts/1111-001")
+        response = self.client.get(f"{PREFIX}/{cash.code}")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/accounting/accounts/create")
+        response = self.client.get(f"{PREFIX}/create")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post("/accounting/accounts/store",
+        response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,
-                                          "base_code": "1113",
-                                          "title": "1113 title"})
+                                          "base_code": stock.base_code,
+                                          "title": stock.title})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1113-001")
+                         f"{PREFIX}/{stock.code}")
 
-        response = self.client.get("/accounting/accounts/1111-001/edit")
+        response = self.client.get(f"{PREFIX}/{cash.code}/edit")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post("/accounting/accounts/1111-001/update",
+        response = self.client.post(f"{PREFIX}/{cash.code}/update",
                                     data={"csrf_token": self.csrf_token,
-                                          "base_code": "1111",
-                                          "title": "1111 title #2"})
+                                          "base_code": cash.base_code,
+                                          "title": f"{cash.title}-2"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1111-001")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{cash.code}")
 
-        response = self.client.post("/accounting/accounts/1111-001/delete",
+        response = self.client.post(f"{PREFIX}/{cash.code}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts")
+        self.assertEqual(response.headers["Location"], PREFIX)
 
-        response = self.client.get("/accounting/accounts/bases/1111")
+        response = self.client.get(f"{PREFIX}/bases/{cash.base_code}")
         self.assertEqual(response.status_code, 200)
 
         with self.app.app_context():
-            account_id: int = Account.find_by_code("1112-001").id
+            bank_id: int = Account.find_by_code(bank.code).id
 
-        response = self.client.post("/accounting/accounts/bases/1112",
+        response = self.client.post(f"{PREFIX}/bases/{bank.base_code}",
                                     data={"csrf_token": self.csrf_token,
                                           "next": "/next",
-                                          f"{account_id}-no": "5"})
+                                          f"{bank_id}-no": "5"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/next")
 
-    def test_change_base(self) -> None:
-        """Tests to change the base account.
+    def test_add(self) -> None:
+        """Tests to add the currencies.
 
         :return: None.
         """
         from accounting.database import db
         from accounting.models import Account
+        create_uri: str = f"{PREFIX}/create"
+        store_uri: str = f"{PREFIX}/store"
+        detail_uri: str = f"{PREFIX}/{stock.code}"
         response: httpx.Response
 
-        response = self.client.post("/accounting/accounts/store",
-                                    data={"csrf_token": self.csrf_token,
-                                          "base_code": "1111",
-                                          "title": "Title #1"})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1111-002")
+        with self.app.app_context():
+            self.assertEqual({x.code for x in Account.query.all()},
+                             {cash.code, bank.code})
 
-        response = self.client.post("/accounting/accounts/store",
-                                    data={"csrf_token": self.csrf_token,
-                                          "base_code": "1111",
-                                          "title": "Title #1"})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1111-003")
+        # Missing CSRF token
+        response = self.client.post(store_uri,
+                                    data={"base_code": stock.base_code,
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 400)
 
-        response = self.client.post("/accounting/accounts/store",
+        # CSRF token mismatch
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": f"{self.csrf_token}-2",
+                                          "base_code": stock.base_code,
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 400)
+
+        # Empty base account code
+        response = self.client.post(store_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "base_code": "1112",
-                                          "title": "Title #1"})
+                                          "base_code": " ",
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
+        # Non-existing base account
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "9999",
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
+        # Unavailable base account
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1",
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
+        # Empty name
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": stock.base_code,
+                                          "title": " "})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
+        # Success, with spaces to be stripped
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": f" {stock.base_code} ",
+                                          "title": f" {stock.title} "})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        # Success under the same base
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": stock.base_code,
+                                          "title": stock.title})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1112-002")
+                         f"{PREFIX}/{stock.base_code}-002")
+
+        # Success under the same base, with order in a mess.
+        with self.app.app_context():
+            stock_2: Account = Account.find_by_code(f"{stock.base_code}-002")
+            stock_2.no = 66
+            db.session.commit()
+
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": stock.base_code,
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{stock.base_code}-067")
 
         with self.app.app_context():
-            id_1: int = Account.find_by_code("1111-001").id
-            id_2: int = Account.find_by_code("1111-002").id
-            id_3: int = Account.find_by_code("1111-003").id
-            id_4: int = Account.find_by_code("1112-001").id
-            id_5: int = Account.find_by_code("1112-002").id
+            self.assertEqual({x.code for x in Account.query.all()},
+                             {cash.code, bank.code, stock.code,
+                              f"{stock.base_code}-066",
+                              f"{stock.base_code}-067"})
 
-        response = self.client.post("/accounting/accounts/1111-002/update",
+            stock_account: Account = Account.find_by_code(stock.code)
+            self.assertEqual(stock_account.base_code, stock.base_code)
+            self.assertEqual(stock_account.title_l10n, stock.title)
+
+    def test_basic_update(self) -> None:
+        """Tests the basic rules to update a user.
+
+        :return: None.
+        """
+        from accounting.models import Account
+        detail_uri: str = f"{PREFIX}/{cash.code}"
+        edit_uri: str = f"{PREFIX}/{cash.code}/edit"
+        update_uri: str = f"{PREFIX}/{cash.code}/update"
+        detail_c_uri: str = f"{PREFIX}/{stock.code}"
+        response: httpx.Response
+
+        # Success, with spaces to be stripped
+        response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "base_code": "1112",
-                                          "title": "Account #1"})
+                                          "base_code": f" {cash.base_code} ",
+                                          "title": f" {cash.title}-1 "})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1112-003")
+        self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            self.assertEqual(db.session.get(Account, id_1).code, "1111-001")
-            self.assertEqual(db.session.get(Account, id_2).code, "1112-003")
-            self.assertEqual(db.session.get(Account, id_3).code, "1111-002")
-            self.assertEqual(db.session.get(Account, id_4).code, "1112-001")
-            self.assertEqual(db.session.get(Account, id_5).code, "1112-002")
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.base_code, cash.base_code)
+            self.assertEqual(cash_account.title_l10n, f"{cash.title}-1")
+
+        # Empty base account code
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": " ",
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # Non-existing base account
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "9999",
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # Unavailable base account
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1",
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # Empty name
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": stock.base_code,
+                                          "title": " "})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # Change the base account
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": stock.base_code,
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_c_uri)
+
+        response = self.client.get(detail_uri)
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.get(detail_c_uri)
+        self.assertEqual(response.status_code, 200)
+
+    def test_update_not_modified(self) -> None:
+        """Tests that the data is not modified.
+
+        :return: None.
+        """
+        from accounting.models import Account
+        detail_uri: str = f"{PREFIX}/{cash.code}"
+        update_uri: str = f"{PREFIX}/{cash.code}/update"
+        response: httpx.Response
+        time.sleep(1)
+
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": f" {cash.base_code} ",
+                                          "title": f" {cash.title} "})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertIsNotNone(cash_account)
+            self.assertEqual(cash_account.created_at, cash_account.updated_at)
+
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": cash.base_code,
+                                          "title": stock.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertIsNotNone(cash_account)
+            self.assertNotEqual(cash_account.created_at,
+                                cash_account.updated_at)
+
+    def test_created_updated_by(self) -> None:
+        """Tests the created-by and updated-by record.
+
+        :return: None.
+        """
+        from accounting.models import Account
+        editor_username, editor2_username = "editor", "editor2"
+        client, csrf_token = get_client(self, self.app, editor2_username)
+        detail_uri: str = f"{PREFIX}/{cash.code}"
+        update_uri: str = f"{PREFIX}/{cash.code}/update"
+        response: httpx.Response
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.created_by.username, editor_username)
+            self.assertEqual(cash_account.updated_by.username, editor_username)
+
+        response = client.post(update_uri,
+                               data={"csrf_token": csrf_token,
+                                     "base_code": cash.base_code,
+                                     "title": f"{cash.title}-2"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.created_by.username,
+                             editor_username)
+            self.assertEqual(cash_account.updated_by.username,
+                             editor2_username)
+
+    def test_l10n(self) -> None:
+        """Tests the localization.
+
+        :return: None
+        """
+        from accounting.models import Account
+        detail_uri: str = f"{PREFIX}/{cash.code}"
+        update_uri: str = f"{PREFIX}/{cash.code}/update"
+        response: httpx.Response
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.title_l10n, cash.title)
+            self.assertEqual(cash_account.l10n, [])
+
+        set_locale(self, self.client, self.csrf_token, "zh_Hant")
+
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": cash.base_code,
+                                          "title": f"{cash.title}-zh_Hant"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.title_l10n, cash.title)
+            self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
+                             {("zh_Hant", f"{cash.title}-zh_Hant")})
+
+        set_locale(self, self.client, self.csrf_token, "en")
+
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": cash.base_code,
+                                          "title": f"{cash.title}-2"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.title_l10n, f"{cash.title}-2")
+            self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
+                             {("zh_Hant", f"{cash.title}-zh_Hant")})
+
+        set_locale(self, self.client, self.csrf_token, "zh_Hant")
+
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": cash.base_code,
+                                          "title": f"{cash.title}-zh_Hant-2"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], detail_uri)
+
+        with self.app.app_context():
+            cash_account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(cash_account.title_l10n, f"{cash.title}-2")
+            self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
+                             {("zh_Hant", f"{cash.title}-zh_Hant-2")})
+
+    def test_delete(self) -> None:
+        """Tests to delete a currency.
+
+        :return: None.
+        """
+        from accounting.models import Account
+        detail_uri: str = f"{PREFIX}/{cash.code}"
+        delete_uri: str = f"{PREFIX}/{cash.code}/delete"
+        list_uri: str = PREFIX
+        response: httpx.Response
+
+        with self.app.app_context():
+            self.assertEqual({x.code for x in Account.query.all()},
+                             {cash.code, bank.code})
+
+        response = self.client.get(detail_uri)
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(delete_uri,
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], list_uri)
+
+        with self.app.app_context():
+            self.assertEqual({x.code for x in Account.query.all()},
+                             {bank.code})
+
+        response = self.client.get(detail_uri)
+        self.assertEqual(response.status_code, 404)
+        response = self.client.post(delete_uri,
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 404)
 
     def test_reorder(self) -> None:
         """Tests to reorder the accounts under a same base account.
@@ -345,13 +653,13 @@ class AccountTestCase(unittest.TestCase):
         response: httpx.Response
 
         for i in range(2, 6):
-            response = self.client.post("/accounting/accounts/store",
+            response = self.client.post(f"{PREFIX}/store",
                                         data={"csrf_token": self.csrf_token,
                                               "base_code": "1111",
                                               "title": "Title"})
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.headers["Location"],
-                             f"/accounting/accounts/1111-00{i}")
+                             f"{PREFIX}/1111-00{i}")
 
         # Normal reorder
         with self.app.app_context():
@@ -361,7 +669,7 @@ class AccountTestCase(unittest.TestCase):
             id_4: int = Account.find_by_code("1111-004").id
             id_5: int = Account.find_by_code("1111-005").id
 
-        response = self.client.post("/accounting/accounts/bases/1111",
+        response = self.client.post(f"{PREFIX}/bases/1111",
                                     data={"csrf_token": self.csrf_token,
                                           "next": "/next",
                                           f"{id_1}-no": "4",
@@ -388,7 +696,7 @@ class AccountTestCase(unittest.TestCase):
             db.session.get(Account, id_5).no = 9
             db.session.commit()
 
-        response = self.client.post("/accounting/accounts/bases/1111",
+        response = self.client.post(f"{PREFIX}/bases/1111",
                                     data={"csrf_token": self.csrf_token,
                                           "next": "/next",
                                           f"{id_2}-no": "3a",
