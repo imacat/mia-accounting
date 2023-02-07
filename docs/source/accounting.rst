@@ -7,16 +7,34 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   accounting.account
    accounting.base_account
+   accounting.currency
    accounting.utils
 
 Submodules
 ----------
 
+accounting.database module
+--------------------------
+
+.. automodule:: accounting.database
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.locale module
 ------------------------
 
 .. automodule:: accounting.locale
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.models module
+------------------------
+
+.. automodule:: accounting.models
    :members:
    :undoc-members:
    :show-inheritance:
