@@ -464,9 +464,9 @@ class CurrencyTestCase(unittest.TestCase):
         response: httpx.Response
 
         with self.app.app_context():
-            currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(currency.created_by.username, editor_username)
-            self.assertEqual(currency.updated_by.username, editor_username)
+            zza_currency: Currency = db.session.get(Currency, zza.code)
+            self.assertEqual(zza_currency.created_by.username, editor_username)
+            self.assertEqual(zza_currency.updated_by.username, editor_username)
 
         response = client.post(update_uri,
                                data={"csrf_token": csrf_token,
@@ -476,9 +476,9 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(currency.created_by.username, editor_username)
-            self.assertEqual(currency.updated_by.username, editor2_username)
+            zza_currency: Currency = db.session.get(Currency, zza.code)
+            self.assertEqual(zza_currency.created_by.username, editor_username)
+            self.assertEqual(zza_currency.updated_by.username, editor2_username)
 
     def test_l10n(self) -> None:
         """Tests the localization.
