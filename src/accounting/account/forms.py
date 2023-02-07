@@ -42,13 +42,25 @@ class BaseAccountExists:
                 "The base account does not exist."))
 
 
+class BaseAccountAvailable:
+    """The validator to check if the base account is available."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data == "":
+            return
+        if len(field.data) != 4:
+            raise ValidationError(lazy_gettext(
+                "The base account is not available."))
+
+
 class AccountForm(FlaskForm):
     """The form to create or edit an account."""
     base_code = StringField(
         filters=[strip_text],
         validators=[
             DataRequired(lazy_gettext("Please select the base account.")),
-            BaseAccountExists()])
+            BaseAccountExists(),
+            BaseAccountAvailable()])
     """The code of the base account."""
     title = StringField(
         filters=[strip_text],
