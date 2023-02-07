@@ -103,5 +103,5 @@ def init_app(app: Flask, can_view_func: t.Callable[[], bool] | None = None,
         __can_view_func = can_view_func
     if can_edit_func is not None:
         __can_edit_func = can_edit_func
-    app.jinja_env.globals["can_view_accounting"] = __can_view_func
-    app.jinja_env.globals["can_edit_accounting"] = __can_edit_func
+    app.jinja_env.globals["can_view_accounting"] = can_view
+    app.jinja_env.globals["can_edit_accounting"] = can_edit
