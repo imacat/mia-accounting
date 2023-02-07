@@ -41,7 +41,7 @@ First written: 2023/1/31
     {{ A_("Order") }}
   </a>
   {% if accounting_can_edit() %}
-    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#delete-modal">
+    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
       <i class="fa-solid fa-trash"></i>
       {{ A_("Delete") }}
     </button>
@@ -49,7 +49,7 @@ First written: 2023/1/31
 </div>
 
 {% if accounting_can_edit() %}
-  <div class="d-md-none material-fab">
+  <div class="d-md-none accounting-material-fab">
     <a class="btn btn-primary" href="{{ url_for("accounting.account.edit", account=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
     </a>
@@ -57,16 +57,16 @@ First written: 2023/1/31
 {% endif %}
 
 {% if accounting_can_edit() %}
-  <form id="delete-form" action="{{ url_for("accounting.account.delete", account=obj) }}" method="post">
-    <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <form action="{{ url_for("accounting.account.delete", account=obj) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if "next" in request.args %}
       <input type="hidden" name="next" value="{{ request.args["next"] }}">
     {% endif %}
-    <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-model-label" aria-hidden="true">
+    <div class="modal fade" id="accounting-delete-modal" tabindex="-1" aria-labelledby="accounting-delete-model-label" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="delete-model-label">{{ A_("Delete Account Confirmation") }}</h1>
+            <h1 class="modal-title fs-5" id="accounting-delete-model-label">{{ A_("Delete Account Confirmation") }}</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -82,9 +82,9 @@ First written: 2023/1/31
   </form>
 {% endif %}
 
-<div class="account col-sm-6">
-  <div class="account-title">{{ obj.title }}</div>
-  <div class="account-code">{{ obj.code }}</div>
+<div class="accounting-card col-sm-6">
+  <div class="accounting-card-title">{{ obj.title }}</div>
+  <div class="accounting-card-code">{{ obj.code }}</div>
   {% if obj.is_offset_needed %}
     <div>
       <span class="badge rounded-pill bg-info">{{ A_("Offset needed") }}</span>

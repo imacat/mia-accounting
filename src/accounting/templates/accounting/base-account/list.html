@@ -27,8 +27,8 @@ First written: 2023/1/26
 
 <div class="btn-group mb-2">
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.base-account.list") }}" method="get" role="search">
-    <input id="search-input" class="form-control form-control-sm search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
-    <label for="search-input" class="search-label">
+    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+    <label for="accounting-search" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
         {{ A_("Search") }}

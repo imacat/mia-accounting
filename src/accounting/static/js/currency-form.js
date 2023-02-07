@@ -23,11 +23,11 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("currency-code")
+    document.getElementById("accounting-code")
         .onchange = validateCode;
-    document.getElementById("currency-name")
+    document.getElementById("accounting-name")
         .onchange = validateName;
-    document.getElementById("currency-form")
+    document.getElementById("accounting-form")
         .onsubmit = validateForm;
 });
 
@@ -69,7 +69,7 @@ function submitFormIfAllAsyncValid() {
         isValid = isAsyncValid[key] && isValid;
     });
     if (isValid) {
-        document.getElementById("currency-form").submit()
+        document.getElementById("accounting-form").submit()
     }
 }
 
@@ -84,8 +84,8 @@ function validateCode(changeEvent = null) {
     const key = "code";
     const isSubmission = changeEvent === null;
     let hasAsyncValidation = false;
-    const field = document.getElementById("currency-code");
-    const error = document.getElementById("currency-code-error");
+    const field = document.getElementById("accounting-code");
+    const error = document.getElementById("accounting-code-error");
     field.value = field.value.trim();
     if (field.value === "") {
         field.classList.add("is-invalid");
@@ -125,8 +125,8 @@ function validateCode(changeEvent = null) {
  * @private
  */
 function validateAsyncCodeIsDuplicated(isSubmission, key) {
-    const field = document.getElementById("currency-code");
-    const error = document.getElementById("currency-code-error");
+    const field = document.getElementById("accounting-code");
+    const error = document.getElementById("accounting-code-error");
     const url = field.dataset.existsUrl;
     const onLoad = function () {
         if (this.status === 200) {
@@ -160,8 +160,8 @@ function validateAsyncCodeIsDuplicated(isSubmission, key) {
  * @private
  */
 function validateName() {
-    const field = document.getElementById("currency-name");
-    const error = document.getElementById("currency-name-error");
+    const field = document.getElementById("accounting-name");
+    const error = document.getElementById("accounting-name-error");
     field.value = field.value.trim();
     if (field.value === "") {
         field.classList.add("is-invalid");

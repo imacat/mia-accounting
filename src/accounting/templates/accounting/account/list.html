@@ -33,8 +33,8 @@ First written: 2023/1/30
     </a>
   {% endif %}
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search">
-    <input id="search-input" class="form-control form-control-sm search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
-    <label for="search-input" class="search-label">
+    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+    <label for="accounting-search" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
         {{ A_("Search") }}
@@ -44,7 +44,7 @@ First written: 2023/1/30
 </div>
 
 {% if accounting_can_edit() %}
-  <div class="d-md-none material-fab">
+  <div class="d-md-none accounting-material-fab">
     <a class="btn btn-primary" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
       <i class="fa-solid fa-plus"></i>
     </a>

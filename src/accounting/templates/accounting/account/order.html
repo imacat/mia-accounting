@@ -39,16 +39,16 @@ First written: 2023/2/2
 
 {% if base.accounts|length > 1 and accounting_can_edit() %}
   <form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
-    <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if "next" in request.args %}
       <input type="hidden" name="next" value="{{ request.args["next"] }}">
     {% endif %}
-    <ul id="account-order-list" class="list-group mb-3" data-base-code="{{ base.code }}">
+    <ul id="accounting-order-list" class="list-group mb-3" data-base-code="{{ base.code }}">
       {% for account in base.accounts|sort(attribute="no") %}
         <li class="list-group-item d-flex justify-content-between" data-id="{{ account.id }}">
-          <input id="account-order-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
+          <input id="accounting-order-{{ account.id }}-no" type="hidden" name="{{ account.id }}-no" value="{{ loop.index }}">
           <div>
-            <span id="account-order-{{ account.id }}-code">{{ account.code }}</span>
+            <span id="accounting-order-{{ account.id }}-code">{{ account.code }}</span>
             {{ account.title }}
           </div>
           <i class="fa-solid fa-bars"></i>
@@ -63,7 +63,7 @@ First written: 2023/2/2
       </button>
     </div>
 
-    <div class="d-md-none material-fab">
+    <div class="d-md-none accounting-material-fab">
       <button class="btn btn-primary" type="submit">
         <i class="fa-solid fa-floppy-disk"></i>
       </button>

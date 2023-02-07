@@ -24,11 +24,11 @@
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
     initializeBaseAccountSelector();
-    document.getElementById("account-base-code")
+    document.getElementById("accounting-base-code")
         .onchange = validateBase;
-    document.getElementById("account-title")
+    document.getElementById("accounting-title")
         .onchange = validateTitle;
-    document.getElementById("account-form")
+    document.getElementById("accounting-form")
         .onsubmit = validateForm;
 });
 
@@ -38,25 +38,25 @@ document.addEventListener("DOMContentLoaded", function () {
  * @private
  */
 function initializeBaseAccountSelector() {
-    const selector = document.getElementById("select-base-modal");
-    const base = document.getElementById("account-base");
-    const baseCode = document.getElementById("account-base-code");
-    const baseContent = document.getElementById("account-base-content");
-    const options = Array.from(document.getElementsByClassName("list-group-item-base"));
-    const btnClear = document.getElementById("btn-clear-base");
+    const selector = document.getElementById("accounting-base-selector-model");
+    const base = document.getElementById("accounting-base");
+    const baseCode = document.getElementById("accounting-base-code");
+    const baseContent = document.getElementById("accounting-base-content");
+    const options = Array.from(document.getElementsByClassName("accounting-base-option"));
+    const btnClear = document.getElementById("accounting-btn-clear-base");
     selector.addEventListener("show.bs.modal", function () {
-        base.classList.add("not-empty");
+        base.classList.add("accounting-not-empty");
         options.forEach(function (item) {
             item.classList.remove("active");
         });
-        const selected = document.getElementById("list-group-item-base-" + baseCode.value);
+        const selected = document.getElementById("accounting-base-option-" + baseCode.value);
         if (selected !== null) {
             selected.classList.add("active");
         }
     });
     selector.addEventListener("hidden.bs.modal", function () {
         if (baseCode.value === "") {
-            base.classList.remove("not-empty");
+            base.classList.remove("accounting-not-empty");
         }
     });
     options.forEach(function (option) {
@@ -101,9 +101,9 @@ function validateForm() {
  * @private
  */
 function validateBase() {
-    const field = document.getElementById("account-base-code");
-    const error = document.getElementById("account-base-code-error");
-    const displayField = document.getElementById("account-base");
+    const field = document.getElementById("accounting-base-code");
+    const error = document.getElementById("accounting-base-code-error");
+    const displayField = document.getElementById("accounting-base");
     field.value = field.value.trim();
     if (field.value === "") {
         displayField.classList.add("is-invalid");
@@ -122,8 +122,8 @@ function validateBase() {
  * @private
  */
 function validateTitle() {
-    const field = document.getElementById("account-title");
-    const error = document.getElementById("account-title-error");
+    const field = document.getElementById("accounting-title");
+    const error = document.getElementById("accounting-title-error");
     field.value = field.value.trim();
     if (field.value === "") {
         field.classList.add("is-invalid");

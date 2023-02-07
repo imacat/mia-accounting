@@ -34,16 +34,16 @@ First written: 2023/2/1
   </a>
 </div>
 
-<form id="account-form" action="{% block action_url %}{% endblock %}" method="post">
+<form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post">
   {{ form.csrf_token }}
   {% if "next" in request.args %}
     <input type="hidden" name="next" value="{{ request.args["next"] }}">
   {% endif %}
   <div class="form-floating mb-3">
-    <input id="account-base-code" type="hidden" name="base_code" value="{{ "" if form.base_code.data is none else form.base_code.data }}">
-    <div id="account-base" class="form-control clickable material-text-field {% if form.base_code.data %} not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#select-base-modal">
-      <label id="account-base-label" class="form-label" for="account-base">{{ A_("Base account") }}</label>
-      <div id="account-base-content">
+    <input id="accounting-base-code" type="hidden" name="base_code" value="{{ "" if form.base_code.data is none else form.base_code.data }}">
+    <div id="accounting-base" class="form-control accounting-clickable accounting-material-text-field {% if form.base_code.data %} accounting-not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-base-selector-model">
+      <label class="form-label" for="accounting-base">{{ A_("Base account") }}</label>
+      <div id="accounting-base-content">
         {% if form.base_code.data %}
           {% if form.base_code.errors %}
             {{ A_("(Unknown)") }}
@@ -53,18 +53,18 @@ First written: 2023/2/1
         {% endif %}
       </div>
     </div>
-    <div id="account-base-code-error" class="invalid-feedback">{% if form.base_code.errors %}{{ form.base_code.errors[0] }}{% endif %}</div>
+    <div id="accounting-base-code-error" class="invalid-feedback">{% if form.base_code.errors %}{{ form.base_code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">
-    <input id="account-title" class="form-control {% if form.title.errors %} is-invalid {% endif %}" type="text" name="title" value="{{ "" if form.title.data is none else form.title.data }}" placeholder=" " required="required">
-    <label class="form-label" for="account-title">{{ A_("Title") }}</label>
-    <div id="account-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
+    <input id="accounting-title" class="form-control {% if form.title.errors %} is-invalid {% endif %}" type="text" name="title" value="{{ "" if form.title.data is none else form.title.data }}" placeholder=" " required="required">
+    <label class="form-label" for="accounting-title">{{ A_("Title") }}</label>
+    <div id="accounting-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-check form-switch mb-3">
-    <input id="account-is-offset-needed" class="form-check-input" type="checkbox" name="is_offset_needed" value="1" {% if form.is_offset_needed.data %} checked="checked" {% endif %}>
-    <label class="form-check-label" for="account-is-offset-needed">
+    <input id="accounting-is-offset-needed" class="form-check-input" type="checkbox" name="is_offset_needed" value="1" {% if form.is_offset_needed.data %} checked="checked" {% endif %}>
+    <label class="form-check-label" for="accounting-is-offset-needed">
       {{ A_("The entries in the account need offsets.") }}
     </label>
   </div>
@@ -76,32 +76,32 @@ First written: 2023/2/1
     </button>
   </div>
 
-  <div class="d-md-none material-fab">
+  <div class="d-md-none accounting-material-fab">
     <button class="btn btn-primary" type="submit">
       <i class="fa-solid fa-floppy-disk"></i>
     </button>
   </div>
 </form>
 
-<div class="modal fade" id="select-base-modal" tabindex="-1" aria-labelledby="select-base-model-label" aria-hidden="true">
+<div class="modal fade" id="accounting-base-selector-model" tabindex="-1" aria-labelledby="accounting-base-selector-model-label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="base-selector-model-label">{{ A_("Select Base Account") }}</h1>
+        <h1 class="modal-title fs-5" id="accounting-base-selector-model-label">{{ A_("Select Base Account") }}</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">
-          <input id="select-base-query" class="form-control form-control-sm" type="search" placeholder=" " required="required" aria-label="Search">
-          <label class="input-group-text" for="select-base-query">
+          <input id="accounting-base-selector-query" class="form-control form-control-sm" type="search" placeholder=" " required="required" aria-label="Search">
+          <label class="input-group-text" for="accounting-base-selector-query">
             <i class="fa-solid fa-magnifying-glass"></i>
             {{ A_("Search") }}
           </label>
         </div>
 
-        <ul class="list-group list-base-selector">
+        <ul class="list-group accounting-selector-list">
           {% for base in form.base_options %}
-          <li id="list-group-item-base-{{ base.code }}" class="list-group-item list-group-item-base clickable" data-code="{{ base.code }}" data-content="{{ base }}">
+          <li id="accounting-base-option-{{ base.code }}" class="list-group-item accounting-base-option accounting-clickable" data-code="{{ base.code }}" data-content="{{ base }}">
             {{ base }}
           </li>
           {% endfor %}
@@ -110,9 +110,9 @@ First written: 2023/2/1
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>
         {% if form.base_code.data %}
-          <button id="btn-clear-base" type="button" class="btn btn-danger">{{ A_("Clear") }}</button>
+          <button id="accounting-btn-clear-base" type="button" class="btn btn-danger">{{ A_("Clear") }}</button>
         {% else %}
-          <button id="btn-clear-base" type="button" class="btn btn-secondary" disabled="disabled">{{ A_("Clear") }}</button>
+          <button id="accounting-btn-clear-base" type="button" class="btn btn-secondary" disabled="disabled">{{ A_("Clear") }}</button>
         {% endif %}
       </div>
     </div>

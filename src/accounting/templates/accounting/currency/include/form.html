@@ -34,21 +34,21 @@ First written: 2023/2/6
   </a>
 </div>
 
-<form id="currency-form" action="{% block action_url %}{% endblock %}" method="post">
+<form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post">
   {{ form.csrf_token }}
   {% if "next" in request.args %}
     <input type="hidden" name="next" value="{{ request.args["next"] }}">
   {% endif %}
   <div class="form-floating mb-3">
-    <input id="currency-code" class="form-control {% if form.code.errors %} is-invalid {% endif %}" type="text" name="code" value="{{ "" if form.code.data is none else form.code.data }}" placeholder=" " required="required" data-exists-url="{{ url_for("accounting.currency-api.exists") }}" data-original="{% block original_code %}{% endblock %}" data-blocklist="{{ form.CODE_BLOCKLIST|tojson|forceescape }}">
-    <label class="form-label" for="currency-code">{{ A_("Code") }}</label>
-    <div id="currency-code-error" class="invalid-feedback">{% if form.code.errors %}{{ form.code.errors[0] }}{% endif %}</div>
+    <input id="accounting-code" class="form-control {% if form.code.errors %} is-invalid {% endif %}" type="text" name="code" value="{{ "" if form.code.data is none else form.code.data }}" placeholder=" " required="required" data-exists-url="{{ url_for("accounting.currency-api.exists") }}" data-original="{% block original_code %}{% endblock %}" data-blocklist="{{ form.CODE_BLOCKLIST|tojson|forceescape }}">
+    <label class="form-label" for="accounting-code">{{ A_("Code") }}</label>
+    <div id="accounting-code-error" class="invalid-feedback">{% if form.code.errors %}{{ form.code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">
-    <input id="currency-name" class="form-control {% if form.name.errors %} is-invalid {% endif %}" type="text" name="name" value="{{ "" if form.name.data is none else form.name.data }}" placeholder=" " required="required">
-    <label class="form-label" for="currency-name">{{ A_("Name") }}</label>
-    <div id="currency-name-error" class="invalid-feedback">{% if form.name.errors %}{{ form.name.errors[0] }}{% endif %}</div>
+    <input id="accounting-name" class="form-control {% if form.name.errors %} is-invalid {% endif %}" type="text" name="name" value="{{ "" if form.name.data is none else form.name.data }}" placeholder=" " required="required">
+    <label class="form-label" for="accounting-name">{{ A_("Name") }}</label>
+    <div id="accounting-name-error" class="invalid-feedback">{% if form.name.errors %}{{ form.name.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="d-none d-md-block">
@@ -58,7 +58,7 @@ First written: 2023/2/6
     </button>
   </div>
 
-  <div class="d-md-none material-fab">
+  <div class="d-md-none accounting-material-fab">
     <button class="btn btn-primary" type="submit">
       <i class="fa-solid fa-floppy-disk"></i>
     </button>

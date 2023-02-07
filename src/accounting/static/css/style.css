@@ -21,65 +21,50 @@
  * First written: 2023/2/1
  */
 
-.clickable {
+.accounting-clickable {
     cursor: pointer;
 }
-.btn-group .btn .search-input {
+.btn-group .btn .accounting-search-input {
     min-height: calc(1em + .5rem + 2px);
     padding: 0 0.5rem;
 }
-.btn-group .btn .search-label button {
+.btn-group .btn .accounting-search-label button {
     border: none;
     background-color: transparent;
     color: inherit;
     padding-right: 0;
 }
 
-/** The account management */
-.account {
+/** The card layout */
+.accounting-card {
     padding: 2em 1.5em;
     margin: 1em;
     background-color: #E9ECEF;
     border-radius: 0.3em;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
-.account .account-title {
+.accounting-card-title {
     font-size: 1.8rem;
     font-weight: bolder;
 }
-.account .account-code {
+.accounting-card-code {
     font-size: 1.4rem;
     color: #373b3e;
 }
-.list-base-selector {
+
+/** The option selector */
+.accounting-selector-list {
     height: 20rem;
     overflow-y: scroll;
 }
 
-/** The currency management. */
-.currency {
-    padding: 2em 1.5em;
-    margin: 1em;
-    background-color: #E9ECEF;
-    border-radius: 0.3em;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-.currency .currency-name {
-    font-size: 1.8rem;
-    font-weight: bolder;
-}
-.currency .currency-code {
-    font-size: 1.4rem;
-    color: #373b3e;
-}
-
 /* The Material Design text field (floating form control in Bootstrap) */
-.material-text-field {
+.accounting-material-text-field {
     position: relative;
     min-height: calc(3.5rem + 2px);
     padding-top: 1.625rem;
 }
-.material-text-field > .form-label {
+.accounting-material-text-field > .form-label {
     position: absolute;
     top: 0;
     left: 0;
@@ -88,27 +73,27 @@
     transform-origin: 0 0;
     transition: opacity .1s ease-in-out,transform .1s ease-in-out;
 }
-.material-text-field.not-empty > .form-label {
+.accounting-material-text-field.accounting-not-empty > .form-label {
     opacity: 0.65;
     transform: scale(.85) translateY(-.5rem) translateX(.15rem);
 }
 
 /* The Material Design floating action buttons */
-.material-fab {
+.accounting-material-fab {
     position: fixed;
     right: 2rem;
     bottom: 1rem;
     z-index: 10;
     flex-direction: column-reverse;
 }
-.material-fab .btn {
+.accounting-material-fab .btn {
     border-radius: 50%;
     transform: scale(1.5);
     box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0,0,0,.12);
     display: block;
     margin-top: 2.5rem;
 }
-.material-fab .btn:hover, .material-fab .btn:focus {
+.accounting-material-fab .btn:hover, .accounting-material-fab .btn:focus {
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0,0,0,.12);
 }
 
