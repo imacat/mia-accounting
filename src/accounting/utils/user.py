@@ -72,9 +72,9 @@ class AbstractUserUtils(t.Generic[T], ABC):
 
 __user_utils: AbstractUserUtils
 """The user utilities."""
-user_cls: t.Type[Model]
+user_cls: t.Type[Model] = Model
 """The user class."""
-user_pk_column: sa.Column
+user_pk_column: sa.Column = sa.Column(sa.Integer)
 """The primary key column of the user class."""
 
 

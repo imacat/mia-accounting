@@ -25,7 +25,7 @@ time.
 
 from flask_sqlalchemy import SQLAlchemy
 
-db: SQLAlchemy
+db: SQLAlchemy = SQLAlchemy()
 """The database instance."""
 
 
