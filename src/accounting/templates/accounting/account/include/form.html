@@ -99,13 +99,14 @@ First written: 2023/2/1
           </label>
         </div>
 
-        <ul class="list-group accounting-selector-list">
+        <ul id="accounting-base-option-list" class="list-group accounting-selector-list">
           {% for base in form.base_options %}
-          <li id="accounting-base-option-{{ base.code }}" class="list-group-item accounting-base-option accounting-clickable" data-code="{{ base.code }}" data-content="{{ base }}">
+          <li id="accounting-base-option-{{ base.code }}" class="list-group-item accounting-base-option accounting-clickable" data-code="{{ base.code }}" data-content="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}">
             {{ base }}
           </li>
           {% endfor %}
         </ul>
+        <p id="accounting-base-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>

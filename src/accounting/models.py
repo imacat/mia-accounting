@@ -64,6 +64,14 @@ class BaseAccount(db.Model):
                 return l10n.title
         return self.title_l10n
 
+    @property
+    def query_values(self) -> list[str]:
+        """Returns the values to be queried.
+
+        :return: The values to be queried.
+        """
+        return [self.code, self.title_l10n] + [x.title for x in self.l10n]
+
 
 class BaseAccountL10n(db.Model):
     """A localized base account title."""

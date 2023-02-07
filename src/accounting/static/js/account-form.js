@@ -79,6 +79,54 @@ function initializeBaseAccountSelector() {
         validateBase();
         bootstrap.Modal.getInstance(selector).hide();
     }
+    initializeBaseAccountQuery();
+}
+
+/**
+ * Initializes the query on the base account options.
+ *
+ * @private
+ */
+function initializeBaseAccountQuery() {
+    const query = document.getElementById("accounting-base-selector-query");
+    const optionList = document.getElementById("accounting-base-option-list");
+    const options = Array.from(document.getElementsByClassName("accounting-base-option"));
+    const queryNoResult = document.getElementById("accounting-base-option-no-result");
+    query.addEventListener("input", function () {
+        console.log(query.value);
+        if (query.value === "") {
+            options.forEach(function (option) {
+                option.classList.remove("d-none");
+            });
+            optionList.classList.remove("d-none");
+            queryNoResult.classList.add("d-none");
+            return
+        }
+        let hasAnyMatched = false;
+        options.forEach(function (option) {
+            const queryValues = JSON.parse(option.dataset.queryValues);
+            let isMatched = false;
+            for (let i = 0; i < queryValues.length; i++) {
+                if (queryValues[i].includes(query.value)) {
+                    isMatched = true;
+                    break;
+                }
+            }
+            if (isMatched) {
+                option.classList.remove("d-none");
+                hasAnyMatched = true;
+            } else {
+                option.classList.add("d-none");
+            }
+        });
+        if (!hasAnyMatched) {
+            optionList.classList.add("d-none");
+            queryNoResult.classList.remove("d-none");
+        } else {
+            optionList.classList.remove("d-none");
+            queryNoResult.classList.add("d-none");
+        }
+    });
 }
 
 /**
