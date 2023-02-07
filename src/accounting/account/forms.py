@@ -32,7 +32,7 @@ from accounting.utils.user import get_current_user_pk
 
 
 class BaseAccountExists:
-    """The validator to check if the base account code exists."""
+    """The validator to check if the base account exists."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data == "":
