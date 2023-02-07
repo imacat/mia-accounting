@@ -52,6 +52,8 @@ zzc: CurrencyData = CurrencyData("ZZC", "Testing Dollar #C")
 """The third test currency."""
 zzd: CurrencyData = CurrencyData("ZZD", "Testing Dollar #D")
 """The fourth test currency."""
+PREFIX: str = "/accounting/currencies"
+"""The URL prefix of the currency management."""
 
 
 class CurrencyCommandTestCase(unittest.TestCase):
@@ -122,21 +124,19 @@ class CurrencyTestCase(unittest.TestCase):
         self.client, self.csrf_token = get_client(self, self.app, "editor")
         response: httpx.Response
 
-        response = self.client.post("/accounting/currencies/store",
+        response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,
                                           "code": zza.code,
                                           "name": zza.name})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zza.code}")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{zza.code}")
 
-        response = self.client.post("/accounting/currencies/store",
+        response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,
                                           "code": zzb.code,
                                           "name": zzb.name})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zzb.code}")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{zzb.code}")
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
@@ -146,31 +146,31 @@ class CurrencyTestCase(unittest.TestCase):
         client, csrf_token = get_client(self, self.app, "nobody")
         response: httpx.Response
 
-        response = client.get("/accounting/currencies")
+        response = client.get(PREFIX)
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"/accounting/currencies/{zza.code}")
+        response = client.get(f"{PREFIX}/{zza.code}")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/currencies/create")
+        response = client.get(f"{PREFIX}/create")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/currencies/store",
+        response = client.post(f"{PREFIX}/store",
                                data={"csrf_token": csrf_token,
                                      "code": zzc.code,
                                      "name": zzc.name})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"/accounting/currencies/{zza.code}/edit")
+        response = client.get(f"{PREFIX}/{zza.code}/edit")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post(f"/accounting/currencies/{zza.code}/update",
+        response = client.post(f"{PREFIX}/{zza.code}/update",
                                data={"csrf_token": csrf_token,
                                      "code": zzd.code,
                                      "name": zzd.name})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post(f"/accounting/currencies/{zzb.code}/delete",
+        response = client.post(f"{PREFIX}/{zzb.code}/delete",
                                data={"csrf_token": csrf_token})
         self.assertEqual(response.status_code, 403)
 
@@ -182,31 +182,31 @@ class CurrencyTestCase(unittest.TestCase):
         client, csrf_token = get_client(self, self.app, "viewer")
         response: httpx.Response
 
-        response = client.get("/accounting/currencies")
+        response = client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"/accounting/currencies/{zza.code}")
+        response = client.get(f"{PREFIX}/{zza.code}")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/currencies/create")
+        response = client.get(f"{PREFIX}/create")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post("/accounting/currencies/store",
+        response = client.post(f"{PREFIX}/store",
                                data={"csrf_token": csrf_token,
                                      "code": zzc.code,
                                      "name": zzc.name})
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"/accounting/currencies/{zza.code}/edit")
+        response = client.get(f"{PREFIX}/{zza.code}/edit")
         self.assertEqual(response.status_code, 403)
 
-        response = client.post(f"/accounting/currencies/{zza.code}/update",
+        response = client.post(f"{PREFIX}/{zza.code}/update",
                                data={"csrf_token": csrf_token,
                                      "code": zzd.code,
                                      "name": zzd.name})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post(f"/accounting/currencies/{zzb.code}/delete",
+        response = client.post(f"{PREFIX}/{zzb.code}/delete",
                                data={"csrf_token": csrf_token})
         self.assertEqual(response.status_code, 403)
 
@@ -217,41 +217,36 @@ class CurrencyTestCase(unittest.TestCase):
         """
         response: httpx.Response
 
-        response = self.client.get("/accounting/currencies")
+        response = self.client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"/accounting/currencies/{zza.code}")
+        response = self.client.get(f"{PREFIX}/{zza.code}")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/accounting/currencies/create")
+        response = self.client.get(f"{PREFIX}/create")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post("/accounting/currencies/store",
+        response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,
                                           "code": zzc.code,
                                           "name": zzc.name})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zzc.code}")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{zzc.code}")
 
-        response = self.client.get(f"/accounting/currencies/{zza.code}/edit")
+        response = self.client.get(f"{PREFIX}/{zza.code}/edit")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(
-            f"/accounting/currencies/{zza.code}/update",
-            data={"csrf_token": self.csrf_token,
-                  "code": zzd.code,
-                  "name": zzd.name})
+        response = self.client.post(f"{PREFIX}/{zza.code}/update",
+                                    data={"csrf_token": self.csrf_token,
+                                          "code": zzd.code,
+                                          "name": zzd.name})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"/accounting/currencies/{zzd.code}")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{zzd.code}")
 
-        response = self.client.post(
-            f"/accounting/currencies/{zzb.code}/delete",
-            data={"csrf_token": self.csrf_token})
+        response = self.client.post(f"{PREFIX}/{zzb.code}/delete",
+                                    data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/currencies")
+        self.assertEqual(response.headers["Location"], PREFIX)
 
     def test_add(self) -> None:
         """Tests to add the currencies.
@@ -260,9 +255,9 @@ class CurrencyTestCase(unittest.TestCase):
         """
         from accounting.models import Currency
         from test_site import db
-        create_uri: str = "/accounting/currencies/create"
-        store_uri: str = "/accounting/currencies/store"
-        detail_uri: str = f"/accounting/currencies/{zzc.code}"
+        create_uri: str = f"{PREFIX}/create"
+        store_uri: str = f"{PREFIX}/store"
+        detail_uri: str = f"{PREFIX}/{zzc.code}"
         response: httpx.Response
 
         with self.app.app_context():
@@ -345,10 +340,10 @@ class CurrencyTestCase(unittest.TestCase):
         """
         from accounting.models import Currency
         from test_site import db
-        detail_uri: str = f"/accounting/currencies/{zza.code}"
-        edit_uri: str = f"/accounting/currencies/{zza.code}/edit"
-        update_uri: str = f"/accounting/currencies/{zza.code}/update"
-        detail_c_uri: str = f"/accounting/currencies/{zzc.code}"
+        detail_uri: str = f"{PREFIX}/{zza.code}"
+        edit_uri: str = f"{PREFIX}/{zza.code}/edit"
+        update_uri: str = f"{PREFIX}/{zza.code}/update"
+        detail_c_uri: str = f"{PREFIX}/{zzc.code}"
         response: httpx.Response
 
         # Success, with spaces to be stripped
@@ -425,8 +420,8 @@ class CurrencyTestCase(unittest.TestCase):
         """
         from accounting.models import Currency
         from test_site import db
-        detail_uri: str = f"/accounting/currencies/{zza.code}"
-        update_uri: str = f"/accounting/currencies/{zza.code}/update"
+        detail_uri: str = f"{PREFIX}/{zza.code}"
+        update_uri: str = f"{PREFIX}/{zza.code}/update"
         response: httpx.Response
         time.sleep(1)
 
@@ -464,8 +459,8 @@ class CurrencyTestCase(unittest.TestCase):
         from test_site import db
         editor_username, editor2_username = "editor", "editor2"
         client, csrf_token = get_client(self, self.app, editor2_username)
-        detail_uri: str = f"/accounting/currencies/{zza.code}"
-        update_uri: str = f"/accounting/currencies/{zza.code}/update"
+        detail_uri: str = f"{PREFIX}/{zza.code}"
+        update_uri: str = f"{PREFIX}/{zza.code}/update"
         response: httpx.Response
 
         with self.app.app_context():
@@ -492,8 +487,8 @@ class CurrencyTestCase(unittest.TestCase):
         """
         from accounting.models import Currency
         from test_site import db
-        detail_uri: str = f"/accounting/currencies/{zza.code}"
-        update_uri: str = f"/accounting/currencies/{zza.code}/update"
+        detail_uri: str = f"{PREFIX}/{zza.code}"
+        update_uri: str = f"{PREFIX}/{zza.code}/update"
         response: httpx.Response
 
         with self.app.app_context():
@@ -552,9 +547,9 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Currency
-        detail_uri: str = f"/accounting/currencies/{zza.code}"
-        delete_uri: str = f"/accounting/currencies/{zza.code}/delete"
-        list_uri: str = "/accounting/currencies"
+        detail_uri: str = f"{PREFIX}/{zza.code}"
+        delete_uri: str = f"{PREFIX}/{zza.code}/delete"
+        list_uri: str = PREFIX
         response: httpx.Response
 
         with self.app.app_context():
