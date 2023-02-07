@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-06 09:47+0800\n"
-"PO-Revision-Date: 2023-02-06 09:48+0800\n"
+"POT-Creation-Date: 2023-02-07 16:22+0800\n"
+"PO-Revision-Date: 2023-02-07 16:23+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -23,12 +23,16 @@ msgstr ""
 msgid "The base account does not exist."
 msgstr "沒有這個基本科目。"
 
-#: src/accounting/account/forms.py:50
+#: src/accounting/account/forms.py:52
+msgid "The base account is not available."
+msgstr "不能選這個基本科目。"
+
+#: src/accounting/account/forms.py:61
 #: src/accounting/static/js/account-form.js:110
 msgid "Please select the base account."
 msgstr "請選擇基本科目。"
 
-#: src/accounting/account/forms.py:55
+#: src/accounting/account/forms.py:67
 msgid "Please fill in the title"
 msgstr "請填上標題。"
 
@@ -50,17 +54,58 @@ msgstr "科目未異動。"
 msgid "The account is updated successfully."
 msgstr "科目存好了。"
 
-#: src/accounting/account/views.py:167
+#: src/accounting/account/views.py:165
 msgid "The account is deleted successfully."
 msgstr "科目刪掉了"
 
-#: src/accounting/account/views.py:194
+#: src/accounting/account/views.py:192
 msgid "The order was not modified."
 msgstr "順序未異動。"
 
-#: src/accounting/account/views.py:197
+#: src/accounting/account/views.py:195
 msgid "The order is updated successfully."
 msgstr "順序存好了。"
+
+#: src/accounting/currency/forms.py:47
+#: src/accounting/static/js/currency-form.js:136
+msgid "Code conflicts with another currency."
+msgstr "代碼與其它貨幣重複"
+
+#: src/accounting/currency/forms.py:52
+#: src/accounting/static/js/currency-form.js:92
+msgid "Please fill in the code."
+msgstr "請填上代碼。"
+
+#: src/accounting/currency/forms.py:54
+#: src/accounting/static/js/currency-form.js:103
+msgid "Code can only be composed of 3 upper-cased letters."
+msgstr "代碼限為三個大寫英文字母。"
+
+#: src/accounting/currency/forms.py:57
+#: src/accounting/static/js/currency-form.js:98
+msgid "This code is not available."
+msgstr "不能用這個代碼。"
+
+#: src/accounting/currency/forms.py:63
+#: src/accounting/static/js/currency-form.js:168
+msgid "Please fill in the name."
+msgstr "請填上名稱。"
+
+#: src/accounting/currency/views.py:90
+msgid "The currency is added successfully"
+msgstr "貨幣加好了。"
+
+#: src/accounting/currency/views.py:146
+msgid "The currency was not modified."
+msgstr "貨幣未異動。"
+
+#: src/accounting/currency/views.py:151
+msgid "The currency is updated successfully."
+msgstr "貨幣存好了。"
+
+#: src/accounting/currency/views.py:167
+msgid "The currency is deleted successfully."
+msgstr "貨幣刪掉了"
 
 #: src/accounting/static/js/account-form.js:130
 msgid "Please fill in the title."
@@ -74,10 +119,13 @@ msgstr "新增科目"
 #: src/accounting/templates/accounting/account/include/form.html:33
 #: src/accounting/templates/accounting/account/order.html:36
 #: src/accounting/templates/accounting/base-account/detail.html:31
+#: src/accounting/templates/accounting/currency/detail.html:31
+#: src/accounting/templates/accounting/currency/include/form.html:33
 msgid "Back"
 msgstr "回上頁"
 
 #: src/accounting/templates/accounting/account/detail.html:36
+#: src/accounting/templates/accounting/currency/detail.html:36
 msgid "Settings"
 msgstr "設定"
 
@@ -86,6 +134,7 @@ msgid "Order"
 msgstr "次序"
 
 #: src/accounting/templates/accounting/account/detail.html:46
+#: src/accounting/templates/accounting/currency/detail.html:42
 msgid "Delete"
 msgstr "刪除"
 
@@ -99,18 +148,22 @@ msgstr "你確定要刪掉這個科目嗎？"
 
 #: src/accounting/templates/accounting/account/detail.html:76
 #: src/accounting/templates/accounting/account/include/form.html:111
+#: src/accounting/templates/accounting/currency/detail.html:72
 msgid "Cancel"
 msgstr "取消"
 
 #: src/accounting/templates/accounting/account/detail.html:77
+#: src/accounting/templates/accounting/currency/detail.html:73
 msgid "Confirm"
 msgstr "確定"
 
 #: src/accounting/templates/accounting/account/detail.html:94
+#: src/accounting/templates/accounting/currency/detail.html:85
 msgid "Created"
 msgstr "建檔"
 
 #: src/accounting/templates/accounting/account/detail.html:95
+#: src/accounting/templates/accounting/currency/detail.html:86
 msgid "Updated"
 msgstr "更新"
 
@@ -121,6 +174,7 @@ msgstr "%(account)s設定"
 
 #: src/accounting/templates/accounting/account/list.html:24
 #: src/accounting/templates/accounting/base-account/list.html:24
+#: src/accounting/templates/accounting/currency/list.html:24
 #, python-format
 msgid "Search Result for \"%(query)s\""
 msgstr "「%(query)s」搜尋結果"
@@ -130,18 +184,21 @@ msgid "Account Management"
 msgstr "科目管理"
 
 #: src/accounting/templates/accounting/account/list.html:32
+#: src/accounting/templates/accounting/currency/list.html:32
 msgid "New"
 msgstr "新增"
 
 #: src/accounting/templates/accounting/account/include/form.html:98
 #: src/accounting/templates/accounting/account/list.html:40
 #: src/accounting/templates/accounting/base-account/list.html:34
+#: src/accounting/templates/accounting/currency/list.html:40
 msgid "Search"
 msgstr "搜尋"
 
 #: src/accounting/templates/accounting/account/list.html:68
 #: src/accounting/templates/accounting/account/order.html:81
 #: src/accounting/templates/accounting/base-account/list.html:51
+#: src/accounting/templates/accounting/currency/list.html:57
 msgid "There is no data."
 msgstr "沒有資料。"
 
@@ -152,6 +209,7 @@ msgstr "%(base)s下的科目"
 
 #: src/accounting/templates/accounting/account/include/form.html:75
 #: src/accounting/templates/accounting/account/order.html:62
+#: src/accounting/templates/accounting/currency/include/form.html:57
 msgid "Save"
 msgstr "儲存"
 
@@ -184,6 +242,35 @@ msgstr "清除"
 msgid "Base Account Managements"
 msgstr "基本科目管理"
 
+#: src/accounting/templates/accounting/currency/create.html:24
+msgid "Add a New Currency"
+msgstr "新增貨幣"
+
+#: src/accounting/templates/accounting/currency/detail.html:65
+msgid "Delete Currency Confirmation"
+msgstr "貨幣刪除確認"
+
+#: src/accounting/templates/accounting/currency/detail.html:69
+msgid "Do you really want to delete this currency?"
+msgstr "你確定要刪掉這個貨幣嗎？"
+
+#: src/accounting/templates/accounting/currency/edit.html:24
+#, python-format
+msgid "%(currency)s Settings"
+msgstr "%(currency)s設定"
+
+#: src/accounting/templates/accounting/currency/list.html:24
+msgid "Currency Management"
+msgstr "貨幣管理"
+
+#: src/accounting/templates/accounting/currency/include/form.html:44
+msgid "Code"
+msgstr "代碼"
+
+#: src/accounting/templates/accounting/currency/include/form.html:50
+msgid "Name"
+msgstr "名稱"
+
 #: src/accounting/templates/accounting/include/nav.html:26
 msgid "Accounting"
 msgstr "記帳"
@@ -195,6 +282,10 @@ msgstr "科目"
 #: src/accounting/templates/accounting/include/nav.html:38
 msgid "Base Accounts"
 msgstr "基本科目"
+
+#: src/accounting/templates/accounting/include/nav.html:44
+msgid "Currencies"
+msgstr "貨幣"
 
 #: src/accounting/utils/pagination.py:206
 msgctxt "Pagination|"
