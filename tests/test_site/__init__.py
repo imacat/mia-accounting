@@ -80,7 +80,7 @@ def create_app(is_testing: bool = False) -> Flask:
             return auth.User.id
 
         @property
-        def current_user(self) -> auth.User:
+        def current_user(self) -> auth.User | None:
             return auth.current_user()
 
         def get_by_username(self, username: str) -> auth.User | None:

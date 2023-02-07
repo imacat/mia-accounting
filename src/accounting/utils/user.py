@@ -50,10 +50,11 @@ class AbstractUserUtils(t.Generic[T], ABC):
 
     @property
     @abstractmethod
-    def current_user(self) -> T:
-        """Returns the current user.
+    def current_user(self) -> T | None:
+        """Returns the currently logged-in user.
 
-        :return: The current user.
+        :return: The currently logged-in user, or None if the user has not
+            logged in
         """
 
     @abstractmethod
@@ -117,7 +118,7 @@ def get_user_pk(username: str) -> int:
     return __user_utils.get_pk(__user_utils.get_by_username(username))
 
 
-def get_current_user() -> user_cls:
+def get_current_user() -> user_cls | None:
     """Returns the currently logged-in user.  The result is cached in the
     current request.
 
