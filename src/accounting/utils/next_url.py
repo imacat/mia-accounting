@@ -81,6 +81,6 @@ def init_app(bp: Blueprint) -> None:
     :param bp: The blueprint of the accounting application.
     :return: None.
     """
-    bp.add_app_template_filter(append_next, "append_next")
-    bp.add_app_template_filter(inherit_next, "inherit_next")
-    bp.add_app_template_filter(or_next, "or_next")
+    bp.add_app_template_filter(append_next, "accounting_append_next")
+    bp.add_app_template_filter(inherit_next, "accounting_inherit_next")
+    bp.add_app_template_filter(or_next, "accounting_or_next")

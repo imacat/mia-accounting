@@ -42,7 +42,7 @@ First written: 2023/1/26
 
   <div class="list-group">
     {% for item in list %}
-      <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.base-account.detail", account=item)|append_next }}">
+      <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.base-account.detail", account=item)|accounting_append_next }}">
         {{ item }}
       </a>
     {% endfor %}

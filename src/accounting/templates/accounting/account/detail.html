@@ -26,17 +26,17 @@ First written: 2023/1/31
 {% block content %}
 
 <div class="btn-group mb-3">
-  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|or_next }}">
+  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|accounting_or_next }}">
     <i class="fa-solid fa-circle-chevron-left"></i>
     {{ A_("Back") }}
   </a>
   {% if can_edit_accounting() %}
-    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.edit", account=obj)|inherit_next }}">
+    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.edit", account=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-gear"></i>
       {{ A_("Settings") }}
     </a>
   {% endif %}
-  <a class="btn btn-primary" href="{{ url_for("accounting.account.order", base=obj.base)|append_next }}">
+  <a class="btn btn-primary" href="{{ url_for("accounting.account.order", base=obj.base)|accounting_append_next }}">
     <i class="fa-solid fa-bars-staggered"></i>
     {{ A_("Order") }}
   </a>
@@ -50,7 +50,7 @@ First written: 2023/1/31
 
 {% if can_edit_accounting() %}
   <div class="d-md-none material-fab">
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.edit", account=obj)|inherit_next }}">
+    <a class="btn btn-primary" href="{{ url_for("accounting.account.edit", account=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
     </a>
   </div>

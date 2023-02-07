@@ -23,7 +23,7 @@ First written: 2023/2/6
 
 {% block header %}{% block title %}{{ A_("%(currency)s Settings", currency=currency) }}{% endblock %}{% endblock %}
 
-{% block back_url %}{{ url_for("accounting.currency.detail", currency=currency)|inherit_next }}{% endblock %}
+{% block back_url %}{{ url_for("accounting.currency.detail", currency=currency)|accounting_inherit_next }}{% endblock %}
 
 {% block action_url %}{{ url_for("accounting.currency.update", currency=currency) }}{% endblock %}
 

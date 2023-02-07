@@ -23,6 +23,6 @@ First written: 2023/2/1
 
 {% block header %}{% block title %}{{ A_("%(account)s Settings", account=account) }}{% endblock %}{% endblock %}
 
-{% block back_url %}{{ url_for("accounting.account.detail", account=account)|inherit_next }}{% endblock %}
+{% block back_url %}{{ url_for("accounting.account.detail", account=account)|accounting_inherit_next }}{% endblock %}
 
 {% block action_url %}{{ url_for("accounting.account.update", account=account) }}{% endblock %}
