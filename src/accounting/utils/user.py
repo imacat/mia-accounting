@@ -23,6 +23,7 @@ import typing as t
 from abc import ABC, abstractmethod
 
 import sqlalchemy as sa
+from flask import g
 from flask_sqlalchemy.model import Model
 
 T = t.TypeVar("T", bound=Model)
@@ -95,7 +96,7 @@ def get_current_user_pk() -> int:
 
     :return: The primary key value of the currently logged-in user.
     """
-    return __user_utils.get_pk(__user_utils.current_user)
+    return __user_utils.get_pk(get_current_user())
 
 
 def has_user(username: str) -> bool:
@@ -114,3 +115,14 @@ def get_user_pk(username: str) -> int:
     :return: The primary key value of the user by the username.
     """
     return __user_utils.get_pk(__user_utils.get_by_username(username))
+
+
+def get_current_user() -> user_cls:
+    """Returns the currently logged-in user.  The result is cached in the
+    current request.
+
+    :return: The currently logged-in user.
+    """
+    if not hasattr(g, "_accounting_user"):
+        setattr(g, "_accounting_user", __user_utils.current_user)
+    return getattr(g, "_accounting_user")
