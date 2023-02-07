@@ -23,8 +23,8 @@ from flask import Flask, Blueprint
 def init_app(app: Flask, bp: Blueprint) -> None:
     """Initialize the application.
 
-    :param bp: The blueprint of the accounting application.
     :param app: The Flask application.
+    :param bp: The blueprint of the accounting application.
     :return: None.
     """
     from .converters import BaseAccountConverter

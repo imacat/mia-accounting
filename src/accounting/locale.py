@@ -116,8 +116,8 @@ def __babel_js_catalog_view() -> Response:
 def init_app(app: Flask, bp: Blueprint) -> None:
     """Initializes the application.
 
-    :param bp: The blueprint of the accounting application.
     :param app: The Flask application.
+    :param bp: The blueprint of the accounting application.
     :return: None.
     """
     bp.add_url_rule("/_jstrans.js", "babel_catalog",
