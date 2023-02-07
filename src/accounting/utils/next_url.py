@@ -22,7 +22,7 @@ This module should not import any other module from the application.
 from urllib.parse import urlparse, parse_qsl, ParseResult, urlencode, \
     urlunparse
 
-from flask import request
+from flask import request, Blueprint
 
 
 def append_next(uri: str) -> str:
@@ -73,3 +73,14 @@ def __set_next(uri: str, next_uri: str) -> str:
     parts: list[str] = list(uri_p)
     parts[4] = urlencode(params)
     return urlunparse(parts)
+
+
+def init_app(bp: Blueprint) -> None:
+    """Initializes the application.
+
+    :param bp: The blueprint of the accounting application.
+    :return: None.
+    """
+    bp.add_app_template_filter(append_next, "append_next")
+    bp.add_app_template_filter(inherit_next, "inherit_next")
+    bp.add_app_template_filter(or_next, "or_next")
