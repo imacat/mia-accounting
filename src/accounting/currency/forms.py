@@ -24,7 +24,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
 from wtforms.validators import DataRequired, Regexp, NoneOf
 
-from accounting.database import db
+from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency
 from accounting.utils.strip_text import strip_text

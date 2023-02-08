@@ -21,9 +21,12 @@ import typing as t
 from pathlib import Path
 
 from flask import Flask, Blueprint
+from flask_sqlalchemy import SQLAlchemy
 
 from accounting.utils.user import AbstractUserUtils
 
+db: SQLAlchemy = SQLAlchemy()
+"""The database instance."""
 data_dir: Path = Path(__file__).parent / "data"
 """The data directory."""
 
@@ -45,8 +48,8 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     """
     # The database instance must be set before loading everything
     # in the application.
-    from .database import set_db
-    set_db(app.extensions["sqlalchemy"])
+    global db
+    db = app.extensions["sqlalchemy"]
     from .utils.user import init_user_utils
     init_user_utils(user_utils)
 

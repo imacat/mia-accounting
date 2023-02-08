@@ -24,8 +24,7 @@ import typing as t
 import click
 from flask.cli import with_appcontext
 
-from accounting import data_dir
-from accounting.database import db
+from accounting import db, data_dir
 from accounting.models import Currency, CurrencyL10n
 from accounting.utils.user import has_user, get_user_pk
 

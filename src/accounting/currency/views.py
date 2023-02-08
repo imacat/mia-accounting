@@ -23,7 +23,7 @@ from flask import Blueprint, render_template, redirect, session, request, \
     flash, url_for
 from werkzeug.datastructures import ImmutableMultiDict
 
-from accounting.database import db
+from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency
 from accounting.utils.next_url import inherit_next, or_next

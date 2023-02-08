@@ -24,7 +24,7 @@ from secrets import randbelow
 import click
 from flask.cli import with_appcontext
 
-from accounting.database import db
+from accounting import db
 from accounting.models import BaseAccount, Account, AccountL10n
 from accounting.utils.user import has_user, get_user_pk
 

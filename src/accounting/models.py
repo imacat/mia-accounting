@@ -25,7 +25,7 @@ from flask import current_app
 from flask_babel import get_locale
 from sqlalchemy import text
 
-from accounting.database import db
+from accounting import db
 from accounting.utils.user import user_cls, user_pk_column
 
 

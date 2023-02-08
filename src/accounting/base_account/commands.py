@@ -23,7 +23,7 @@ import click
 from flask.cli import with_appcontext
 
 from accounting import data_dir
-from accounting.database import db
+from accounting import db
 from accounting.models import BaseAccount, BaseAccountL10n
 
 

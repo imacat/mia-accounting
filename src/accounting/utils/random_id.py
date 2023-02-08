@@ -22,7 +22,7 @@ This module should not import any other module from the application.
 import typing as t
 from secrets import randbelow
 
-from accounting.database import db
+from accounting import db
 
 
 def new_id(cls: t.Type):

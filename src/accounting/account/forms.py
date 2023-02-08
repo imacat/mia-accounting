@@ -23,7 +23,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.database import db
+from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import BaseAccount, Account
 from accounting.utils.random_id import new_id

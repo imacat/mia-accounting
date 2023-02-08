@@ -75,7 +75,7 @@ class AccountCommandTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.database import db
+            from accounting import db
             from accounting.models import BaseAccount, Account, AccountL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -129,7 +129,7 @@ class AccountTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.database import db
+            from accounting import db
             from accounting.models import BaseAccount, Account, AccountL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -316,7 +316,7 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.database import db
+        from accounting import db
         from accounting.models import Account
         create_uri: str = f"{PREFIX}/create"
         store_uri: str = f"{PREFIX}/store"
@@ -648,7 +648,7 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.database import db
+        from accounting import db
         from accounting.models import Account
         response: httpx.Response
 

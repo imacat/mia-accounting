@@ -71,7 +71,7 @@ class CurrencyCommandTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.database import db
+            from accounting import db
             from accounting.models import Currency, CurrencyL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -128,7 +128,7 @@ class CurrencyTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.database import db
+            from accounting import db
             from accounting.models import Currency, CurrencyL10n
             result: Result
             result = runner.invoke(args="init-db")

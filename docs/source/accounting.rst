@@ -15,14 +15,6 @@ Subpackages
 Submodules
 ----------
 
-accounting.database module
---------------------------
-
-.. automodule:: accounting.database
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 accounting.locale module
 ------------------------
 
