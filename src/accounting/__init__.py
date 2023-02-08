@@ -18,10 +18,14 @@
 
 """
 import typing as t
+from pathlib import Path
 
 from flask import Flask, Blueprint
 
 from accounting.utils.user import AbstractUserUtils
+
+data_dir: Path = Path(__file__).parent / "data"
+"""The data directory."""
 
 
 def init_app(app: Flask, user_utils: AbstractUserUtils,
