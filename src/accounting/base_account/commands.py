@@ -26,10 +26,6 @@ from accounting import data_dir
 from accounting.database import db
 from accounting.models import BaseAccount, BaseAccountL10n
 
-BaseAccountData = tuple[int, str, str, str]
-"""The format of the base account data, as a list of (code, English,
-Traditional Chinese, Simplified Chinese) tuples."""
-
 
 @click.command("accounting-init-base")
 @with_appcontext
