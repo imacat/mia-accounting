@@ -68,9 +68,9 @@ class BaseAccountCommandTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         result: Result = runner.invoke(args="accounting-init-base")
         self.assertEqual(result.exit_code, 0)
-
         with self.app.app_context():
             accounts: list[BaseAccount] = BaseAccount.query.all()
+
         self.assertEqual(len(accounts), len(data))
         for account in accounts:
             self.assertIn(account.code, data)
