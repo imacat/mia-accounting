@@ -17,11 +17,14 @@
 """The console commands for the currency management.
 
 """
+import csv
 import os
+import typing as t
 
 import click
 from flask.cli import with_appcontext
 
+from accounting import data_dir
 from accounting.database import db
 from accounting.models import Currency, CurrencyL10n
 from accounting.utils.user import has_user, get_user_pk
@@ -54,25 +57,29 @@ def __validate_username(ctx: click.core.Context, param: click.core.Option,
 @with_appcontext
 def init_currencies_command(username: str) -> None:
     """Initializes the currencies."""
-    data: list[CurrencyData] = [
-        ("TWD", "New Taiwan dollar", "新臺幣", "新台币"),
-        ("USD", "United States dollar", "美元", "美元"),
-    ]
-    creator_pk: int = get_user_pk(username)
-    existing: list[Currency] = Currency.query.all()
-    existing_code: set[str] = {x.code for x in existing}
-    to_add: list[CurrencyData] = [x for x in data if x[0] not in existing_code]
+    existing_codes: set[str] = {x.code for x in Currency.query.all()}
+
+    with open(data_dir / "currencies.csv") as fh:
+        data: list[dict[str, str]] = [x for x in csv.DictReader(fh)]
+    to_add: list[dict[str, str]] = [x for x in data
+                                    if x["code"] not in existing_codes]
     if len(to_add) == 0:
         click.echo("No more currency to add.")
         return
 
-    db.session.bulk_save_objects(
-        [Currency(code=x[0], name_l10n=x[1],
-                  created_by_id=creator_pk, updated_by_id=creator_pk)
-         for x in data])
-    db.session.bulk_save_objects(
-        [CurrencyL10n(currency_code=x[0], locale=y[0], name=y[1])
-         for x in data for y in (("zh_Hant", x[2]), ("zh_Hans", x[3]))])
+    creator_pk: int = get_user_pk(username)
+    currency_data: list[dict[str, t.Any]] = [{"code": x["code"],
+                                              "name_l10n": x["name"],
+                                              "created_by_id": creator_pk,
+                                              "updated_by_id": creator_pk}
+                                             for x in to_add]
+    locales: list[str] = [x[5:] for x in to_add[0] if x.startswith("l10n-")]
+    l10n_data: list[dict[str, str]] = [{"currency_code": x["code"],
+                                        "locale": y,
+                                        "name": x[f"l10n-{y}"]}
+                                       for x in to_add for y in locales]
+    db.session.bulk_insert_mappings(Currency, currency_data)
+    db.session.bulk_insert_mappings(CurrencyL10n, l10n_data)
     db.session.commit()
 
     click.echo(F"{len(to_add)} added.  Currencies initialized.")

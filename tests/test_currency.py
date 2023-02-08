@@ -17,7 +17,9 @@
 """The test for the currency management.
 
 """
+import csv
 import time
+import typing as t
 import unittest
 
 import httpx
@@ -83,20 +85,34 @@ class CurrencyCommandTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.models import Currency, CurrencyL10n
+        from accounting import data_dir
+        from accounting.models import Currency
+
+        with open(data_dir / "currencies.csv") as fh:
+            data: dict[dict[str, t.Any]] \
+                = {x["code"]: {"code": x["code"],
+                               "name": x["name"],
+                               "l10n": {y[5:]: x[y]
+                                        for y in x if y.startswith("l10n-")}}
+                   for x in csv.DictReader(fh)}
+
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             result: Result = runner.invoke(
                 args=["accounting-init-currencies", "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             currencies: list[Currency] = Currency.query.all()
-            l10n: list[CurrencyL10n] = CurrencyL10n.query.all()
-        self.assertEqual(len(currencies), 2)
-        self.assertEqual(len(l10n), 2 * 2)
-        l10n_keys: set[str] = {f"{x.currency_code}-{x.locale}" for x in l10n}
+
+        self.assertEqual(len(currencies), len(data))
         for currency in currencies:
-            self.assertIn(f"{currency.code}-zh_Hant", l10n_keys)
-            self.assertIn(f"{currency.code}-zh_Hant", l10n_keys)
+            self.assertIn(currency.code, data)
+            self.assertEqual(currency.name_l10n, data[currency.code]["name"])
+            l10n: dict[str, str] = {x.locale: x.name for x in currency.l10n}
+            self.assertEqual(len(l10n), len(data[currency.code]["l10n"]))
+            for locale in l10n:
+                self.assertIn(locale, data[currency.code]["l10n"])
+                self.assertEqual(l10n[locale],
+                                 data[currency.code]["l10n"][locale])
 
 
 class CurrencyTestCase(unittest.TestCase):
