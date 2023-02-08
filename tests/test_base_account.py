@@ -17,6 +17,8 @@
 """The test for the base account management.
 
 """
+import csv
+import typing as t
 import unittest
 
 import httpx
@@ -52,19 +54,33 @@ class BaseAccountCommandTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.models import BaseAccount, BaseAccountL10n
+        from accounting import data_dir
+        from accounting.models import BaseAccount
+
+        with open(data_dir / "base_accounts.csv") as fh:
+            data: dict[dict[str, t.Any]] \
+                = {x["code"]: {"code": x["code"],
+                               "title": x["title"],
+                               "l10n": {y[5:]: x[y]
+                                        for y in x if y.startswith("l10n-")}}
+                   for x in csv.DictReader(fh)}
+
         runner: FlaskCliRunner = self.app.test_cli_runner()
         result: Result = runner.invoke(args="accounting-init-base")
         self.assertEqual(result.exit_code, 0)
+
         with self.app.app_context():
             accounts: list[BaseAccount] = BaseAccount.query.all()
-            l10n: list[BaseAccountL10n] = BaseAccountL10n.query.all()
-        self.assertEqual(len(accounts), 527)
-        self.assertEqual(len(l10n), 527 * 2)
-        l10n_keys: set[str] = {f"{x.account_code}-{x.locale}" for x in l10n}
+        self.assertEqual(len(accounts), len(data))
         for account in accounts:
-            self.assertIn(f"{account.code}-zh_Hant", l10n_keys)
-            self.assertIn(f"{account.code}-zh_Hant", l10n_keys)
+            self.assertIn(account.code, data)
+            self.assertEqual(account.title_l10n, data[account.code]["title"])
+            l10n: dict[str, str] = {x.locale: x.title for x in account.l10n}
+            self.assertEqual(len(l10n), len(data[account.code]["l10n"]))
+            for locale in l10n:
+                self.assertIn(locale, data[account.code]["l10n"])
+                self.assertEqual(l10n[locale],
+                                 data[account.code]["l10n"][locale])
 
 
 class BaseAccountTestCase(unittest.TestCase):
