@@ -58,8 +58,8 @@ def init_currencies_command(username: str) -> None:
     """Initializes the currencies."""
     existing_codes: set[str] = {x.code for x in Currency.query.all()}
 
-    with open(data_dir / "currencies.csv") as fh:
-        data: list[dict[str, str]] = [x for x in csv.DictReader(fh)]
+    with open(data_dir / "currencies.csv") as fp:
+        data: list[dict[str, str]] = [x for x in csv.DictReader(fp)]
     to_add: list[dict[str, str]] = [x for x in data
                                     if x["code"] not in existing_codes]
     if len(to_add) == 0:

@@ -57,13 +57,13 @@ class BaseAccountCommandTestCase(unittest.TestCase):
         from accounting import data_dir
         from accounting.models import BaseAccount
 
-        with open(data_dir / "base_accounts.csv") as fh:
+        with open(data_dir / "base_accounts.csv") as fp:
             data: dict[dict[str, t.Any]] \
                 = {x["code"]: {"code": x["code"],
                                "title": x["title"],
                                "l10n": {y[5:]: x[y]
                                         for y in x if y.startswith("l10n-")}}
-                   for x in csv.DictReader(fh)}
+                   for x in csv.DictReader(fp)}
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         result: Result = runner.invoke(args="accounting-init-base")

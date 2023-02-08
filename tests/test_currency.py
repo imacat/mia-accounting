@@ -88,13 +88,13 @@ class CurrencyCommandTestCase(unittest.TestCase):
         from accounting import data_dir
         from accounting.models import Currency
 
-        with open(data_dir / "currencies.csv") as fh:
+        with open(data_dir / "currencies.csv") as fp:
             data: dict[dict[str, t.Any]] \
                 = {x["code"]: {"code": x["code"],
                                "name": x["name"],
                                "l10n": {y[5:]: x[y]
                                         for y in x if y.startswith("l10n-")}}
-                   for x in csv.DictReader(fh)}
+                   for x in csv.DictReader(fp)}
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():

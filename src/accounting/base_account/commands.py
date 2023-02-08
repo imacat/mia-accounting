@@ -35,8 +35,8 @@ def init_base_accounts_command() -> None:
         click.echo("Base accounts already exist.")
         raise click.Abort
 
-    with open(data_dir / "base_accounts.csv") as fh:
-        data: list[dict[str, str]] = [x for x in csv.DictReader(fh)]
+    with open(data_dir / "base_accounts.csv") as fp:
+        data: list[dict[str, str]] = [x for x in csv.DictReader(fp)]
     account_data: list[dict[str, str]] = [{"code": x["code"],
                                            "title_l10n": x["title"]}
                                           for x in data]
