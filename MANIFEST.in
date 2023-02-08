@@ -22,7 +22,7 @@ include docs/source/*
 include docs/source/_static/*
 include docs/source/_templates/*
 include tests/*
-include tests/testsite/*
-include tests/testsite/templates/*
-include tests/testsite/translations/*
-include tests/testsite/translations/*/LC_MESSAGES/*
+include tests/test_site/*
+include tests/test_site/templates/*
+include tests/test_site/translations/*
+include tests/test_site/translations/*/LC_MESSAGES/*
