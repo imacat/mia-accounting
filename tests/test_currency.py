@@ -137,7 +137,7 @@ class CurrencyTestCase(unittest.TestCase):
             Currency.query.delete()
             db.session.commit()
 
-        self.client, self.csrf_token = get_client(self, self.app, "editor")
+        self.client, self.csrf_token = get_client(self.app, "editor")
         response: httpx.Response
 
         response = self.client.post(f"{PREFIX}/store",
@@ -159,7 +159,7 @@ class CurrencyTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self, self.app, "nobody")
+        client, csrf_token = get_client(self.app, "nobody")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -195,7 +195,7 @@ class CurrencyTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self, self.app, "viewer")
+        client, csrf_token = get_client(self.app, "viewer")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -474,7 +474,7 @@ class CurrencyTestCase(unittest.TestCase):
         from accounting.models import Currency
         from test_site import db
         editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self, self.app, editor2_username)
+        client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
         response: httpx.Response
@@ -533,7 +533,7 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual(zza_currency.name_l10n, zza.name)
             self.assertEqual(zza_currency.l10n, [])
 
-        set_locale(self, self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -548,7 +548,7 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.name) for x in zza_currency.l10n},
                              {("zh_Hant", f"{zza.name}-zh_Hant")})
 
-        set_locale(self, self.client, self.csrf_token, "en")
+        set_locale(self.client, self.csrf_token, "en")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -563,7 +563,7 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.name) for x in zza_currency.l10n},
                              {("zh_Hant", f"{zza.name}-zh_Hant")})
 
-        set_locale(self, self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,

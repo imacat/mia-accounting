@@ -141,7 +141,7 @@ class AccountTestCase(unittest.TestCase):
             Account.query.delete()
             db.session.commit()
 
-        self.client, self.csrf_token = get_client(self, self.app, "editor")
+        self.client, self.csrf_token = get_client(self.app, "editor")
         response: httpx.Response
 
         response = self.client.post(f"{PREFIX}/store",
@@ -166,7 +166,7 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        client, csrf_token = get_client(self, self.app, "nobody")
+        client, csrf_token = get_client(self.app, "nobody")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -215,7 +215,7 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        client, csrf_token = get_client(self, self.app, "viewer")
+        client, csrf_token = get_client(self.app, "viewer")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -527,7 +527,7 @@ class AccountTestCase(unittest.TestCase):
         """
         from accounting.models import Account
         editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self, self.app, editor2_username)
+        client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
         response: httpx.Response
@@ -566,7 +566,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual(cash_account.title_l10n, cash.title)
             self.assertEqual(cash_account.l10n, [])
 
-        set_locale(self, self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -581,7 +581,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
                              {("zh_Hant", f"{cash.title}-zh_Hant")})
 
-        set_locale(self, self.client, self.csrf_token, "en")
+        set_locale(self.client, self.csrf_token, "en")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -596,7 +596,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
                              {("zh_Hant", f"{cash.title}-zh_Hant")})
 
-        set_locale(self, self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,

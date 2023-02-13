@@ -108,7 +108,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self, self.app, "nobody")
+        client, csrf_token = get_client(self.app, "nobody")
         response: httpx.Response
 
         response = client.get("/accounting/base-accounts")
@@ -122,7 +122,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self, self.app, "viewer")
+        client, csrf_token = get_client(self.app, "viewer")
         response: httpx.Response
 
         response = client.get("/accounting/base-accounts")
@@ -136,7 +136,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self, self.app, "editor")
+        client, csrf_token = get_client(self.app, "editor")
         response: httpx.Response
 
         response = client.get("/accounting/base-accounts")
