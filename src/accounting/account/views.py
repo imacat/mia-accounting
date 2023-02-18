@@ -30,6 +30,7 @@ from accounting.utils.next_url import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
 from .forms import AccountForm, sort_accounts_in, AccountReorderForm
+from .query import get_account_query
 
 bp: Blueprint = Blueprint("account", __name__)
 """The view blueprint for the account management."""
@@ -42,7 +43,6 @@ def list_accounts() -> str:
 
     :return: The account list.
     """
-    from .query import get_account_query
     accounts: list[BaseAccount] = get_account_query()
     pagination: Pagination = Pagination[BaseAccount](accounts)
     return render_template("accounting/account/list.html",
