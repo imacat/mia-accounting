@@ -96,9 +96,10 @@ class AccountForm(FlaskForm):
             setattr(self, "__post_update",
                     lambda: sort_accounts_in(prev_base_code, obj.id))
 
-    def post_update(self, obj) -> None:
+    def post_update(self, obj: Account) -> None:
         """The post-processing after the update.
 
+        :param obj: The account object.
         :return: None
         """
         current_user_pk: int = get_current_user_pk()
