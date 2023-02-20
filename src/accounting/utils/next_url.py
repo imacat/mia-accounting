@@ -68,7 +68,7 @@ def __set_next(uri: str, next_uri: str) -> str:
     """
     uri_p: ParseResult = urlparse(uri)
     params: list[tuple[str, str]] = parse_qsl(uri_p.query)
-    params = [x for x in params if x[0] == "next"]
+    params = [x for x in params if x[0] != "next"]
     params.append(("next", next_uri))
     parts: list[str] = list(uri_p)
     parts[4] = urlencode(params)
