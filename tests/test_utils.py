@@ -23,7 +23,7 @@ from urllib.parse import quote_plus
 import httpx
 from flask import Flask, request
 
-from accounting.utils.next_url import append_next, inherit_next, or_next
+from accounting.utils.next_uri import append_next, inherit_next, or_next
 from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
 from test_site import create_app, csrf

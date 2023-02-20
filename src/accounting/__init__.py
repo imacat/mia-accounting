@@ -73,7 +73,7 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     from . import currency
     currency.init_app(app, bp)
 
-    from .utils import next_url
-    next_url.init_app(bp)
+    from .utils import next_uri
+    next_uri.init_app(bp)
 
     app.register_blueprint(bp)

@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The utilities to handle the next URL.
+"""The utilities to handle the next URI.
 
 This module should not import any other module from the application.
 

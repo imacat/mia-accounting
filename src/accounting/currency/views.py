@@ -26,7 +26,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency
-from accounting.utils.next_url import inherit_next, or_next
+from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
 from .forms import CurrencyForm
