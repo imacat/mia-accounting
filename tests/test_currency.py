@@ -463,8 +463,8 @@ class CurrencyTestCase(unittest.TestCase):
         with self.app.app_context():
             zza_currency: Currency = db.session.get(Currency, zza.code)
             self.assertIsNotNone(zza_currency)
-            self.assertNotEqual(zza_currency.created_at,
-                                zza_currency.updated_at)
+            self.assertLess(zza_currency.created_at,
+                            zza_currency.updated_at)
 
     def test_created_updated_by(self) -> None:
         """Tests the created-by and updated-by record.

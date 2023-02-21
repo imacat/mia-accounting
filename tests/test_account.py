@@ -517,8 +517,8 @@ class AccountTestCase(unittest.TestCase):
         with self.app.app_context():
             cash_account: Account = Account.find_by_code(cash.code)
             self.assertIsNotNone(cash_account)
-            self.assertNotEqual(cash_account.created_at,
-                                cash_account.updated_at)
+            self.assertLess(cash_account.created_at,
+                            cash_account.updated_at)
 
     def test_created_updated_by(self) -> None:
         """Tests the created-by and updated-by record.
