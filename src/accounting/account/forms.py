@@ -81,7 +81,7 @@ class AccountForm(FlaskForm):
             obj.id = new_id(Account)
         obj.base_code = self.base_code.data
         if prev_base_code != self.base_code.data:
-            max_no: int = db.session.scalars(
+            max_no: int | None = db.session.scalars(
                 sa.select(sa.func.max(Account.no))
                 .filter(Account.base_code == self.base_code.data)).one()
             obj.no = 1 if max_no is None else max_no + 1
