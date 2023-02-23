@@ -66,8 +66,8 @@ class AccountForm(FlaskForm):
         filters=[strip_text],
         validators=[DataRequired(lazy_gettext("Please fill in the title"))])
     """The title."""
-    is_offset_needed = BooleanField()
-    """Whether the the entries of this account need offsets."""
+    is_pay_off_needed = BooleanField()
+    """Whether the the entries of this account need pay-off."""
 
     def populate_obj(self, obj: Account) -> None:
         """Populates the form data into an account object.
@@ -86,7 +86,7 @@ class AccountForm(FlaskForm):
                 .filter(Account.base_code == self.base_code.data)).one()
             obj.no = 1 if max_no is None else max_no + 1
         obj.title = self.title.data
-        obj.is_offset_needed = self.is_offset_needed.data
+        obj.is_pay_off_needed = self.is_pay_off_needed.data
         if is_new:
             current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk

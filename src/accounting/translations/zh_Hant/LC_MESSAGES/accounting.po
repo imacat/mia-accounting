@@ -39,7 +39,7 @@ msgstr "請填上標題。"
 #: src/accounting/account/query.py:50
 #: src/accounting/templates/accounting/account/detail.html:90
 #: src/accounting/templates/accounting/account/list.html:62
-msgid "Offset needed"
+msgid "Pay-off needed"
 msgstr "逐筆核銷"
 
 #: src/accounting/account/views.py:88
@@ -226,7 +226,7 @@ msgid "Title"
 msgstr "標題"
 
 #: src/accounting/templates/accounting/account/include/form.html:68
-msgid "The entries in the account need offsets."
+msgid "The entries in the account need pay-off."
 msgstr "帳目要逐筆核銷。"
 
 #: src/accounting/templates/accounting/account/include/form.html:90

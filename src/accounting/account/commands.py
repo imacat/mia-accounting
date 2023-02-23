@@ -30,7 +30,7 @@ from accounting.utils.user import has_user, get_user_pk
 
 AccountData = tuple[int, str, int, str, str, str, bool]
 """The format of the account data, as a list of (ID, base account code, number,
-English, Traditional Chinese, Simplified Chinese, is-offset-needed) tuples."""
+English, Traditional Chinese, Simplified Chinese, is-pay-off-needed) tuples."""
 
 
 def __validate_username(ctx: click.core.Context, param: click.core.Option,
@@ -93,10 +93,10 @@ def init_accounts_command(username: str) -> None:
     data: list[AccountData] = []
     for base in bases_to_add:
         l10n: dict[str, str] = {x.locale: x.title for x in base.l10n}
-        is_offset_needed: bool = True if re.match("^[12]1[34]", base.code) \
+        is_pay_off_needed: bool = True if re.match("^[12]1[34]", base.code) \
             else False
         data.append((get_new_id(), base.code, 1, base.title_l10n,
-                     l10n["zh_Hant"], l10n["zh_Hans"], is_offset_needed))
+                     l10n["zh_Hant"], l10n["zh_Hans"], is_pay_off_needed))
     __add_accounting_accounts(data, creator_pk)
     click.echo(F"{len(data)} added.  Accounting accounts initialized.")
 
@@ -113,7 +113,7 @@ def __add_accounting_accounts(data: list[AccountData], creator_pk: int)\
                                        base_code=x[1],
                                        no=x[2],
                                        title_l10n=x[3],
-                                       is_offset_needed=x[6],
+                                       is_pay_off_needed=x[6],
                                        created_by_id=creator_pk,
                                        updated_by_id=creator_pk)
                                for x in data]

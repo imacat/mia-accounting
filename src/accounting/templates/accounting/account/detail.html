@@ -85,9 +85,9 @@ First written: 2023/1/31
 <div class="accounting-card col-sm-6">
   <div class="accounting-card-title">{{ obj.title }}</div>
   <div class="accounting-card-code">{{ obj.code }}</div>
-  {% if obj.is_offset_needed %}
+  {% if obj.is_pay_off_needed %}
     <div>
-      <span class="badge rounded-pill bg-info">{{ A_("Offset needed") }}</span>
+      <span class="badge rounded-pill bg-info">{{ A_("Pay-off needed") }}</span>
     </div>
   {% endif %}
   <div class="small text-secondary fst-italic">

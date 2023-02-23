@@ -109,8 +109,8 @@ class Account(db.Model):
     """The account number under the base account."""
     title_l10n = db.Column("title", db.String, nullable=False)
     """The title."""
-    is_offset_needed = db.Column(db.Boolean, nullable=False, default=False)
-    """Whether the entries of this account need offsets."""
+    is_pay_off_needed = db.Column(db.Boolean, nullable=False, default=False)
+    """Whether the entries of this account need pay-off."""
     created_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
     """The time of creation."""

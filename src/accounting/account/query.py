@@ -47,8 +47,8 @@ def get_account_query() -> list[Account]:
                Account.title_l10n.contains(k),
                code.contains(k),
                Account.id.in_(l10n_matches)]
-        if k in gettext("Offset needed"):
-            sub_conditions.append(Account.is_offset_needed)
+        if k in gettext("Pay-off needed"):
+            sub_conditions.append(Account.is_pay_off_needed)
         conditions.append(sa.or_(*sub_conditions))
 
     return Account.query.filter(*conditions)\
