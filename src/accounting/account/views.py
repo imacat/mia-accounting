@@ -19,6 +19,7 @@
 """
 from urllib.parse import parse_qsl, urlencode
 
+import sqlalchemy as sa
 from flask import Blueprint, render_template, session, redirect, flash, \
     url_for, request
 from werkzeug.datastructures import ImmutableMultiDict
@@ -29,6 +30,7 @@ from accounting.models import Account, BaseAccount
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
+from accounting.utils.user import get_current_user_pk
 from .forms import AccountForm, sort_accounts_in, AccountReorderForm
 from .query import get_account_query
 
@@ -143,7 +145,8 @@ def update_account(account: Account) -> redirect:
         flash(lazy_gettext("The account was not modified."), "success")
         return redirect(inherit_next(url_for("accounting.account.detail",
                                              account=account)))
-    form.post_update(account)
+    account.updated_by_id = get_current_user_pk()
+    account.updated_at = sa.func.now()
     db.session.commit()
     flash(lazy_gettext("The account is updated successfully."), "success")
     return redirect(inherit_next(url_for("accounting.account.detail",

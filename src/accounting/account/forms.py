@@ -76,14 +76,15 @@ class AccountForm(FlaskForm):
         :return: None.
         """
         is_new: bool = obj.id is None
-        prev_base_code: str | None = obj.base_code
         if is_new:
             obj.id = new_id(Account)
-        obj.base_code = self.base_code.data
-        if prev_base_code != self.base_code.data:
+        if obj.base_code != self.base_code.data:
+            if obj.base_code is not None:
+                sort_accounts_in(obj.base_code, obj.id)
             max_no: int | None = db.session.scalars(
                 sa.select(sa.func.max(Account.no))
                 .filter(Account.base_code == self.base_code.data)).one()
+            obj.base_code = self.base_code.data
             obj.no = 1 if max_no is None else max_no + 1
         obj.title = self.title.data
         obj.is_pay_off_needed = self.is_pay_off_needed.data
@@ -91,10 +92,6 @@ class AccountForm(FlaskForm):
             current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk
             obj.updated_by_id = current_user_pk
-        if prev_base_code is not None \
-                and prev_base_code != self.base_code.data:
-            setattr(self, "__post_update",
-                    lambda: sort_accounts_in(prev_base_code, obj.id))
 
     def post_update(self, obj: Account) -> None:
         """The post-processing after the update.

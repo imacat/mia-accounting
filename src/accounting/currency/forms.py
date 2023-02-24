@@ -19,7 +19,6 @@
 """
 from __future__ import annotations
 
-import sqlalchemy as sa
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
 from wtforms.validators import DataRequired, Regexp, NoneOf
@@ -82,13 +81,3 @@ class CurrencyForm(FlaskForm):
             current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk
             obj.updated_by_id = current_user_pk
-
-    def post_update(self, obj: Currency) -> None:
-        """The post-processing after the update.
-
-        :param obj: The currency object.
-        :return: None
-        """
-        current_user_pk: int = get_current_user_pk()
-        obj.updated_by_id = current_user_pk
-        obj.updated_at = sa.func.now()

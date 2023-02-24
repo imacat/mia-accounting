@@ -19,6 +19,7 @@
 """
 from urllib.parse import urlencode, parse_qsl
 
+import sqlalchemy as sa
 from flask import Blueprint, render_template, redirect, session, request, \
     flash, url_for
 from werkzeug.datastructures import ImmutableMultiDict
@@ -29,6 +30,7 @@ from accounting.models import Currency
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
+from accounting.utils.user import get_current_user_pk
 from .forms import CurrencyForm
 
 bp: Blueprint = Blueprint("currency", __name__)
@@ -146,7 +148,8 @@ def update_currency(currency: Currency) -> redirect:
         flash(lazy_gettext("The currency was not modified."), "success")
         return redirect(inherit_next(url_for("accounting.currency.detail",
                                              currency=currency)))
-    form.post_update(currency)
+    currency.updated_by_id = get_current_user_pk()
+    currency.updated_at = sa.func.now()
     db.session.commit()
     flash(lazy_gettext("The currency is updated successfully."), "success")
     return redirect(inherit_next(url_for("accounting.currency.detail",
