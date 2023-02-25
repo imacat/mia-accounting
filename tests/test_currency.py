@@ -27,7 +27,7 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from test_site import create_app
+from test_site import create_app, db
 from testlib import get_client, set_locale
 
 
@@ -71,7 +71,6 @@ class CurrencyCommandTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting import db
             from accounting.models import Currency, CurrencyL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -128,7 +127,6 @@ class CurrencyTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting import db
             from accounting.models import Currency, CurrencyL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -270,7 +268,6 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Currency
-        from test_site import db
         create_uri: str = f"{PREFIX}/create"
         store_uri: str = f"{PREFIX}/store"
         detail_uri: str = f"{PREFIX}/{zzc.code}"
@@ -355,7 +352,6 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Currency
-        from test_site import db
         detail_uri: str = f"{PREFIX}/{zza.code}"
         edit_uri: str = f"{PREFIX}/{zza.code}/edit"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
@@ -435,7 +431,6 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Currency
-        from test_site import db
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
         zza_currency: Currency
@@ -475,7 +470,6 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Currency
-        from test_site import db
         editor_username, editor2_username = "editor", "editor2"
         client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{zza.code}"
@@ -526,7 +520,6 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None
         """
         from accounting.models import Currency
-        from test_site import db
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
         response: httpx.Response

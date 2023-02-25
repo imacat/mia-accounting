@@ -26,7 +26,7 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from test_site import create_app
+from test_site import create_app, db
 from testlib import get_client, set_locale
 
 
@@ -75,7 +75,6 @@ class AccountCommandTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting import db
             from accounting.models import BaseAccount, Account, AccountL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -129,7 +128,6 @@ class AccountTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting import db
             from accounting.models import BaseAccount, Account, AccountL10n
             result: Result
             result = runner.invoke(args="init-db")
@@ -316,7 +314,6 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting import db
         from accounting.models import Account
         create_uri: str = f"{PREFIX}/create"
         store_uri: str = f"{PREFIX}/store"
@@ -489,7 +486,6 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting import db
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
@@ -652,7 +648,6 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting import db
         from accounting.models import Account
         response: httpx.Response
 
@@ -704,7 +699,6 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting import db
         from accounting.models import Account
         response: httpx.Response
 
