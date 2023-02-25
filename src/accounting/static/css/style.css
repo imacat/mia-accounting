@@ -34,6 +34,9 @@
     color: inherit;
     padding-right: 0;
 }
+.form-floating > textarea.form-control {
+    height: 6rem;
+}
 .accounting-dragged {
     color: #141619;
     background-color: #D3D3D4;
