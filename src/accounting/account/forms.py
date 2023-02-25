@@ -81,11 +81,11 @@ class AccountForm(FlaskForm):
         if obj.base_code != self.base_code.data:
             if obj.base_code is not None:
                 sort_accounts_in(obj.base_code, obj.id)
-            max_no: int | None = db.session.scalars(
-                sa.select(sa.func.max(Account.no))
-                .filter(Account.base_code == self.base_code.data)).one()
+            sort_accounts_in(self.base_code.data, obj.id)
+            count: int = Account.query\
+                .filter(Account.base_code == self.base_code.data).count()
             obj.base_code = self.base_code.data
-            obj.no = 1 if max_no is None else max_no + 1
+            obj.no = count + 1
         obj.title = self.title.data
         obj.is_pay_off_needed = self.is_pay_off_needed.data
         if is_new:

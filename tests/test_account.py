@@ -401,13 +401,13 @@ class AccountTestCase(unittest.TestCase):
                                           "title": stock.title})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{stock.base_code}-067")
+                         f"{PREFIX}/{stock.base_code}-003")
 
         with self.app.app_context():
             self.assertEqual({x.code for x in Account.query.all()},
                              {cash.code, bank.code, stock.code,
-                              f"{stock.base_code}-066",
-                              f"{stock.base_code}-067"})
+                              f"{stock.base_code}-002",
+                              f"{stock.base_code}-003"})
 
             stock_account: Account = Account.find_by_code(stock.code)
             self.assertEqual(stock_account.base_code, stock.base_code)
@@ -642,6 +642,58 @@ class AccountTestCase(unittest.TestCase):
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 404)
+
+    def test_change_base_code(self) -> None:
+        """Tests to change the base code of an account.
+
+        :return: None.
+        """
+        from accounting import db
+        from accounting.models import Account
+        response: httpx.Response
+
+        for i in range(2, 6):
+            response = self.client.post(f"{PREFIX}/store",
+                                        data={"csrf_token": self.csrf_token,
+                                              "base_code": "1111",
+                                              "title": "Title"})
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.headers["Location"],
+                             f"{PREFIX}/1111-00{i}")
+
+        with self.app.app_context():
+            account_1: Account = Account.find_by_code("1111-001")
+            id_1: int = account_1.id
+            account_2: Account = Account.find_by_code("1111-002")
+            id_2: int = account_2.id
+            account_3: Account = Account.find_by_code("1111-003")
+            id_3: int = account_3.id
+            account_4: Account = Account.find_by_code("1111-004")
+            id_4: int = account_4.id
+            account_5: Account = Account.find_by_code("1111-005")
+            id_5: int = account_5.id
+            account_1.no = 3
+            account_2.no = 5
+            account_3.no = 8
+            account_4.base_code = "1112"
+            account_4.no = 2
+            account_5.base_code = "1112"
+            account_5.no = 6
+            db.session.commit()
+
+        response = self.client.post(f"{PREFIX}/1111-005/update",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "1112",
+                                          "title": "Title"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/1112-003")
+
+        with self.app.app_context():
+            self.assertEqual(db.session.get(Account, id_1).no, 1)
+            self.assertEqual(db.session.get(Account, id_2).no, 3)
+            self.assertEqual(db.session.get(Account, id_3).no, 2)
+            self.assertEqual(db.session.get(Account, id_4).no, 1)
+            self.assertEqual(db.session.get(Account, id_5).no, 2)
 
     def test_reorder(self) -> None:
         """Tests to reorder the accounts under a same base account.
