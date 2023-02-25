@@ -438,6 +438,7 @@ class CurrencyTestCase(unittest.TestCase):
         from test_site import db
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
+        zza_currency: Currency
         response: httpx.Response
         time.sleep(1)
 
@@ -449,7 +450,7 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
+            zza_currency = db.session.get(Currency, zza.code)
             self.assertIsNotNone(zza_currency)
             self.assertEqual(zza_currency.created_at, zza_currency.updated_at)
 
@@ -461,7 +462,7 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
+            zza_currency = db.session.get(Currency, zza.code)
             self.assertIsNotNone(zza_currency)
             self.assertLess(zza_currency.created_at,
                             zza_currency.updated_at)

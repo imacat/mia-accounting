@@ -492,6 +492,7 @@ class AccountTestCase(unittest.TestCase):
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
+        cash_account: Account
         response: httpx.Response
         time.sleep(1)
 
@@ -503,7 +504,7 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
+            cash_account = Account.find_by_code(cash.code)
             self.assertIsNotNone(cash_account)
             self.assertEqual(cash_account.created_at, cash_account.updated_at)
 
@@ -515,7 +516,7 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
+            cash_account = Account.find_by_code(cash.code)
             self.assertIsNotNone(cash_account)
             self.assertLess(cash_account.created_at,
                             cash_account.updated_at)
