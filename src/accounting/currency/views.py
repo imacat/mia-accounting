@@ -27,6 +27,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency
+from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
@@ -80,9 +81,7 @@ def add_currency() -> redirect:
     """
     form = CurrencyForm(request.form)
     if not form.validate():
-        for key in form.errors:
-            for error in form.errors[key]:
-                flash(error, "error")
+        flash_form_errors(form)
         session["form"] = urlencode(list(request.form.items()))
         return redirect(inherit_next(url_for("accounting.currency.create")))
     currency: Currency = Currency()
@@ -136,9 +135,7 @@ def update_currency(currency: Currency) -> redirect:
     form = CurrencyForm(request.form)
     form.obj_code = currency.code
     if not form.validate():
-        for key in form.errors:
-            for error in form.errors[key]:
-                flash(error, "error")
+        flash_form_errors(form)
         session["form"] = urlencode(list(request.form.items()))
         return redirect(inherit_next(url_for("accounting.currency.edit",
                                              currency=currency)))

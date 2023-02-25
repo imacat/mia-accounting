@@ -27,6 +27,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Account, BaseAccount
+from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
@@ -78,9 +79,7 @@ def add_account() -> redirect:
     """
     form = AccountForm(request.form)
     if not form.validate():
-        for key in form.errors:
-            for error in form.errors[key]:
-                flash(error, "error")
+        flash_form_errors(form)
         session["form"] = urlencode(list(request.form.items()))
         return redirect(inherit_next(url_for("accounting.account.create")))
     account: Account = Account()
@@ -133,9 +132,7 @@ def update_account(account: Account) -> redirect:
     """
     form = AccountForm(request.form)
     if not form.validate():
-        for key in form.errors:
-            for error in form.errors[key]:
-                flash(error, "error")
+        flash_form_errors(form)
         session["form"] = urlencode(list(request.form.items()))
         return redirect(inherit_next(url_for("accounting.account.edit",
                                              account=account)))
