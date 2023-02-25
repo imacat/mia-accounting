@@ -17,8 +17,8 @@
 """The test for the account management.
 
 """
-import time
 import unittest
+from datetime import timedelta
 
 import httpx
 import sqlalchemy as sa
@@ -489,12 +489,12 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
+        from accounting import db
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
         cash_account: Account
         response: httpx.Response
-        time.sleep(1)
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -506,7 +506,10 @@ class AccountTestCase(unittest.TestCase):
         with self.app.app_context():
             cash_account = Account.find_by_code(cash.code)
             self.assertIsNotNone(cash_account)
-            self.assertEqual(cash_account.created_at, cash_account.updated_at)
+            cash_account.created_at \
+                = cash_account.created_at - timedelta(seconds=5)
+            cash_account.updated_at = cash_account.created_at
+            db.session.commit()
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,

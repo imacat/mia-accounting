@@ -18,9 +18,9 @@
 
 """
 import csv
-import time
 import typing as t
 import unittest
+from datetime import timedelta
 
 import httpx
 from click.testing import Result
@@ -440,7 +440,6 @@ class CurrencyTestCase(unittest.TestCase):
         update_uri: str = f"{PREFIX}/{zza.code}/update"
         zza_currency: Currency
         response: httpx.Response
-        time.sleep(1)
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -452,7 +451,10 @@ class CurrencyTestCase(unittest.TestCase):
         with self.app.app_context():
             zza_currency = db.session.get(Currency, zza.code)
             self.assertIsNotNone(zza_currency)
-            self.assertEqual(zza_currency.created_at, zza_currency.updated_at)
+            zza_currency.created_at \
+                = zza_currency.created_at - timedelta(seconds=5)
+            zza_currency.updated_at = zza_currency.created_at
+            db.session.commit()
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
