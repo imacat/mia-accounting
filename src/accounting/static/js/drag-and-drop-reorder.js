@@ -46,14 +46,14 @@ function initializeMouseDragAndDropReordering(list, onReorder) {
         item.draggable = true;
         item.addEventListener("dragstart", function () {
             dragged = item;
-            dragged.classList.add("list-group-item-dark");
+            dragged.classList.add("accounting-dragged");
         });
         item.addEventListener("dragover", function () {
             onDragOver(dragged, item);
             onReorder();
         });
         item.addEventListener("dragend", function () {
-            dragged.classList.remove("list-group-item-dark");
+            dragged.classList.remove("accounting-dragged");
             dragged = null;
         });
     });
@@ -70,7 +70,7 @@ function initializeTouchDragAndDropReordering(list, onReorder) {
     const items = Array.from(list.children);
     items.forEach(function (item) {
         item.addEventListener("touchstart", function () {
-            item.classList.add("list-group-item-dark");
+            item.classList.add("accounting-dragged");
         });
         item.addEventListener("touchmove", function (event) {
             const touch = event.targetTouches[0];
@@ -79,7 +79,7 @@ function initializeTouchDragAndDropReordering(list, onReorder) {
             onReorder();
         });
         item.addEventListener("touchend", function () {
-            item.classList.remove("list-group-item-dark");
+            item.classList.remove("accounting-dragged");
         });
     });
 }

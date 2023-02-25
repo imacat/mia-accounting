@@ -34,6 +34,10 @@
     color: inherit;
     padding-right: 0;
 }
+.accounting-dragged {
+    color: #141619;
+    background-color: #D3D3D4;
+}
 
 /** The card layout */
 .accounting-card {
