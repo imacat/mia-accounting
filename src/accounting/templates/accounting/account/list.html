@@ -25,16 +25,28 @@ First written: 2023/1/30
 
 {% block content %}
 
-<div class="btn-group mb-2">
+<div class="btn-group mb-2 d-none d-md-inline-flex">
   {% if accounting_can_edit() %}
-    <a class="btn btn-primary text-nowrap d-none d-md-block" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
+    <a class="btn btn-primary text-nowrap" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
       <i class="fa-solid fa-plus"></i>
       {{ A_("New") }}
     </a>
   {% endif %}
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search">
-    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
-    <label for="accounting-search" class="accounting-search-label">
+    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+    <label for="accounting-search-desktop" class="accounting-search-label">
+      <button type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        {{ A_("Search") }}
+      </button>
+    </label>
+  </form>
+</div>
+
+<div class="btn-group mb-2 d-md-none">
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search">
+    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+    <label for="accounting-search-mobile" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
         {{ A_("Search") }}
