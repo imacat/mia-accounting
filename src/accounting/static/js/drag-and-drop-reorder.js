@@ -91,7 +91,7 @@ function initializeTouchDragAndDropReordering(list, onReorder) {
  * @param target {Element} the other item that was dragged over
  */
 function onDragOver(dragged, target) {
-    if (target.parentElement !== dragged.parentElement || target === dragged) {
+    if (dragged === null || target.parentElement !== dragged.parentElement || target === dragged) {
         return;
     }
     let isBefore = false;
