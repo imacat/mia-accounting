@@ -93,7 +93,6 @@ function initializeBaseAccountQuery() {
     const options = Array.from(document.getElementsByClassName("accounting-base-option"));
     const queryNoResult = document.getElementById("accounting-base-option-no-result");
     query.addEventListener("input", function () {
-        console.log(query.value);
         if (query.value === "") {
             options.forEach(function (option) {
                 option.classList.remove("d-none");
