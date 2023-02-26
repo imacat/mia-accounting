@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
  * @private
  */
 function initializeBaseAccountSelector() {
-    const selector = document.getElementById("accounting-base-selector-model");
+    const selector = document.getElementById("accounting-base-selector-modal");
     const base = document.getElementById("accounting-base");
     const baseCode = document.getElementById("accounting-base-code");
     const baseContent = document.getElementById("accounting-base-content");

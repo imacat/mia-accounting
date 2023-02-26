@@ -41,7 +41,7 @@ First written: 2023/2/1
   {% endif %}
   <div class="form-floating mb-3">
     <input id="accounting-base-code" type="hidden" name="base_code" value="{{ "" if form.base_code.data is none else form.base_code.data }}">
-    <div id="accounting-base" class="form-control accounting-clickable accounting-material-text-field {% if form.base_code.data %} accounting-not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-base-selector-model">
+    <div id="accounting-base" class="form-control accounting-clickable accounting-material-text-field {% if form.base_code.data %} accounting-not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-base-selector-modal">
       <label class="form-label" for="accounting-base">{{ A_("Base account") }}</label>
       <div id="accounting-base-content">
         {% if form.base_code.data %}
@@ -83,11 +83,11 @@ First written: 2023/2/1
   </div>
 </form>
 
-<div class="modal fade" id="accounting-base-selector-model" tabindex="-1" aria-labelledby="accounting-base-selector-model-label" aria-hidden="true">
+<div class="modal fade" id="accounting-base-selector-modal" tabindex="-1" aria-labelledby="accounting-base-selector-modal-label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="accounting-base-selector-model-label">{{ A_("Select Base Account") }}</h1>
+        <h1 class="modal-title fs-5" id="accounting-base-selector-modal-label">{{ A_("Select Base Account") }}</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">

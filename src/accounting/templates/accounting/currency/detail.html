@@ -58,11 +58,11 @@ First written: 2023/2/6
     {% if "next" in request.args %}
       <input type="hidden" name="next" value="{{ request.args["next"] }}">
     {% endif %}
-    <div class="modal fade" id="accounting-delete-modal" tabindex="-1" aria-labelledby="accounting-delete-model-label" aria-hidden="true">
+    <div class="modal fade" id="accounting-delete-modal" tabindex="-1" aria-labelledby="accounting-delete-modal-label" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="accounting-delete-model-label">{{ A_("Delete Currency Confirmation") }}</h1>
+            <h1 class="modal-title fs-5" id="accounting-delete-modal-label">{{ A_("Delete Currency Confirmation") }}</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
