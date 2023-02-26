@@ -29,4 +29,5 @@ def strip_text(s: str | None) -> str | None:
     """
     if s is None:
         return None
-    return s.strip()
+    s = s.strip()
+    return s if s != "" else None
