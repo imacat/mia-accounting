@@ -31,52 +31,47 @@ from test_site import create_app
 
 class NextUriTestCase(unittest.TestCase):
     """The test case for the next URI utilities."""
+    TARGET: str = "/target"
 
-    def test_next_uri(self) -> None:
-        """Tests the next URI utilities.
+    def setUp(self) -> None:
+        """Sets up the test.
+        This is run once per test.
 
         :return: None.
         """
-        app: Flask = create_app(is_testing=True)
-        target: str = "/target"
+        self.app: Flask = create_app(is_testing=True)
 
-        @app.get("/test-csrf")
+        @self.app.get("/test-csrf")
         def test_csrf() -> str:
             """The test view to return the CSRF token."""
             return render_template_string("{{csrf_token()}}")
 
-        @app.route("/test-next", methods=["GET", "POST"])
-        def test_next_view() -> str:
+    def test_next_uri(self) -> None:
+        """Tests the next URI utilities with the next URI.
+
+        :return: None.
+        """
+        def test_next_uri_view() -> str:
             """The test view with the next URI."""
             current_uri: str = request.full_path if request.query_string \
                 else request.path
-            self.assertEqual(append_next(target),
-                             f"{target}?next={quote_plus(current_uri)}")
+            self.assertEqual(append_next(self.TARGET),
+                             f"{self.TARGET}?next={quote_plus(current_uri)}")
             next_uri: str = request.form["next"] if request.method == "POST" \
                 else request.args["next"]
-            self.assertEqual(inherit_next(target),
-                             f"{target}?next={quote_plus(next_uri)}")
-            self.assertEqual(or_next(target), next_uri)
+            self.assertEqual(inherit_next(self.TARGET),
+                             f"{self.TARGET}?next={quote_plus(next_uri)}")
+            self.assertEqual(or_next(self.TARGET), next_uri)
             return ""
 
-        @app.route("/test-no-next", methods=["GET", "POST"])
-        def test_no_next_view() -> str:
-            """The test view without the next URI."""
-            current_uri: str = request.full_path if request.query_string \
-                else request.path
-            self.assertEqual(append_next(target),
-                             f"{target}?next={quote_plus(current_uri)}")
-            self.assertEqual(inherit_next(target), target)
-            self.assertEqual(or_next(target), target)
-            return ""
-
-        client: httpx.Client = httpx.Client(app=app,
+        self.app.add_url_rule("/test-next", view_func=test_next_uri_view,
+                              methods=["GET", "POST"])
+        client: httpx.Client = httpx.Client(app=self.app,
                                             base_url="https://testserver")
         client.headers["Referer"] = "https://testserver"
         csrf_token: str = client.get("/test-csrf").text
         response: httpx.Response
 
-        # With the next URI
         response = client.get("/test-next?next=/next&q=abc&page-no=4")
         self.assertEqual(response.status_code, 200)
         response = client.post("/test-next", data={"csrf_token": csrf_token,
@@ -84,7 +79,29 @@ class NextUriTestCase(unittest.TestCase):
                                                    "name": "viewer"})
         self.assertEqual(response.status_code, 200)
 
-        # Without the next URI
+    def test_no_next_uri(self) -> None:
+        """Tests the next URI utilities without the next URI.
+
+        :return: None.
+        """
+        def test_no_next_uri_view() -> str:
+            """The test view without the next URI."""
+            current_uri: str = request.full_path if request.query_string \
+                else request.path
+            self.assertEqual(append_next(self.TARGET),
+                             f"{self.TARGET}?next={quote_plus(current_uri)}")
+            self.assertEqual(inherit_next(self.TARGET), self.TARGET)
+            self.assertEqual(or_next(self.TARGET), self.TARGET)
+            return ""
+
+        self.app.add_url_rule("/test-no-next", view_func=test_no_next_uri_view,
+                              methods=["GET", "POST"])
+        client: httpx.Client = httpx.Client(app=self.app,
+                                            base_url="https://testserver")
+        client.headers["Referer"] = "https://testserver"
+        csrf_token: str = client.get("/test-csrf").text
+        response: httpx.Response
+
         response = client.get("/test-no-next?q=abc&page-no=4")
         self.assertEqual(response.status_code, 200)
         response = client.post("/test-no-next", data={"csrf_token": csrf_token,
