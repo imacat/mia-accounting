@@ -284,13 +284,11 @@ class TransactionForm(FlaskForm):
         self.__set_date(obj, self.date.data)
         obj.note = self.note.data
 
-        entries: list[JournalEntry] = obj.entries
         collector_cls: t.Type[JournalEntryCollector] = self.collector
-        collector: collector_cls = collector_cls(self, obj.id, entries,
-                                                 obj.currencies)
+        collector: collector_cls = collector_cls(self, obj)
         collector.collect()
 
-        to_delete: set[int] = {x.id for x in entries
+        to_delete: set[int] = {x.id for x in obj.entries
                                if x.id not in collector.to_keep}
         if len(to_delete) > 0:
             JournalEntry.query.filter(JournalEntry.id.in_(to_delete)).delete()
@@ -373,27 +371,24 @@ T = t.TypeVar("T", bound=TransactionForm)
 class JournalEntryCollector(t.Generic[T], ABC):
     """The journal entry collector."""
 
-    def __init__(self, form: T, txn_id: int, entries: list[JournalEntry],
-                 currencies: list[TransactionCurrency]):
+    def __init__(self, form: T, obj: Transaction):
         """Constructs the journal entry collector.
 
         :param form: The transaction form.
-        :param txn_id: The transaction ID.
-        :param entries: The existing journal entries.
-        :param currencies: The currencies in the transaction.
+        :param obj: The transaction.
         """
         self.form: T = form
         """The transaction form."""
-        self.entries: list[JournalEntry] = entries
+        self.__obj: Transaction = obj
+        """The transaction object."""
+        self.__entries: list[JournalEntry] = list(obj.entries)
         """The existing journal entries."""
-        self.txn_id: int = txn_id
-        """The transaction ID."""
         self.__entries_by_id: dict[int, JournalEntry] \
-            = {x.id: x for x in entries}
+            = {x.id: x for x in self.__entries}
         """A dictionary from the entry ID to their entries."""
-        self.__no_by_id: dict[int, int] = {x.id: x.no for x in entries}
+        self.__no_by_id: dict[int, int] = {x.id: x.no for x in self.__entries}
         """A dictionary from the entry number to their entries."""
-        self.__currencies: list[TransactionCurrency] = currencies
+        self.__currencies: list[TransactionCurrency] = obj.currencies
         """The currencies in the transaction."""
         self._debit_no: int = 1
         """The number index for the debit entries."""
@@ -420,7 +415,6 @@ class JournalEntryCollector(t.Generic[T], ABC):
         """
         entry: JournalEntry | None = self.__entries_by_id.get(form.eid.data)
         if entry is not None:
-            self.to_keep.add(entry.id)
             entry.currency_code = currency_code
             form.populate_obj(entry)
             entry.no = no
@@ -428,12 +422,12 @@ class JournalEntryCollector(t.Generic[T], ABC):
                 self.form.is_modified = True
         else:
             entry = JournalEntry()
-            entry.transaction_id = self.txn_id
             entry.currency_code = currency_code
             form.populate_obj(entry)
             entry.no = no
-            db.session.add(entry)
+            self.__obj.entries.append(entry)
             self.form.is_modified = True
+        self.to_keep.add(entry.id)
 
     def _make_cash_entry(self, forms: list[JournalEntryForm], is_debit: bool,
                          currency_code: str, no: int) -> None:
@@ -447,14 +441,13 @@ class JournalEntryCollector(t.Generic[T], ABC):
         :param no: The number of the entry.
         :return: None.
         """
-        candidates: list[JournalEntry] = [x for x in self.entries
+        candidates: list[JournalEntry] = [x for x in self.__entries
                                           if x.is_debit == is_debit
                                           and x.currency_code == currency_code]
         entry: JournalEntry
         if len(candidates) > 0:
             candidates.sort(key=lambda x: x.no)
             entry = candidates[0]
-            self.to_keep.add(entry.id)
             entry.account_id = Account.cash().id
             entry.summary = None
             entry.amount = sum([x.amount.data for x in forms])
@@ -464,15 +457,15 @@ class JournalEntryCollector(t.Generic[T], ABC):
         else:
             entry = JournalEntry()
             entry.id = new_id(JournalEntry)
-            entry.transaction_id = self.txn_id
             entry.is_debit = is_debit
             entry.currency_code = currency_code
             entry.account_id = Account.cash().id
             entry.summary = None
             entry.amount = sum([x.amount.data for x in forms])
             entry.no = no
-            db.session.add(entry)
+            self.__obj.entries.append(entry)
             self.form.is_modified = True
+        self.to_keep.add(entry.id)
 
     def _sort_entry_forms(self, forms: list[JournalEntryForm]) -> None:
         """Sorts the journal entry forms.
