@@ -87,8 +87,7 @@ def add_account() -> redirect:
     db.session.add(account)
     db.session.commit()
     flash(lazy_gettext("The account is added successfully"), "success")
-    return redirect(inherit_next(url_for("accounting.account.detail",
-                                         account=account)))
+    return redirect(inherit_next(__get_detail_uri(account)))
 
 
 @bp.get("/<account:account>", endpoint="detail")
@@ -140,14 +139,12 @@ def update_account(account: Account) -> redirect:
         form.populate_obj(account)
     if not account.is_modified:
         flash(lazy_gettext("The account was not modified."), "success")
-        return redirect(inherit_next(url_for("accounting.account.detail",
-                                             account=account)))
+        return redirect(inherit_next(__get_detail_uri(account)))
     account.updated_by_id = get_current_user_pk()
     account.updated_at = sa.func.now()
     db.session.commit()
     flash(lazy_gettext("The account is updated successfully."), "success")
-    return redirect(inherit_next(url_for("accounting.account.detail",
-                                         account=account)))
+    return redirect(inherit_next(__get_detail_uri(account)))
 
 
 @bp.post("/<account:account>/delete", endpoint="delete")
@@ -163,7 +160,7 @@ def delete_account(account: Account) -> redirect:
     sort_accounts_in(account.base_code, account.id)
     db.session.commit()
     flash(lazy_gettext("The account is deleted successfully."), "success")
-    return redirect(or_next(url_for("accounting.account.list")))
+    return redirect(or_next(__get_list_uri()))
 
 
 @bp.get("/bases/<baseAccount:base>", endpoint="order")
@@ -190,7 +187,24 @@ def sort_accounts(base: BaseAccount) -> redirect:
     form.save_order()
     if not form.is_modified:
         flash(lazy_gettext("The order was not modified."), "success")
-        return redirect(or_next(url_for("accounting.account.list")))
+        return redirect(or_next(__get_list_uri()))
     db.session.commit()
     flash(lazy_gettext("The order is updated successfully."), "success")
-    return redirect(or_next(url_for("accounting.account.list")))
+    return redirect(or_next(__get_list_uri()))
+
+
+def __get_detail_uri(account: Account) -> str:
+    """Returns the detail URI of an account.
+
+    :param account: The account.
+    :return: The detail URI of the account.
+    """
+    return url_for("accounting.account.detail", account=account)
+
+
+def __get_list_uri() -> str:
+    """Returns the account list URI.
+
+    :return: The account list URI.
+    """
+    return url_for("accounting.account.list")
