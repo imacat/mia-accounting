@@ -60,6 +60,17 @@ def format_amount(value: Decimal | None) -> str:
     return "{:,}".format(whole) + str(frac)[1:]
 
 
+def format_amount_input(value: Decimal) -> str:
+    """Format an amount for an input value.
+
+    :param value: The amount.
+    :return: The formatted amount text for an input value.
+    """
+    whole: int = int(value)
+    frac: Decimal = (value - whole).normalize()
+    return str(whole) + str(frac)[1:]
+
+
 def format_date(value: date) -> str:
     """Formats a date to be human-friendly.
 

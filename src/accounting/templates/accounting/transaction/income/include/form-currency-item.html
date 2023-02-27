@@ -55,7 +55,7 @@ First written: 2023/2/25
                     account_text = entry_form.account_text,
                     summary_data = "" if entry_form.summary.data is none else entry_form.summary.data,
                     summary_errors = entry_form.summary.errors,
-                    amount_data = "" if entry_form.amount.data is none else entry_form.amount.data,
+                    amount_data = "" if entry_form.amount.data is none else entry_form.amount.data|accounting_txn_format_amount_input,
                     amount_errors = entry_form.amount.errors,
                     amount_text = entry_form.amount.data|accounting_txn_format_amount,
                     entry_errors = entry_form.all_errors %}
