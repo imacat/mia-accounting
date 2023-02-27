@@ -825,7 +825,7 @@ function validateNote() {
     const error = document.getElementById("accounting-note-error");
     field.value = field.value
          .replace(/^\s*\n/, "")
-         .replace(/\s+$/, "");
+         .trimEnd();
     field.classList.remove("is-invalid");
     error.innerText = "";
     return true;
