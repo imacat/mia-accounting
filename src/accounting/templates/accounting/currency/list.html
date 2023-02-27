@@ -32,8 +32,8 @@ First written: 2023/2/6
       {{ A_("New") }}
     </a>
   {% endif %}
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.currency.list") }}" method="get" role="search">
-    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.currency.list") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
+    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
     <label for="accounting-search-desktop" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -44,8 +44,8 @@ First written: 2023/2/6
 </div>
 
 <div class="btn-group mb-2 d-md-none">
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.currency.list") }}" method="get" role="search">
-    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required" aria-label="Search">
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.currency.list") }}" method="get" role="search" aria-label="{{ A_("Search for Mobile") }}">
+    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
     <label for="accounting-search-mobile" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>

@@ -20,7 +20,7 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/1/26
 #}
 {% if pagination.is_paged %}
-  <nav aria-label="Page navigation">
+  <nav aria-label="{{ A_("Page navigation") }}">
     <ul class="pagination">
       {% for link in pagination.pages %}
         {% if link.uri is none %}
