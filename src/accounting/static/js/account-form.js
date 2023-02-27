@@ -105,8 +105,8 @@ function initializeBaseAccountQuery() {
         options.forEach(function (option) {
             const queryValues = JSON.parse(option.dataset.queryValues);
             let isMatched = false;
-            for (let i = 0; i < queryValues.length; i++) {
-                if (queryValues[i].includes(query.value)) {
+            for (const queryValue of queryValues) {
+                if (queryValue.includes(query.value)) {
                     isMatched = true;
                     break;
                 }
