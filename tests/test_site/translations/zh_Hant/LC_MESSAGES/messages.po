@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask Demonstration 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-06 23:25+0800\n"
-"PO-Revision-Date: 2023-02-06 23:26+0800\n"
+"POT-Creation-Date: 2023-02-27 10:07+0800\n"
+"PO-Revision-Date: 2023-02-27 10:08+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -31,7 +31,7 @@ msgstr "首頁"
 
 #: tests/test_site/templates/base.html:68
 msgid "Log Out"
-msgstr ""
+msgstr "登出"
 
 #: tests/test_site/templates/base.html:78
 #: tests/test_site/templates/login.html:24
