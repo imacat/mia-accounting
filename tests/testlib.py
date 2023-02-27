@@ -23,6 +23,9 @@ from html.parser import HTMLParser
 import httpx
 from flask import Flask
 
+TEST_SERVER: str = "https://testserver"
+"""The test server URI."""
+
 
 def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
     """Returns a user client.
@@ -31,8 +34,8 @@ def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
     :param username: The username.
     :return: A tuple of the client and the CSRF token.
     """
-    client: httpx.Client = httpx.Client(app=app, base_url="https://testserver")
-    client.headers["Referer"] = "https://testserver"
+    client: httpx.Client = httpx.Client(app=app, base_url=TEST_SERVER)
+    client.headers["Referer"] = TEST_SERVER
     csrf_token: str = get_csrf_token(client, "/login")
     response: httpx.Response = client.post("/login",
                                            data={"csrf_token": csrf_token,

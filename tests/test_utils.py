@@ -27,6 +27,7 @@ from accounting.utils.next_uri import append_next, inherit_next, or_next
 from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
 from test_site import create_app
+from testlib import TEST_SERVER
 
 
 class NextUriTestCase(unittest.TestCase):
@@ -66,9 +67,8 @@ class NextUriTestCase(unittest.TestCase):
 
         self.app.add_url_rule("/test-next", view_func=test_next_uri_view,
                               methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.app,
-                                            base_url="https://testserver")
-        client.headers["Referer"] = "https://testserver"
+        client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        client.headers["Referer"] = TEST_SERVER
         csrf_token: str = client.get("/test-csrf").text
         response: httpx.Response
 
@@ -96,9 +96,8 @@ class NextUriTestCase(unittest.TestCase):
 
         self.app.add_url_rule("/test-no-next", view_func=test_no_next_uri_view,
                               methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.app,
-                                            base_url="https://testserver")
-        client.headers["Referer"] = "https://testserver"
+        client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        client.headers["Referer"] = TEST_SERVER
         csrf_token: str = client.get("/test-csrf").text
         response: httpx.Response
 
@@ -188,8 +187,8 @@ class PaginationTestCase(unittest.TestCase):
             self.assertEqual(pagination.list, self.params.result)
             return ""
 
-        self.client = httpx.Client(app=self.app, base_url="https://testserver")
-        self.client.headers["Referer"] = "https://testserver"
+        self.client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        self.client.headers["Referer"] = TEST_SERVER
 
     def __test_success(self, query: str, items: range,
                        result: range, is_paged: bool = True,
