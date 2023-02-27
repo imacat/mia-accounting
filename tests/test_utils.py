@@ -293,25 +293,28 @@ class PaginationTestCase(unittest.TestCase):
 
         :return: None.
         """
+        page_37: str = "q=word&page-no=37&next=%2F"
+        page_size_15_default: str = "q=word&page-size=15&next=%2F"
+
         # A malformed page size
         self.__test_malformed("q=word&page-size=100a&page-no=37&next=%2F",
-                              range(1, 691), "q=word&page-no=37&next=%2F")
+                              range(1, 691), page_37)
         # A default page size
         self.__test_malformed(f"q=word&page-size={DEFAULT_PAGE_SIZE}"
                               "&page-no=37&next=%2F",
-                              range(1, 691), "q=word&page-no=37&next=%2F")
+                              range(1, 691), page_37)
         # An invalid page size
         self.__test_malformed("q=word&page-size=0&page-no=37&next=%2F",
-                              range(1, 691), "q=word&page-no=37&next=%2F")
+                              range(1, 691), page_37)
         # A malformed page number
         self.__test_malformed("q=word&page-size=15&page-no=37a&next=%2F",
-                              range(1, 691), "q=word&page-size=15&next=%2F")
+                              range(1, 691), page_size_15_default)
         # A default page number
         self.__test_malformed("q=word&page-size=15&page-no=1&next=%2F",
-                              range(1, 691), "q=word&page-size=15&next=%2F")
+                              range(1, 691), page_size_15_default)
         # A default page number, on a reversed list
         self.__test_malformed("q=word&page-size=15&page-no=46&next=%2F",
-                              range(1, 691), "q=word&page-size=15&next=%2F",
+                              range(1, 691), page_size_15_default,
                               is_reversed=True)
         # A page number beyond the last page
         self.__test_malformed("q=word&page-size=15&page-no=100&next=%2F",
@@ -320,11 +323,11 @@ class PaginationTestCase(unittest.TestCase):
         # A page number beyond the last page, on a reversed list
         self.__test_malformed("q=word&page-size=15&page-no=100&next=%2F",
                               range(1, 691),
-                              "q=word&page-size=15&next=%2F", is_reversed=True)
+                              page_size_15_default, is_reversed=True)
         # A page number before the first page
         self.__test_malformed("q=word&page-size=15&page-no=0&next=%2F",
                               range(1, 691),
-                              "q=word&page-size=15&next=%2F")
+                              page_size_15_default)
         # A page number before the first page, on a reversed list
         self.__test_malformed("q=word&page-size=15&page-no=0&next=%2F",
                               range(1, 691),
