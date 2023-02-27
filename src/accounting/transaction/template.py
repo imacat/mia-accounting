@@ -40,7 +40,7 @@ def with_type(uri: str) -> str:
         return uri
     uri_p: ParseResult = urlparse(uri)
     params: list[tuple[str, str]] = parse_qsl(uri_p.query)
-    params = [x for x in params if x[0] != "next"]
+    params = [x for x in params if x[0] != "as"]
     params.append(("as", request.args["as"]))
     parts: list[str] = list(uri_p)
     parts[4] = urlencode(params)
