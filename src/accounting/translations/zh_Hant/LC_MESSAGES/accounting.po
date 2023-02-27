@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-07 16:22+0800\n"
-"PO-Revision-Date: 2023-02-07 18:04+0800\n"
+"POT-Creation-Date: 2023-02-27 15:28+0800\n"
+"PO-Revision-Date: 2023-02-27 15:29+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -18,6 +18,21 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.11.0\n"
+
+#: src/accounting/models.py:575
+#, python-format
+msgid "Cash Expense Transaction#%(id)s"
+msgstr "現金支出傳票#%(id)s"
+
+#: src/accounting/models.py:577
+#, python-format
+msgid "Cash Income Transaction#%(id)s"
+msgstr "現金收入傳票#%(id)s"
+
+#: src/accounting/models.py:578
+#, python-format
+msgid "Transfer Transaction#%(id)s"
+msgstr "轉帳傳票#%(id)s"
 
 #: src/accounting/account/forms.py:41
 msgid "The base account does not exist."
@@ -28,7 +43,7 @@ msgid "The base account is not available."
 msgstr "不能選這個基本科目。"
 
 #: src/accounting/account/forms.py:61
-#: src/accounting/static/js/account-form.js:110
+#: src/accounting/static/js/account-form.js:157
 msgid "Please select the base account."
 msgstr "請選擇基本科目。"
 
@@ -38,15 +53,15 @@ msgstr "請填上標題。"
 
 #: src/accounting/account/query.py:50
 #: src/accounting/templates/accounting/account/detail.html:90
-#: src/accounting/templates/accounting/account/list.html:62
+#: src/accounting/templates/accounting/account/list.html:74
 msgid "Pay-off needed"
 msgstr "逐筆核銷"
 
-#: src/accounting/account/views.py:88
+#: src/accounting/account/views.py:89
 msgid "The account is added successfully"
 msgstr "科目加好了。"
 
-#: src/accounting/account/views.py:143
+#: src/accounting/account/views.py:142
 msgid "The account was not modified."
 msgstr "科目未異動。"
 
@@ -58,44 +73,44 @@ msgstr "科目存好了。"
 msgid "The account is deleted successfully."
 msgstr "科目刪掉了"
 
-#: src/accounting/account/views.py:192
+#: src/accounting/account/views.py:192 src/accounting/transaction/views.py:210
 msgid "The order was not modified."
 msgstr "順序未異動。"
 
-#: src/accounting/account/views.py:195
+#: src/accounting/account/views.py:195 src/accounting/transaction/views.py:213
 msgid "The order is updated successfully."
 msgstr "順序存好了。"
 
-#: src/accounting/currency/forms.py:47
+#: src/accounting/currency/forms.py:46
 #: src/accounting/static/js/currency-form.js:136
 msgid "Code conflicts with another currency."
 msgstr "代碼與其它貨幣重複。"
 
-#: src/accounting/currency/forms.py:52
+#: src/accounting/currency/forms.py:51
 #: src/accounting/static/js/currency-form.js:92
 msgid "Please fill in the code."
 msgstr "請填上代碼。"
 
-#: src/accounting/currency/forms.py:54
+#: src/accounting/currency/forms.py:53
 #: src/accounting/static/js/currency-form.js:103
 msgid "Code can only be composed of 3 upper-cased letters."
 msgstr "代碼限為三個大寫英文字母。"
 
-#: src/accounting/currency/forms.py:57
+#: src/accounting/currency/forms.py:56
 #: src/accounting/static/js/currency-form.js:98
 msgid "This code is not available."
 msgstr "不能用這個代碼。"
 
-#: src/accounting/currency/forms.py:63
+#: src/accounting/currency/forms.py:62
 #: src/accounting/static/js/currency-form.js:168
 msgid "Please fill in the name."
 msgstr "請填上名稱。"
 
-#: src/accounting/currency/views.py:90
+#: src/accounting/currency/views.py:91
 msgid "The currency is added successfully"
 msgstr "貨幣加好了。"
 
-#: src/accounting/currency/views.py:146
+#: src/accounting/currency/views.py:145
 msgid "The currency was not modified."
 msgstr "貨幣未異動。"
 
@@ -107,9 +122,39 @@ msgstr "貨幣存好了。"
 msgid "The currency is deleted successfully."
 msgstr "貨幣刪掉了"
 
-#: src/accounting/static/js/account-form.js:130
+#: src/accounting/static/js/account-form.js:177
 msgid "Please fill in the title."
 msgstr "請填上標題。"
+
+#: src/accounting/static/js/transaction-form.js:308
+#: src/accounting/static/js/transaction-form.js:764
+#: src/accounting/transaction/forms.py:46
+msgid "Please select the account."
+msgstr "請選擇科目。"
+
+#: src/accounting/static/js/transaction-form.js:344
+#: src/accounting/static/js/transaction-form.js:769
+msgid "Please fill in the amount."
+msgstr "請填上金額。"
+
+#: src/accounting/static/js/transaction-form.js:641
+msgid "Please fill in the date."
+msgstr "請填上日期。"
+
+#: src/accounting/static/js/transaction-form.js:676
+#: src/accounting/transaction/forms.py:56
+msgid "Please add some currencies."
+msgstr "請加上貨幣。"
+
+#: src/accounting/static/js/transaction-form.js:742
+#: src/accounting/transaction/forms.py:77
+msgid "Please add some journal entries."
+msgstr "請加上分錄。"
+
+#: src/accounting/static/js/transaction-form.js:807
+#: src/accounting/transaction/forms.py:670
+msgid "The totals of the debit and credit amounts do not match."
+msgstr "借方貸方合計不符。 "
 
 #: src/accounting/templates/accounting/account/create.html:24
 msgid "Add a New Account"
@@ -121,20 +166,26 @@ msgstr "新增科目"
 #: src/accounting/templates/accounting/base-account/detail.html:31
 #: src/accounting/templates/accounting/currency/detail.html:31
 #: src/accounting/templates/accounting/currency/include/form.html:33
+#: src/accounting/templates/accounting/transaction/include/detail.html:31
+#: src/accounting/templates/accounting/transaction/include/form.html:34
+#: src/accounting/templates/accounting/transaction/order.html:36
 msgid "Back"
 msgstr "回上頁"
 
 #: src/accounting/templates/accounting/account/detail.html:36
 #: src/accounting/templates/accounting/currency/detail.html:36
+#: src/accounting/templates/accounting/transaction/include/detail.html:36
 msgid "Settings"
 msgstr "設定"
 
 #: src/accounting/templates/accounting/account/detail.html:41
+#: src/accounting/templates/accounting/transaction/include/detail.html:41
 msgid "Order"
 msgstr "次序"
 
 #: src/accounting/templates/accounting/account/detail.html:46
 #: src/accounting/templates/accounting/currency/detail.html:42
+#: src/accounting/templates/accounting/transaction/include/detail.html:46
 msgid "Delete"
 msgstr "刪除"
 
@@ -142,28 +193,45 @@ msgstr "刪除"
 msgid "Delete Account Confirmation"
 msgstr "科目刪除確認"
 
+#: src/accounting/templates/accounting/account/detail.html:70
+#: src/accounting/templates/accounting/account/include/form.html:91
+#: src/accounting/templates/accounting/currency/detail.html:66
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:27
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:27
+#: src/accounting/templates/accounting/transaction/include/detail.html:70
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:28
+msgid "Close"
+msgstr "關閉"
+
 #: src/accounting/templates/accounting/account/detail.html:73
 msgid "Do you really want to delete this account?"
 msgstr "你確定要刪掉這個科目嗎？"
 
 #: src/accounting/templates/accounting/account/detail.html:76
-#: src/accounting/templates/accounting/account/include/form.html:111
+#: src/accounting/templates/accounting/account/include/form.html:112
 #: src/accounting/templates/accounting/currency/detail.html:72
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:49
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:49
+#: src/accounting/templates/accounting/transaction/include/detail.html:76
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:52
 msgid "Cancel"
 msgstr "取消"
 
 #: src/accounting/templates/accounting/account/detail.html:77
 #: src/accounting/templates/accounting/currency/detail.html:73
+#: src/accounting/templates/accounting/transaction/include/detail.html:77
 msgid "Confirm"
 msgstr "確定"
 
 #: src/accounting/templates/accounting/account/detail.html:94
 #: src/accounting/templates/accounting/currency/detail.html:85
+#: src/accounting/templates/accounting/transaction/include/detail.html:106
 msgid "Created"
 msgstr "建檔"
 
 #: src/accounting/templates/accounting/account/detail.html:95
 #: src/accounting/templates/accounting/currency/detail.html:86
+#: src/accounting/templates/accounting/transaction/include/detail.html:107
 msgid "Updated"
 msgstr "更新"
 
@@ -175,6 +243,7 @@ msgstr "%(account)s設定"
 #: src/accounting/templates/accounting/account/list.html:24
 #: src/accounting/templates/accounting/base-account/list.html:24
 #: src/accounting/templates/accounting/currency/list.html:24
+#: src/accounting/templates/accounting/transaction/list.html:28
 #, python-format
 msgid "Search Result for \"%(query)s\""
 msgstr "「%(query)s」搜尋結果"
@@ -185,20 +254,50 @@ msgstr "科目管理"
 
 #: src/accounting/templates/accounting/account/list.html:32
 #: src/accounting/templates/accounting/currency/list.html:32
+#: src/accounting/templates/accounting/transaction/expense/include/form-currency-item.html:75
+#: src/accounting/templates/accounting/transaction/include/form.html:60
+#: src/accounting/templates/accounting/transaction/income/include/form-currency-item.html:75
+#: src/accounting/templates/accounting/transaction/list.html:37
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:77
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:117
 msgid "New"
 msgstr "新增"
 
+#: src/accounting/templates/accounting/account/list.html:35
+#: src/accounting/templates/accounting/currency/list.html:35
+#: src/accounting/templates/accounting/transaction/list.html:57
+msgid "Search for Desktop"
+msgstr "桌機版檢索"
+
 #: src/accounting/templates/accounting/account/include/form.html:98
 #: src/accounting/templates/accounting/account/list.html:40
+#: src/accounting/templates/accounting/account/list.html:52
+#: src/accounting/templates/accounting/base-account/list.html:29
 #: src/accounting/templates/accounting/base-account/list.html:34
 #: src/accounting/templates/accounting/currency/list.html:40
+#: src/accounting/templates/accounting/currency/list.html:52
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:34
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:34
+#: src/accounting/templates/accounting/transaction/list.html:62
+#: src/accounting/templates/accounting/transaction/list.html:74
 msgid "Search"
 msgstr "搜尋"
 
-#: src/accounting/templates/accounting/account/list.html:68
+#: src/accounting/templates/accounting/account/list.html:47
+#: src/accounting/templates/accounting/currency/list.html:47
+#: src/accounting/templates/accounting/transaction/list.html:69
+msgid "Search for Mobile"
+msgstr "行動版檢索"
+
+#: src/accounting/templates/accounting/account/include/form.html:109
+#: src/accounting/templates/accounting/account/list.html:80
 #: src/accounting/templates/accounting/account/order.html:81
 #: src/accounting/templates/accounting/base-account/list.html:51
-#: src/accounting/templates/accounting/currency/list.html:57
+#: src/accounting/templates/accounting/currency/list.html:77
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:46
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:46
+#: src/accounting/templates/accounting/transaction/list.html:93
+#: src/accounting/templates/accounting/transaction/order.html:80
 msgid "There is no data."
 msgstr "沒有資料。"
 
@@ -210,6 +309,9 @@ msgstr "%(base)s下的科目"
 #: src/accounting/templates/accounting/account/include/form.html:75
 #: src/accounting/templates/accounting/account/order.html:62
 #: src/accounting/templates/accounting/currency/include/form.html:57
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:53
+#: src/accounting/templates/accounting/transaction/include/form.html:76
+#: src/accounting/templates/accounting/transaction/order.html:61
 msgid "Save"
 msgstr "儲存"
 
@@ -233,8 +335,10 @@ msgstr "帳目要逐筆核銷。"
 msgid "Select Base Account"
 msgstr "選擇基本科目"
 
-#: src/accounting/templates/accounting/account/include/form.html:113
-#: src/accounting/templates/accounting/account/include/form.html:115
+#: src/accounting/templates/accounting/account/include/form.html:114
+#: src/accounting/templates/accounting/account/include/form.html:116
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:50
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:50
 msgid "Clear"
 msgstr "清除"
 
@@ -276,16 +380,213 @@ msgid "Accounting"
 msgstr "記帳"
 
 #: src/accounting/templates/accounting/include/nav.html:32
+msgid "Transactions"
+msgstr "傳票"
+
+#: src/accounting/templates/accounting/include/nav.html:38
 msgid "Accounts"
 msgstr "科目"
 
-#: src/accounting/templates/accounting/include/nav.html:38
+#: src/accounting/templates/accounting/include/nav.html:44
 msgid "Base Accounts"
 msgstr "基本科目"
 
-#: src/accounting/templates/accounting/include/nav.html:44
+#: src/accounting/templates/accounting/include/nav.html:50
 msgid "Currencies"
 msgstr "貨幣"
+
+#: src/accounting/templates/accounting/include/pagination.html:23
+msgid "Page navigation"
+msgstr "分頁瀏覽"
+
+#: src/accounting/templates/accounting/transaction/list.html:28
+msgid "Transaction Management"
+msgstr "傳票管理"
+
+#: src/accounting/templates/accounting/transaction/list.html:42
+msgid "Cash Expense"
+msgstr "現金支出"
+
+#: src/accounting/templates/accounting/transaction/list.html:46
+msgid "Cash Income"
+msgstr "現金收入"
+
+#: src/accounting/templates/accounting/transaction/include/add-new-material-fab.html:32
+#: src/accounting/templates/accounting/transaction/list.html:51
+msgid "Transfer"
+msgstr "轉帳"
+
+#: src/accounting/templates/accounting/transaction/order.html:29
+#, python-format
+msgid "Transactions on %(date)s"
+msgstr "%(date)s的傳票"
+
+#: src/accounting/templates/accounting/transaction/expense/create.html:24
+msgid "Add a New Cash Expense Transaction"
+msgstr "新增現金支出傳票"
+
+#: src/accounting/templates/accounting/transaction/expense/detail.html:30
+#: src/accounting/templates/accounting/transaction/expense/include/form-currency-item.html:45
+#: src/accounting/templates/accounting/transaction/include/form.html:52
+#: src/accounting/templates/accounting/transaction/income/detail.html:30
+#: src/accounting/templates/accounting/transaction/income/include/form-currency-item.html:45
+msgid "Content"
+msgstr "內容"
+
+#: src/accounting/templates/accounting/transaction/expense/detail.html:46
+#: src/accounting/templates/accounting/transaction/expense/include/form-currency-item.html:68
+#: src/accounting/templates/accounting/transaction/income/detail.html:46
+#: src/accounting/templates/accounting/transaction/income/include/form-currency-item.html:68
+#: src/accounting/templates/accounting/transaction/transfer/detail.html:49
+#: src/accounting/templates/accounting/transaction/transfer/detail.html:75
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:70
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:110
+msgid "Total"
+msgstr "合計"
+
+#: src/accounting/templates/accounting/transaction/expense/edit.html:24
+#: src/accounting/templates/accounting/transaction/income/edit.html:24
+#: src/accounting/templates/accounting/transaction/transfer/edit.html:24
+#, python-format
+msgid "Editing %(txn)s"
+msgstr "編輯%(txn)s"
+
+#: src/accounting/templates/accounting/transaction/expense/include/form-currency-item.html:32
+#: src/accounting/templates/accounting/transaction/income/include/form-currency-item.html:32
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:32
+msgid "Currency"
+msgstr "貨幣"
+
+#: src/accounting/templates/accounting/transaction/include/add-new-material-fab.html:26
+msgid "Cash expense"
+msgstr "現金支出"
+
+#: src/accounting/templates/accounting/transaction/include/add-new-material-fab.html:29
+msgid "Cash income"
+msgstr "現金收入"
+
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:26
+msgid "Select Credit Account"
+msgstr "選擇貸方科目科目"
+
+#: src/accounting/templates/accounting/transaction/include/credit-account-modal.html:44
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:44
+msgid "More…"
+msgstr "更多…"
+
+#: src/accounting/templates/accounting/transaction/include/debit-account-modal.html:26
+msgid "Select Debit Account"
+msgstr "選擇借方科目"
+
+#: src/accounting/templates/accounting/transaction/include/detail.html:69
+msgid "Delete Transaction Confirmation"
+msgstr "傳票刪除確認"
+
+#: src/accounting/templates/accounting/transaction/include/detail.html:73
+msgid "Do you really want to delete this transaction?"
+msgstr "你確定要刪掉這張傳票嗎？"
+
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:27
+msgid "Journal Entry Content"
+msgstr "分錄內容"
+
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:33
+msgid "Account"
+msgstr "科目"
+
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:41
+msgid "Summary"
+msgstr "摘要"
+
+#: src/accounting/templates/accounting/transaction/include/entry-form-modal.html:47
+msgid "Amount"
+msgstr "金額"
+
+#: src/accounting/templates/accounting/transaction/include/form.html:46
+msgid "Date"
+msgstr "日期"
+
+#: src/accounting/templates/accounting/transaction/include/form.html:69
+msgid "Note"
+msgstr "備註"
+
+#: src/accounting/templates/accounting/transaction/income/create.html:24
+msgid "Add a New Cash Income Transaction"
+msgstr "新增現金收入傳票"
+
+#: src/accounting/templates/accounting/transaction/transfer/create.html:24
+msgid "Add a New Transfer Transaction"
+msgstr "新增轉帳傳票"
+
+#: src/accounting/templates/accounting/transaction/transfer/detail.html:33
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:47
+msgid "Debit"
+msgstr "借方"
+
+#: src/accounting/templates/accounting/transaction/transfer/detail.html:59
+#: src/accounting/templates/accounting/transaction/transfer/include/form-currency-item.html:87
+msgid "Credit"
+msgstr "貸方"
+
+#: src/accounting/transaction/forms.py:44
+msgid "Please select the currency."
+msgstr "請選擇貨幣。"
+
+#: src/accounting/transaction/forms.py:67
+msgid "The currency does not exist."
+msgstr "沒有這個貨幣。"
+
+#: src/accounting/transaction/forms.py:88
+msgid "The account does not exist."
+msgstr "沒有這個科目。"
+
+#: src/accounting/transaction/forms.py:99
+msgid "Please fill in a positive amount."
+msgstr "金額請填正數。"
+
+#: src/accounting/transaction/forms.py:113
+msgid "This account is not for debit entries."
+msgstr "科目不是借方科目。"
+
+#: src/accounting/transaction/forms.py:200
+msgid "This account is not for credit entries."
+msgstr "科目不是貸方科目。"
+
+#: src/accounting/transaction/template.py:71
+msgid "Today"
+msgstr "今天"
+
+#: src/accounting/transaction/template.py:73
+msgid "Yesterday"
+msgstr "昨天"
+
+#: src/accounting/transaction/template.py:75
+msgid "Tomorrow"
+msgstr "明天"
+
+#: src/accounting/transaction/template.py:79
+msgid "The day before yesterday"
+msgstr "前天"
+
+#: src/accounting/transaction/template.py:81
+msgid "The day after tomorrow"
+msgstr "後天"
+
+#: src/accounting/transaction/views.py:104
+msgid "The transaction is added successfully"
+msgstr "傳票加好了。"
+
+#: src/accounting/transaction/views.py:158
+msgid "The transaction was not modified."
+msgstr "傳票未異動。"
+
+#: src/accounting/transaction/views.py:163
+msgid "The transaction is updated successfully."
+msgstr "傳票存好了。"
+
+#: src/accounting/transaction/views.py:179
+msgid "The transaction is deleted successfully."
+msgstr "傳票刪掉了"
 
 #: src/accounting/utils/pagination.py:206
 msgctxt "Pagination|"
