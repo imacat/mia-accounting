@@ -204,7 +204,7 @@ class Account(db.Model):
         :param code: The code.
         :return: The account, or None if this account does not exist.
         """
-        m = re.match("^([1-9]{4})-([0-9]{3})$", code)
+        m = re.match(r"^([1-9]{4})-(\d{3})$", code)
         if m is None:
             return None
         return cls.query.filter(cls.base_code == m.group(1),
