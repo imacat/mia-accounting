@@ -29,6 +29,9 @@ from flask.testing import FlaskCliRunner
 from test_site import create_app, db
 from testlib import get_client, set_locale
 
+NEXT_URI: str = "/_next"
+"""The next URI."""
+
 
 class AccountData:
     """The account data."""
@@ -203,7 +206,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = client.post(f"{PREFIX}/bases/{bank.base_code}",
                                data={"csrf_token": csrf_token,
-                                     "next": "/next",
+                                     "next": NEXT_URI,
                                      f"{bank_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
@@ -252,7 +255,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = client.post(f"{PREFIX}/bases/{bank.base_code}",
                                data={"csrf_token": csrf_token,
-                                     "next": "/next",
+                                     "next": NEXT_URI,
                                      f"{bank_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
@@ -304,10 +307,10 @@ class AccountTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/bases/{bank.base_code}",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": "/next",
+                                          "next": NEXT_URI,
                                           f"{bank_id}-no": "5"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/next")
+        self.assertEqual(response.headers["Location"], NEXT_URI)
 
     def test_add(self) -> None:
         """Tests to add the currencies.
@@ -721,14 +724,14 @@ class AccountTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/bases/1111",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": "/next",
+                                          "next": NEXT_URI,
                                           f"{id_1}-no": "4",
                                           f"{id_2}-no": "1",
                                           f"{id_3}-no": "5",
                                           f"{id_4}-no": "2",
                                           f"{id_5}-no": "3"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], f"/next")
+        self.assertEqual(response.headers["Location"], NEXT_URI)
 
         with self.app.app_context():
             self.assertEqual(db.session.get(Account, id_1).code, "1111-004")
@@ -748,12 +751,12 @@ class AccountTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/bases/1111",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": "/next",
+                                          "next": NEXT_URI,
                                           f"{id_2}-no": "3a",
                                           f"{id_3}-no": "5",
                                           f"{id_4}-no": "2"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], f"/next")
+        self.assertEqual(response.headers["Location"], NEXT_URI)
 
         with self.app.app_context():
             self.assertEqual(db.session.get(Account, id_1).code, "1111-003")
