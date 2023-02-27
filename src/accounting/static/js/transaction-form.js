@@ -530,17 +530,17 @@ function filterAccountOptions(prefix) {
     const more = document.getElementById(prefix + "-more");
     const queryNoResult = document.getElementById(prefix + "-option-no-result");
     const codesInUse = getAccountCodeUsedInForm();
-    let hasAnyMatched = false;
+    let shouldAnyShow = false;
     options.forEach(function (option) {
-        const isMatched = shouldAccountOptionShow(option, more, codesInUse, query);
-        if (isMatched) {
+        const shouldShow = shouldAccountOptionShow(option, more, codesInUse, query);
+        if (shouldShow) {
             option.classList.remove("d-none");
-            hasAnyMatched = true;
+            shouldAnyShow = true;
         } else {
             option.classList.add("d-none");
         }
     });
-    if (!hasAnyMatched) {
+    if (!shouldAnyShow && more.classList.contains("d-none")) {
         optionList.classList.add("d-none");
         queryNoResult.classList.remove("d-none");
     } else {
