@@ -34,10 +34,10 @@ from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
 from accounting.utils.user import get_current_user_pk
 from .dispatcher import TransactionType, get_txn_type, TXN_TYPE_OBJ
-from .template import with_type, format_amount, format_amount_input, \
-    format_date, text2html, currency_options, default_currency_code
 from .forms import sort_transactions_in, TransactionReorderForm
 from .query import get_transaction_query
+from .template import with_type, format_amount, format_amount_input, \
+    format_date, text2html, currency_options, default_currency_code
 
 bp: Blueprint = Blueprint("transaction", __name__)
 """The view blueprint for the transaction management."""
