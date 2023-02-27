@@ -41,6 +41,7 @@ First written: 2023/2/26
     {{ A_("Order") }}
   </a>
   {% if accounting_can_edit() %}
+    {% block to_transfer %}{% endblock %}
     <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
       <i class="fa-solid fa-trash"></i>
       {{ A_("Delete") }}

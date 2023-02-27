@@ -21,6 +21,13 @@ First written: 2023/2/26
 #}
 {% extends "accounting/transaction/include/detail.html" %}
 
+{% block to_transfer %}
+  <a class="btn btn-primary" href="{{ url_for("accounting.transaction.edit", txn=obj)|accounting_txn_to_transfer|accounting_inherit_next }}">
+    <i class="fa-solid fa-bars-staggered"></i>
+    {{ A_("To Transfer") }}
+  </a>
+{% endblock %}
+
 {% block transaction_currencies %}
   {% for currency in obj.currencies %}
     <div class="mb-3">

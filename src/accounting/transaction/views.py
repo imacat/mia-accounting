@@ -36,12 +36,14 @@ from accounting.utils.user import get_current_user_pk
 from .dispatcher import TransactionType, get_txn_type, TXN_TYPE_OBJ
 from .forms import sort_transactions_in, TransactionReorderForm
 from .query import get_transaction_query
-from .template import with_type, format_amount, format_amount_input, \
-    format_date, text2html, currency_options, default_currency_code
+from .template import with_type, to_transfer, format_amount, \
+    format_amount_input, format_date, text2html, currency_options, \
+    default_currency_code
 
 bp: Blueprint = Blueprint("transaction", __name__)
 """The view blueprint for the transaction management."""
 bp.add_app_template_filter(with_type, "accounting_txn_with_type")
+bp.add_app_template_filter(to_transfer, "accounting_txn_to_transfer")
 bp.add_app_template_filter(format_amount, "accounting_txn_format_amount")
 bp.add_app_template_filter(format_amount_input,
                            "accounting_txn_format_amount_input")

@@ -47,6 +47,21 @@ def with_type(uri: str) -> str:
     return urlunparse(parts)
 
 
+def to_transfer(uri: str) -> str:
+    """Adds the transfer transaction type to the URI.
+
+    :param uri: The URI.
+    :return: The result URL, with the transfer transaction type added.
+    """
+    uri_p: ParseResult = urlparse(uri)
+    params: list[tuple[str, str]] = parse_qsl(uri_p.query)
+    params = [x for x in params if x[0] != "as"]
+    params.append(("as", "transfer"))
+    parts: list[str] = list(uri_p)
+    parts[4] = urlencode(params)
+    return urlunparse(parts)
+
+
 def format_amount(value: Decimal | None) -> str:
     """Formats an amount for readability.
 
