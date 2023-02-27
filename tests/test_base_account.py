@@ -29,6 +29,11 @@ from flask.testing import FlaskCliRunner
 from test_site import create_app
 from testlib import get_client
 
+LIST_URI: str = "/accounting/base-accounts"
+"""The list URI."""
+DETAIL_URI: str = "/accounting/base-accounts/1111"
+"""The detail URI."""
+
 
 class BaseAccountCommandTestCase(unittest.TestCase):
     """The base account console command test case."""
@@ -111,10 +116,10 @@ class BaseAccountTestCase(unittest.TestCase):
         client, csrf_token = get_client(self.app, "nobody")
         response: httpx.Response
 
-        response = client.get("/accounting/base-accounts")
+        response = client.get(LIST_URI)
         self.assertEqual(response.status_code, 403)
 
-        response = client.get("/accounting/base-accounts/1111")
+        response = client.get(DETAIL_URI)
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -125,10 +130,10 @@ class BaseAccountTestCase(unittest.TestCase):
         client, csrf_token = get_client(self.app, "viewer")
         response: httpx.Response
 
-        response = client.get("/accounting/base-accounts")
+        response = client.get(LIST_URI)
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/base-accounts/1111")
+        response = client.get(DETAIL_URI)
         self.assertEqual(response.status_code, 200)
 
     def test_editor(self) -> None:
@@ -139,8 +144,8 @@ class BaseAccountTestCase(unittest.TestCase):
         client, csrf_token = get_client(self.app, "editor")
         response: httpx.Response
 
-        response = client.get("/accounting/base-accounts")
+        response = client.get(LIST_URI)
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/accounting/base-accounts/1111")
+        response = client.get(DETAIL_URI)
         self.assertEqual(response.status_code, 200)
