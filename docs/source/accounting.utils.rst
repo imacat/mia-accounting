@@ -4,10 +4,18 @@ accounting.utils package
 Submodules
 ----------
 
-accounting.utils.next\_url module
+accounting.utils.flash\_errors module
+-------------------------------------
+
+.. automodule:: accounting.utils.flash_errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.utils.next\_uri module
 ---------------------------------
 
-.. automodule:: accounting.utils.next_url
+.. automodule:: accounting.utils.next_uri
    :members:
    :undoc-members:
    :show-inheritance:

@@ -10,6 +10,7 @@ Subpackages
    accounting.account
    accounting.base_account
    accounting.currency
+   accounting.transaction
    accounting.utils
 
 Submodules
