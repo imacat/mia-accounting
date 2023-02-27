@@ -89,8 +89,7 @@ def add_currency() -> redirect:
     db.session.add(currency)
     db.session.commit()
     flash(lazy_gettext("The currency is added successfully"), "success")
-    return redirect(inherit_next(url_for("accounting.currency.detail",
-                                         currency=currency)))
+    return redirect(inherit_next(__get_detail_uri(currency)))
 
 
 @bp.get("/<currency:currency>", endpoint="detail")
@@ -143,14 +142,12 @@ def update_currency(currency: Currency) -> redirect:
         form.populate_obj(currency)
     if not currency.is_modified:
         flash(lazy_gettext("The currency was not modified."), "success")
-        return redirect(inherit_next(url_for("accounting.currency.detail",
-                                             currency=currency)))
+        return redirect(inherit_next(__get_detail_uri(currency)))
     currency.updated_by_id = get_current_user_pk()
     currency.updated_at = sa.func.now()
     db.session.commit()
     flash(lazy_gettext("The currency is updated successfully."), "success")
-    return redirect(inherit_next(url_for("accounting.currency.detail",
-                                         currency=currency)))
+    return redirect(inherit_next(__get_detail_uri(currency)))
 
 
 @bp.post("/<currency:currency>/delete", endpoint="delete")
@@ -176,3 +173,13 @@ def exists_code() -> dict[str, bool]:
     :return: Whether the currency code exists.
     """
     return {"exists": db.session.get(Currency, request.args["q"]) is not None}
+
+
+def __get_detail_uri(currency: Currency) -> str:
+    """Returns the detail URI of a currency.
+
+    :param currency: The currency.
+    :return: The detail URI of the currency.
+    """
+    return url_for("accounting.currency.detail", currency=currency)
+
