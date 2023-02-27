@@ -65,6 +65,50 @@
     overflow-y: scroll;
 }
 
+/** The transaction management */
+.accounting-currency-control {
+    background-color: transparent;
+}
+.accounting-currency-content {
+    width: calc(100% - 3rem);
+}
+.accounting-entry-content {
+    width: calc(100% - 3rem);
+    background-color: transparent;
+}
+.accounting-entry-control {
+    border-color: transparent;
+}
+.accounting-transaction-card {
+    padding: 2em 1.5em;
+    margin: 1em;
+    background-color: #F8F9FA;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.accounting-transaction-card h2 {
+    border-bottom: thick double slategray;
+}
+.accounting-list-group-stripped .list-group-item:nth-child(2n+1) {
+    background-color: #f2f2f2;
+}
+.accounting-list-group-stripped .list-group-item-success:nth-child(2n+1) {
+    background-color: #c7dbd2;
+}
+.accounting-list-group-hover .list-group-item:hover {
+    background-color: #ececec;
+}
+.accounting-transaction-entry {
+    border: none;
+}
+.accounting-transaction-entry-header {
+    font-weight: bolder;
+    border-bottom: thick double slategray;
+}
+.list-group-item.accounting-transaction-entry-total {
+    font-weight: bolder;
+    border-top: thick double slategray;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
     position: relative;
@@ -101,6 +145,36 @@
     margin-top: 2.5rem;
 }
 .accounting-material-fab .btn:hover, .accounting-material-fab .btn:focus {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0,0,0,.12);
+}
+.accounting-btn-material-fab {
+    transition: transform .1s ease-in-out, right .1s ease-in-out, bottom .1s ease-in-out;
+}
+.show .accounting-btn-material-fab {
+    transform: scale(1.5) rotate(-45deg);
+}
+.accounting-material-fab-speed-dial-group {
+    position: absolute;
+    right: -2rem;
+    bottom: -7rem;
+    text-align: right;
+    opacity: 0;
+    transform: scale(0.1);
+    line-height: 5.5rem;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out, right .1s ease-in-out, bottom .1s ease-in-out;
+}
+.show .accounting-material-fab-speed-dial-group {
+    opacity: 1;
+    transform: scale(0.6);
+    right: -0.5rem;
+    bottom: 0.7rem;
+}
+.accounting-material-fab-speed-dial-group .btn {
+    background-color: white;
+    white-space: nowrap;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0,0,0,.12);
+}
+.accounting-material-fab-speed-dial-group .btn:hover, .accounting-material-fab-speed-dial-group .btn:focus {
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0,0,0,.12);
 }
 

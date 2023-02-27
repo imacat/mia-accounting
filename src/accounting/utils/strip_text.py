@@ -19,6 +19,7 @@
 This module should not import any other module from the application.
 
 """
+import re
 
 
 def strip_text(s: str | None) -> str | None:
@@ -30,4 +31,16 @@ def strip_text(s: str | None) -> str | None:
     if s is None:
         return None
     s = s.strip()
+    return s if s != "" else None
+
+
+def strip_multiline_text(s: str | None) -> str | None:
+    """The filter to strip a piece of multi-line text.
+
+    :param s: The text input string.
+    :return: The filtered string.
+    """
+    if s is None:
+        return None
+    s = re.sub(r"^\s*\n", "", s.rstrip())
     return s if s != "" else None

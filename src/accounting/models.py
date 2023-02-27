@@ -17,8 +17,11 @@
 """The data models.
 
 """
+from __future__ import annotations
+
 import re
 import typing as t
+from decimal import Decimal
 
 import sqlalchemy as sa
 from flask import current_app
@@ -26,6 +29,7 @@ from flask_babel import get_locale
 from sqlalchemy import text
 
 from accounting import db
+from accounting.locale import gettext
 from accounting.utils.user import user_cls, user_pk_column
 
 
@@ -134,6 +138,8 @@ class Account(db.Model):
     l10n = db.relationship("AccountL10n", back_populates="account",
                            lazy=False)
     """The localized titles."""
+    entries = db.relationship("JournalEntry", back_populates="account")
+    """The journal entries."""
 
     __CASH = "1111-001"
     """The code of the cash account,"""
@@ -197,6 +203,25 @@ class Account(db.Model):
                 return
         self.l10n.append(AccountL10n(locale=current_locale, title=value))
 
+    @property
+    def is_in_use(self) -> bool:
+        """Returns whether the account is in use.
+
+        :return: True if the account is in use, or False otherwise.
+        """
+        if not hasattr(self, "__is_in_use"):
+            setattr(self, "__is_in_use", len(self.entries) > 0)
+        return getattr(self, "__is_in_use")
+
+    @is_in_use.setter
+    def is_in_use(self, is_in_use: bool) -> None:
+        """Sets whether the account is in use.
+
+        :param is_in_use: True if the account is in use, or False otherwise.
+        :return: None.
+        """
+        setattr(self, "__is_in_use", is_in_use)
+
     @classmethod
     def find_by_code(cls, code: str) -> t.Self | None:
         """Finds an account by its code.
@@ -250,6 +275,14 @@ class Account(db.Model):
                                 cls.base_code != "3351",
                                 cls.base_code != "3353")\
             .order_by(cls.base_code, cls.no).all()
+
+    @property
+    def query_values(self) -> list[str]:
+        """Returns the values to be queried.
+
+        :return: The values to be queried.
+        """
+        return [self.code, self.title_l10n] + [x.title for x in self.l10n]
 
     @classmethod
     def cash(cls) -> t.Self:
@@ -370,6 +403,8 @@ class Currency(db.Model):
     l10n = db.relationship("CurrencyL10n", back_populates="currency",
                            lazy=False)
     """The localized names."""
+    entries = db.relationship("JournalEntry", back_populates="currency")
+    """The journal entries."""
 
     def __str__(self) -> str:
         """Returns the string representation of the currency.
@@ -450,3 +485,215 @@ class CurrencyL10n(db.Model):
     """The locale."""
     name = db.Column(db.String, nullable=False)
     """The localized name."""
+
+
+class TransactionCurrency:
+    """A currency in a transaction."""
+
+    def __init__(self, code: str, debit: list[JournalEntry],
+                 credit: list[JournalEntry]):
+        """Constructs the currency in the transaction.
+
+        :param code: The currency code.
+        :param debit: The debit entries.
+        :param credit: The credit entries.
+        """
+        self.code: str = code
+        """The currency code."""
+        self.debit: list[JournalEntry] = debit
+        """The debit entries."""
+        self.credit: list[JournalEntry] = credit
+        """The credit entries."""
+
+    @property
+    def name(self) -> str:
+        """Returns the currency name.
+
+        :return: The currency name.
+        """
+        return db.session.get(Currency, self.code).name
+
+    @property
+    def debit_total(self) -> Decimal:
+        """Returns the total amount of the debit journal entries.
+
+        :return: The total amount of the debit journal entries.
+        """
+        return sum([x.amount for x in self.debit])
+
+    @property
+    def credit_total(self) -> str:
+        """Returns the total amount of the credit journal entries.
+
+        :return: The total amount of the credit journal entries.
+        """
+        return sum([x.amount for x in self.credit])
+
+
+class Transaction(db.Model):
+    """A transaction."""
+    __tablename__ = "accounting_transactions"
+    """The table name."""
+    id = db.Column(db.Integer, nullable=False, primary_key=True,
+                   autoincrement=False)
+    """The transaction ID."""
+    date = db.Column(db.Date, nullable=False)
+    """The date."""
+    no = db.Column(db.Integer, nullable=False, default=text("1"))
+    """The account number under the date."""
+    note = db.Column(db.String)
+    """The note."""
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
+                           server_default=db.func.now())
+    """The time of creation."""
+    created_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
+                              nullable=False)
+    """The ID of the creator."""
+    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    """The creator."""
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
+                           server_default=db.func.now())
+    """The time of last update."""
+    updated_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
+                              nullable=False)
+    """The ID of the updator."""
+    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    """The updator."""
+    entries = db.relationship("JournalEntry", back_populates="transaction")
+    """The journal entries."""
+
+    def __str__(self) -> str:
+        """Returns the string representation of this transaction.
+
+        :return: The string representation of this transaction.
+        """
+        if self.is_cash_expense:
+            return gettext("Cash Expense Transaction#%(id)s", id=self.id)
+        if self.is_cash_income:
+            return gettext("Cash Income Transaction#%(id)s", id=self.id)
+        return gettext("Transfer Transaction#%(id)s", id=self.id)
+
+    @property
+    def currencies(self) -> list[TransactionCurrency]:
+        """Returns the journal entries categorized by their currencies.
+
+        :return: The currency categories.
+        """
+        entries: list[JournalEntry] = sorted(self.entries, key=lambda x: x.no)
+        codes: list[str] = []
+        by_currency: dict[str, list[JournalEntry]] = {}
+        for entry in entries:
+            if entry.currency_code not in by_currency:
+                codes.append(entry.currency_code)
+                by_currency[entry.currency_code] = []
+            by_currency[entry.currency_code].append(entry)
+        return [TransactionCurrency(code=x,
+                                    debit=[y for y in by_currency[x]
+                                           if y.is_debit],
+                                    credit=[y for y in by_currency[x]
+                                            if not y.is_debit])
+                for x in codes]
+
+    @property
+    def is_cash_income(self) -> bool:
+        """Returns whether this is a cash income transaction.
+
+        :return: True if this is a cash income transaction, or False otherwise.
+        """
+        for currency in self.currencies:
+            if len(currency.debit) > 1:
+                return False
+            if currency.debit[0].account.code != "1111-001":
+                return False
+        return True
+
+    @property
+    def is_cash_expense(self) -> bool:
+        """Returns whether this is a cash expense transaction.
+
+        :return: True if this is a cash expense transaction, or False
+            otherwise.
+        """
+        for currency in self.currencies:
+            if len(currency.credit) > 1:
+                return False
+            if currency.credit[0].account.code != "1111-001":
+                return False
+        return True
+
+    def delete(self) -> None:
+        """Deletes the transaction.
+
+        :return: None.
+        """
+        JournalEntry.query\
+            .filter(JournalEntry.transaction_id == self.id).delete()
+        db.session.delete(self)
+
+
+class JournalEntry(db.Model):
+    """An accounting journal entry."""
+    __tablename__ = "accounting_journal_entries"
+    """The table name."""
+    id = db.Column(db.Integer, nullable=False, primary_key=True,
+                   autoincrement=False)
+    """The entry ID."""
+    transaction_id = db.Column(db.Integer,
+                               db.ForeignKey(Transaction.id,
+                                             onupdate="CASCADE",
+                                             ondelete="CASCADE"),
+                               nullable=False)
+    """The transaction ID."""
+    transaction = db.relationship(Transaction, back_populates="entries")
+    """The transaction."""
+    is_debit = db.Column(db.Boolean, nullable=False)
+    """True for a debit entry, or False for a credit entry."""
+    no = db.Column(db.Integer, nullable=False)
+    """The entry number under the transaction and debit or credit."""
+    pay_off_target_id = db.Column(db.Integer,
+                                  db.ForeignKey(id, onupdate="CASCADE"),
+                                  nullable=True)
+    """The ID of the pay-off target entry."""
+    pay_off_target = db.relationship("JournalEntry", back_populates="pay_off",
+                                     remote_side=id, passive_deletes=True)
+    """The pay-off target entry."""
+    pay_off = db.relationship("JournalEntry", back_populates="pay_off_target")
+    """The pay-off entries."""
+    currency_code = db.Column(db.String,
+                              db.ForeignKey(Currency.code, onupdate="CASCADE"),
+                              nullable=False)
+    """The currency code."""
+    currency = db.relationship(Currency, back_populates="entries")
+    """The currency."""
+    account_id = db.Column(db.Integer,
+                           db.ForeignKey(Account.id,
+                                         onupdate="CASCADE"),
+                           nullable=False)
+    """The account ID."""
+    account = db.relationship(Account, back_populates="entries", lazy=False)
+    """The account."""
+    summary = db.Column(db.String, nullable=True)
+    """The summary."""
+    amount = db.Column(db.Numeric(14, 2), nullable=False)
+    """The amount."""
+
+    @property
+    def eid(self) -> int | None:
+        """Returns the journal entry ID.  This is the alternative name of the
+        ID field, to work with WTForms.
+
+        :return: The journal entry ID.
+        """
+        return self.id
+
+    @property
+    def account_code(self) -> str:
+        """Returns the account code.
+
+        :return: The account code.
+        """
+        return self.account.code

@@ -115,7 +115,7 @@ class EmptyPagination(AbstractPagination[T]):
 
 class NonEmptyPagination(AbstractPagination[T]):
     """The pagination with real data."""
-    PAGE_SIZE_OPTIONS: list[int] = [10, 100, 200]
+    PAGE_SIZE_OPTION_VALUES: list[int] = [10, 100, 200]
     """The page size options."""
 
     def __init__(self, items: list[T], is_reversed: bool = False):
@@ -278,7 +278,7 @@ class NonEmptyPagination(AbstractPagination[T]):
             return []
         return [Link(str(x), self.__uri_size(x),
                      is_current=x == self.page_size)
-                for x in self.PAGE_SIZE_OPTIONS]
+                for x in self.PAGE_SIZE_OPTION_VALUES]
 
     def __uri_size(self, page_size: int) -> str:
         """Returns the URI of a page size.

@@ -1,0 +1,111 @@
+{#
+The Mia! Accounting Flask Project
+detail.html: The account detail
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/26
+#}
+{% extends "accounting/base.html" %}
+
+{% block header %}{% block title %}{{ obj }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-3">
+  <a class="btn btn-primary" href="{{ url_for("accounting.transaction.list")|accounting_or_next }}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    {{ A_("Back") }}
+  </a>
+  {% if accounting_can_edit() %}
+    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.transaction.edit", txn=obj)|accounting_inherit_next }}">
+      <i class="fa-solid fa-gear"></i>
+      {{ A_("Settings") }}
+    </a>
+  {% endif %}
+  <a class="btn btn-primary" href="{{ url_for("accounting.transaction.order", txn_date=obj.date)|accounting_append_next }}">
+    <i class="fa-solid fa-bars-staggered"></i>
+    {{ A_("Order") }}
+  </a>
+  {% if accounting_can_edit() %}
+    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
+      <i class="fa-solid fa-trash"></i>
+      {{ A_("Delete") }}
+    </button>
+  {% endif %}
+</div>
+
+{% if accounting_can_edit() %}
+  <div class="d-md-none accounting-material-fab">
+    <a class="btn btn-primary" href="{{ url_for("accounting.transaction.edit", txn=obj)|accounting_inherit_next }}">
+      <i class="fa-solid fa-pen-to-square"></i>
+    </a>
+  </div>
+{% endif %}
+
+{% if accounting_can_edit() %}
+  <form action="{{ url_for("accounting.transaction.delete", txn=obj) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if "next" in request.args %}
+      <input type="hidden" name="next" value="{{ request.args["next"] }}">
+    {% endif %}
+    <div class="modal fade" id="accounting-delete-modal" tabindex="-1" aria-labelledby="accounting-delete-modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="accounting-delete-modal-label">{{ A_("Delete Transaction Confirmation") }}</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ A_("Close") }}"></button>
+          </div>
+          <div class="modal-body">
+            {{ A_("Do you really want to delete this transaction?") }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>
+            <button type="submit" class="btn btn-danger">{{ A_("Confirm") }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+{% endif %}
+
+<div class="accounting-transaction-card">
+  <div class="d-none d-sm-flex justify-content-center mb-3">
+    <h2 class="text-center">{{ obj }}</h2>
+  </div>
+
+  <div class="mb-3">
+    {{ obj.date|accounting_txn_format_date }}
+  </div>
+
+  {% block transaction_currencies %}{% endblock %}
+
+  {% if obj.note %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <i class="far fa-comment-dots"></i>
+        {{ obj.note|accounting_txn_text2html|safe }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="small text-secondary fst-italic">
+    <div>{{ A_("Created") }} {{ obj.created_at }} {{ obj.created_by }}</div>
+    <div>{{ A_("Updated") }} {{ obj.updated_at }} {{ obj.updated_by }}</div>
+  </div>
+</div>
+
+{% endblock %}

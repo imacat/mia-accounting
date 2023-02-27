@@ -73,6 +73,9 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     from . import currency
     currency.init_app(app, bp)
 
+    from . import transaction
+    transaction.init_app(app, bp)
+
     from .utils import next_uri
     next_uri.init_app(bp)
 
