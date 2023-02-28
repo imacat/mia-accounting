@@ -480,7 +480,7 @@ function updateBalance(currencyIndex, entryType) {
  * @private
  */
 function initializeAccountSelectors() {
-    const selectors = Array.from(document.getElementsByClassName("accounting-selector-modal"));
+    const selectors = Array.from(document.getElementsByClassName("accounting-account-selector-modal"));
     const formAccountControl = document.getElementById("accounting-entry-form-account-control");
     const formAccount = document.getElementById("accounting-entry-form-account");
     for (const selector of selectors) {
