@@ -110,9 +110,9 @@ class SummaryHelper {
             }
         }
         let selectedBtnTag = null;
-        for (const btnTag of tagButtons) {
-            if (btnTag.classList.contains("btn-primary")) {
-                selectedBtnTag = btnTag;
+        for (const tagButton of tagButtons) {
+            if (tagButton.classList.contains("btn-primary")) {
+                selectedBtnTag = tagButton;
                 break;
             }
         }
@@ -124,7 +124,7 @@ class SummaryHelper {
      *
      */
     #initializeGeneralTagHelper() {
-        const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-general-btn-tag"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-general-btn-tag"));
         const summary = document.getElementById(this.#prefix + "-summary");
         const tag = document.getElementById(this.#prefix + "-general-tag");
         const helper = this;
@@ -137,30 +137,30 @@ class SummaryHelper {
                 summary.value = prefix + summary.value.substring(pos + 1);
             }
         }
-        for (const button of buttons) {
-            button.onclick = function () {
-                for (const otherButton of buttons) {
+        for (const tagButton of tagButtons) {
+            tagButton.onclick = function () {
+                for (const otherButton of tagButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
-                tag.value = button.dataset.value;
-                helper.#filterSuggestedAccounts(button);
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                tag.value = tagButton.dataset.value;
+                helper.#filterSuggestedAccounts(tagButton);
                 updateSummary();
             };
         }
         tag.onchange = function () {
             let isMatched = false;
-            for (const button of buttons) {
-                if (button.dataset.value === tag.value) {
-                    button.classList.remove("btn-outline-primary");
-                    button.classList.add("btn-primary");
-                    helper.#filterSuggestedAccounts(button);
+            for (const tagButton of tagButtons) {
+                if (tagButton.dataset.value === tag.value) {
+                    tagButton.classList.remove("btn-outline-primary");
+                    tagButton.classList.add("btn-primary");
+                    helper.#filterSuggestedAccounts(tagButton);
                     isMatched = true;
                 } else {
-                    button.classList.remove("btn-primary");
-                    button.classList.add("btn-outline-primary");
+                    tagButton.classList.remove("btn-primary");
+                    tagButton.classList.add("btn-outline-primary");
                 }
             }
             if (!isMatched) {
@@ -175,7 +175,7 @@ class SummaryHelper {
      *
      */
     #initializeGeneralTripHelper() {
-        const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-btn-tag"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-btn-tag"));
         const summary = document.getElementById(this.#prefix + "-summary");
         const tag = document.getElementById(this.#prefix + "-travel-tag");
         const from = document.getElementById(this.#prefix + "-travel-from");
@@ -184,38 +184,38 @@ class SummaryHelper {
         const helper = this;
         const updateSummary = function () {
             let direction;
-            for (const button of directionButtons) {
-                if (button.classList.contains("btn-primary")) {
-                    direction = button.dataset.arrow;
+            for (const directionButton of directionButtons) {
+                if (directionButton.classList.contains("btn-primary")) {
+                    direction = directionButton.dataset.arrow;
                     break;
                 }
             }
             summary.value = tag.value + "—" + from.value + direction + to.value;
         };
-        for (const button of buttons) {
-            button.onclick = function () {
-                for (const otherButton of buttons) {
+        for (const tagButton of tagButtons) {
+            tagButton.onclick = function () {
+                for (const otherButton of tagButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
-                tag.value = button.dataset.value;
-                helper.#filterSuggestedAccounts(button);
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                tag.value = tagButton.dataset.value;
+                helper.#filterSuggestedAccounts(tagButton);
                 updateSummary();
             };
         }
         tag.onchange = function () {
             let isMatched = false;
-            for (const button of buttons) {
-                if (button.dataset.value === tag.value) {
-                    button.classList.remove("btn-outline-primary");
-                    button.classList.add("btn-primary");
-                    helper.#filterSuggestedAccounts(button);
+            for (const tagButton of tagButtons) {
+                if (tagButton.dataset.value === tag.value) {
+                    tagButton.classList.remove("btn-outline-primary");
+                    tagButton.classList.add("btn-primary");
+                    helper.#filterSuggestedAccounts(tagButton);
                     isMatched = true;
                 } else {
-                    button.classList.remove("btn-primary");
-                    button.classList.add("btn-outline-primary");
+                    tagButton.classList.remove("btn-primary");
+                    tagButton.classList.add("btn-outline-primary");
                 }
             }
             if (!isMatched) {
@@ -228,14 +228,14 @@ class SummaryHelper {
             updateSummary();
             helper.#validateGeneralTripFrom();
         };
-        for (const button of directionButtons) {
-            button.onclick = function () {
+        for (const directionButton of directionButtons) {
+            directionButton.onclick = function () {
                 for (const otherButton of directionButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
+                directionButton.classList.remove("btn-outline-primary");
+                directionButton.classList.add("btn-primary");
                 updateSummary();
             };
         }
@@ -250,7 +250,7 @@ class SummaryHelper {
      *
      */
     #initializeBusTripHelper() {
-        const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-bus-btn-tag"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-bus-btn-tag"));
         const summary = document.getElementById(this.#prefix + "-summary");
         const tag = document.getElementById(this.#prefix + "-bus-tag");
         const route = document.getElementById(this.#prefix + "-bus-route");
@@ -260,30 +260,30 @@ class SummaryHelper {
         const updateSummary = function () {
             summary.value = tag.value + "—" + route.value + "—" + from.value + "→" + to.value;
         };
-        for (const button of buttons) {
-            button.onclick = function () {
-                for (const otherButton of buttons) {
+        for (const tagButton of tagButtons) {
+            tagButton.onclick = function () {
+                for (const otherButton of tagButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
-                tag.value = button.dataset.value;
-                helper.#filterSuggestedAccounts(button);
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                tag.value = tagButton.dataset.value;
+                helper.#filterSuggestedAccounts(tagButton);
                 updateSummary();
             };
         }
         tag.onchange = function () {
             let isMatched = false;
-            for (const button of buttons) {
-                if (button.dataset.value === tag.value) {
-                    button.classList.remove("btn-outline-primary");
-                    button.classList.add("btn-primary");
-                    helper.#filterSuggestedAccounts(button);
+            for (const tagButton of tagButtons) {
+                if (tagButton.dataset.value === tag.value) {
+                    tagButton.classList.remove("btn-outline-primary");
+                    tagButton.classList.add("btn-primary");
+                    helper.#filterSuggestedAccounts(tagButton);
                     isMatched = true;
                 } else {
-                    button.classList.remove("btn-primary");
-                    button.classList.add("btn-outline-primary");
+                    tagButton.classList.remove("btn-primary");
+                    tagButton.classList.add("btn-outline-primary");
                 }
             }
             if (!isMatched) {
@@ -309,25 +309,25 @@ class SummaryHelper {
     /**
      * Filters the suggested accounts.
      *
-     * @param btnTag {HTMLButtonElement|null} the tag button
+     * @param tagButton {HTMLButtonElement|null} the tag button
      */
-    #filterSuggestedAccounts(btnTag) {
+    #filterSuggestedAccounts(tagButton) {
         const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
-        if (btnTag === null) {
-            for (const btnAccount of accountButtons) {
-                btnAccount.classList.add("d-none");
-                btnAccount.classList.remove("btn-primary");
-                btnAccount.classList.add("btn-outline-primary");
+        if (tagButton === null) {
+            for (const accountButton of accountButtons) {
+                accountButton.classList.add("d-none");
+                accountButton.classList.remove("btn-primary");
+                accountButton.classList.add("btn-outline-primary");
                 this.#selectAccount(null);
             }
             return;
         }
-        const suggested = JSON.parse(btnTag.dataset.accounts);
-        for (const btnAccount of accountButtons) {
-            if (suggested.includes(btnAccount.dataset.code)) {
-                btnAccount.classList.remove("d-none");
+        const suggested = JSON.parse(tagButton.dataset.accounts);
+        for (const accountButton of accountButtons) {
+            if (suggested.includes(accountButton.dataset.code)) {
+                accountButton.classList.remove("d-none");
             } else {
-                btnAccount.classList.add("d-none");
+                accountButton.classList.add("d-none");
             }
             this.#selectAccount(suggested[0]);
         }
@@ -358,9 +358,9 @@ class SummaryHelper {
     #initializeSuggestedAccounts() {
         const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
         const helper = this;
-        for (const btnAccount of accountButtons) {
-            btnAccount.onclick = function () {
-                helper.#selectAccount(btnAccount.dataset.code);
+        for (const accountButton of accountButtons) {
+            accountButton.onclick = function () {
+                helper.#selectAccount(accountButton.dataset.code);
             };
         }
     }
@@ -378,15 +378,15 @@ class SummaryHelper {
             return;
         }
         const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
-        for (const btnAccount of accountButtons) {
-            if (btnAccount.dataset.code === selectedCode) {
-                btnAccount.classList.remove("btn-outline-primary");
-                btnAccount.classList.add("btn-primary");
-                form.dataset.selectedAccountCode = btnAccount.dataset.code;
-                form.dataset.selectedAccountText = btnAccount.dataset.text;
+        for (const accountButton of accountButtons) {
+            if (accountButton.dataset.code === selectedCode) {
+                accountButton.classList.remove("btn-outline-primary");
+                accountButton.classList.add("btn-primary");
+                form.dataset.selectedAccountCode = accountButton.dataset.code;
+                form.dataset.selectedAccountText = accountButton.dataset.text;
             } else {
-                btnAccount.classList.remove("btn-primary");
-                btnAccount.classList.add("btn-outline-primary");
+                accountButton.classList.remove("btn-primary");
+                accountButton.classList.add("btn-outline-primary");
             }
         }
     }
@@ -643,11 +643,11 @@ class SummaryHelper {
      */
     initShow(isNew) {
         const closeButtons = Array.from(document.getElementsByClassName(this.#prefix + "-close"));
-        for (const button of closeButtons) {
+        for (const closeButton of closeButtons) {
             if (isNew) {
-                button.dataset.bsTarget = "#" + this.#prefix + "-modal";
+                closeButton.dataset.bsTarget = "#" + this.#prefix + "-modal";
             } else {
-                button.dataset.bsTarget = "#accounting-entry-form-modal";
+                closeButton.dataset.bsTarget = "#accounting-entry-form-modal";
             }
         }
         this.#reset();
@@ -668,17 +668,17 @@ class SummaryHelper {
             input.value = "";
             input.classList.remove("is-invalid");
         }
-        for (const button of tagButtons) {
-            button.classList.remove("btn-primary");
-            button.classList.add("btn-outline-primary");
+        for (const tagButton of tagButtons) {
+            tagButton.classList.remove("btn-primary");
+            tagButton.classList.add("btn-outline-primary");
         }
-        for (const button of directionButtons) {
-            if (button.classList.contains("accounting-default")) {
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
+        for (const directionButton of directionButtons) {
+            if (directionButton.classList.contains("accounting-default")) {
+                directionButton.classList.remove("btn-outline-primary");
+                directionButton.classList.add("btn-primary");
             } else {
-                button.classList.add("btn-outline-primary");
-                button.classList.remove("btn-primary");
+                directionButton.classList.add("btn-outline-primary");
+                directionButton.classList.remove("btn-primary");
             }
         }
         this.#filterSuggestedAccounts(null);
@@ -727,7 +727,7 @@ class SummaryHelper {
         const from = document.getElementById(this.#prefix + "-bus-from");
         const to = document.getElementById(this.#prefix + "-bus-to");
         const number = document.getElementById(this.#prefix + "-number");
-        const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-bus-btn-tag"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-bus-btn-tag"));
         tag.value = tagName;
         route.value = routeName;
         from.value = fromName;
@@ -735,11 +735,11 @@ class SummaryHelper {
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
         }
-        for (const button of buttons) {
-            if (button.dataset.value === tagName) {
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
-                this.#filterSuggestedAccounts(button);
+        for (const tagButton of tagButtons) {
+            if (tagButton.dataset.value === tagName) {
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                this.#filterSuggestedAccounts(tagButton);
             }
         }
         this.#switchToTab("bus");
@@ -759,28 +759,28 @@ class SummaryHelper {
         const from = document.getElementById(this.#prefix + "-travel-from");
         const to = document.getElementById(this.#prefix + "-travel-to");
         const number = document.getElementById(this.#prefix + "-number");
-        const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-btn-tag"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-btn-tag"));
         const directionButtons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-direction"));
         tag.value = tagName;
         from.value = fromName;
-        for (const btnDirection of directionButtons) {
-            if (btnDirection.dataset.arrow === direction) {
-                btnDirection.classList.remove("btn-outline-primary");
-                btnDirection.classList.add("btn-primary");
+        for (const directionButton of directionButtons) {
+            if (directionButton.dataset.arrow === direction) {
+                directionButton.classList.remove("btn-outline-primary");
+                directionButton.classList.add("btn-primary");
             } else {
-                btnDirection.classList.add("btn-outline-primary");
-                btnDirection.classList.remove("btn-primary");
+                directionButton.classList.add("btn-outline-primary");
+                directionButton.classList.remove("btn-primary");
             }
         }
         to.value = toName;
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
         }
-        for (const button of buttons) {
-            if (button.dataset.value === tagName) {
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
-                this.#filterSuggestedAccounts(button);
+        for (const tagButton of tagButtons) {
+            if (tagButton.dataset.value === tagName) {
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                this.#filterSuggestedAccounts(tagButton);
             }
         }
         this.#switchToTab("travel");
@@ -795,16 +795,16 @@ class SummaryHelper {
     #populateGeneralTag(tagName, numberStr) {
         const tag = document.getElementById(this.#prefix + "-general-tag");
         const number = document.getElementById(this.#prefix + "-number");
-        const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-general-btn-tag"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-general-btn-tag"));
         tag.value = tagName;
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
         }
-        for (const button of buttons) {
-            if (button.dataset.value === tagName) {
-                button.classList.remove("btn-outline-primary");
-                button.classList.add("btn-primary");
-                this.#filterSuggestedAccounts(button);
+        for (const tagButton of tagButtons) {
+            if (tagButton.dataset.value === tagName) {
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                this.#filterSuggestedAccounts(tagButton);
             }
         }
         this.#switchToTab("general");
