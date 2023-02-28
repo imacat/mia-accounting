@@ -35,33 +35,33 @@ First written: 2023/2/28
           </div>
           <ul class="nav nav-tabs mb-2">
             <li class="nav-item">
-              <span class="nav-link active accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="page" data-tab-id="general">
+              <span id="accounting-summary-helper-{{ summary_helper.type }}-tab-general" class="nav-link active accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="page" data-tab-id="general">
                 {{ A_("General") }}
               </span>
             </li>
             <li class="nav-item">
-              <span class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="travel">
+              <span id="accounting-summary-helper-{{ summary_helper.type }}-tab-travel" class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="travel">
                 {{ A_("Travel") }}
               </span>
             </li>
             <li class="nav-item">
-              <span class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="bus">
+              <span id="accounting-summary-helper-{{ summary_helper.type }}-tab-bus" class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="bus">
                 {{ A_("Bus") }}
               </span>
             </li>
             <li class="nav-item">
-              <span class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="regular">
+              <span id="accounting-summary-helper-{{ summary_helper.type }}-tab-regular" class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="regular">
                 {{ A_("Regular") }}
               </span>
             </li>
             <li class="nav-item">
-              <span class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="number">
+              <span id="accounting-summary-helper-{{ summary_helper.type }}-tab-number" class="nav-link accounting-clickable accounting-summary-helper-{{ summary_helper.type }}-tab" aria-current="false" data-tab-id="number">
                 {{ A_("Number") }}
               </span>
             </li>
           </ul>
           {# A general summary with a tag #}
-          <div class="accounting-summary-helper-{{ summary_helper.type }}-page" aria-current="page" data-tab-id="general">
+          <div class="accounting-summary-helper-{{ summary_helper.type }}-page" aria-current="page" aria-labelledby="accounting-summary-helper-{{ summary_helper.type }}-tab-general" data-tab-id="general">
             <div class="form-floating mb-2">
               <input id="accounting-summary-helper-{{ summary_helper.type }}-general-tag" class="form-control accounting-summary-helper-{{ summary_helper.type }}-input" type="text" value="" placeholder=" ">
               <label class="form-label" for="accounting-summary-helper-{{ summary_helper.type }}-general-tag">{{ A_("Tag") }}</label>
@@ -77,7 +77,7 @@ First written: 2023/2/28
           </div>
 
           {# A general trip with the origin and distination #}
-          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" data-tab-id="travel">
+          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-helper-{{ summary_helper.type }}-tab-travel" data-tab-id="travel">
             <div class="form-floating mb-2">
               <input id="accounting-summary-helper-{{ summary_helper.type }}-travel-tag" class="form-control accounting-summary-helper-{{ summary_helper.type }}-input" type="text" value="" placeholder=" ">
               <label class="form-label" for="accounting-summary-helper-{{ summary_helper.type }}-travel-tag">{{ A_("Tag") }}</label>
@@ -111,7 +111,7 @@ First written: 2023/2/28
           </div>
 
           {# A bus trip with the route name or route number, the origin and distination #}
-          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" data-tab-id="bus">
+          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-helper-{{ summary_helper.type }}-tab-bus" data-tab-id="bus">
             <div class="d-flex justify-content-between mb-2">
               <div class="form-floating me-2">
                 <input id="accounting-summary-helper-{{ summary_helper.type }}-bus-tag" class="form-control accounting-summary-helper-{{ summary_helper.type }}-input" type="text" value="" placeholder=" ">
@@ -148,12 +148,12 @@ First written: 2023/2/28
           </div>
 
           {# A regular income/payment #}
-          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" data-tab-id="regular">
+          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-helper-{{ summary_helper.type }}-tab-regular" data-tab-id="regular">
             {# TODO: To be done #}
           </div>
 
           {# The number of items #}
-          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" data-tab-id="number">
+          <div class="accounting-summary-helper-{{ summary_helper.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-helper-{{ summary_helper.type }}-tab-number" data-tab-id="number">
             <div class="form-floating">
               <input id="accounting-summary-helper-{{ summary_helper.type }}-number" class="form-control accounting-summary-helper-{{ summary_helper.type }}-input" type="number" min="1" value="" placeholder=" ">
               <label class="form-label" for="accounting-summary-helper-{{ summary_helper.type }}-number">{{ A_("The number of items") }}</label>
