@@ -203,25 +203,6 @@ class Account(db.Model):
                 return
         self.l10n.append(AccountL10n(locale=current_locale, title=value))
 
-    @property
-    def is_in_use(self) -> bool:
-        """Returns whether the account is in use.
-
-        :return: True if the account is in use, or False otherwise.
-        """
-        if not hasattr(self, "__is_in_use"):
-            setattr(self, "__is_in_use", len(self.entries) > 0)
-        return getattr(self, "__is_in_use")
-
-    @is_in_use.setter
-    def is_in_use(self, is_in_use: bool) -> None:
-        """Sets whether the account is in use.
-
-        :param is_in_use: True if the account is in use, or False otherwise.
-        :return: None.
-        """
-        setattr(self, "__is_in_use", is_in_use)
-
     @classmethod
     def find_by_code(cls, code: str) -> t.Self | None:
         """Finds an account by its code.

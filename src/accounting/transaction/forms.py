@@ -115,6 +115,35 @@ class IsDebitAccount:
             "This account is not for debit entries."))
 
 
+class AccountOption:
+    """An account option."""
+
+    def __init__(self, account: Account):
+        """Constructs an account option.
+
+        :param account: The account.
+        """
+        self.__account: Account = account
+        self.id: str = account.id
+        self.code: str = account.code
+        self.is_in_use: bool = False
+
+    def __str__(self) -> str:
+        """Returns the string representation of the account option.
+
+        :return: The string representation of the account option.
+        """
+        return str(self.__account)
+
+    @property
+    def query_values(self) -> list[str]:
+        """Returns the values to be queried.
+
+        :return: The values to be queried.
+        """
+        return self.__account.query_values
+
+
 class JournalEntryForm(FlaskForm):
     """The base form to create or edit a journal entry."""
     eid = IntegerField()
@@ -321,39 +350,36 @@ class TransactionForm(FlaskForm):
             obj.no = count + 1
 
     @property
-    def debit_account_options(self) -> list[Account]:
+    def debit_account_options(self) -> list[AccountOption]:
         """The selectable debit accounts.
 
         :return: The selectable debit accounts.
         """
-        accounts: list[Account] = Account.debit()
-        in_use: set[int] = self.__get_in_use_account_id()
+        accounts: list[AccountOption] \
+            = [AccountOption(x) for x in Account.debit()]
+        in_use: set[int] = set(db.session.scalars(
+            sa.select(JournalEntry.account_id)
+            .filter(JournalEntry.is_debit)
+            .group_by(JournalEntry.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
         return accounts
 
     @property
-    def credit_account_options(self) -> list[Account]:
+    def credit_account_options(self) -> list[AccountOption]:
         """The selectable credit accounts.
 
         :return: The selectable credit accounts.
         """
-        accounts: list[Account] = Account.credit()
-        in_use: set[int] = self.__get_in_use_account_id()
+        accounts: list[AccountOption] \
+            = [AccountOption(x) for x in Account.credit()]
+        in_use: set[int] = set(db.session.scalars(
+            sa.select(JournalEntry.account_id)
+            .filter(sa.not_(JournalEntry.is_debit))
+            .group_by(JournalEntry.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
         return accounts
-
-    def __get_in_use_account_id(self) -> set[int]:
-        """Returns the ID of the accounts that are in use.
-
-        :return: The ID of the accounts that are in use.
-        """
-        if self.__in_use_account_id is None:
-            self.__in_use_account_id = set(db.session.scalars(
-                sa.select(JournalEntry.account_id)
-                .group_by(JournalEntry.account_id)).all())
-        return self.__in_use_account_id
 
     @property
     def currencies_errors(self) -> list[str | LazyString]:

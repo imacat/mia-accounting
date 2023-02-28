@@ -25,7 +25,7 @@ First written: 2023/2/25
     <input type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-eid" value="{{ entry_id }}">
   {% endif %}
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-no" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-no" value="{{ entry_index }}">
-  <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account-code" class="accounting-account-code" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account_code" value="{{ account_code_data }}" data-text="{{ account_text }}">
+  <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account-code" class="accounting-{{ entry_type }}-account-code" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account_code" value="{{ account_code_data }}" data-text="{{ account_text }}">
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary" value="{{ summary_data }}">
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" class="accounting-currency-{{ currency_index }}-{{ entry_type }}-amount" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" value="{{ amount_data }}">
   <div class="accounting-entry-content">

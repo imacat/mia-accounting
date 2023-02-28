@@ -140,7 +140,7 @@ class AccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getAccountCodeUsedInForm() {
-        const accountCodes = Array.from(document.getElementsByClassName("accounting-account-code"));
+        const accountCodes = Array.from(document.getElementsByClassName("accounting-" + this.#prefix + "-account-code"));
         const formAccount = document.getElementById("accounting-entry-form-account");
         const inUse = [formAccount.dataset.code];
         for (const accountCode of accountCodes) {
