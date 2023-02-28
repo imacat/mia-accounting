@@ -698,15 +698,15 @@ class SummaryHelper {
             return;
         }
         let found;
-        found = summary.value.match(/^(.+?)—(.+?)—(.+?)→(.+?)(?:×(\d+)?)?$/);
+        found = summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:×(\d+))?$/);
         if (found !== null) {
             return this.#populateBusTrip(found[1], found[2], found[3], found[4], found[5]);
         }
-        found = summary.value.match(/^(.+?)—(.+?)([→↔])(.+?)(?:×(\d+)?)?$/);
+        found = summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:×(\d+))?$/);
         if (found !== null) {
             return this.#populateGeneralTrip(found[1], found[2], found[3], found[4], found[5]);
         }
-        found = summary.value.match(/^(.+?)—.+?(?:×(\d+)?)?$/);
+        found = summary.value.match(/^([^—]+)—.+?(?:×(\d+)?)?$/);
         if (found !== null) {
             return this.#populateGeneralTag(found[1], found[2]);
         }
