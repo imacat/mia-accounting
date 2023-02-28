@@ -34,8 +34,10 @@ class SummaryAccount:
         :param account: The account.
         :param freq: The frequency of the tag with the account.
         """
-        self.__account: Account = account
+        self.account: Account = account
         """The account."""
+        self.id: int = account.id
+        """The account ID."""
         self.code: str = account.code
         """The account code."""
         self.freq: int = freq
@@ -46,7 +48,7 @@ class SummaryAccount:
 
         :return: The string representation of the account.
         """
-        return str(self.__account)
+        return str(self.account)
 
     def add_freq(self, freq: int) -> None:
         """Adds the frequency of an account.
@@ -97,6 +99,14 @@ class SummaryTag:
         :return: The accounts by the order of their frequencies.
         """
         return sorted(self.__account_dict.values(), key=lambda x: -x.freq)
+
+    @property
+    def account_codes(self) -> list[str]:
+        """Returns the account codes by the order of their frequencies.
+
+        :return: The account codes by the order of their frequencies.
+        """
+        return [x.code for x in self.accounts]
 
 
 class SummaryType:
@@ -165,6 +175,26 @@ class SummaryEntryType:
         :return: None.
         """
         self.__type_dict[tag_type].add_tag(name, account, freq)
+
+    @property
+    def accounts(self) -> list[SummaryAccount]:
+        """Returns the suggested accounts of all tags in the summary helper in
+        the entry type, in their frequency order.
+
+        :return: The suggested accounts of all tags, in their frequency order.
+        """
+        accounts: dict[int, SummaryAccount] = {}
+        freq: dict[int, int] = {}
+        for tag_type in self.__type_dict.values():
+            for tag in tag_type.tags:
+                for account in tag.accounts:
+                    accounts[account.id] = account
+                    if account.id not in freq:
+                        freq[account.id] = 0
+                    freq[account.id] \
+                        = freq[account.id] + account.freq
+        return [accounts[y] for y in sorted(freq.keys(),
+                                            key=lambda x: -freq[x])]
 
 
 class SummaryHelper:

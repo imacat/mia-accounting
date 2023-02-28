@@ -78,6 +78,7 @@ class SummaryHelper {
         this.#initializeGeneralTripHelper();
         this.#initializeBusTripHelper();
         this.#initializeNumberHelper();
+        this.#initializeSuggestedAccounts();
         this.#initializeSubmission();
     }
 
@@ -89,6 +90,7 @@ class SummaryHelper {
     #switchToTab(tabId) {
         const tabs = Array.from(document.getElementsByClassName(this.#prefix + "-tab"));
         const pages = Array.from(document.getElementsByClassName(this.#prefix + "-page"));
+        const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-" + tabId + "-btn-tag"));
         tabs.forEach(function (tab) {
             if (tab.dataset.tabId === tabId) {
                 tab.classList.add("active");
@@ -107,6 +109,14 @@ class SummaryHelper {
                 page.ariaCurrent = "false";
             }
         });
+        let selectedBtnTag = null;
+        for (const btnTag of tagButtons) {
+            if (btnTag.classList.contains("btn-primary")) {
+                selectedBtnTag = btnTag;
+                break;
+            }
+        }
+        this.#filterSuggestedAccounts(selectedBtnTag);
     }
 
     /**
@@ -117,6 +127,7 @@ class SummaryHelper {
         const buttons = Array.from(document.getElementsByClassName(this.#prefix + "-general-btn-tag"));
         const summary = document.getElementById(this.#prefix + "-summary");
         const tag = document.getElementById(this.#prefix + "-general-tag");
+        const helper = this;
         const updateSummary = function () {
             const pos = summary.value.indexOf("—");
             const prefix = tag.value === ""? "": tag.value + "—";
@@ -135,19 +146,26 @@ class SummaryHelper {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 tag.value = button.dataset.value;
+                helper.#filterSuggestedAccounts(button);
                 updateSummary();
             };
         });
         tag.onchange = function () {
+            let isMatched = false;
             buttons.forEach(function (button) {
                 if (button.dataset.value === tag.value) {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-primary");
+                    helper.#filterSuggestedAccounts(button);
+                    isMatched = true;
                 } else {
                     button.classList.remove("btn-primary");
                     button.classList.add("btn-outline-primary");
                 }
             });
+            if (!isMatched) {
+                helper.#filterSuggestedAccounts(null);
+            }
             updateSummary();
         };
     }
@@ -183,19 +201,26 @@ class SummaryHelper {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 tag.value = button.dataset.value;
+                helper.#filterSuggestedAccounts(button);
                 updateSummary();
             };
         });
         tag.onchange = function () {
+            let isMatched = false;
             buttons.forEach(function (button) {
                 if (button.dataset.value === tag.value) {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-primary");
+                    helper.#filterSuggestedAccounts(button);
+                    isMatched = true;
                 } else {
                     button.classList.remove("btn-primary");
                     button.classList.add("btn-outline-primary");
                 }
             });
+            if (!isMatched) {
+                helper.#filterSuggestedAccounts(null)
+            }
             updateSummary();
             helper.#validateGeneralTripTag();
         };
@@ -244,19 +269,26 @@ class SummaryHelper {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 tag.value = button.dataset.value;
+                helper.#filterSuggestedAccounts(button);
                 updateSummary();
             };
         });
         tag.onchange = function () {
+            let isMatched = false;
             buttons.forEach(function (button) {
                 if (button.dataset.value === tag.value) {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-primary");
+                    helper.#filterSuggestedAccounts(button);
+                    isMatched = true;
                 } else {
                     button.classList.remove("btn-primary");
                     button.classList.add("btn-outline-primary");
                 }
             });
+            if (!isMatched) {
+                helper.#filterSuggestedAccounts(null);
+            }
             updateSummary();
             helper.#validateBusTripTag();
         };
@@ -275,6 +307,33 @@ class SummaryHelper {
     }
 
     /**
+     * Filters the suggested accounts.
+     *
+     * @param btnTag {HTMLButtonElement|null} the tag button
+     */
+    #filterSuggestedAccounts(btnTag) {
+        const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
+        if (btnTag === null) {
+            for (const btnAccount of accountButtons) {
+                btnAccount.classList.add("d-none");
+                btnAccount.classList.remove("btn-primary");
+                btnAccount.classList.add("btn-outline-primary");
+                this.#selectAccount(null);
+            }
+            return;
+        }
+        const suggested = JSON.parse(btnTag.dataset.accounts);
+        for (const btnAccount of accountButtons) {
+            if (suggested.includes(btnAccount.dataset.code)) {
+                btnAccount.classList.remove("d-none");
+            } else {
+                btnAccount.classList.add("d-none");
+            }
+            this.#selectAccount(suggested[0]);
+        }
+    }
+
+    /**
      * Initializes the number helper.
      *
      */
@@ -290,6 +349,46 @@ class SummaryHelper {
                 summary.value = summary.value + "×" + String(number.value);
             }
         };
+    }
+
+    /**
+     * Initializes the suggested accounts.
+     *
+     */
+    #initializeSuggestedAccounts() {
+        const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
+        const helper = this;
+        accountButtons.forEach(function (btnAccount) {
+            btnAccount.onclick = function () {
+                helper.#selectAccount(btnAccount.dataset.code);
+            };
+        });
+    }
+
+    /**
+     * Select a suggested account.
+     *
+     * @param selectedCode {string|null} the account code, or null to deselect the account
+     */
+    #selectAccount(selectedCode) {
+        const form = document.getElementById(this.#prefix);
+        if (selectedCode === null) {
+            form.dataset.selectedAccountCode = "";
+            form.dataset.selectedAccountText = "";
+            return;
+        }
+        const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
+        accountButtons.forEach(function (btnAccount) {
+            if (btnAccount.dataset.code === selectedCode) {
+                btnAccount.classList.remove("btn-outline-primary");
+                btnAccount.classList.add("btn-primary");
+                form.dataset.selectedAccountCode = btnAccount.dataset.code;
+                form.dataset.selectedAccountText = btnAccount.dataset.text;
+            } else {
+                btnAccount.classList.remove("btn-primary");
+                btnAccount.classList.add("btn-outline-primary");
+            }
+        })
     }
 
     /**
@@ -512,15 +611,24 @@ class SummaryHelper {
      *
      */
     #submit() {
+        const form = document.getElementById(this.#prefix);
         const summary = document.getElementById(this.#prefix + "-summary");
         const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
         const formSummary = document.getElementById("accounting-entry-form-summary");
+        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
+        const formAccount = document.getElementById("accounting-entry-form-account");
         const helperModal = document.getElementById(this.#prefix + "-modal");
         const entryModal = document.getElementById("accounting-entry-form-modal");
         if (summary.value === "") {
             formSummaryControl.classList.remove("accounting-not-empty");
         } else {
             formSummaryControl.classList.add("accounting-not-empty");
+        }
+        if (form.dataset.selectedAccountCode !== "") {
+            formAccountControl.classList.add("accounting-not-empty");
+            formAccount.dataset.code = form.dataset.selectedAccountCode;
+            formAccount.dataset.text = form.dataset.selectedAccountText;
+            formAccount.innerText = form.dataset.selectedAccountText;
         }
         formSummary.dataset.value = summary.value;
         formSummary.innerText = summary.value;
@@ -573,6 +681,7 @@ class SummaryHelper {
                 button.classList.remove("btn-primary");
             }
         });
+        this.#filterSuggestedAccounts(null);
         this.#switchToTab(this.#defaultTabId);
     }
 
@@ -626,12 +735,13 @@ class SummaryHelper {
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
         }
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             if (button.dataset.value === tagName) {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
+                this.#filterSuggestedAccounts(button);
             }
-        });
+        }
         this.#switchToTab("bus");
     }
 
@@ -666,12 +776,13 @@ class SummaryHelper {
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
         }
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             if (button.dataset.value === tagName) {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
+                this.#filterSuggestedAccounts(button);
             }
-        });
+        }
         this.#switchToTab("travel");
     }
 
@@ -689,12 +800,13 @@ class SummaryHelper {
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
         }
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             if (button.dataset.value === tagName) {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
+                this.#filterSuggestedAccounts(button);
             }
-        });
+        }
         this.#switchToTab("general");
     }
 
