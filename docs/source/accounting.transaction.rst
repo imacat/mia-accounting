@@ -36,6 +36,14 @@ accounting.transaction.query module
    :undoc-members:
    :show-inheritance:
 
+accounting.transaction.summary\_helper module
+---------------------------------------------
+
+.. automodule:: accounting.transaction.summary_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.transaction.template module
 --------------------------------------
 
