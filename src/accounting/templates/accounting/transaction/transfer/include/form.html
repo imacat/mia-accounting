@@ -56,6 +56,12 @@ First written: 2023/2/25
   {% with summary_helper = form.summary_helper.credit %}
     {% include "accounting/transaction/include/summary-helper-modal.html" %}
   {% endwith %}
-  {% include "accounting/transaction/include/debit-account-modal.html" %}
-  {% include "accounting/transaction/include/credit-account-modal.html" %}
+  {% with entry_type = "debit",
+          account_options = form.debit_account_options %}
+    {% include "accounting/transaction/include/account-selector-modal.html" %}
+  {% endwith %}
+  {% with entry_type = "credit",
+          account_options = form.credit_account_options %}
+    {% include "accounting/transaction/include/account-selector-modal.html" %}
+  {% endwith %}
 {% endblock %}
