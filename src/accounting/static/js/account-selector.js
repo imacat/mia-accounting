@@ -242,7 +242,6 @@ class AccountSelector {
             selectors[entryForm.dataset.entryType].initShow();
         };
     }
-
     /**
      * Initializes the account selector for the journal entry form.
      *x
