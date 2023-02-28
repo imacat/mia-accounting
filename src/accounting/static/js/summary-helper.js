@@ -560,17 +560,17 @@ class SummaryHelper {
             input.value = "";
             input.classList.remove("is-invalid");
         });
-        tagButtons.forEach(function (btnTag) {
-            btnTag.classList.remove("btn-primary");
-            btnTag.classList.add("btn-outline-primary");
+        tagButtons.forEach(function (button) {
+            button.classList.remove("btn-primary");
+            button.classList.add("btn-outline-primary");
         });
-        directionButtons.forEach(function (btnDirection) {
-            if (btnDirection.classList.contains("accounting-default")) {
-                btnDirection.classList.remove("btn-outline-primary");
-                btnDirection.classList.add("btn-primary");
+        directionButtons.forEach(function (button) {
+            if (button.classList.contains("accounting-default")) {
+                button.classList.remove("btn-outline-primary");
+                button.classList.add("btn-primary");
             } else {
-                btnDirection.classList.add("btn-outline-primary");
-                btnDirection.classList.remove("btn-primary");
+                button.classList.add("btn-outline-primary");
+                button.classList.remove("btn-primary");
             }
         });
         this.#switchToTab(this.#defaultTabId);
