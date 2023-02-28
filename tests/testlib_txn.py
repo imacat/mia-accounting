@@ -393,10 +393,11 @@ def add_txn(client: httpx.Client, form: dict[str, str]) -> int:
     :return: The newly-added transaction ID.
     """
     prefix: str = "/accounting/transactions"
-    txn_type: str \
-        = "income" if len({x for x in form if "-debit-" in x}) == 0 else\
-        ("expense" if len({x for x in form if "-credit-" in x}) == 0 else
-         "transfer")
+    txn_type: str = "transfer"
+    if len({x for x in form if "-debit-" in x}) == 0:
+        txn_type = "income"
+    elif len({x for x in form if "-credit-" in x}) == 0:
+        txn_type = "expense"
     store_uri = f"{prefix}/store/{txn_type}"
     response: httpx.Response = client.post(store_uri, data=form)
     assert response.status_code == 302
