@@ -167,7 +167,6 @@ function initializeNewEntryButton(button) {
         entryForm.dataset.entryIndex = button.dataset.entryIndex;
         formAccountControl.classList.remove("accounting-not-empty");
         formAccountControl.classList.remove("is-invalid");
-        formAccountControl.dataset.bsTarget = button.dataset.accountModal;
         formAccount.innerText = "";
         formAccount.dataset.code = "";
         formAccount.dataset.text = "";
@@ -181,6 +180,7 @@ function initializeNewEntryButton(button) {
         formAmount.value = "";
         formAmount.classList.remove("is-invalid");
         formAmountError.innerText = "";
+        AccountSelector.initializeJournalEntryForm();
         SummaryHelper.initializeNewJournalEntry(button.dataset.entryType);
     };
 }
@@ -225,7 +225,6 @@ function initializeJournalEntry(entry) {
         } else {
             formAccountControl.classList.add("accounting-not-empty");
         }
-        formAccountControl.dataset.bsTarget = entry.dataset.accountModal;
         formAccount.innerText = accountCode.dataset.text;
         formAccount.dataset.code = accountCode.value;
         formAccount.dataset.text = accountCode.dataset.text;
@@ -238,6 +237,7 @@ function initializeJournalEntry(entry) {
         formSummary.dataset.value = summary.value;
         formSummary.innerText = summary.value;
         formAmount.value = amount.value;
+        AccountSelector.initializeJournalEntryForm();
         validateJournalEntryForm();
     };
 }

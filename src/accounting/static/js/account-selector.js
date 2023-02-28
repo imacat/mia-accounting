@@ -23,54 +23,54 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
-    initializeAccountSelectors();
+    AccountSelector.initialize();
 });
 
 /**
- * Initializes the account selectors.
+ * The account selector.
  *
- * @private
  */
-function initializeAccountSelectors() {
-    const selectors = Array.from(document.getElementsByClassName("accounting-account-selector-modal"));
-    const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-    const formAccount = document.getElementById("accounting-entry-form-account");
-    formAccountControl.onclick = function () {
-        const entryForm = document.getElementById("accounting-entry-form");
-        const prefix = "accounting-account-selector-" + entryForm.dataset.entryType;
-        const query = document.getElementById(prefix + "-query")
-        const more = document.getElementById(prefix + "-more");
-        const options = Array.from(document.getElementsByClassName(prefix + "-option"));
-        const btnClear = document.getElementById(prefix + "-btn-clear");
-        query.value = "";
-        more.classList.remove("d-none");
-        filterAccountOptions(prefix);
-        for (const option of options) {
-            if (option.dataset.code === formAccount.dataset.code) {
-                option.classList.add("active");
-            } else {
-                option.classList.remove("active");
-            }
-        }
-        if (formAccount.dataset.code === "") {
-            btnClear.classList.add("btn-secondary");
-            btnClear.classList.remove("btn-danger");
-            btnClear.disabled = true;
-        } else {
-            btnClear.classList.add("btn-danger");
-            btnClear.classList.remove("btn-secondary");
-            btnClear.disabled = false;
-        }
-    };
-    for (const selector of selectors) {
-        const more = document.getElementById(selector.dataset.prefix + "-more");
-        const btnClear = document.getElementById(selector.dataset.prefix + "-btn-clear");
-        const options = Array.from(document.getElementsByClassName(selector.dataset.prefix + "-option"));
+class AccountSelector {
+
+    /**
+     * The entry type
+     * @type {string}
+     */
+    #entryType;
+
+    /**
+     * The prefix of the HTML ID and class
+     * @type {string}
+     */
+    #prefix;
+
+    /**
+     * Constructs an account selector.
+     *
+     * @param modal {HTMLFormElement} the account selector modal
+     */
+    constructor(modal) {
+        this.#entryType = modal.dataset.entryType;
+        this.#prefix = "accounting-account-selector-" + modal.dataset.entryType;
+        this.#init();
+    }
+
+    /**
+     * Initializes the account selector.
+     *
+     */
+    #init() {
+        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
+        const formAccount = document.getElementById("accounting-entry-form-account");
+        const more = document.getElementById(this.#prefix + "-more");
+        const btnClear = document.getElementById(this.#prefix + "-btn-clear");
+        const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
+        const selector1 = this
         more.onclick = function () {
             more.classList.add("d-none");
-            filterAccountOptions(selector.dataset.prefix);
+            selector1.#filterAccountOptions();
         };
-        initializeAccountQuery(selector);
+        this.#initializeAccountQuery();
         btnClear.onclick = function () {
             formAccountControl.classList.remove("accounting-not-empty");
             formAccount.innerText = "";
@@ -88,100 +88,168 @@ function initializeAccountSelectors() {
             };
         }
     }
-}
 
-/**
- * Initializes the query on the account options.
- *
- * @param selector {HTMLDivElement} the selector modal
- * @private
- */
-function initializeAccountQuery(selector) {
-    const query = document.getElementById(selector.dataset.prefix + "-query");
-    query.addEventListener("input", function () {
-        filterAccountOptions(selector.dataset.prefix);
-    });
-}
-
-/**
- * Filters the account options.
- *
- * @param prefix {string} the HTML ID and class prefix
- * @private
- */
-function filterAccountOptions(prefix) {
-    const query = document.getElementById(prefix + "-query");
-    const optionList = document.getElementById(prefix + "-option-list");
-    if (optionList === null) {
-        console.log(prefix + "-option-list");
+    /**
+     * Initializes the query on the account options.
+     *
+     */
+    #initializeAccountQuery() {
+        const query = document.getElementById(this.#prefix + "-query");
+        const helper = this;
+        query.addEventListener("input", function () {
+            helper.#filterAccountOptions();
+        });
     }
-    const options = Array.from(document.getElementsByClassName(prefix + "-option"));
-    const more = document.getElementById(prefix + "-more");
-    const queryNoResult = document.getElementById(prefix + "-option-no-result");
-    const codesInUse = getAccountCodeUsedInForm();
-    let shouldAnyShow = false;
-    for (const option of options) {
-        const shouldShow = shouldAccountOptionShow(option, more, codesInUse, query);
-        if (shouldShow) {
-            option.classList.remove("d-none");
-            shouldAnyShow = true;
-        } else {
-            option.classList.add("d-none");
+
+    /**
+     * Filters the account options.
+     *
+     */
+    #filterAccountOptions() {
+        const query = document.getElementById(this.#prefix + "-query");
+        const optionList = document.getElementById(this.#prefix + "-option-list");
+        if (optionList === null) {
+            console.log(this.#prefix + "-option-list");
         }
-    }
-    if (!shouldAnyShow && more.classList.contains("d-none")) {
-        optionList.classList.add("d-none");
-        queryNoResult.classList.remove("d-none");
-    } else {
-        optionList.classList.remove("d-none");
-        queryNoResult.classList.add("d-none");
-    }
-}
-
-/**
- * Returns whether an account option should show.
- *
- * @param option {HTMLLIElement} the account option
- * @param more {HTMLLIElement} the more account element
- * @param inUse {string[]} the account codes that are used in the form
- * @param query {HTMLInputElement} the query element, if any
- * @return {boolean} true if the account option should show, or false otherwise
- * @private
- */
-function shouldAccountOptionShow(option, more, inUse, query) {
-    const isQueryMatched = function () {
-        if (query.value === "") {
-            return true;
-        }
-        const queryValues = JSON.parse(option.dataset.queryValues);
-        for (const queryValue of queryValues) {
-            if (queryValue.includes(query.value)) {
-                return true;
+        const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
+        const more = document.getElementById(this.#prefix + "-more");
+        const queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
+        const codesInUse = this.#getAccountCodeUsedInForm();
+        let shouldAnyShow = false;
+        for (const option of options) {
+            const shouldShow = this.#shouldAccountOptionShow(option, more, codesInUse, query);
+            if (shouldShow) {
+                option.classList.remove("d-none");
+                shouldAnyShow = true;
+            } else {
+                option.classList.add("d-none");
             }
         }
-        return false;
-    };
-    const isMoreMatched = function () {
-        if (more.classList.contains("d-none")) {
-            return true;
+        if (!shouldAnyShow && more.classList.contains("d-none")) {
+            optionList.classList.add("d-none");
+            queryNoResult.classList.remove("d-none");
+        } else {
+            optionList.classList.remove("d-none");
+            queryNoResult.classList.add("d-none");
         }
-        return option.classList.contains("accounting-account-in-use") || inUse.includes(option.dataset.code);
-    };
-    return isMoreMatched() && isQueryMatched();
-}
-
-/**
- * Returns the account codes that are used in the form.
- *
- * @return {string[]} the account codes that are used in the form
- * @private
- */
-function getAccountCodeUsedInForm() {
-    const accountCodes = Array.from(document.getElementsByClassName("accounting-account-code"));
-    const formAccount = document.getElementById("accounting-entry-form-account");
-    const inUse = [formAccount.dataset.code];
-    for (const accountCode of accountCodes) {
-        inUse.push(accountCode.value);
     }
-    return inUse
+
+    /**
+     * Returns the account codes that are used in the form.
+     *
+     * @return {string[]} the account codes that are used in the form
+     */
+    #getAccountCodeUsedInForm() {
+        const accountCodes = Array.from(document.getElementsByClassName("accounting-account-code"));
+        const formAccount = document.getElementById("accounting-entry-form-account");
+        const inUse = [formAccount.dataset.code];
+        for (const accountCode of accountCodes) {
+            inUse.push(accountCode.value);
+        }
+        return inUse
+    }
+
+    /**
+     * Returns whether an account option should show.
+     *
+     * @param option {HTMLLIElement} the account option
+     * @param more {HTMLLIElement} the more account element
+     * @param inUse {string[]} the account codes that are used in the form
+     * @param query {HTMLInputElement} the query element, if any
+     * @return {boolean} true if the account option should show, or false otherwise
+     */
+    #shouldAccountOptionShow(option, more, inUse, query) {
+        const isQueryMatched = function () {
+            if (query.value === "") {
+                return true;
+            }
+            const queryValues = JSON.parse(option.dataset.queryValues);
+            for (const queryValue of queryValues) {
+                if (queryValue.includes(query.value)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        const isMoreMatched = function () {
+            if (more.classList.contains("d-none")) {
+                return true;
+            }
+            return option.classList.contains("accounting-account-in-use") || inUse.includes(option.dataset.code);
+        };
+        return isMoreMatched() && isQueryMatched();
+    }
+
+    /**
+     * Initializes the account selector when it is shown.
+     *
+     */
+    initShow() {
+        const formAccount = document.getElementById("accounting-entry-form-account");
+        const query = document.getElementById(this.#prefix + "-query")
+        const more = document.getElementById(this.#prefix + "-more");
+        const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
+        const btnClear = document.getElementById(this.#prefix + "-btn-clear");
+        query.value = "";
+        more.classList.remove("d-none");
+        this.#filterAccountOptions();
+        for (const option of options) {
+            if (option.dataset.code === formAccount.dataset.code) {
+                option.classList.add("active");
+            } else {
+                option.classList.remove("active");
+            }
+        }
+        if (formAccount.dataset.code === "") {
+            btnClear.classList.add("btn-secondary");
+            btnClear.classList.remove("btn-danger");
+            btnClear.disabled = true;
+        } else {
+            btnClear.classList.add("btn-danger");
+            btnClear.classList.remove("btn-secondary");
+            btnClear.disabled = false;
+        }
+    }
+
+    /**
+     * The account selectors.
+     * @type {{debit: AccountSelector, credit: AccountSelector}}
+     */
+    static #selectors = {}
+
+    /**
+     * Initializes the account selectors.
+     *
+     */
+    static initialize() {
+        const modals = Array.from(document.getElementsByClassName("accounting-account-selector-modal"));
+        for (const modal of modals) {
+            const selector = new AccountSelector(modal);
+            this.#selectors[selector.#entryType] = selector;
+        }
+        this.#initializeTransactionForm();
+    }
+
+    /**
+     * Initializes the transaction form.
+     *
+     */
+    static #initializeTransactionForm() {
+        const entryForm = document.getElementById("accounting-entry-form");
+        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
+        const selectors = this.#selectors;
+        formAccountControl.onclick = function () {
+            selectors[entryForm.dataset.entryType].initShow();
+        };
+    }
+
+    /**
+     * Initializes the account selector for the journal entry form.
+     *x
+     */
+    static initializeJournalEntryForm() {
+        const entryForm = document.getElementById("accounting-entry-form");
+        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
+        formAccountControl.dataset.bsTarget = "#accounting-account-selector-" + entryForm.dataset.entryType + "-modal";
+    }
 }
