@@ -46,5 +46,8 @@ First written: 2023/2/25
 {% endblock %}
 
 {% block account_selector_modals %}
+  {% with summary_helper = form.summary_helper.debit %}
+    {% include "accounting/transaction/include/summary-helper-modal.html" %}
+  {% endwith %}
   {% include "accounting/transaction/include/debit-account-modal.html" %}
 {% endblock %}

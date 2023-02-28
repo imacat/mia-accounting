@@ -206,8 +206,6 @@ class SummaryHelper:
         """The debit tags."""
         self.credit: SummaryEntryType = SummaryEntryType("credit")
         """The credit tags."""
-        self.types: set[SummaryEntryType] = {self.debit, self.credit}
-        """The tags categorized by the entry types."""
         entry_type: sa.Label = sa.case((JournalEntry.is_debit, "debit"),
                                        else_="credit").label("entry_type")
         tag_type: sa.Label = sa.case(
@@ -227,7 +225,7 @@ class SummaryHelper:
             = {x.id: x for x in Account.query
                .filter(Account.id.in_({x.account_id for x in result})).all()}
         entry_type_dict: dict[t.Literal["debit", "credit"], SummaryEntryType] \
-            = {x.type: x for x in self.types}
+            = {x.type: x for x in {self.debit, self.credit}}
         for row in result:
             entry_type_dict[row.entry_type].add_tag(
                 row.tag_type, row.tag, accounts[row.account_id], row.freq)

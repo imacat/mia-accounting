@@ -86,9 +86,6 @@ First written: 2023/2/26
 </form>
 
 {% include "accounting/transaction/include/entry-form-modal.html" %}
-{% for summary_helper in form.summary_helper.types %}
-  {% include "accounting/transaction/include/summary-helper-modal.html" %}
-{% endfor %}
 {% block account_selector_modals %}{% endblock %}
 
 {% endblock %}
