@@ -37,6 +37,7 @@ from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Transaction, Account, JournalEntry, \
     TransactionCurrency, Currency
+from accounting.transaction.summary_helper import SummaryHelper
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_text, strip_multiline_text
 from accounting.utils.user import get_current_user_pk
@@ -358,7 +359,7 @@ class TransactionForm(FlaskForm):
     def currencies_errors(self) -> list[str | LazyString]:
         """Returns the currency errors, without the errors in their sub-forms.
 
-        :return:
+        :return: The currency errors, without the errors in their sub-forms.
         """
         return [x for x in self.currencies.errors
                 if isinstance(x, str) or isinstance(x, LazyString)]
