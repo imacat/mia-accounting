@@ -69,11 +69,11 @@ class SummaryHelper {
     #init() {
         const helper = this;
         const tabs = Array.from(document.getElementsByClassName(this.#prefix + "-tab"));
-        tabs.forEach(function (tab) {
+        for (const tab of tabs) {
             tab.onclick = function () {
                 helper.#switchToTab(tab.dataset.tabId);
             }
-        });
+        }
         this.#initializeGeneralTagHelper();
         this.#initializeGeneralTripHelper();
         this.#initializeBusTripHelper();
@@ -91,7 +91,7 @@ class SummaryHelper {
         const tabs = Array.from(document.getElementsByClassName(this.#prefix + "-tab"));
         const pages = Array.from(document.getElementsByClassName(this.#prefix + "-page"));
         const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-" + tabId + "-btn-tag"));
-        tabs.forEach(function (tab) {
+        for (const tab of tabs) {
             if (tab.dataset.tabId === tabId) {
                 tab.classList.add("active");
                 tab.ariaCurrent = "page";
@@ -99,8 +99,8 @@ class SummaryHelper {
                 tab.classList.remove("active");
                 tab.ariaCurrent = "false";
             }
-        });
-        pages.forEach(function (page) {
+        }
+        for (const page of pages) {
             if (page.dataset.tabId === tabId) {
                 page.classList.remove("d-none");
                 page.ariaCurrent = "page";
@@ -108,7 +108,7 @@ class SummaryHelper {
                 page.classList.add("d-none");
                 page.ariaCurrent = "false";
             }
-        });
+        }
         let selectedBtnTag = null;
         for (const btnTag of tagButtons) {
             if (btnTag.classList.contains("btn-primary")) {
@@ -137,22 +137,22 @@ class SummaryHelper {
                 summary.value = prefix + summary.value.substring(pos + 1);
             }
         }
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             button.onclick = function () {
-                buttons.forEach(function (otherButton) {
+                for (const otherButton of buttons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
-                });
+                }
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 tag.value = button.dataset.value;
                 helper.#filterSuggestedAccounts(button);
                 updateSummary();
             };
-        });
+        }
         tag.onchange = function () {
             let isMatched = false;
-            buttons.forEach(function (button) {
+            for (const button of buttons) {
                 if (button.dataset.value === tag.value) {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-primary");
@@ -162,7 +162,7 @@ class SummaryHelper {
                     button.classList.remove("btn-primary");
                     button.classList.add("btn-outline-primary");
                 }
-            });
+            }
             if (!isMatched) {
                 helper.#filterSuggestedAccounts(null);
             }
@@ -192,22 +192,22 @@ class SummaryHelper {
             }
             summary.value = tag.value + "—" + from.value + direction + to.value;
         };
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             button.onclick = function () {
-                buttons.forEach(function (otherButton) {
+                for (const otherButton of buttons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
-                });
+                }
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 tag.value = button.dataset.value;
                 helper.#filterSuggestedAccounts(button);
                 updateSummary();
             };
-        });
+        }
         tag.onchange = function () {
             let isMatched = false;
-            buttons.forEach(function (button) {
+            for (const button of buttons) {
                 if (button.dataset.value === tag.value) {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-primary");
@@ -217,7 +217,7 @@ class SummaryHelper {
                     button.classList.remove("btn-primary");
                     button.classList.add("btn-outline-primary");
                 }
-            });
+            }
             if (!isMatched) {
                 helper.#filterSuggestedAccounts(null)
             }
@@ -228,17 +228,17 @@ class SummaryHelper {
             updateSummary();
             helper.#validateGeneralTripFrom();
         };
-        directionButtons.forEach(function (button) {
+        for (const button of directionButtons) {
             button.onclick = function () {
-                directionButtons.forEach(function (otherButton) {
+                for (const otherButton of directionButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
-                });
+                }
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 updateSummary();
             };
-        });
+        }
         to.onchange = function () {
             updateSummary();
             helper.#validateGeneralTripTo();
@@ -260,22 +260,22 @@ class SummaryHelper {
         const updateSummary = function () {
             summary.value = tag.value + "—" + route.value + "—" + from.value + "→" + to.value;
         };
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             button.onclick = function () {
-                buttons.forEach(function (otherButton) {
+                for (const otherButton of buttons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
-                });
+                }
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
                 tag.value = button.dataset.value;
                 helper.#filterSuggestedAccounts(button);
                 updateSummary();
             };
-        });
+        }
         tag.onchange = function () {
             let isMatched = false;
-            buttons.forEach(function (button) {
+            for (const button of buttons) {
                 if (button.dataset.value === tag.value) {
                     button.classList.remove("btn-outline-primary");
                     button.classList.add("btn-primary");
@@ -285,7 +285,7 @@ class SummaryHelper {
                     button.classList.remove("btn-primary");
                     button.classList.add("btn-outline-primary");
                 }
-            });
+            }
             if (!isMatched) {
                 helper.#filterSuggestedAccounts(null);
             }
@@ -358,11 +358,11 @@ class SummaryHelper {
     #initializeSuggestedAccounts() {
         const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
         const helper = this;
-        accountButtons.forEach(function (btnAccount) {
+        for (const btnAccount of accountButtons) {
             btnAccount.onclick = function () {
                 helper.#selectAccount(btnAccount.dataset.code);
             };
-        });
+        }
     }
 
     /**
@@ -378,7 +378,7 @@ class SummaryHelper {
             return;
         }
         const accountButtons = Array.from(document.getElementsByClassName(this.#prefix + "-account"));
-        accountButtons.forEach(function (btnAccount) {
+        for (const btnAccount of accountButtons) {
             if (btnAccount.dataset.code === selectedCode) {
                 btnAccount.classList.remove("btn-outline-primary");
                 btnAccount.classList.add("btn-primary");
@@ -388,7 +388,7 @@ class SummaryHelper {
                 btnAccount.classList.remove("btn-primary");
                 btnAccount.classList.add("btn-outline-primary");
             }
-        })
+        }
     }
 
     /**
@@ -664,15 +664,15 @@ class SummaryHelper {
         const inputs = Array.from(document.getElementsByClassName(this.#prefix + "-input"));
         const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-btn-tag"));
         const directionButtons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-direction"));
-        inputs.forEach(function (input) {
+        for (const input of inputs) {
             input.value = "";
             input.classList.remove("is-invalid");
-        });
-        tagButtons.forEach(function (button) {
+        }
+        for (const button of tagButtons) {
             button.classList.remove("btn-primary");
             button.classList.add("btn-outline-primary");
-        });
-        directionButtons.forEach(function (button) {
+        }
+        for (const button of directionButtons) {
             if (button.classList.contains("accounting-default")) {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-primary");
@@ -680,7 +680,7 @@ class SummaryHelper {
                 button.classList.add("btn-outline-primary");
                 button.classList.remove("btn-primary");
             }
-        });
+        }
         this.#filterSuggestedAccounts(null);
         this.#switchToTab(this.#defaultTabId);
     }
@@ -763,7 +763,7 @@ class SummaryHelper {
         const directionButtons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-direction"));
         tag.value = tagName;
         from.value = fromName;
-        directionButtons.forEach(function (btnDirection) {
+        for (const btnDirection of directionButtons) {
             if (btnDirection.dataset.arrow === direction) {
                 btnDirection.classList.remove("btn-outline-primary");
                 btnDirection.classList.add("btn-primary");
@@ -771,7 +771,7 @@ class SummaryHelper {
                 btnDirection.classList.add("btn-outline-primary");
                 btnDirection.classList.remove("btn-primary");
             }
-        });
+        }
         to.value = toName;
         if (numberStr !== undefined) {
             number.value = parseInt(numberStr);
