@@ -255,8 +255,8 @@ function initializeJournalEntryFormModal() {
     const formAmount = document.getElementById("accounting-entry-form-amount");
     const modal = document.getElementById("accounting-entry-form-modal");
     formAccountControl.onclick = function () {
-        const prefix = "accounting-" + entryForm.dataset.entryType + "-account";
-        const query = document.getElementById(prefix + "-selector-query")
+        const prefix = "accounting-account-selector-" + entryForm.dataset.entryType;
+        const query = document.getElementById(prefix + "-query")
         const more = document.getElementById(prefix + "-more");
         const options = Array.from(document.getElementsByClassName(prefix + "-option"));
         const btnClear = document.getElementById(prefix + "-btn-clear");
@@ -518,7 +518,7 @@ function initializeAccountSelectors() {
  * @private
  */
 function initializeAccountQuery(selector) {
-    const query = document.getElementById(selector.dataset.prefix + "-selector-query");
+    const query = document.getElementById(selector.dataset.prefix + "-query");
     query.addEventListener("input", function () {
         filterAccountOptions(selector.dataset.prefix);
     });
@@ -531,7 +531,7 @@ function initializeAccountQuery(selector) {
  * @private
  */
 function filterAccountOptions(prefix) {
-    const query = document.getElementById(prefix + "-selector-query");
+    const query = document.getElementById(prefix + "-query");
     const optionList = document.getElementById(prefix + "-option-list");
     if (optionList === null) {
         console.log(prefix + "-option-list");
