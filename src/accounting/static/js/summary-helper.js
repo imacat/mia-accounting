@@ -637,7 +637,7 @@ class SummaryHelper {
     }
 
     /**
-     * Initializes the summary help when it is shown.
+     * Initializes the summary helper when it is shown.
      *
      * @param isNew {boolean} true for adding a new journal entry, or false otherwise
      */
