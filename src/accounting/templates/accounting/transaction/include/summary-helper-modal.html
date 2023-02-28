@@ -27,7 +27,7 @@ First written: 2023/2/28
           <h1 class="modal-title fs-5" id="accounting-summary-helper-{{ summary_helper.type }}-modal-label">
             <label for="accounting-summary-helper-{{ summary_helper.type }}-summary">{{ A_("Summary") }}</label>
           </h1>
-          <button type="button" class="btn-close accounting-summary-helper-{{ summary_helper.type }}-close" data-bs-toggle="modal" data-bs-target="" aria-label="{{ A_("Close") }}"></button>
+          <button class="btn-close accounting-summary-helper-{{ summary_helper.type }}-close" type="button" data-bs-toggle="modal" data-bs-target="" aria-label="{{ A_("Close") }}"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -165,14 +165,14 @@ First written: 2023/2/28
           {# The suggested accounts #}
           <div class="mt-3">
             {% for account in summary_helper.accounts %}
-              <button class="btn btn-outline-primary d-none accounting-summary-helper-{{ summary_helper.type }}-account" type="button" role="button" data-code="{{ account.code }}" data-text="{{ account }}">
+              <button class="btn btn-outline-primary d-none accounting-summary-helper-{{ summary_helper.type }}-account" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
                 {{ account }}
               </button>
             {% endfor %}
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary accounting-summary-helper-{{ summary_helper.type }}-close" data-bs-toggle="modal" data-bs-target="">{{ A_("Cancel") }}</button>
+          <button class="btn btn-secondary accounting-summary-helper-{{ summary_helper.type }}-close" type="button" data-bs-toggle="modal" data-bs-target="">{{ A_("Cancel") }}</button>
           <button id="accounting-summary-helper-{{ summary_helper.type }}-btn-save" type="submit" class="btn btn-primary">{{ A_("Save") }}</button>
         </div>
       </div>
