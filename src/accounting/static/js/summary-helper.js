@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 class SummaryHelper {
 
     /**
-     * The entry type
+     * The entry type, either "debit" or "credit"
      * @type {string}
      */
     #entryType;
