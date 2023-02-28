@@ -79,12 +79,12 @@ function initializeCurrencyForms() {
     btnNew.onclick = function () {
         const currencies = Array.from(document.getElementsByClassName("accounting-currency"));
         let maxIndex = 0;
-        currencies.forEach(function (currency) {
+        for (const currency of currencies) {
             const index = parseInt(currency.dataset.index);
             if (maxIndex < index) {
                 maxIndex = index;
             }
-        });
+        }
         const newIndex = String(maxIndex + 1);
         const html = form.dataset.currencyTemplate
             .replaceAll("CURRENCY_INDEX", escapeHtml(newIndex));
@@ -122,9 +122,9 @@ function initializeBtnDeleteCurrency(button) {
 function resetDeleteCurrencyButtons() {
     const buttons = Array.from(document.getElementsByClassName("accounting-btn-delete-currency"));
     if (buttons.length > 1) {
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             button.classList.remove("d-none");
-        });
+        }
     } else {
         buttons[0].classList.add("d-none");
     }
@@ -263,13 +263,13 @@ function initializeJournalEntryFormModal() {
         query.value = "";
         more.classList.remove("d-none");
         filterAccountOptions(prefix);
-        options.forEach(function (option) {
+        for (const option of options) {
             if (option.dataset.code === formAccount.dataset.code) {
                 option.classList.add("active");
             } else {
                 option.classList.remove("active");
             }
-        });
+        }
         if (formAccount.dataset.code === "") {
             btnClear.classList.add("btn-secondary");
             btnClear.classList.remove("btn-danger");
@@ -376,12 +376,12 @@ function saveJournalEntryForm() {
         const entries = Array.from(document.getElementsByClassName("accounting-currency-" + currencyIndex + "-" + entryType));
         const entryList = document.getElementById("accounting-currency-" + currencyIndex + "-" + entryType + "-list")
         let maxIndex = 0;
-        entries.forEach(function (entry) {
+        for (const entry of entries) {
             const index = parseInt(entry.dataset.entryIndex);
             if (maxIndex < index) {
                 maxIndex = index;
             }
-        });
+        }
         entryIndex = String(maxIndex + 1);
         const html = form.dataset.entryTemplate
             .replaceAll("CURRENCY_INDEX", escapeHtml(currencyIndex))
@@ -446,9 +446,9 @@ function initializeDeleteJournalEntryButton(button) {
 function resetDeleteJournalEntryButtons(sameClass) {
     const buttons = Array.from(document.getElementsByClassName(sameClass));
     if (buttons.length > 1) {
-        buttons.forEach(function (button) {
+        for (const button of buttons) {
             button.classList.remove("d-none");
-        });
+        }
     } else {
         buttons[0].classList.add("d-none");
     }
@@ -466,11 +466,11 @@ function updateBalance(currencyIndex, entryType) {
     const amounts = Array.from(document.getElementsByClassName(prefix + "-amount"));
     const totalText = document.getElementById(prefix + "-total");
     let total = new Decimal("0");
-    amounts.forEach(function (amount) {
+    for (const amount of amounts) {
         if (amount.value !== "") {
             total = total.plus(new Decimal(amount.value));
         }
-    });
+    }
     totalText.innerText = formatDecimal(total);
 }
 
@@ -483,7 +483,7 @@ function initializeAccountSelectors() {
     const selectors = Array.from(document.getElementsByClassName("accounting-selector-modal"));
     const formAccountControl = document.getElementById("accounting-entry-form-account-control");
     const formAccount = document.getElementById("accounting-entry-form-account");
-    selectors.forEach(function (selector) {
+    for (const selector of selectors) {
         const more = document.getElementById(selector.dataset.prefix + "-more");
         const btnClear = document.getElementById(selector.dataset.prefix + "-btn-clear");
         const options = Array.from(document.getElementsByClassName(selector.dataset.prefix + "-option"));
@@ -499,7 +499,7 @@ function initializeAccountSelectors() {
             formAccount.dataset.text = "";
             validateJournalEntryAccount();
         };
-        options.forEach(function (option) {
+        for (const option of options) {
             option.onclick = function () {
                 formAccountControl.classList.add("accounting-not-empty");
                 formAccount.innerText = option.dataset.content;
@@ -507,8 +507,8 @@ function initializeAccountSelectors() {
                 formAccount.dataset.text = option.dataset.content;
                 validateJournalEntryAccount();
             };
-        });
-    });
+        }
+    }
 }
 
 /**
@@ -541,7 +541,7 @@ function filterAccountOptions(prefix) {
     const queryNoResult = document.getElementById(prefix + "-option-no-result");
     const codesInUse = getAccountCodeUsedInForm();
     let shouldAnyShow = false;
-    options.forEach(function (option) {
+    for (const option of options) {
         const shouldShow = shouldAccountOptionShow(option, more, codesInUse, query);
         if (shouldShow) {
             option.classList.remove("d-none");
@@ -549,7 +549,7 @@ function filterAccountOptions(prefix) {
         } else {
             option.classList.add("d-none");
         }
-    });
+    }
     if (!shouldAnyShow && more.classList.contains("d-none")) {
         optionList.classList.add("d-none");
         queryNoResult.classList.remove("d-none");
@@ -601,9 +601,9 @@ function getAccountCodeUsedInForm() {
     const accountCodes = Array.from(document.getElementsByClassName("accounting-account-code"));
     const formAccount = document.getElementById("accounting-entry-form-account");
     const inUse = [formAccount.dataset.code];
-    accountCodes.forEach(function (accountCode) {
+    for (const accountCode of accountCodes) {
         inUse.push(accountCode.value);
-    });
+    }
     return inUse
 }
 
@@ -665,9 +665,9 @@ function validateCurrencies() {
     const currencies = Array.from(document.getElementsByClassName("accounting-currency"));
     let isValid = true;
     isValid = validateCurrenciesReal() && isValid;
-    currencies.forEach(function (currency) {
+    for (const currency of currencies) {
         isValid = validateCurrency(currency) && isValid;
-    });
+    }
     return isValid;
 }
 
@@ -728,9 +728,9 @@ function validateJournalEntries(currency, entryType) {
     const entries = Array.from(document.getElementsByClassName("accounting-currency-" + currencyIndex + "-" + entryType));
     let isValid = true;
     isValid = validateJournalEntriesReal(currencyIndex, entryType) && isValid;
-    entries.forEach(function (entry) {
+    for (const entry of entries) {
         isValid = validateJournalEntry(entry) && isValid;
-    })
+    }
     return isValid;
 }
 
@@ -801,17 +801,17 @@ function validateBalance(currency) {
     const creditAmounts = Array.from(document.getElementsByClassName(prefix + "-credit-amount"));
     if (debit !== null && credit !== null) {
         let debitTotal = new Decimal("0");
-        debitAmounts.forEach(function (amount) {
+        for (const amount of debitAmounts) {
             if (amount.value !== "") {
                 debitTotal = debitTotal.plus(new Decimal(amount.value));
             }
-        });
+        }
         let creditTotal = new Decimal("0");
-        creditAmounts.forEach(function (amount) {
+        for (const amount of creditAmounts) {
             if (amount.value !== "") {
                 creditTotal = creditTotal.plus(new Decimal(amount.value));
             }
-        });
+        }
         if (!debitTotal.equals(creditTotal)) {
             control.classList.add("is-invalid");
             error.innerText = A_("The totals of the debit and credit amounts do not match.");
