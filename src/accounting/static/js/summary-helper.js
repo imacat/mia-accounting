@@ -138,7 +138,7 @@ class SummaryHelper {
         }
         this.#initializeTagButtons("general", tag, updateSummary);
         tag.onchange = function () {
-            helper.#tagInputOnChange("general", tag, updateSummary);
+            helper.#onTagInputChange("general", tag, updateSummary);
         };
     }
 
@@ -165,7 +165,7 @@ class SummaryHelper {
         };
         this.#initializeTagButtons("travel", tag, updateSummary);
         tag.onchange = function () {
-            helper.#tagInputOnChange("travel", tag, updateSummary);
+            helper.#onTagInputChange("travel", tag, updateSummary);
             helper.#validateGeneralTripTag();
         };
         from.onchange = function () {
@@ -205,7 +205,7 @@ class SummaryHelper {
         };
         this.#initializeTagButtons("bus", tag, updateSummary);
         tag.onchange = function () {
-            helper.#tagInputOnChange("bus", tag, updateSummary);
+            helper.#onTagInputChange("bus", tag, updateSummary);
             helper.#validateBusTripTag();
         };
         route.onchange = function () {
@@ -254,7 +254,7 @@ class SummaryHelper {
      * @param tag {HTMLInputElement} the tag input
      * @param updateSummary {function(): void} the callback to update the summary
      */
-    #tagInputOnChange(tabId, tag, updateSummary) {
+    #onTagInputChange(tabId, tag, updateSummary) {
         const tagButtons = Array.from(document.getElementsByClassName(this.#prefix + "-" + tabId + "-btn-tag"));
         let isMatched = false;
         for (const tagButton of tagButtons) {
