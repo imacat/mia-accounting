@@ -643,13 +643,13 @@ class SummaryHelper {
      */
     initShow(isNew) {
         const closeButtons = Array.from(document.getElementsByClassName(this.#prefix + "-close"));
-        closeButtons.forEach(function (button) {
+        for (const button of closeButtons) {
             if (isNew) {
-                button.dataset.bsTarget = "";
+                button.dataset.bsTarget = "#" + this.#prefix + "-modal";
             } else {
                 button.dataset.bsTarget = "#accounting-entry-form-modal";
             }
-        });
+        }
         this.#reset();
         if (!isNew) {
             this.#populate();
