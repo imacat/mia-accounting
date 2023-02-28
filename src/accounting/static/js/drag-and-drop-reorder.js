@@ -42,7 +42,7 @@ function initializeDragAndDropReordering(list, onReorder) {
 function initializeMouseDragAndDropReordering(list, onReorder) {
     const items = Array.from(list.children);
     let dragged = null;
-    items.forEach(function (item) {
+    for (const item of items) {
         item.draggable = true;
         item.addEventListener("dragstart", function () {
             dragged = item;
@@ -56,7 +56,7 @@ function initializeMouseDragAndDropReordering(list, onReorder) {
             dragged.classList.remove("accounting-dragged");
             dragged = null;
         });
-    });
+    }
 }
 
 /**
@@ -68,7 +68,7 @@ function initializeMouseDragAndDropReordering(list, onReorder) {
  */
 function initializeTouchDragAndDropReordering(list, onReorder) {
     const items = Array.from(list.children);
-    items.forEach(function (item) {
+    for (const item of items) {
         item.addEventListener("touchstart", function () {
             item.classList.add("accounting-dragged");
         });
@@ -81,7 +81,7 @@ function initializeTouchDragAndDropReordering(list, onReorder) {
         item.addEventListener("touchend", function () {
             item.classList.remove("accounting-dragged");
         });
-    });
+    }
 }
 
 /**

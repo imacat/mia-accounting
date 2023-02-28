@@ -65,9 +65,9 @@ function validateForm() {
  */
 function submitFormIfAllAsyncValid() {
     let isValid = true;
-    Object.keys(isAsyncValid).forEach(function (key) {
+    for (const key of Object.keys(isAsyncValid)) {
         isValid = isAsyncValid[key] && isValid;
-    });
+    }
     if (isValid) {
         document.getElementById("accounting-form").submit()
     }

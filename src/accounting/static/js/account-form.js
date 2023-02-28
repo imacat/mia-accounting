@@ -46,9 +46,9 @@ function initializeBaseAccountSelector() {
     const btnClear = document.getElementById("accounting-btn-clear-base");
     selector.addEventListener("show.bs.modal", function () {
         base.classList.add("accounting-not-empty");
-        options.forEach(function (item) {
-            item.classList.remove("active");
-        });
+        for (const option of options) {
+            option.classList.remove("active");
+        }
         const selected = document.getElementById("accounting-base-option-" + baseCode.value);
         if (selected !== null) {
             selected.classList.add("active");
@@ -59,7 +59,7 @@ function initializeBaseAccountSelector() {
             base.classList.remove("accounting-not-empty");
         }
     });
-    options.forEach(function (option) {
+    for (const option of options) {
         option.onclick = function () {
             baseCode.value = option.dataset.code;
             baseContent.innerText = option.dataset.content;
@@ -69,7 +69,7 @@ function initializeBaseAccountSelector() {
             validateBase();
             bootstrap.Modal.getInstance(selector).hide();
         };
-    });
+    }
     btnClear.onclick = function () {
         baseCode.value = "";
         baseContent.innerText = "";
@@ -94,15 +94,15 @@ function initializeBaseAccountQuery() {
     const queryNoResult = document.getElementById("accounting-base-option-no-result");
     query.addEventListener("input", function () {
         if (query.value === "") {
-            options.forEach(function (option) {
+            for (const option of options) {
                 option.classList.remove("d-none");
-            });
+            }
             optionList.classList.remove("d-none");
             queryNoResult.classList.add("d-none");
             return
         }
         let hasAnyMatched = false;
-        options.forEach(function (option) {
+        for (const option of options) {
             const queryValues = JSON.parse(option.dataset.queryValues);
             let isMatched = false;
             for (const queryValue of queryValues) {
@@ -117,7 +117,7 @@ function initializeBaseAccountQuery() {
             } else {
                 option.classList.add("d-none");
             }
-        });
+        }
         if (!hasAnyMatched) {
             optionList.classList.add("d-none");
             queryNoResult.classList.remove("d-none");
