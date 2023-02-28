@@ -163,6 +163,7 @@ class SummaryHelper {
         const from = document.getElementById(this.#prefix + "-travel-from");
         const directionButtons = Array.from(document.getElementsByClassName(this.#prefix + "-travel-direction"))
         const to = document.getElementById(this.#prefix + "-travel-to");
+        const helper = this;
         const updateSummary = function () {
             let direction;
             for (const button of directionButtons) {
@@ -196,8 +197,12 @@ class SummaryHelper {
                 }
             });
             updateSummary();
+            helper.#validateGeneralTripTag();
         };
-        from.onchange = updateSummary;
+        from.onchange = function () {
+            updateSummary();
+            helper.#validateGeneralTripFrom();
+        };
         directionButtons.forEach(function (button) {
             button.onclick = function () {
                 directionButtons.forEach(function (otherButton) {
@@ -209,7 +214,10 @@ class SummaryHelper {
                 updateSummary();
             };
         });
-        to.onchange = updateSummary;
+        to.onchange = function () {
+            updateSummary();
+            helper.#validateGeneralTripTo();
+        };
     }
 
     /**
@@ -223,6 +231,7 @@ class SummaryHelper {
         const route = document.getElementById(this.#prefix + "-bus-route");
         const from = document.getElementById(this.#prefix + "-bus-from");
         const to = document.getElementById(this.#prefix + "-bus-to");
+        const helper = this;
         const updateSummary = function () {
             summary.value = tag.value + "—" + route.value + "—" + from.value + "→" + to.value;
         };
@@ -249,10 +258,20 @@ class SummaryHelper {
                 }
             });
             updateSummary();
+            helper.#validateBusTripTag();
         };
-        route.onchange = updateSummary;
-        from.onchange = updateSummary;
-        to.onchange = updateSummary;
+        route.onchange = function () {
+            updateSummary();
+            helper.#validateBusTripRoute();
+        };
+        from.onchange = function () {
+            updateSummary();
+            helper.#validateBusTripFrom();
+        };
+        to.onchange = function () {
+            updateSummary();
+            helper.#validateBusTripTo();
+        };
     }
 
     /**
@@ -294,6 +313,197 @@ class SummaryHelper {
      * @return {boolean} true if valid, or false otherwise
      */
     #validate() {
+        const tabs = Array.from(document.getElementsByClassName(this.#prefix + "-tab"));
+        let isValid = true;
+        for (const tab of tabs) {
+            if (tab.classList.contains("active")) {
+                switch (tab.dataset.tabId) {
+                    case "general":
+                        isValid = this.#validateGeneralTag() && isValid;
+                        break;
+                    case "travel":
+                        isValid = this.#validateGeneralTrip() && isValid;
+                        break;
+                    case "bus":
+                        isValid = this.#validateBusTrip() && isValid;
+                        break;
+                }
+            }
+        }
+        return isValid;
+    }
+
+    /**
+     * Validates a general tag.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateGeneralTag() {
+        const field = document.getElementById(this.#prefix + "-general-tag");
+        const error = document.getElementById(this.#prefix + "-general-tag-error");
+        field.value = field.value.trim();
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates a general trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateGeneralTrip() {
+        let isValid = true;
+        isValid = this.#validateGeneralTripTag() && isValid;
+        isValid = this.#validateGeneralTripFrom() && isValid;
+        isValid = this.#validateGeneralTripTo() && isValid;
+        return isValid;
+    }
+
+    /**
+     * Validates the tag of a general trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateGeneralTripTag() {
+        const field = document.getElementById(this.#prefix + "-travel-tag");
+        const error = document.getElementById(this.#prefix + "-travel-tag-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the tag.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the origin of a general trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateGeneralTripFrom() {
+        const field = document.getElementById(this.#prefix + "-travel-from");
+        const error = document.getElementById(this.#prefix + "-travel-from-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the origin.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the destination of a general trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateGeneralTripTo() {
+        const field = document.getElementById(this.#prefix + "-travel-to");
+        const error = document.getElementById(this.#prefix + "-travel-to-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the destination.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates a bus trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateBusTrip() {
+        let isValid = true;
+        isValid = this.#validateBusTripTag() && isValid;
+        isValid = this.#validateBusTripRoute() && isValid;
+        isValid = this.#validateBusTripFrom() && isValid;
+        isValid = this.#validateBusTripTo() && isValid;
+        return isValid;
+    }
+
+    /**
+     * Validates the tag of a bus trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateBusTripTag() {
+        const field = document.getElementById(this.#prefix + "-bus-tag");
+        const error = document.getElementById(this.#prefix + "-bus-tag-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the tag.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the route of a bus trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateBusTripRoute() {
+        const field = document.getElementById(this.#prefix + "-bus-route");
+        const error = document.getElementById(this.#prefix + "-bus-route-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the route.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the origin of a bus trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateBusTripFrom() {
+        const field = document.getElementById(this.#prefix + "-bus-from");
+        const error = document.getElementById(this.#prefix + "-bus-from-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the origin.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the destination of a bus trip.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateBusTripTo() {
+        const field = document.getElementById(this.#prefix + "-bus-to");
+        const error = document.getElementById(this.#prefix + "-bus-to-error");
+        field.value = field.value.trim();
+        if (field.value === "") {
+            field.classList.add("is-invalid");
+            error.innerText = A_("Please fill in the destination.");
+            return false;
+        }
+        field.classList.remove("is-invalid");
+        error.innerText = "";
         return true;
     }
 
