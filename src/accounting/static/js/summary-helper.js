@@ -68,6 +68,7 @@ class SummaryHelper {
      */
     #init() {
         const helper = this;
+        const summary = document.getElementById(this.#prefix + "-summary");
         const tabs = Array.from(document.getElementsByClassName(this.#prefix + "-tab"));
         for (const tab of tabs) {
             tab.onclick = function () {
@@ -80,6 +81,10 @@ class SummaryHelper {
         this.#initializeNumberHelper();
         this.#initializeSuggestedAccounts();
         this.#initializeSubmission();
+        summary.onchange = function () {
+            summary.value = summary.value.trim();
+            helper.#parseAndPopulate();
+        };
     }
 
     /**
@@ -610,6 +615,8 @@ class SummaryHelper {
      * @param isNew {boolean} true for adding a new journal entry, or false otherwise
      */
     initShow(isNew) {
+        const formSummary = document.getElementById("accounting-entry-form-summary");
+        const summary = document.getElementById(this.#prefix + "-summary");
         const closeButtons = Array.from(document.getElementsByClassName(this.#prefix + "-close"));
         for (const closeButton of closeButtons) {
             if (isNew) {
@@ -620,7 +627,8 @@ class SummaryHelper {
         }
         this.#reset();
         if (!isNew) {
-            this.#populate();
+            summary.value = formSummary.dataset.value;
+            this.#parseAndPopulate();
         }
     }
 
@@ -654,13 +662,11 @@ class SummaryHelper {
     }
 
     /**
-     * Populates the summary helper from the journal entry form.
+     * Parses the summary input and populates the summary helper.
      *
      */
-    #populate() {
-        const formSummary = document.getElementById("accounting-entry-form-summary");
+    #parseAndPopulate() {
         const summary = document.getElementById(this.#prefix + "-summary");
-        summary.value = formSummary.dataset.value;
         const pos = summary.value.indexOf("—");
         if (pos === -1) {
             return;
