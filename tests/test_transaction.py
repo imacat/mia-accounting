@@ -31,7 +31,7 @@ from testlib import get_client
 from testlib_txn import Accounts, get_add_form, get_unchanged_update_form, \
     get_update_form, match_txn_detail, set_negative_amount, \
     remove_debit_in_a_currency, remove_credit_in_a_currency, NEXT_URI, \
-    NON_EMPTY_NOTE, EMPTY_NOTE
+    NON_EMPTY_NOTE, EMPTY_NOTE, add_txn
 
 PREFIX: str = "/accounting/transactions"
 """The URL prefix of the transaction management."""
@@ -75,7 +75,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(txn_id)
@@ -110,7 +110,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(txn_id)
@@ -144,7 +144,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(txn_id)
         response: httpx.Response
@@ -326,7 +326,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction, TransactionCurrency
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         edit_uri: str = f"{PREFIX}/{txn_id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update"
@@ -479,7 +479,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update"
         txn: Transaction
@@ -513,7 +513,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         editor_username, editor2_username = "editor", "editor2"
         client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
@@ -542,7 +542,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         delete_uri: str = f"{PREFIX}/{txn_id}/delete"
         response: httpx.Response
@@ -561,17 +561,6 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
                                     data={"csrf_token": self.csrf_token,
                                           "next": NEXT_URI})
         self.assertEqual(response.status_code, 404)
-
-    def __add_txn(self) -> int:
-        """Adds a transaction.
-
-        :return: The newly-added transaction ID..
-        """
-        store_uri: str = f"{PREFIX}/store/income"
-        form: dict[str, str] = self.__get_add_form()
-        response: httpx.Response = self.client.post(store_uri, data=form)
-        self.assertEqual(response.status_code, 302)
-        return match_txn_detail(response.headers["Location"])
 
     def __get_add_form(self) -> dict[str, str]:
         """Returns the form data to add a new transaction.
@@ -647,7 +636,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(txn_id)
@@ -682,7 +671,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(txn_id)
@@ -716,7 +705,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(txn_id)
         response: httpx.Response
@@ -901,7 +890,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction, TransactionCurrency
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         edit_uri: str = f"{PREFIX}/{txn_id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update"
@@ -1058,7 +1047,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update"
         txn: Transaction
@@ -1092,7 +1081,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         editor_username, editor2_username = "editor", "editor2"
         client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
@@ -1121,7 +1110,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         delete_uri: str = f"{PREFIX}/{txn_id}/delete"
         response: httpx.Response
@@ -1140,17 +1129,6 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
                                     data={"csrf_token": self.csrf_token,
                                           "next": NEXT_URI})
         self.assertEqual(response.status_code, 404)
-
-    def __add_txn(self) -> int:
-        """Adds a transaction.
-
-        :return: The newly-added transaction ID..
-        """
-        store_uri: str = f"{PREFIX}/store/expense"
-        form: dict[str, str] = self.__get_add_form()
-        response: httpx.Response = self.client.post(store_uri, data=form)
-        self.assertEqual(response.status_code, 302)
-        return match_txn_detail(response.headers["Location"])
 
     def __get_add_form(self) -> dict[str, str]:
         """Returns the form data to add a new transaction.
@@ -1226,7 +1204,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(txn_id)
@@ -1261,7 +1239,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(txn_id)
@@ -1295,7 +1273,7 @@ class TransferTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(txn_id)
         response: httpx.Response
@@ -1507,7 +1485,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction, TransactionCurrency
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         edit_uri: str = f"{PREFIX}/{txn_id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update"
@@ -1698,7 +1676,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update"
         txn: Transaction
@@ -1732,7 +1710,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         editor_username, editor2_username = "editor", "editor2"
         client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
@@ -1762,7 +1740,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction, TransactionCurrency
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?as=income&next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update?as=income"
         form_0: dict[str, str] = self.__get_update_form(txn_id)
@@ -1861,7 +1839,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Transaction, TransactionCurrency
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?as=expense&next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update?as=expense"
         form_0: dict[str, str] = self.__get_update_form(txn_id)
@@ -1963,7 +1941,7 @@ class TransferTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        txn_id: int = self.__add_txn()
+        txn_id: int = add_txn(self.client, self.__get_add_form())
         detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         delete_uri: str = f"{PREFIX}/{txn_id}/delete"
         response: httpx.Response
@@ -1982,17 +1960,6 @@ class TransferTransactionTestCase(unittest.TestCase):
                                     data={"csrf_token": self.csrf_token,
                                           "next": NEXT_URI})
         self.assertEqual(response.status_code, 404)
-
-    def __add_txn(self) -> int:
-        """Adds a transaction.
-
-        :return: The newly-added transaction ID..
-        """
-        store_uri: str = f"{PREFIX}/store/transfer"
-        form: dict[str, str] = self.__get_add_form()
-        response: httpx.Response = self.client.post(store_uri, data=form)
-        self.assertEqual(response.status_code, 302)
-        return match_txn_detail(response.headers["Location"])
 
     def __get_add_form(self) -> dict[str, str]:
         """Returns the form data to add a new transaction.
@@ -2062,11 +2029,11 @@ class TransactionReorderTestCase(unittest.TestCase):
         from accounting.models import Transaction
         response: httpx.Response
 
-        id_1: int = self.__add_income_txn()
-        id_2: int = self.__add_expense_txn()
-        id_3: int = self.__add_transfer_txn()
-        id_4: int = self.__add_income_txn()
-        id_5: int = self.__add_expense_txn()
+        id_1: int = add_txn(self.client, self.__get_add_income_form())
+        id_2: int = add_txn(self.client, self.__get_add_expense_form())
+        id_3: int = add_txn(self.client, self.__get_add_transfer_form())
+        id_4: int = add_txn(self.client, self.__get_add_income_form())
+        id_5: int = add_txn(self.client, self.__get_add_expense_form())
 
         with self.app.app_context():
             txn_1: Transaction = db.session.get(Transaction, id_1)
@@ -2108,11 +2075,11 @@ class TransactionReorderTestCase(unittest.TestCase):
         from accounting.models import Transaction
         response: httpx.Response
 
-        id_1: int = self.__add_income_txn()
-        id_2: int = self.__add_expense_txn()
-        id_3: int = self.__add_transfer_txn()
-        id_4: int = self.__add_income_txn()
-        id_5: int = self.__add_expense_txn()
+        id_1: int = add_txn(self.client, self.__get_add_income_form())
+        id_2: int = add_txn(self.client, self.__get_add_expense_form())
+        id_3: int = add_txn(self.client, self.__get_add_transfer_form())
+        id_4: int = add_txn(self.client, self.__get_add_income_form())
+        id_5: int = add_txn(self.client, self.__get_add_expense_form())
 
         with self.app.app_context():
             txn_date: date = db.session.get(Transaction, id_1).date
@@ -2160,17 +2127,6 @@ class TransactionReorderTestCase(unittest.TestCase):
             self.assertEqual(db.session.get(Transaction, id_4).no, 1)
             self.assertEqual(db.session.get(Transaction, id_5).no, 5)
 
-    def __add_income_txn(self) -> int:
-        """Adds a transaction.
-
-        :return: The newly-added transaction ID..
-        """
-        store_uri: str = f"{PREFIX}/store/income"
-        form: dict[str, str] = self.__get_add_income_form()
-        response: httpx.Response = self.client.post(store_uri, data=form)
-        self.assertEqual(response.status_code, 302)
-        return match_txn_detail(response.headers["Location"])
-
     def __get_add_income_form(self) -> dict[str, str]:
         """Returns the form data to add a new transaction.
 
@@ -2179,17 +2135,6 @@ class TransactionReorderTestCase(unittest.TestCase):
         form: dict[str, str] = get_add_form(self.csrf_token)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
-
-    def __add_expense_txn(self) -> int:
-        """Adds a transaction.
-
-        :return: The newly-added transaction ID..
-        """
-        store_uri: str = f"{PREFIX}/store/expense"
-        form: dict[str, str] = self.__get_add_expense_form()
-        response: httpx.Response = self.client.post(store_uri, data=form)
-        self.assertEqual(response.status_code, 302)
-        return match_txn_detail(response.headers["Location"])
 
     def __get_add_expense_form(self) -> dict[str, str]:
         """Returns the form data to add a new transaction.
@@ -2213,17 +2158,6 @@ class TransactionReorderTestCase(unittest.TestCase):
             txn_id, self.app, self.csrf_token)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
-
-    def __add_transfer_txn(self) -> int:
-        """Adds a transaction.
-
-        :return: The newly-added transaction ID..
-        """
-        store_uri: str = f"{PREFIX}/store/transfer"
-        form: dict[str, str] = self.__get_add_transfer_form()
-        response: httpx.Response = self.client.post(store_uri, data=form)
-        self.assertEqual(response.status_code, 302)
-        return match_txn_detail(response.headers["Location"])
 
     def __get_add_transfer_form(self) -> dict[str, str]:
         """Returns the form data to add a new transaction.

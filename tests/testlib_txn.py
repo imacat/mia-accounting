@@ -22,6 +22,7 @@ from decimal import Decimal
 from datetime import date
 from secrets import randbelow
 
+import httpx
 from flask import Flask
 
 from test_site import db
@@ -379,6 +380,24 @@ def __get_currency_prefix(form: dict[str, str], code: str) -> str:
     key: str = [x for x in form if form[x] == code][0]
     m: re.Match = re.match(r"^(.+-)code$", key)
     return m.group(1)
+
+
+def add_txn(client: httpx.Client, form: dict[str, str]) -> int:
+    """Adds a transfer transaction.
+
+    :param client: The client.
+    :param form: The form data.
+    :return: The newly-added transaction ID.
+    """
+    prefix: str = "/accounting/transactions"
+    txn_type: str \
+        = "income" if len({x for x in form if "-debit-" in x}) == 0 else\
+        ("expense" if len({x for x in form if "-credit-" in x}) == 0 else
+         "transfer")
+    store_uri = f"{prefix}/store/{txn_type}"
+    response: httpx.Response = client.post(store_uri, data=form)
+    assert response.status_code == 302
+    return match_txn_detail(response.headers["Location"])
 
 
 def match_txn_detail(location: str) -> int:
