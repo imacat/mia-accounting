@@ -364,6 +364,14 @@ class TransactionForm(FlaskForm):
         return [x for x in self.currencies.errors
                 if isinstance(x, str) or isinstance(x, LazyString)]
 
+    @property
+    def summary_helper(self) -> SummaryHelper:
+        """Returns the summary helper.
+
+        :return: The summary helper.
+        """
+        return SummaryHelper()
+
 
 T = t.TypeVar("T", bound=TransactionForm)
 """A transaction form variant."""

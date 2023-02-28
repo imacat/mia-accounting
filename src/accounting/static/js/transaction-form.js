@@ -157,6 +157,7 @@ function initializeNewEntryButton(button) {
     const formAccountControl = document.getElementById("accounting-entry-form-account-control");
     const formAccount = document.getElementById("accounting-entry-form-account");
     const formAccountError = document.getElementById("accounting-entry-form-account-error")
+    const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
     const formSummary = document.getElementById("accounting-entry-form-summary");
     const formSummaryError = document.getElementById("accounting-entry-form-summary-error");
     const formAmount = document.getElementById("accounting-entry-form-amount");
@@ -165,19 +166,23 @@ function initializeNewEntryButton(button) {
         entryForm.dataset.currencyIndex = button.dataset.currencyIndex;
         entryForm.dataset.entryType = button.dataset.entryType;
         entryForm.dataset.entryIndex = button.dataset.entryIndex;
-        formAccountControl.classList.remove("accounting-not-empty")
+        formAccountControl.classList.remove("accounting-not-empty");
         formAccountControl.classList.remove("is-invalid");
         formAccountControl.dataset.bsTarget = button.dataset.accountModal;
         formAccount.innerText = "";
         formAccount.dataset.code = "";
         formAccount.dataset.text = "";
         formAccountError.innerText = "";
-        formSummary.value = "";
-        formSummary.classList.remove("is-invalid");
+        formSummaryControl.dataset.bsTarget = "#accounting-summary-helper-" + button.dataset.entryType + "-modal";
+        formSummaryControl.classList.remove("accounting-not-empty");
+        formSummaryControl.classList.remove("is-invalid");
+        formSummary.dataset.value = "";
+        formSummary.innerText = ""
         formSummaryError.innerText = ""
         formAmount.value = "";
         formAmount.classList.remove("is-invalid");
         formAmountError.innerText = "";
+        SummaryHelper.initializeNewJournalEntry(button.dataset.entryType);
     };
 }
 
@@ -209,6 +214,7 @@ function initializeJournalEntry(entry) {
     const control = document.getElementById(entry.dataset.prefix + "-control");
     const formAccountControl = document.getElementById("accounting-entry-form-account-control");
     const formAccount = document.getElementById("accounting-entry-form-account");
+    const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
     const formSummary = document.getElementById("accounting-entry-form-summary");
     const formAmount = document.getElementById("accounting-entry-form-amount");
     control.onclick = function () {
@@ -224,7 +230,14 @@ function initializeJournalEntry(entry) {
         formAccount.innerText = accountCode.dataset.text;
         formAccount.dataset.code = accountCode.value;
         formAccount.dataset.text = accountCode.dataset.text;
-        formSummary.value = summary.value;
+        formSummaryControl.dataset.bsTarget = "#accounting-summary-helper-" + entry.dataset.entryType + "-modal";
+        if (summary.value === "") {
+            formSummaryControl.classList.remove("accounting-not-empty");
+        } else {
+            formSummaryControl.classList.add("accounting-not-empty");
+        }
+        formSummary.dataset.value = summary.value;
+        formSummary.innerText = summary.value;
         formAmount.value = amount.value;
         validateJournalEntryForm();
     };
@@ -239,7 +252,6 @@ function initializeJournalEntryFormModal() {
     const entryForm = document.getElementById("accounting-entry-form");
     const formAccountControl = document.getElementById("accounting-entry-form-account-control");
     const formAccount = document.getElementById("accounting-entry-form-account");
-    const formSummary = document.getElementById("accounting-entry-form-summary");
     const formAmount = document.getElementById("accounting-entry-form-amount");
     const modal = document.getElementById("accounting-entry-form-modal");
     formAccountControl.onclick = function () {
@@ -268,7 +280,6 @@ function initializeJournalEntryFormModal() {
             btnClear.disabled = false;
         }
     };
-    formSummary.onchange = validateJournalEntrySummary;
     formAmount.onchange = validateJournalEntryAmount;
     entryForm.onsubmit = function () {
         if (validateJournalEntryForm()) {
@@ -320,10 +331,9 @@ function validateJournalEntryAccount() {
  * @private
  */
 function validateJournalEntrySummary() {
-    const field = document.getElementById("accounting-entry-form-summary");
+    const control = document.getElementById("accounting-entry-form-summary-control");
     const error = document.getElementById("accounting-entry-form-summary-error");
-    field.value = field.value.trim();
-    field.classList.remove("is-invalid");
+    control.classList.remove("is-invalid");
     error.innerText = "";
     return true;
 }
@@ -393,8 +403,8 @@ function saveJournalEntryForm() {
     accountCode.value = formAccount.dataset.code;
     accountCode.dataset.text = formAccount.dataset.text;
     accountText.innerText = formAccount.dataset.text;
-    summary.value = formSummary.value;
-    summaryText.innerText = formSummary.value;
+    summary.value = formSummary.dataset.value;
+    summaryText.innerText = formSummary.dataset.value;
     amount.value = formAmount.value;
     amountText.innerText = formatDecimal(new Decimal(formAmount.value));
     if (entryForm.dataset.entryIndex === "new") {

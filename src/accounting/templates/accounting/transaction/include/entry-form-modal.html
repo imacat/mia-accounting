@@ -36,9 +36,11 @@ First written: 2023/2/25
             <div id="accounting-entry-form-account-error" class="invalid-feedback"></div>
           </div>
 
-          <div class="form-floating mb-3">
-            <input id="accounting-entry-form-summary" class="form-control" type="text" value="" placeholder=" ">
-            <label for="accounting-entry-form-summary">{{ A_("Summary") }}</label>
+          <div class="mb-3">
+            <div id="accounting-entry-form-summary-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="">
+              <label class="form-label" for="accounting-entry-form-summary">{{ A_("Summary") }}</label>
+              <div id="accounting-entry-form-summary" data-value=""></div>
+            </div>
             <div id="accounting-entry-form-summary-error" class="invalid-feedback"></div>
           </div>
 
