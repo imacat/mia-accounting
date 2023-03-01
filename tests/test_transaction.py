@@ -34,7 +34,7 @@ from testlib_txn import Accounts, get_add_form, get_unchanged_update_form, \
     NON_EMPTY_NOTE, EMPTY_NOTE, add_txn
 
 PREFIX: str = "/accounting/transactions"
-"""The URL prefix of the transaction management."""
+"""The URL prefix for the transaction management."""
 
 
 class CashIncomeTransactionTestCase(unittest.TestCase):

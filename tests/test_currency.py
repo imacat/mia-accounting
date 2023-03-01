@@ -55,7 +55,7 @@ zzc: CurrencyData = CurrencyData("ZZC", "Testing Dollar #C")
 zzd: CurrencyData = CurrencyData("ZZD", "Testing Dollar #D")
 """The fourth test currency."""
 PREFIX: str = "/accounting/currencies"
-"""The URL prefix of the currency management."""
+"""The URL prefix for the currency management."""
 
 
 class CurrencyCommandTestCase(unittest.TestCase):

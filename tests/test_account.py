@@ -62,7 +62,7 @@ stock: AccountData = AccountData("1121", 1, "Stock")
 loan: AccountData = AccountData("2112", 1, "Loan")
 """The loan account."""
 PREFIX: str = "/accounting/accounts"
-"""The URL prefix of the currency management."""
+"""The URL prefix for the account management."""
 
 
 class AccountCommandTestCase(unittest.TestCase):
