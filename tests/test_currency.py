@@ -342,9 +342,9 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual({x.code for x in Currency.query.all()},
                              {zza.code, zzb.code, zzc.code})
 
-            zzc_currency: Currency = db.session.get(Currency, zzc.code)
-            self.assertEqual(zzc_currency.code, zzc.code)
-            self.assertEqual(zzc_currency.name_l10n, zzc.name)
+            currency: Currency = db.session.get(Currency, zzc.code)
+            self.assertEqual(currency.code, zzc.code)
+            self.assertEqual(currency.name_l10n, zzc.name)
 
     def test_basic_update(self) -> None:
         """Tests the basic rules to update a user.
@@ -367,9 +367,9 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.code, zza.code)
-            self.assertEqual(zza_currency.name_l10n, f"{zza.name}-1")
+            currency: Currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.code, zza.code)
+            self.assertEqual(currency.name_l10n, f"{zza.name}-1")
 
         # Empty code
         response = self.client.post(update_uri,
@@ -433,7 +433,7 @@ class CurrencyTestCase(unittest.TestCase):
         from accounting.models import Currency
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
-        zza_currency: Currency
+        currency: Currency | None
         response: httpx.Response
 
         response = self.client.post(update_uri,
@@ -444,11 +444,11 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency = db.session.get(Currency, zza.code)
-            self.assertIsNotNone(zza_currency)
-            zza_currency.created_at \
-                = zza_currency.created_at - timedelta(seconds=5)
-            zza_currency.updated_at = zza_currency.created_at
+            currency = db.session.get(Currency, zza.code)
+            self.assertIsNotNone(currency)
+            currency.created_at \
+                = currency.created_at - timedelta(seconds=5)
+            currency.updated_at = currency.created_at
             db.session.commit()
 
         response = self.client.post(update_uri,
@@ -459,10 +459,10 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency = db.session.get(Currency, zza.code)
-            self.assertIsNotNone(zza_currency)
-            self.assertLess(zza_currency.created_at,
-                            zza_currency.updated_at)
+            currency = db.session.get(Currency, zza.code)
+            self.assertIsNotNone(currency)
+            self.assertLess(currency.created_at,
+                            currency.updated_at)
 
     def test_created_updated_by(self) -> None:
         """Tests the created-by and updated-by record.
@@ -474,12 +474,13 @@ class CurrencyTestCase(unittest.TestCase):
         client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
+        currency: Currency
         response: httpx.Response
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.created_by.username, editor_username)
-            self.assertEqual(zza_currency.updated_by.username, editor_username)
+            currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.created_by.username, editor_username)
+            self.assertEqual(currency.updated_by.username, editor_username)
 
         response = client.post(update_uri,
                                data={"csrf_token": csrf_token,
@@ -489,9 +490,9 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.created_by.username, editor_username)
-            self.assertEqual(zza_currency.updated_by.username, editor2_username)
+            currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.created_by.username, editor_username)
+            self.assertEqual(currency.updated_by.username, editor2_username)
 
     def test_api_exists(self) -> None:
         """Tests the API to check if a code exists.
@@ -522,12 +523,13 @@ class CurrencyTestCase(unittest.TestCase):
         from accounting.models import Currency
         detail_uri: str = f"{PREFIX}/{zza.code}"
         update_uri: str = f"{PREFIX}/{zza.code}/update"
+        currency: Currency
         response: httpx.Response
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.name_l10n, zza.name)
-            self.assertEqual(zza_currency.l10n, [])
+            currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.name_l10n, zza.name)
+            self.assertEqual(currency.l10n, [])
 
         set_locale(self.client, self.csrf_token, "zh_Hant")
 
@@ -539,9 +541,9 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.name_l10n, zza.name)
-            self.assertEqual({(x.locale, x.name) for x in zza_currency.l10n},
+            currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.name_l10n, zza.name)
+            self.assertEqual({(x.locale, x.name) for x in currency.l10n},
                              {("zh_Hant", f"{zza.name}-zh_Hant")})
 
         set_locale(self.client, self.csrf_token, "en")
@@ -554,9 +556,9 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.name_l10n, f"{zza.name}-2")
-            self.assertEqual({(x.locale, x.name) for x in zza_currency.l10n},
+            currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.name_l10n, f"{zza.name}-2")
+            self.assertEqual({(x.locale, x.name) for x in currency.l10n},
                              {("zh_Hant", f"{zza.name}-zh_Hant")})
 
         set_locale(self.client, self.csrf_token, "zh_Hant")
@@ -569,9 +571,9 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            zza_currency: Currency = db.session.get(Currency, zza.code)
-            self.assertEqual(zza_currency.name_l10n, f"{zza.name}-2")
-            self.assertEqual({(x.locale, x.name) for x in zza_currency.l10n},
+            currency = db.session.get(Currency, zza.code)
+            self.assertEqual(currency.name_l10n, f"{zza.name}-2")
+            self.assertEqual({(x.locale, x.name) for x in currency.l10n},
                              {("zh_Hant", f"{zza.name}-zh_Hant-2")})
 
     def test_delete(self) -> None:

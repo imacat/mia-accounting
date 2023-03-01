@@ -409,9 +409,9 @@ class AccountTestCase(unittest.TestCase):
                               f"{stock.base_code}-002",
                               f"{stock.base_code}-003"})
 
-            stock_account: Account = Account.find_by_code(stock.code)
-            self.assertEqual(stock_account.base_code, stock.base_code)
-            self.assertEqual(stock_account.title_l10n, stock.title)
+            account: Account = Account.find_by_code(stock.code)
+            self.assertEqual(account.base_code, stock.base_code)
+            self.assertEqual(account.title_l10n, stock.title)
 
     def test_basic_update(self) -> None:
         """Tests the basic rules to update a user.
@@ -434,9 +434,9 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.base_code, cash.base_code)
-            self.assertEqual(cash_account.title_l10n, f"{cash.title}-1")
+            account: Account = Account.find_by_code(cash.code)
+            self.assertEqual(account.base_code, cash.base_code)
+            self.assertEqual(account.title_l10n, f"{cash.title}-1")
 
         # Empty base account code
         response = self.client.post(update_uri,
@@ -492,7 +492,7 @@ class AccountTestCase(unittest.TestCase):
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
-        cash_account: Account
+        account: Account
         response: httpx.Response
 
         response = self.client.post(update_uri,
@@ -503,11 +503,11 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account = Account.find_by_code(cash.code)
-            self.assertIsNotNone(cash_account)
-            cash_account.created_at \
-                = cash_account.created_at - timedelta(seconds=5)
-            cash_account.updated_at = cash_account.created_at
+            account = Account.find_by_code(cash.code)
+            self.assertIsNotNone(account)
+            account.created_at \
+                = account.created_at - timedelta(seconds=5)
+            account.updated_at = account.created_at
             db.session.commit()
 
         response = self.client.post(update_uri,
@@ -518,10 +518,10 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account = Account.find_by_code(cash.code)
-            self.assertIsNotNone(cash_account)
-            self.assertLess(cash_account.created_at,
-                            cash_account.updated_at)
+            account = Account.find_by_code(cash.code)
+            self.assertIsNotNone(account)
+            self.assertLess(account.created_at,
+                            account.updated_at)
 
     def test_created_updated_by(self) -> None:
         """Tests the created-by and updated-by record.
@@ -533,12 +533,13 @@ class AccountTestCase(unittest.TestCase):
         client, csrf_token = get_client(self.app, editor2_username)
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
+        account: Account
         response: httpx.Response
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.created_by.username, editor_username)
-            self.assertEqual(cash_account.updated_by.username, editor_username)
+            account = Account.find_by_code(cash.code)
+            self.assertEqual(account.created_by.username, editor_username)
+            self.assertEqual(account.updated_by.username, editor_username)
 
         response = client.post(update_uri,
                                data={"csrf_token": csrf_token,
@@ -548,10 +549,10 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.created_by.username,
+            account = Account.find_by_code(cash.code)
+            self.assertEqual(account.created_by.username,
                              editor_username)
-            self.assertEqual(cash_account.updated_by.username,
+            self.assertEqual(account.updated_by.username,
                              editor2_username)
 
     def test_l10n(self) -> None:
@@ -562,12 +563,13 @@ class AccountTestCase(unittest.TestCase):
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{cash.code}"
         update_uri: str = f"{PREFIX}/{cash.code}/update"
+        account: Account
         response: httpx.Response
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.title_l10n, cash.title)
-            self.assertEqual(cash_account.l10n, [])
+            account = Account.find_by_code(cash.code)
+            self.assertEqual(account.title_l10n, cash.title)
+            self.assertEqual(account.l10n, [])
 
         set_locale(self.client, self.csrf_token, "zh_Hant")
 
@@ -579,9 +581,9 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.title_l10n, cash.title)
-            self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
+            account = Account.find_by_code(cash.code)
+            self.assertEqual(account.title_l10n, cash.title)
+            self.assertEqual({(x.locale, x.title) for x in account.l10n},
                              {("zh_Hant", f"{cash.title}-zh_Hant")})
 
         set_locale(self.client, self.csrf_token, "en")
@@ -594,9 +596,9 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.title_l10n, f"{cash.title}-2")
-            self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
+            account = Account.find_by_code(cash.code)
+            self.assertEqual(account.title_l10n, f"{cash.title}-2")
+            self.assertEqual({(x.locale, x.title) for x in account.l10n},
                              {("zh_Hant", f"{cash.title}-zh_Hant")})
 
         set_locale(self.client, self.csrf_token, "zh_Hant")
@@ -609,9 +611,9 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.app.app_context():
-            cash_account: Account = Account.find_by_code(cash.code)
-            self.assertEqual(cash_account.title_l10n, f"{cash.title}-2")
-            self.assertEqual({(x.locale, x.title) for x in cash_account.l10n},
+            account = Account.find_by_code(cash.code)
+            self.assertEqual(account.title_l10n, f"{cash.title}-2")
+            self.assertEqual({(x.locale, x.title) for x in account.l10n},
                              {("zh_Hant", f"{cash.title}-zh_Hant-2")})
 
     def test_delete(self) -> None:
