@@ -33,7 +33,7 @@ from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_view, has_permission, can_edit
 from accounting.utils.user import get_current_user_pk
 from .forms import AccountForm, sort_accounts_in, AccountReorderForm
-from .query import get_account_query
+from .queries import get_account_query
 
 bp: Blueprint = Blueprint("account", __name__)
 """The view blueprint for the account management."""

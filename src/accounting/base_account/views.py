@@ -34,7 +34,7 @@ def list_accounts() -> str:
 
     :return: The account list.
     """
-    from .query import get_base_account_query
+    from .queries import get_base_account_query
     accounts: list[BaseAccount] = get_base_account_query()
     pagination: Pagination = Pagination[BaseAccount](accounts)
     return render_template("accounting/base-account/list.html",

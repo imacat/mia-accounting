@@ -47,7 +47,7 @@ def list_currencies() -> str:
 
     :return: The currency list.
     """
-    from .query import get_currency_query
+    from .queries import get_currency_query
     currencies: list[Currency] = get_currency_query()
     pagination: Pagination = Pagination[Currency](currencies)
     return render_template("accounting/currency/list.html",
