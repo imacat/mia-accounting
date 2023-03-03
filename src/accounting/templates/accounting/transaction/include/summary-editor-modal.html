@@ -160,6 +160,12 @@ First written: 2023/2/28
               <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-number-number">{{ A_("The number of items") }}</label>
               <div id="accounting-summary-editor-{{ summary_editor.type }}-number-number-error" class="invalid-feedback"></div>
             </div>
+
+            <div class="form-floating">
+              <input id="accounting-summary-editor-{{ summary_editor.type }}-number-note" class="form-control" type="text" value="" placeholder=" ">
+              <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-number-note">{{ A_("Note") }}</label>
+              <div id="accounting-summary-editor-{{ summary_editor.type }}-number-note-error" class="invalid-feedback"></div>
+            </div>
           </div>
 
           {# The suggested accounts #}

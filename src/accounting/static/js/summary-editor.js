@@ -75,6 +75,12 @@ class SummaryEditor {
     number;
 
     /**
+     * The note.
+     * @type {HTMLInputElement}
+     */
+    note;
+
+    /**
      * The account buttons
      * @type {HTMLButtonElement[]}
      */
@@ -140,6 +146,7 @@ class SummaryEditor {
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
         this.number = document.getElementById(this.prefix + "-number-number");
+        this.note = document.getElementById(this.prefix + "-number-note");
         // noinspection JSValidateTypes
         this.#accountButtons = Array.from(document.getElementsByClassName(this.prefix + "-account"));
 
@@ -605,7 +612,7 @@ class GeneralTagTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—.+?(?:×\d+)?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—.+?(?:×\d+)?(?:\([^)]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -761,7 +768,7 @@ class GeneralTripTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:×\d+)?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:×\d+)?(?:\([^)]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -949,7 +956,7 @@ class BusTripTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:×\d+)?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:×\d+)?(?:\([^)]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -1110,13 +1117,11 @@ class NumberTab extends TabPlane {
         super(editor);
         const tabPlane = this;
         this.editor.number.onchange = function () {
-            const found = tabPlane.editor.summary.value.match(/^(.+)×(\d+)$/);
-            if (found !== null) {
-                tabPlane.editor.summary.value = found[1];
-            }
-            if (parseInt(tabPlane.editor.number.value) > 1) {
-                tabPlane.editor.summary.value = tabPlane.editor.summary.value + "×" + tabPlane.editor.number.value;
-            }
+            tabPlane.updateSummary();
+        };
+        this.editor.note.onchange = function () {
+            tabPlane.editor.note.value = tabPlane.editor.note.value.trim();
+            tabPlane.updateSummary();
         };
     }
 
@@ -1131,12 +1136,31 @@ class NumberTab extends TabPlane {
     };
 
     /**
+     * Updates the summary according to the input in the tab plane.
+     *
+     * @override
+     */
+    updateSummary() {
+        const found = this.editor.summary.value.match(/^(.*?)(?:×\d+)?(?:\([^)]+\))?$/);
+        if (found !== null) {
+            this.editor.summary.value = found[1];
+        }
+        if (parseInt(this.editor.number.value) > 1) {
+            this.editor.summary.value = this.editor.summary.value + "×" + this.editor.number.value;
+        }
+        if (this.editor.note.value !== "") {
+            this.editor.summary.value = this.editor.summary.value + "(" + this.editor.note.value + ")";
+        }
+    }
+
+    /**
      * Resets the tab plane input.
      *
      * @override
      */
     reset() {
         this.editor.number.value = "";
+        this.editor.note.value = "";
     }
 
     /**
@@ -1146,11 +1170,16 @@ class NumberTab extends TabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^.+×(\d+)$/);
-        if (found === null) {
+        const found = this.editor.summary.value.match(/^(.*?)(?:×(\d+))?(?:\(([^)]+)\))?$/);
+        if (found[2] === undefined) {
             this.editor.number.value = "";
         } else {
-            this.editor.number.value = found[1];
+            this.editor.number.value = found[2];
+        }
+        if (found[3] === undefined) {
+            this.editor.note.value = "";
+        } else {
+            this.editor.note.value = found[3];
         }
         return true;
     }
