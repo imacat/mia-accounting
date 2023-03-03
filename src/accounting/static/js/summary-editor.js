@@ -22,7 +22,7 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     SummaryEditor.initialize();
 });
 
@@ -163,13 +163,10 @@ class SummaryEditor {
         }
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
-        const editor = this;
-        this.summary.onchange = function () {
-            editor.#onSummaryChange();
-        };
-        this.#form.onsubmit = function () {
-            if (editor.currentTab.validate()) {
-                editor.#submit();
+        this.summary.onchange = () => this.#onSummaryChange();
+        this.#form.onsubmit = () => {
+            if (this.currentTab.validate()) {
+                this.#submit();
             }
             return false;
         };
@@ -220,11 +217,8 @@ class SummaryEditor {
      *
      */
     #initializeSuggestedAccounts() {
-        const editor = this;
         for (const accountButton of this.#accountButtons) {
-            accountButton.onclick = function () {
-                editor.#selectAccount(accountButton);
-            };
+            accountButton.onclick = () => this.#selectAccount(accountButton);
         }
     }
 
@@ -307,10 +301,7 @@ class SummaryEditor {
             const editor = new SummaryEditor(form);
             this.#editors[editor.#entryType] = editor;
         }
-        const editors = this;
-        formSummaryControl.onclick = function () {
-            editors.#editors[entryForm.dataset.entryType].#onOpen();
-        };
+        formSummaryControl.onclick = () => this.#editors[entryForm.dataset.entryType].#onOpen()
     }
 
     /**
@@ -365,10 +356,7 @@ class TabPlane {
         this.prefix = this.editor.prefix + "-" + this.tabId();
         this.#tab = document.getElementById(this.prefix + "-tab");
         this.#page = document.getElementById(this.prefix + "-page");
-        const tabPlane = this;
-        this.#tab.onclick = function () {
-            tabPlane.switchToMe();
-        };
+        this.#tab.onclick = () => this.switchToMe();
     }
 
     /**
@@ -460,10 +448,9 @@ class TagTabPlane extends TabPlane {
         // noinspection JSValidateTypes
         this.tagButtons = Array.from(document.getElementsByClassName(this.prefix + "-btn-tag"));
         this.initializeTagButtons();
-        const tabPlane = this;
-        this.tag.onchange = function () {
-            tabPlane.onTagChange();
-            tabPlane.updateSummary();
+        this.tag.onchange = () => {
+            this.onTagChange();
+            this.updateSummary();
         };
     }
 
@@ -519,18 +506,17 @@ class TagTabPlane extends TabPlane {
      *
      */
     initializeTagButtons() {
-        const tabPlane = this;
-        for (const tagButton of tabPlane.tagButtons) {
-            tagButton.onclick = function () {
-                for (const otherButton of tabPlane.tagButtons) {
+        for (const tagButton of this.tagButtons) {
+            tagButton.onclick = () => {
+                for (const otherButton of this.tagButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
-                tabPlane.tag.value = tagButton.dataset.value;
-                tabPlane.editor.filterSuggestedAccounts(tagButton);
-                tabPlane.updateSummary();
+                this.tag.value = tagButton.dataset.value;
+                this.editor.filterSuggestedAccounts(tagButton);
+                this.updateSummary();
             };
         }
     }
@@ -702,27 +688,26 @@ class GeneralTripTab extends TagTabPlane {
         this.#toError = document.getElementById(this.prefix + "-to-error")
         // noinspection JSValidateTypes
         this.#directionButtons = Array.from(document.getElementsByClassName(this.prefix + "-direction"));
-        const tabPlane = this;
-        this.#from.onchange = function () {
-            tabPlane.#from.value = tabPlane.#from.value.trim();
-            tabPlane.updateSummary();
-            tabPlane.validateFrom();
+        this.#from.onchange = () => {
+            this.#from.value = this.#from.value.trim();
+            this.updateSummary();
+            this.validateFrom();
         };
         for (const directionButton of this.#directionButtons) {
-            directionButton.onclick = function () {
-                for (const otherButton of tabPlane.#directionButtons) {
+            directionButton.onclick = () => {
+                for (const otherButton of this.#directionButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
                 directionButton.classList.remove("btn-outline-primary");
                 directionButton.classList.add("btn-primary");
-                tabPlane.updateSummary();
+                this.updateSummary();
             };
         }
-        this.#to.onchange = function () {
-            tabPlane.#to.value = tabPlane.#to.value.trim();
-            tabPlane.updateSummary();
-            tabPlane.validateTo();
+        this.#to.onchange = () => {
+            this.#to.value = this.#to.value.trim();
+            this.updateSummary();
+            this.validateTo();
         };
     }
 
@@ -915,21 +900,20 @@ class BusTripTab extends TagTabPlane {
         this.#fromError = document.getElementById(this.prefix + "-from-error");
         this.#to = document.getElementById(this.prefix + "-to");
         this.#toError = document.getElementById(this.prefix + "-to-error")
-        const tabPlane = this;
-        this.#route.onchange = function () {
-            tabPlane.#route.value = tabPlane.#route.value.trim();
-            tabPlane.updateSummary();
-            tabPlane.validateRoute();
+        this.#route.onchange = () => {
+            this.#route.value = this.#route.value.trim();
+            this.updateSummary();
+            this.validateRoute();
         };
-        this.#from.onchange = function () {
-            tabPlane.#from.value = tabPlane.#from.value.trim();
-            tabPlane.updateSummary();
-            tabPlane.validateFrom();
+        this.#from.onchange = () => {
+            this.#from.value = this.#from.value.trim();
+            this.updateSummary();
+            this.validateFrom();
         };
-        this.#to.onchange = function () {
-            tabPlane.#to.value = tabPlane.#to.value.trim();
-            tabPlane.updateSummary();
-            tabPlane.validateTo();
+        this.#to.onchange = () => {
+            this.#to.value = this.#to.value.trim();
+            this.updateSummary();
+            this.validateTo();
         };
     }
 
@@ -1139,13 +1123,10 @@ class AnnotationTab extends TabPlane {
      */
     constructor(editor) {
         super(editor);
-        const tabPlane = this;
-        this.editor.number.onchange = function () {
-            tabPlane.updateSummary();
-        };
-        this.editor.note.onchange = function () {
-            tabPlane.editor.note.value = tabPlane.editor.note.value.trim();
-            tabPlane.updateSummary();
+        this.editor.number.onchange = () => this.updateSummary();
+        this.editor.note.onchange = () => {
+            this.editor.note.value = this.editor.note.value.trim();
+            this.updateSummary();
         };
     }
 
