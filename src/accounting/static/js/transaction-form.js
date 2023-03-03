@@ -22,7 +22,7 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     initializeCurrencyForms();
     initializeJournalEntries();
     initializeFormValidation();
@@ -68,14 +68,14 @@ function initializeCurrencyForms() {
     const btnNew = document.getElementById("accounting-btn-new-currency");
     const currencyList = document.getElementById("accounting-currency-list");
     const deleteButtons = Array.from(document.getElementsByClassName("accounting-btn-delete-currency"));
-    const onReorder = function () {
+    const onReorder = () => {
         const currencies = Array.from(currencyList.children);
         for (let i = 0; i < currencies.length; i++) {
             const no = document.getElementById(currencies[i].dataset.prefix + "-no");
             no.value = String(i + 1);
         }
     };
-    btnNew.onclick = function () {
+    btnNew.onclick = () => {
         const currencies = Array.from(document.getElementsByClassName("accounting-currency"));
         let maxIndex = 0;
         for (const currency of currencies) {
@@ -107,7 +107,7 @@ function initializeCurrencyForms() {
  */
 function initializeBtnDeleteCurrency(button) {
     const target = document.getElementById(button.dataset.target);
-    button.onclick = function () {
+    button.onclick = () => {
         target.parentElement.removeChild(target);
         resetDeleteCurrencyButtons();
     };
@@ -161,7 +161,7 @@ function initializeNewEntryButton(button) {
     const formSummaryError = document.getElementById("accounting-entry-form-summary-error");
     const formAmount = document.getElementById("accounting-entry-form-amount");
     const formAmountError = document.getElementById("accounting-entry-form-amount-error");
-    button.onclick = function () {
+    button.onclick = () => {
         entryForm.dataset.currencyIndex = button.dataset.currencyIndex;
         entryForm.dataset.entryType = button.dataset.entryType;
         entryForm.dataset.entryIndex = button.dataset.entryIndex;
@@ -191,7 +191,7 @@ function initializeNewEntryButton(button) {
  * @param entryList {HTMLUListElement} the journal entry list.
  */
 function initializeJournalEntryListReorder(entryList) {
-    initializeDragAndDropReordering(entryList, function () {
+    initializeDragAndDropReordering(entryList, () => {
         const entries = Array.from(entryList.children);
         for (let i = 0; i < entries.length; i++) {
             const no = document.getElementById(entries[i].dataset.prefix + "-no");
@@ -216,7 +216,7 @@ function initializeJournalEntry(entry) {
     const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
     const formSummary = document.getElementById("accounting-entry-form-summary");
     const formAmount = document.getElementById("accounting-entry-form-amount");
-    control.onclick = function () {
+    control.onclick = () => {
         entryForm.dataset.currencyIndex = entry.dataset.currencyIndex;
         entryForm.dataset.entryType = entry.dataset.entryType;
         entryForm.dataset.entryIndex = entry.dataset.entryIndex;
@@ -252,7 +252,7 @@ function initializeJournalEntryFormModal() {
     const formAmount = document.getElementById("accounting-entry-form-amount");
     const modal = document.getElementById("accounting-entry-form-modal");
     formAmount.onchange = validateJournalEntryAmount;
-    entryForm.onsubmit = function () {
+    entryForm.onsubmit = () => {
         if (validateJournalEntryForm()) {
             saveJournalEntryForm();
             bootstrap.Modal.getInstance(modal).hide();
@@ -398,7 +398,7 @@ function initializeDeleteJournalEntryButton(button) {
     const currencyIndex = target.dataset.currencyIndex;
     const entryType = target.dataset.entryType;
     const currency = document.getElementById("accounting-currency-" + currencyIndex);
-    button.onclick = function () {
+    button.onclick = () => {
         target.parentElement.removeChild(target);
         resetDeleteJournalEntryButtons(button.dataset.sameClass);
         updateBalance(currencyIndex, entryType);
