@@ -38,7 +38,7 @@ First written: 2023/2/25
   {% else %}
     {% with currency_index = 1,
             only_one_currency_form = True,
-            currency_code_data = accounting_txn_default_currency_code(),
+            currency_code_data = accounting_default_currency_code(),
             debit_total = "-" %}
       {% include "accounting/transaction/expense/include/form-currency-item.html" %}
     {% endwith %}

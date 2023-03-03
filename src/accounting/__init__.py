@@ -62,6 +62,12 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     bp.add_app_template_filter(format_amount, "accounting_format_amount")
     bp.add_app_template_filter(format_date, "accounting_format_date")
 
+    from .template_globals import currency_options, default_currency_code
+    bp.add_app_template_global(currency_options,
+                               "accounting_currency_options")
+    bp.add_app_template_global(default_currency_code,
+                               "accounting_default_currency_code")
+
     from . import locale
     locale.init_app(app, bp)
 

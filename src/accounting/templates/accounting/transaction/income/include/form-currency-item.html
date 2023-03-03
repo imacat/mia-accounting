@@ -25,7 +25,7 @@ First written: 2023/2/25
     <div class="d-flex justify-content-between mt-2 mb-3">
       <div class="form-floating accounting-currency-content">
         <select id="accounting-currency-{{ currency_index }}-code" class="form-select" name="currency-{{ currency_index }}-code">
-          {% for currency in accounting_txn_currency_options() %}
+          {% for currency in accounting_currency_options() %}
             <option value="{{ currency.code }}" {% if currency.code == currency_code_data %} selected="selected" {% endif %}>{{ currency }}</option>
           {% endfor %}
         </select>
