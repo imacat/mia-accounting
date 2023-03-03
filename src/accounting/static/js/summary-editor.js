@@ -181,8 +181,8 @@ class SummaryEditor {
      */
     #onSummaryChange() {
         this.summary.value = this.summary.value.trim();
-        for (const tab of [this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
-            if (tab.populate()) {
+        for (const tabPlane of [this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
+            if (tabPlane.populate()) {
                 break;
             }
         }
@@ -283,8 +283,8 @@ class SummaryEditor {
      */
     #reset() {
         this.summary.value = "";
-        for (const tab of Object.values(this.tabPlanes)) {
-            tab.reset();
+        for (const tabPlane of Object.values(this.tabPlanes)) {
+            tabPlane.reset();
         }
         this.tabPlanes.general.switchToMe();
     }
