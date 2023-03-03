@@ -462,25 +462,33 @@ class TagTabPlane extends TabPlane {
         this.initializeTagButtons();
         const tabPlane = this;
         this.tag.onchange = function () {
-            tabPlane.tag.value = tabPlane.tag.value.trim();
-            let isMatched = false;
-            for (const tagButton of tabPlane.tagButtons) {
-                if (tagButton.dataset.value === tabPlane.tag.value) {
-                    tagButton.classList.remove("btn-outline-primary");
-                    tagButton.classList.add("btn-primary");
-                    tabPlane.editor.filterSuggestedAccounts(tagButton);
-                    isMatched = true;
-                } else {
-                    tagButton.classList.remove("btn-primary");
-                    tagButton.classList.add("btn-outline-primary");
-                }
-            }
-            if (!isMatched) {
-                tabPlane.editor.filterSuggestedAccounts(null);
-            }
+            tabPlane.onTagChange();
             tabPlane.updateSummary();
-            tabPlane.validateTag();
         };
+    }
+
+    /**
+     * The callback when the tag input is changed
+     *
+     */
+    onTagChange() {
+        this.tag.value = this.tag.value.trim();
+        let isMatched = false;
+        for (const tagButton of this.tagButtons) {
+            if (tagButton.dataset.value === this.tag.value) {
+                tagButton.classList.remove("btn-outline-primary");
+                tagButton.classList.add("btn-primary");
+                this.editor.filterSuggestedAccounts(tagButton);
+                isMatched = true;
+            } else {
+                tagButton.classList.remove("btn-primary");
+                tagButton.classList.add("btn-outline-primary");
+            }
+        }
+        if (!isMatched) {
+            this.editor.filterSuggestedAccounts(null);
+        }
+        this.validateTag();
     }
 
     /**
@@ -618,7 +626,10 @@ class GeneralTagTab extends TagTabPlane {
         if (found === null) {
             return false;
         }
-        this.tag.value = found[1];
+        if (this.tag.value !== found[1]) {
+            this.tag.value = found[1];
+            this.onTagChange();
+        }
         for (const tagButton of this.tagButtons) {
             if (tagButton.dataset.value === this.tag.value) {
                 tagButton.classList.remove("btn-outline-primary");
@@ -776,7 +787,10 @@ class GeneralTripTab extends TagTabPlane {
         if (found === null) {
             return false;
         }
-        this.tag.value = found[1];
+        if (this.tag.value !== found[1]) {
+            this.tag.value = found[1];
+            this.onTagChange();
+        }
         this.#from.value = found[2];
         for (const directionButton of this.#directionButtons) {
             if (directionButton.dataset.arrow === found[3]) {
@@ -967,7 +981,10 @@ class BusTripTab extends TagTabPlane {
         if (found === null) {
             return false;
         }
-        this.tag.value = found[1];
+        if (this.tag.value !== found[1]) {
+            this.tag.value = found[1];
+            this.onTagChange();
+        }
         this.#route.value = found[2];
         this.#from.value = found[3];
         this.#to.value = found[4];
