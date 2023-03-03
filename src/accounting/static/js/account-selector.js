@@ -95,9 +95,9 @@ class AccountSelector {
      */
     #initializeAccountQuery() {
         const query = document.getElementById(this.#prefix + "-query");
-        const helper = this;
+        const selector = this;
         query.addEventListener("input", function () {
-            helper.#filterAccountOptions();
+            selector.#filterAccountOptions();
         });
     }
 
