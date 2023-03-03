@@ -462,6 +462,7 @@ class TagTabPlane extends TabPlane {
         this.initializeTagButtons();
         const tabPlane = this;
         this.tag.onchange = function () {
+            tabPlane.tag.value = tabPlane.tag.value.trim();
             let isMatched = false;
             for (const tagButton of tabPlane.tagButtons) {
                 if (tagButton.dataset.value === tabPlane.tag.value) {
@@ -692,6 +693,7 @@ class GeneralTripTab extends TagTabPlane {
         this.#directionButtons = Array.from(document.getElementsByClassName(this.prefix + "-direction"));
         const tabPlane = this;
         this.#from.onchange = function () {
+            tabPlane.#from.value = tabPlane.#from.value.trim();
             tabPlane.updateSummary();
             tabPlane.validateFrom();
         };
@@ -707,6 +709,7 @@ class GeneralTripTab extends TagTabPlane {
             };
         }
         this.#to.onchange = function () {
+            tabPlane.#to.value = tabPlane.#to.value.trim();
             tabPlane.updateSummary();
             tabPlane.validateTo();
         };
@@ -900,14 +903,17 @@ class BusTripTab extends TagTabPlane {
         this.#toError = document.getElementById(this.prefix + "-to-error")
         const tabPlane = this;
         this.#route.onchange = function () {
+            tabPlane.#route.value = tabPlane.#route.value.trim();
             tabPlane.updateSummary();
             tabPlane.validateRoute();
         };
         this.#from.onchange = function () {
+            tabPlane.#from.value = tabPlane.#from.value.trim();
             tabPlane.updateSummary();
             tabPlane.validateFrom();
         };
         this.#to.onchange = function () {
+            tabPlane.#to.value = tabPlane.#to.value.trim();
             tabPlane.updateSummary();
             tabPlane.validateTo();
         };
