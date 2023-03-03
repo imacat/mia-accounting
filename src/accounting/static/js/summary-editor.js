@@ -613,7 +613,7 @@ class GeneralTagTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—.+?(?:×\d+)?(?:\([^)]+\))?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—/);
         if (found === null) {
             return false;
         }
