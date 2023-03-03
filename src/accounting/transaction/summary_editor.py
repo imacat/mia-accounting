@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The summary helper.
+"""The summary editor.
 
 """
 import typing as t
@@ -178,7 +178,7 @@ class SummaryEntryType:
 
     @property
     def accounts(self) -> list[SummaryAccount]:
-        """Returns the suggested accounts of all tags in the summary helper in
+        """Returns the suggested accounts of all tags in the summary editor in
         the entry type, in their frequency order.
 
         :return: The suggested accounts of all tags, in their frequency order.
@@ -197,11 +197,11 @@ class SummaryEntryType:
                                             key=lambda x: -freq[x])]
 
 
-class SummaryHelper:
-    """The summary helper."""
+class SummaryEditor:
+    """The summary editor."""
 
     def __init__(self):
-        """Constructs the summary helper."""
+        """Constructs the summary editor."""
         self.debit: SummaryEntryType = SummaryEntryType("debit")
         """The debit tags."""
         self.credit: SummaryEntryType = SummaryEntryType("credit")

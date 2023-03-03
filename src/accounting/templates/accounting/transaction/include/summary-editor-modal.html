@@ -1,0 +1,181 @@
+{#
+The Mia! Accounting Flask Project
+summary-editor-modal.html: The modal of the summary editor
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/28
+#}
+<form id="accounting-summary-editor-{{ summary_editor.type }}" class="accounting-summary-editor" data-entry-type="{{ summary_editor.type }}">
+  <div id="accounting-summary-editor-{{ summary_editor.type }}-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="accounting-summary-editor-{{ summary_editor.type }}-modal-label">
+            <label for="accounting-summary-editor-{{ summary_editor.type }}-summary">{{ A_("Summary") }}</label>
+          </h1>
+          <button class="btn-close" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal" aria-label="{{ A_("Close") }}"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <input id="accounting-summary-editor-{{ summary_editor.type }}-summary" class="form-control" type="text" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-modal-label">
+          </div>
+          <ul class="nav nav-tabs mb-2">
+            <li class="nav-item">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-general-tab" class="nav-link active accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="page" data-tab-id="general">
+                {{ A_("General") }}
+              </span>
+            </li>
+            <li class="nav-item">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-travel-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false" data-tab-id="travel">
+                {{ A_("Travel") }}
+              </span>
+            </li>
+            <li class="nav-item">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-bus-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false" data-tab-id="bus">
+                {{ A_("Bus") }}
+              </span>
+            </li>
+            <li class="nav-item">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-regular-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false" data-tab-id="regular">
+                {{ A_("Regular") }}
+              </span>
+            </li>
+            <li class="nav-item">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-number-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false" data-tab-id="number">
+                {{ A_("Number") }}
+              </span>
+            </li>
+          </ul>
+          {# A general summary with a tag #}
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-general-page" class="accounting-summary-editor-{{ summary_editor.type }}-page" aria-current="page" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-tab-general" data-tab-id="general">
+            <div class="form-floating mb-2">
+              <input id="accounting-summary-editor-{{ summary_editor.type }}-general-tag" class="form-control" type="text" value="" placeholder=" ">
+              <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-general-tag">{{ A_("Tag") }}</label>
+              <div id="accounting-summary-editor-{{ summary_editor.type }}-general-tag-error" class="invalid-feedback"></div>
+            </div>
+
+            <div>
+              {% for tag in summary_editor.general.tags %}
+                <button class="btn btn-outline-primary accounting-summary-editor-{{ summary_editor.type }}-general-btn-tag" type="button" tabindex="-1" data-value="{{ tag.name }}" data-accounts="{{ tag.account_codes|tojson|forceescape }}">
+                  {{ tag }}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+
+          {# A general trip with the origin and distination #}
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-travel-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-tab-travel" data-tab-id="travel">
+            <div class="form-floating mb-2">
+              <input id="accounting-summary-editor-{{ summary_editor.type }}-travel-tag" class="form-control" type="text" value="" placeholder=" ">
+              <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-travel-tag">{{ A_("Tag") }}</label>
+              <div id="accounting-summary-editor-{{ summary_editor.type }}-travel-tag-error" class="invalid-feedback"></div>
+            </div>
+
+            <div>
+              {% for tag in summary_editor.travel.tags %}
+                <button class="btn btn-outline-primary accounting-summary-editor-{{ summary_editor.type }}-travel-btn-tag" type="button" tabindex="-1" data-value="{{ tag.name }}" data-accounts="{{ tag.account_codes|tojson|forceescape }}">
+                  {{ tag }}
+                </button>
+              {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-2">
+              <div class="form-floating">
+                <input id="accounting-summary-editor-{{ summary_editor.type }}-travel-from" class="form-control" type="text" value="" placeholder=" ">
+                <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-travel-from">{{ A_("From") }}</label>
+                <div id="accounting-summary-editor-{{ summary_editor.type }}-travel-from-error" class="invalid-feedback"></div>
+              </div>
+              <div class="btn-group-vertical ms-1 me-1">
+                <button class="btn btn-primary accounting-summary-editor-{{ summary_editor.type }}-travel-direction accounting-default" type="button" tabindex="-1" data-arrow="&rarr;">&rarr;</button>
+                <button class="btn btn-outline-primary accounting-summary-editor-{{ summary_editor.type }}-travel-direction" type="button" tabindex="-1" data-arrow="&harr;">&harr;</button>
+              </div>
+              <div class="form-floating">
+                <input id="accounting-summary-editor-{{ summary_editor.type }}-travel-to" class="form-control" type="text" value="" placeholder=" ">
+                <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-travel-to">{{ A_("To") }}</label>
+                <div id="accounting-summary-editor-{{ summary_editor.type }}-travel-to-error" class="invalid-feedback"></div>
+              </div>
+            </div>
+          </div>
+
+          {# A bus trip with the route name or route number, the origin and distination #}
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-tab-bus" data-tab-id="bus">
+            <div class="d-flex justify-content-between mb-2">
+              <div class="form-floating me-2">
+                <input id="accounting-summary-editor-{{ summary_editor.type }}-bus-tag" class="form-control" type="text" value="" placeholder=" ">
+                <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-bus-tag">{{ A_("Tag") }}</label>
+                <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-tag-error" class="invalid-feedback"></div>
+              </div>
+              <div class="form-floating">
+                <input id="accounting-summary-editor-{{ summary_editor.type }}-bus-route" class="form-control" type="text" value="" placeholder=" ">
+                <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-bus-route">{{ A_("Route") }}</label>
+                <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-route-error" class="invalid-feedback"></div>
+              </div>
+            </div>
+
+            <div>
+              {% for tag in summary_editor.bus.tags %}
+                <button class="btn btn-outline-primary accounting-summary-editor-{{ summary_editor.type }}-bus-btn-tag" type="button" tabindex="-1" data-value="{{ tag.name }}" data-accounts="{{ tag.account_codes|tojson|forceescape }}">
+                  {{ tag }}
+                </button>
+              {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-2">
+              <div class="form-floating me-2">
+                <input id="accounting-summary-editor-{{ summary_editor.type }}-bus-from" class="form-control" type="text" value="" placeholder=" ">
+                <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-bus-from">{{ A_("From") }}</label>
+                <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-from-error" class="invalid-feedback"></div>
+              </div>
+              <div class="form-floating">
+                <input id="accounting-summary-editor-{{ summary_editor.type }}-bus-to" class="form-control" type="text" value="" placeholder=" ">
+                <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-bus-to">{{ A_("To") }}</label>
+                <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-to-error" class="invalid-feedback"></div>
+              </div>
+            </div>
+          </div>
+
+          {# A regular income or payment #}
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-regular-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-tab-regular" data-tab-id="regular">
+            {# TODO: To be done #}
+          </div>
+
+          {# The number of items #}
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-number-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-tab-number" data-tab-id="number">
+            <div class="form-floating">
+              <input id="accounting-summary-editor-{{ summary_editor.type }}-number-number" class="form-control" type="number" min="1" value="" placeholder=" ">
+              <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-number">{{ A_("The number of items") }}</label>
+              <div id="accounting-summary-editor-{{ summary_editor.type }}-number-error" class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          {# The suggested accounts #}
+          <div class="mt-3">
+            {% for account in summary_editor.accounts %}
+              <button class="btn btn-outline-primary d-none accounting-summary-editor-{{ summary_editor.type }}-account" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
+                {{ account }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal">{{ A_("Cancel") }}</button>
+          <button id="accounting-summary-editor-{{ summary_editor.type }}-btn-save" type="submit" class="btn btn-primary">{{ A_("Save") }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

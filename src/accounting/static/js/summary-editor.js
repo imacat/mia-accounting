@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * summary-helper.js: The JavaScript for the summary helper
+ * summary-editor.js: The JavaScript for the summary editor
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -23,23 +23,23 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", function () {
-    SummaryHelper.initialize();
+    SummaryEditor.initialize();
 });
 
 /**
- * A summary helper.
+ * A summary editor.
  *
  */
-class SummaryHelper {
+class SummaryEditor {
 
     /**
-     * The summary helper form
+     * The summary editor form
      * @type {HTMLFormElement}
      */
     #form;
 
     /**
-     * The modal of the summary helper
+     * The modal of the summary editor
      * @type {HTMLFormElement}
      */
     #modal;
@@ -129,14 +129,14 @@ class SummaryHelper {
     tabPlanes = {};
 
     /**
-     * Constructs a summary helper.
+     * Constructs a summary editor.
      *
-     * @param form {HTMLFormElement} the summary helper form
+     * @param form {HTMLFormElement} the summary editor form
      */
     constructor(form) {
         this.#form = form;
         this.#entryType = form.dataset.entryType;
-        this.prefix = "accounting-summary-helper-" + form.dataset.entryType;
+        this.prefix = "accounting-summary-editor-" + form.dataset.entryType;
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
         this.number = document.getElementById(this.prefix + "-number-number");
@@ -156,13 +156,13 @@ class SummaryHelper {
         }
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
-        const helper = this;
+        const editor = this;
         this.summary.onchange = function () {
-            helper.#onSummaryChange();
+            editor.#onSummaryChange();
         };
         this.#form.onsubmit = function () {
-            if (helper.currentTab.validate()) {
-                helper.#submit();
+            if (editor.currentTab.validate()) {
+                editor.#submit();
             }
             return false;
         };
@@ -212,10 +212,10 @@ class SummaryHelper {
      *
      */
     #initializeSuggestedAccounts() {
-        const helper = this;
+        const editor = this;
         for (const accountButton of this.#accountButtons) {
             accountButton.onclick = function () {
-                helper.#selectAccount(accountButton);
+                editor.#selectAccount(accountButton);
             };
         }
     }
@@ -260,7 +260,7 @@ class SummaryHelper {
     }
 
     /**
-     * The callback when the summary helper is shown.
+     * The callback when the summary editor is shown.
      *
      */
     #onOpen() {
@@ -270,7 +270,7 @@ class SummaryHelper {
     }
 
     /**
-     * Resets the summary helper.
+     * Resets the summary editor.
      *
      */
     #reset() {
@@ -282,36 +282,36 @@ class SummaryHelper {
     }
 
     /**
-     * The summary helpers.
-     * @type {{debit: SummaryHelper, credit: SummaryHelper}}
+     * The summary editors.
+     * @type {{debit: SummaryEditor, credit: SummaryEditor}}
      */
-    static #helpers = {}
+    static #editors = {}
 
     /**
-     * Initializes the summary helpers.
+     * Initializes the summary editors.
      *
      */
     static initialize() {
-        const forms = Array.from(document.getElementsByClassName("accounting-summary-helper"));
+        const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
         const entryForm = document.getElementById("accounting-entry-form");
         const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
         for (const form of forms) {
-            const helper = new SummaryHelper(form);
-            this.#helpers[helper.#entryType] = helper;
+            const editor = new SummaryEditor(form);
+            this.#editors[editor.#entryType] = editor;
         }
-        const helpers = this;
+        const editors = this;
         formSummaryControl.onclick = function () {
-            helpers.#helpers[entryForm.dataset.entryType].#onOpen();
+            editors.#editors[entryForm.dataset.entryType].#onOpen();
         };
     }
 
     /**
-     * Initializes the summary helper for a new journal entry.
+     * Initializes the summary editor for a new journal entry.
      *
      * @param entryType {string} the entry type, either "debit" or "credit"
      */
     static initializeNewJournalEntry(entryType) {
-        this.#helpers[entryType].#onOpen();
+        this.#editors[entryType].#onOpen();
     }
 }
 
@@ -324,10 +324,10 @@ class SummaryHelper {
 class TabPlane {
 
     /**
-     * The parent summary helper
-     * @type {SummaryHelper}
+     * The parent summary editor
+     * @type {SummaryEditor}
      */
-    helper;
+    editor;
 
     /**
      * The prefix of the HTML ID and classes
@@ -350,11 +350,11 @@ class TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param helper {SummaryHelper} the parent summary helper
+     * @param editor {SummaryEditor} the parent summary editor
      */
-    constructor(helper) {
-        this.helper = helper;
-        this.prefix = this.helper.prefix + "-" + this.tabId();
+    constructor(editor) {
+        this.editor = editor;
+        this.prefix = this.editor.prefix + "-" + this.tabId();
         this.#tab = document.getElementById(this.prefix + "-tab");
         this.#page = document.getElementById(this.prefix + "-page");
         const tabPlane = this;
@@ -399,7 +399,7 @@ class TabPlane {
      *
      */
     switchToMe() {
-        for (const tabPlane of Object.values(this.helper.tabPlanes)) {
+        for (const tabPlane of Object.values(this.editor.tabPlanes)) {
             tabPlane.#tab.classList.remove("active")
             tabPlane.#tab.ariaCurrent = "false";
             tabPlane.#page.classList.add("d-none");
@@ -409,7 +409,7 @@ class TabPlane {
         this.#tab.ariaCurrent = "page";
         this.#page.classList.remove("d-none");
         this.#page.ariaCurrent = "page";
-        this.helper.currentTab = this;
+        this.editor.currentTab = this;
     }
 }
 
@@ -442,11 +442,11 @@ class TagTabPlane extends TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param helper {SummaryHelper} the parent summary helper
+     * @param editor {SummaryEditor} the parent summary editor
      * @override
      */
-    constructor(helper) {
-        super(helper);
+    constructor(editor) {
+        super(editor);
         this.tag = document.getElementById(this.prefix + "-tag");
         this.tagError = document.getElementById(this.prefix + "-tag-error");
         // noinspection JSValidateTypes
@@ -459,7 +459,7 @@ class TagTabPlane extends TabPlane {
                 if (tagButton.dataset.value === tabPlane.tag.value) {
                     tagButton.classList.remove("btn-outline-primary");
                     tagButton.classList.add("btn-primary");
-                    tabPlane.helper.filterSuggestedAccounts(tagButton);
+                    tabPlane.editor.filterSuggestedAccounts(tagButton);
                     isMatched = true;
                 } else {
                     tagButton.classList.remove("btn-primary");
@@ -467,7 +467,7 @@ class TagTabPlane extends TabPlane {
                 }
             }
             if (!isMatched) {
-                tabPlane.helper.filterSuggestedAccounts(null);
+                tabPlane.editor.filterSuggestedAccounts(null);
             }
             tabPlane.updateSummary();
             tabPlane.validateTag();
@@ -494,7 +494,7 @@ class TagTabPlane extends TabPlane {
                 break;
             }
         }
-        this.helper.filterSuggestedAccounts(selectedTagButton);
+        this.editor.filterSuggestedAccounts(selectedTagButton);
     }
 
     /**
@@ -512,7 +512,7 @@ class TagTabPlane extends TabPlane {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
                 tabPlane.tag.value = tagButton.dataset.value;
-                tabPlane.helper.filterSuggestedAccounts(tagButton);
+                tabPlane.editor.filterSuggestedAccounts(tagButton);
                 tabPlane.updateSummary();
             };
         }
@@ -589,12 +589,12 @@ class GeneralTagTab extends TagTabPlane {
      * @override
      */
     updateSummary() {
-        const pos = this.helper.summary.value.indexOf("—");
+        const pos = this.editor.summary.value.indexOf("—");
         const prefix = this.tag.value === ""? "": this.tag.value + "—";
         if (pos === -1) {
-            this.helper.summary.value = prefix + this.helper.summary.value;
+            this.editor.summary.value = prefix + this.editor.summary.value;
         } else {
-            this.helper.summary.value = prefix + this.helper.summary.value.substring(pos + 1);
+            this.editor.summary.value = prefix + this.editor.summary.value.substring(pos + 1);
         }
     }
 
@@ -605,7 +605,7 @@ class GeneralTagTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.helper.summary.value.match(/^([^—]+)—.+?(?:×\d+)?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—.+?(?:×\d+)?$/);
         if (found === null) {
             return false;
         }
@@ -614,7 +614,7 @@ class GeneralTagTab extends TagTabPlane {
             if (tagButton.dataset.value === this.tag.value) {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
-                this.helper.filterSuggestedAccounts(tagButton);
+                this.editor.filterSuggestedAccounts(tagButton);
             }
         }
         this.switchToMe();
@@ -671,11 +671,11 @@ class GeneralTripTab extends TagTabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param helper {SummaryHelper} the parent summary helper
+     * @param editor {SummaryEditor} the parent summary editor
      * @override
      */
-    constructor(helper) {
-        super(helper);
+    constructor(editor) {
+        super(editor);
         this.#from = document.getElementById(this.prefix + "-from");
         this.#fromError = document.getElementById(this.prefix + "-from-error");
         this.#to = document.getElementById(this.prefix + "-to");
@@ -727,7 +727,7 @@ class GeneralTripTab extends TagTabPlane {
                 break;
             }
         }
-        this.helper.summary.value = this.tag.value + "—" + this.#from.value + direction + this.#to.value;
+        this.editor.summary.value = this.tag.value + "—" + this.#from.value + direction + this.#to.value;
     }
 
     /**
@@ -761,7 +761,7 @@ class GeneralTripTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.helper.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:×\d+)?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:×\d+)?$/);
         if (found === null) {
             return false;
         }
@@ -781,7 +781,7 @@ class GeneralTripTab extends TagTabPlane {
             if (tagButton.dataset.value === this.tag.value) {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
-                this.helper.filterSuggestedAccounts(tagButton);
+                this.editor.filterSuggestedAccounts(tagButton);
             }
         }
         this.switchToMe();
@@ -879,11 +879,11 @@ class BusTripTab extends TagTabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param helper {SummaryHelper} the parent summary helper
+     * @param editor {SummaryEditor} the parent summary editor
      * @override
      */
-    constructor(helper) {
-        super(helper);
+    constructor(editor) {
+        super(editor);
         this.#route = document.getElementById(this.prefix + "-route");
         this.#routeError = document.getElementById(this.prefix + "-route-error");
         this.#from = document.getElementById(this.prefix + "-from");
@@ -921,7 +921,7 @@ class BusTripTab extends TagTabPlane {
      * @override
      */
     updateSummary() {
-        this.helper.summary.value = this.tag.value + "—" + this.#route.value + "—" + this.#from.value + "→" + this.#to.value;
+        this.editor.summary.value = this.tag.value + "—" + this.#route.value + "—" + this.#from.value + "→" + this.#to.value;
     }
 
     /**
@@ -949,7 +949,7 @@ class BusTripTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.helper.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:×\d+)?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:×\d+)?$/);
         if (found === null) {
             return false;
         }
@@ -961,7 +961,7 @@ class BusTripTab extends TagTabPlane {
             if (tagButton.dataset.value === this.tag.value) {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
-                this.helper.filterSuggestedAccounts(tagButton);
+                this.editor.filterSuggestedAccounts(tagButton);
                 break;
             }
         }
@@ -1041,11 +1041,11 @@ class RegularPaymentTab extends TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param helper {SummaryHelper} the parent summary helper
+     * @param editor {SummaryEditor} the parent summary editor
      * @override
      */
-    constructor(helper) {
-        super(helper);
+    constructor(editor) {
+        super(editor);
         // noinspection JSValidateTypes
         this.#payments = Array.from(document.getElementsByClassName(this.prefix + "-payment"));
     }
@@ -1103,19 +1103,19 @@ class NumberTab extends TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param helper {SummaryHelper} the parent summary helper
+     * @param editor {SummaryEditor} the parent summary editor
      * @override
      */
-    constructor(helper) {
-        super(helper);
+    constructor(editor) {
+        super(editor);
         const tabPlane = this;
-        this.helper.number.onchange = function () {
-            const found = tabPlane.helper.summary.value.match(/^(.+)×(\d+)$/);
+        this.editor.number.onchange = function () {
+            const found = tabPlane.editor.summary.value.match(/^(.+)×(\d+)$/);
             if (found !== null) {
-                tabPlane.helper.summary.value = found[1];
+                tabPlane.editor.summary.value = found[1];
             }
-            if (parseInt(tabPlane.helper.number.value) > 1) {
-                tabPlane.helper.summary.value = tabPlane.helper.summary.value + "×" + tabPlane.helper.number.value;
+            if (parseInt(tabPlane.editor.number.value) > 1) {
+                tabPlane.editor.summary.value = tabPlane.editor.summary.value + "×" + tabPlane.editor.number.value;
             }
         };
     }
@@ -1136,7 +1136,7 @@ class NumberTab extends TabPlane {
      * @override
      */
     reset() {
-        this.helper.number.value = "";
+        this.editor.number.value = "";
     }
 
     /**
@@ -1146,11 +1146,11 @@ class NumberTab extends TabPlane {
      * @override
      */
     populate() {
-        const found = this.helper.summary.value.match(/^.+×(\d+)$/);
+        const found = this.editor.summary.value.match(/^.+×(\d+)$/);
         if (found === null) {
-            this.helper.number.value = "";
+            this.editor.number.value = "";
         } else {
-            this.helper.number.value = found[1];
+            this.editor.number.value = found[1];
         }
         return true;
     }

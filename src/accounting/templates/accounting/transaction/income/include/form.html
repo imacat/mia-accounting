@@ -46,8 +46,8 @@ First written: 2023/2/25
 {% endblock %}
 
 {% block form_modals %}
-  {% with summary_helper = form.summary_helper.credit %}
-    {% include "accounting/transaction/include/summary-helper-modal.html" %}
+  {% with summary_editor = form.summary_editor.credit %}
+    {% include "accounting/transaction/include/summary-editor-modal.html" %}
   {% endwith %}
   {% with entry_type = "credit",
           account_options = form.credit_account_options %}

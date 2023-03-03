@@ -37,7 +37,7 @@ from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Transaction, Account, JournalEntry, \
     TransactionCurrency, Currency
-from accounting.transaction.summary_helper import SummaryHelper
+from accounting.transaction.summary_editor import SummaryEditor
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_text, strip_multiline_text
 from accounting.utils.user import get_current_user_pk
@@ -391,12 +391,12 @@ class TransactionForm(FlaskForm):
                 if isinstance(x, str) or isinstance(x, LazyString)]
 
     @property
-    def summary_helper(self) -> SummaryHelper:
-        """Returns the summary helper.
+    def summary_editor(self) -> SummaryEditor:
+        """Returns the summary editor.
 
-        :return: The summary helper.
+        :return: The summary editor.
         """
-        return SummaryHelper()
+        return SummaryEditor()
 
 
 T = t.TypeVar("T", bound=TransactionForm)

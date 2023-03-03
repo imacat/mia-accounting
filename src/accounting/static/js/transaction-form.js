@@ -171,7 +171,7 @@ function initializeNewEntryButton(button) {
         formAccount.dataset.code = "";
         formAccount.dataset.text = "";
         formAccountError.innerText = "";
-        formSummaryControl.dataset.bsTarget = "#accounting-summary-helper-" + button.dataset.entryType + "-modal";
+        formSummaryControl.dataset.bsTarget = "#accounting-summary-editor-" + button.dataset.entryType + "-modal";
         formSummaryControl.classList.remove("accounting-not-empty");
         formSummaryControl.classList.remove("is-invalid");
         formSummary.dataset.value = "";
@@ -181,7 +181,7 @@ function initializeNewEntryButton(button) {
         formAmount.classList.remove("is-invalid");
         formAmountError.innerText = "";
         AccountSelector.initializeJournalEntryForm();
-        SummaryHelper.initializeNewJournalEntry(button.dataset.entryType);
+        SummaryEditor.initializeNewJournalEntry(button.dataset.entryType);
     };
 }
 
@@ -228,7 +228,7 @@ function initializeJournalEntry(entry) {
         formAccount.innerText = accountCode.dataset.text;
         formAccount.dataset.code = accountCode.value;
         formAccount.dataset.text = accountCode.dataset.text;
-        formSummaryControl.dataset.bsTarget = "#accounting-summary-helper-" + entry.dataset.entryType + "-modal";
+        formSummaryControl.dataset.bsTarget = "#accounting-summary-editor-" + entry.dataset.entryType + "-modal";
         if (summary.value === "") {
             formSummaryControl.classList.remove("accounting-not-empty");
         } else {

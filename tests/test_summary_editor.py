@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The test for the summary helper.
+"""The test for the summary editor.
 
 """
 import unittest
@@ -29,8 +29,8 @@ from testlib import get_client
 from testlib_txn import Accounts, NEXT_URI, add_txn
 
 
-class SummeryHelperTestCase(unittest.TestCase):
-    """The summary helper test case."""
+class SummeryEditorTestCase(unittest.TestCase):
+    """The summary editor test case."""
 
     def setUp(self) -> None:
         """Sets up the test.
@@ -61,101 +61,101 @@ class SummeryHelperTestCase(unittest.TestCase):
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
-    def test_summary_helper(self) -> None:
-        """Test the summary helper.
+    def test_summary_editor(self) -> None:
+        """Test the summary editor.
 
         :return: None.
         """
-        from accounting.transaction.summary_helper import SummaryHelper
+        from accounting.transaction.summary_editor import SummaryEditor
         for form in get_form_data(self.csrf_token):
             add_txn(self.client, form)
         with self.app.app_context():
-            helper: SummaryHelper = SummaryHelper()
+            editor: SummaryEditor = SummaryEditor()
 
         # Debit-General
-        self.assertEqual(len(helper.debit.general.tags), 2)
-        self.assertEqual(helper.debit.general.tags[0].name, "Lunch")
-        self.assertEqual(len(helper.debit.general.tags[0].accounts), 2)
-        self.assertEqual(helper.debit.general.tags[0].accounts[0].code,
+        self.assertEqual(len(editor.debit.general.tags), 2)
+        self.assertEqual(editor.debit.general.tags[0].name, "Lunch")
+        self.assertEqual(len(editor.debit.general.tags[0].accounts), 2)
+        self.assertEqual(editor.debit.general.tags[0].accounts[0].code,
                          Accounts.MEAL)
-        self.assertEqual(helper.debit.general.tags[0].accounts[1].code,
+        self.assertEqual(editor.debit.general.tags[0].accounts[1].code,
                          Accounts.PAYABLE)
-        self.assertEqual(helper.debit.general.tags[1].name, "Dinner")
-        self.assertEqual(len(helper.debit.general.tags[1].accounts), 2)
-        self.assertEqual(helper.debit.general.tags[1].accounts[0].code,
+        self.assertEqual(editor.debit.general.tags[1].name, "Dinner")
+        self.assertEqual(len(editor.debit.general.tags[1].accounts), 2)
+        self.assertEqual(editor.debit.general.tags[1].accounts[0].code,
                          Accounts.MEAL)
-        self.assertEqual(helper.debit.general.tags[1].accounts[1].code,
+        self.assertEqual(editor.debit.general.tags[1].accounts[1].code,
                          Accounts.PAYABLE)
 
         # Debit-Travel
-        self.assertEqual(len(helper.debit.travel.tags), 3)
-        self.assertEqual(helper.debit.travel.tags[0].name, "Bike")
-        self.assertEqual(len(helper.debit.travel.tags[0].accounts), 1)
-        self.assertEqual(helper.debit.travel.tags[0].accounts[0].code,
+        self.assertEqual(len(editor.debit.travel.tags), 3)
+        self.assertEqual(editor.debit.travel.tags[0].name, "Bike")
+        self.assertEqual(len(editor.debit.travel.tags[0].accounts), 1)
+        self.assertEqual(editor.debit.travel.tags[0].accounts[0].code,
                          Accounts.TRAVEL)
-        self.assertEqual(helper.debit.travel.tags[1].name, "Taxi")
-        self.assertEqual(len(helper.debit.travel.tags[1].accounts), 1)
-        self.assertEqual(helper.debit.travel.tags[1].accounts[0].code,
+        self.assertEqual(editor.debit.travel.tags[1].name, "Taxi")
+        self.assertEqual(len(editor.debit.travel.tags[1].accounts), 1)
+        self.assertEqual(editor.debit.travel.tags[1].accounts[0].code,
                          Accounts.TRAVEL)
-        self.assertEqual(helper.debit.travel.tags[2].name, "Airplane")
-        self.assertEqual(len(helper.debit.travel.tags[2].accounts), 1)
-        self.assertEqual(helper.debit.travel.tags[2].accounts[0].code,
+        self.assertEqual(editor.debit.travel.tags[2].name, "Airplane")
+        self.assertEqual(len(editor.debit.travel.tags[2].accounts), 1)
+        self.assertEqual(editor.debit.travel.tags[2].accounts[0].code,
                          Accounts.TRAVEL)
 
         # Debit-Bus
-        self.assertEqual(len(helper.debit.bus.tags), 2)
-        self.assertEqual(helper.debit.bus.tags[0].name, "Train")
-        self.assertEqual(len(helper.debit.bus.tags[0].accounts), 1)
-        self.assertEqual(helper.debit.bus.tags[0].accounts[0].code,
+        self.assertEqual(len(editor.debit.bus.tags), 2)
+        self.assertEqual(editor.debit.bus.tags[0].name, "Train")
+        self.assertEqual(len(editor.debit.bus.tags[0].accounts), 1)
+        self.assertEqual(editor.debit.bus.tags[0].accounts[0].code,
                          Accounts.TRAVEL)
-        self.assertEqual(helper.debit.bus.tags[1].name, "Bus")
-        self.assertEqual(len(helper.debit.bus.tags[1].accounts), 1)
-        self.assertEqual(helper.debit.bus.tags[1].accounts[0].code,
+        self.assertEqual(editor.debit.bus.tags[1].name, "Bus")
+        self.assertEqual(len(editor.debit.bus.tags[1].accounts), 1)
+        self.assertEqual(editor.debit.bus.tags[1].accounts[0].code,
                          Accounts.TRAVEL)
 
         # Credit-General
-        self.assertEqual(len(helper.credit.general.tags), 2)
-        self.assertEqual(helper.credit.general.tags[0].name, "Lunch")
-        self.assertEqual(len(helper.credit.general.tags[0].accounts), 3)
-        self.assertEqual(helper.credit.general.tags[0].accounts[0].code,
+        self.assertEqual(len(editor.credit.general.tags), 2)
+        self.assertEqual(editor.credit.general.tags[0].name, "Lunch")
+        self.assertEqual(len(editor.credit.general.tags[0].accounts), 3)
+        self.assertEqual(editor.credit.general.tags[0].accounts[0].code,
                          Accounts.PAYABLE)
-        self.assertEqual(helper.credit.general.tags[0].accounts[1].code,
+        self.assertEqual(editor.credit.general.tags[0].accounts[1].code,
                          Accounts.BANK)
-        self.assertEqual(helper.credit.general.tags[0].accounts[2].code,
+        self.assertEqual(editor.credit.general.tags[0].accounts[2].code,
                          Accounts.CASH)
-        self.assertEqual(helper.credit.general.tags[1].name, "Dinner")
-        self.assertEqual(len(helper.credit.general.tags[1].accounts), 2)
-        self.assertEqual(helper.credit.general.tags[1].accounts[0].code,
+        self.assertEqual(editor.credit.general.tags[1].name, "Dinner")
+        self.assertEqual(len(editor.credit.general.tags[1].accounts), 2)
+        self.assertEqual(editor.credit.general.tags[1].accounts[0].code,
                          Accounts.BANK)
-        self.assertEqual(helper.credit.general.tags[1].accounts[1].code,
+        self.assertEqual(editor.credit.general.tags[1].accounts[1].code,
                          Accounts.PAYABLE)
 
         # Credit-Travel
-        self.assertEqual(len(helper.credit.travel.tags), 2)
-        self.assertEqual(helper.credit.travel.tags[0].name, "Bike")
-        self.assertEqual(len(helper.credit.travel.tags[0].accounts), 2)
-        self.assertEqual(helper.credit.travel.tags[0].accounts[0].code,
+        self.assertEqual(len(editor.credit.travel.tags), 2)
+        self.assertEqual(editor.credit.travel.tags[0].name, "Bike")
+        self.assertEqual(len(editor.credit.travel.tags[0].accounts), 2)
+        self.assertEqual(editor.credit.travel.tags[0].accounts[0].code,
                          Accounts.PAYABLE)
-        self.assertEqual(helper.credit.travel.tags[0].accounts[1].code,
+        self.assertEqual(editor.credit.travel.tags[0].accounts[1].code,
                          Accounts.PREPAID)
-        self.assertEqual(helper.credit.travel.tags[1].name, "Taxi")
-        self.assertEqual(len(helper.credit.travel.tags[1].accounts), 2)
-        self.assertEqual(helper.credit.travel.tags[1].accounts[0].code,
+        self.assertEqual(editor.credit.travel.tags[1].name, "Taxi")
+        self.assertEqual(len(editor.credit.travel.tags[1].accounts), 2)
+        self.assertEqual(editor.credit.travel.tags[1].accounts[0].code,
                          Accounts.PAYABLE)
-        self.assertEqual(helper.credit.travel.tags[1].accounts[1].code,
+        self.assertEqual(editor.credit.travel.tags[1].accounts[1].code,
                          Accounts.CASH)
 
         # Credit-Bus
-        self.assertEqual(len(helper.credit.bus.tags), 2)
-        self.assertEqual(helper.credit.bus.tags[0].name, "Train")
-        self.assertEqual(len(helper.credit.bus.tags[0].accounts), 2)
-        self.assertEqual(helper.credit.bus.tags[0].accounts[0].code,
+        self.assertEqual(len(editor.credit.bus.tags), 2)
+        self.assertEqual(editor.credit.bus.tags[0].name, "Train")
+        self.assertEqual(len(editor.credit.bus.tags[0].accounts), 2)
+        self.assertEqual(editor.credit.bus.tags[0].accounts[0].code,
                          Accounts.PREPAID)
-        self.assertEqual(helper.credit.bus.tags[0].accounts[1].code,
+        self.assertEqual(editor.credit.bus.tags[0].accounts[1].code,
                          Accounts.PAYABLE)
-        self.assertEqual(helper.credit.bus.tags[1].name, "Bus")
-        self.assertEqual(len(helper.credit.bus.tags[1].accounts), 1)
-        self.assertEqual(helper.credit.bus.tags[1].accounts[0].code,
+        self.assertEqual(editor.credit.bus.tags[1].name, "Bus")
+        self.assertEqual(len(editor.credit.bus.tags[1].accounts), 1)
+        self.assertEqual(editor.credit.bus.tags[1].accounts[0].code,
                          Accounts.PREPAID)
 
 
