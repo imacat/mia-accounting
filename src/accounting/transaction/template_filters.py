@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The template filters and globals for the transaction management.
+"""The template filters for the transaction management.
 
 """
 from datetime import date, timedelta
@@ -23,11 +23,10 @@ from html import escape
 from urllib.parse import ParseResult, urlparse, parse_qsl, urlencode, \
     urlunparse
 
-from flask import request, current_app
+from flask import request
 from flask_babel import get_locale
 
 from accounting.locale import gettext
-from accounting.models import Currency
 
 
 def with_type(uri: str) -> str:
@@ -126,20 +125,3 @@ def text2html(value: str) -> str:
     s = s.replace("\n", "<br>")
     s = s.replace("  ", " &nbsp;")
     return s
-
-
-def currency_options() -> str:
-    """Returns the currency options.
-
-    :return: The currency options.
-    """
-    return Currency.query.order_by(Currency.code).all()
-
-
-def default_currency_code() -> str:
-    """Returns the default currency code.
-
-    :return: The default currency code.
-    """
-    with current_app.app_context():
-        return current_app.config.get("DEFAULT_CURRENCY", "USD")
