@@ -31,10 +31,10 @@ First written: 2023/2/25
               currency_code_errors = currency_form.code.errors,
               debit_forms = currency_form.debit,
               debit_errors = currency_form.debit_errors,
-              debit_total = currency_form.form.debit_total|accounting_txn_format_amount,
+              debit_total = currency_form.form.debit_total|accounting_format_amount,
               credit_forms = currency_form.credit,
               credit_errors = currency_form.credit_errors,
-              credit_total = currency_form.form.credit_total|accounting_txn_format_amount %}
+              credit_total = currency_form.form.credit_total|accounting_format_amount %}
         {% include "accounting/transaction/transfer/include/form-currency-item.html" %}
       {% endwith %}
     {% endfor %}

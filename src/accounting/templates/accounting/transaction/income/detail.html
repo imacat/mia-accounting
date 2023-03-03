@@ -44,14 +44,14 @@ First written: 2023/2/26
                   <div>{{ entry.summary }}</div>
                 {% endif %}
               </div>
-              <div>{{ entry.amount|accounting_txn_format_amount }}</div>
+              <div>{{ entry.amount|accounting_format_amount }}</div>
             </div>
           </li>
         {% endfor %}
         <li class="list-group-item accounting-transaction-entry accounting-transaction-entry-total">
           <div class="d-flex justify-content-between">
             <div>{{ A_("Total") }}</div>
-            <div>{{ currency.debit_total|accounting_txn_format_amount }}</div>
+            <div>{{ currency.debit_total|accounting_format_amount }}</div>
           </div>
         </li>
       </ul>

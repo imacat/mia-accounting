@@ -85,7 +85,7 @@ First written: 2023/2/18
   <div class="list-group">
   {% for item in list %}
     <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.transaction.detail", txn=item)|accounting_append_next }}">
-      {{ item.date|accounting_txn_format_date }} {{ item }}
+      {{ item.date|accounting_format_date }} {{ item }}
     </a>
   {% endfor %}
   </div>

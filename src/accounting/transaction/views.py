@@ -36,18 +36,16 @@ from accounting.utils.user import get_current_user_pk
 from .dispatcher import TransactionType, get_txn_type, TXN_TYPE_OBJ
 from .forms import sort_transactions_in, TransactionReorderForm
 from .queries import get_transaction_query
-from .template_filters import with_type, to_transfer, format_amount, \
-    format_amount_input, format_date, text2html
+from .template_filters import with_type, to_transfer, format_amount_input, \
+    text2html
 from .template_globals import currency_options, default_currency_code
 
 bp: Blueprint = Blueprint("transaction", __name__)
 """The view blueprint for the transaction management."""
 bp.add_app_template_filter(with_type, "accounting_txn_with_type")
 bp.add_app_template_filter(to_transfer, "accounting_txn_to_transfer")
-bp.add_app_template_filter(format_amount, "accounting_txn_format_amount")
 bp.add_app_template_filter(format_amount_input,
                            "accounting_txn_format_amount_input")
-bp.add_app_template_filter(format_date, "accounting_txn_format_date")
 bp.add_app_template_filter(text2html, "accounting_txn_text2html")
 bp.add_app_template_global(currency_options, "accounting_txn_currency_options")
 bp.add_app_template_global(default_currency_code,
@@ -192,8 +190,8 @@ def show_transaction_order(txn_date: date) -> str:
     :param txn_date: The date.
     :return: The order of the transactions in the date.
     """
-    transactions: list[Transaction] = Transaction.query\
-        .filter(Transaction.date == txn_date)\
+    transactions: list[Transaction] = Transaction.query \
+        .filter(Transaction.date == txn_date) \
         .order_by(Transaction.no).all()
     return render_template("accounting/transaction/order.html",
                            date=txn_date, list=transactions)

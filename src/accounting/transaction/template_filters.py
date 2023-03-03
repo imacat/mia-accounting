@@ -17,16 +17,12 @@
 """The template filters for the transaction management.
 
 """
-from datetime import date, timedelta
 from decimal import Decimal
 from html import escape
 from urllib.parse import ParseResult, urlparse, parse_qsl, urlencode, \
     urlunparse
 
 from flask import request
-from flask_babel import get_locale
-
-from accounting.locale import gettext
 
 
 def with_type(uri: str) -> str:
@@ -61,19 +57,6 @@ def to_transfer(uri: str) -> str:
     return urlunparse(parts)
 
 
-def format_amount(value: Decimal | None) -> str:
-    """Formats an amount for readability.
-
-    :param value: The amount.
-    :return: The formatted amount text.
-    """
-    if value is None or value == 0:
-        return "-"
-    whole: int = int(value)
-    frac: Decimal = (value - whole).normalize()
-    return "{:,}".format(whole) + str(frac)[1:]
-
-
 def format_amount_input(value: Decimal) -> str:
     """Format an amount for an input value.
 
@@ -83,36 +66,6 @@ def format_amount_input(value: Decimal) -> str:
     whole: int = int(value)
     frac: Decimal = (value - whole).normalize()
     return str(whole) + str(frac)[1:]
-
-
-def format_date(value: date) -> str:
-    """Formats a date to be human-friendly.
-
-    :param value: The date.
-    :return: The human-friendly date text.
-    """
-    today: date = date.today()
-    if value == today:
-        return gettext("Today")
-    if value == today - timedelta(days=1):
-        return gettext("Yesterday")
-    if value == today + timedelta(days=1):
-        return gettext("Tomorrow")
-    locale = str(get_locale())
-    if locale == "zh" or locale.startswith("zh_"):
-        if value == today - timedelta(days=2):
-            return gettext("The day before yesterday")
-        if value == today + timedelta(days=2):
-            return gettext("The day after tomorrow")
-    if locale == "zh" or locale.startswith("zh_"):
-        weekdays = ["一", "二", "三", "四", "五", "六", "日"]
-        weekday = weekdays[value.weekday()]
-    else:
-        weekday = value.strftime("%a")
-    if value.year != today.year:
-        return "{}/{}/{}({})".format(
-            value.year, value.month, value.day, weekday)
-    return "{}/{}({})".format(value.month, value.day, weekday)
 
 
 def text2html(value: str) -> str:

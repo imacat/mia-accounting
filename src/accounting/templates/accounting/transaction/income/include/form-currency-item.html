@@ -57,7 +57,7 @@ First written: 2023/2/25
                     summary_errors = entry_form.summary.errors,
                     amount_data = "" if entry_form.amount.data is none else entry_form.amount.data|accounting_txn_format_amount_input,
                     amount_errors = entry_form.amount.errors,
-                    amount_text = entry_form.amount.data|accounting_txn_format_amount,
+                    amount_text = entry_form.amount.data|accounting_format_amount,
                     entry_errors = entry_form.all_errors %}
               {% include "accounting/transaction/include/form-entry-item.html" %}
             {% endwith %}

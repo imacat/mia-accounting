@@ -58,6 +58,10 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
                               template_folder="templates",
                               static_folder="static")
 
+    from .template_filters import format_amount, format_date
+    bp.add_app_template_filter(format_amount, "accounting_format_amount")
+    bp.add_app_template_filter(format_date, "accounting_format_date")
+
     from . import locale
     locale.init_app(app, bp)
 
