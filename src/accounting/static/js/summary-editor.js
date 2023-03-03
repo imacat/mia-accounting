@@ -126,11 +126,11 @@ class SummaryEditor {
      * The tab plane classes
      * @type {typeof TabPlane[]}
      */
-    #TAB_CLASES = [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, NumberTab]
+    #TAB_CLASES = [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, AnnotationTab]
 
     /**
      * The tab planes
-     * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, regular: RegularPaymentTab, number: NumberTab}}
+     * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, regular: RegularPaymentTab, annotation: AnnotationTab}}
      */
     tabPlanes = {};
 
@@ -145,8 +145,8 @@ class SummaryEditor {
         this.prefix = "accounting-summary-editor-" + form.dataset.entryType;
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
-        this.number = document.getElementById(this.prefix + "-number-number");
-        this.note = document.getElementById(this.prefix + "-number-note");
+        this.number = document.getElementById(this.prefix + "-annotation-number");
+        this.note = document.getElementById(this.prefix + "-annotation-note");
         // noinspection JSValidateTypes
         this.#accountButtons = Array.from(document.getElementsByClassName(this.prefix + "-account"));
 
@@ -186,7 +186,7 @@ class SummaryEditor {
                 break;
             }
         }
-        this.tabPlanes.number.populate();
+        this.tabPlanes.annotation.populate();
     }
 
     /**
@@ -1102,11 +1102,11 @@ class RegularPaymentTab extends TabPlane {
 }
 
 /**
- * The number tab plane.
+ * The annotation tab plane.
  *
  * @private
  */
-class NumberTab extends TabPlane {
+class AnnotationTab extends TabPlane {
 
     /**
      * Constructs a tab plane.
@@ -1133,7 +1133,7 @@ class NumberTab extends TabPlane {
      * @abstract
      */
     tabId() {
-        return "number";
+        return "annotation";
     };
 
     /**
