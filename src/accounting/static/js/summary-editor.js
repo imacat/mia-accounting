@@ -180,6 +180,7 @@ class SummaryEditor {
      *
      */
     #onSummaryChange() {
+        this.summary.value = this.summary.value.trim();
         for (const tab of [this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tab.populate()) {
                 break;
