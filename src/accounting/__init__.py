@@ -68,6 +68,9 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     from .utils import permission
     permission.init_app(bp, can_view_func, can_edit_func)
 
+    from .utils import next_uri
+    next_uri.init_app(bp)
+
     from . import base_account
     base_account.init_app(app, bp)
 
@@ -79,8 +82,5 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
 
     from . import transaction
     transaction.init_app(app, bp)
-
-    from .utils import next_uri
-    next_uri.init_app(bp)
 
     app.register_blueprint(bp)
