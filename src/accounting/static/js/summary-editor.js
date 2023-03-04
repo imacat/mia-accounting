@@ -46,7 +46,7 @@ class SummaryEditor {
 
     /**
      * The modal of the summary editor
-     * @type {HTMLFormElement}
+     * @type {HTMLDivElement}
      */
     #modal;
 
