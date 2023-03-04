@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The view dispatcher for different transaction types.
+"""The operators for different transaction types.
 
 """
 import typing as t
@@ -30,10 +30,10 @@ from .forms import TransactionForm, IncomeTransactionForm, \
     ExpenseTransactionForm, TransferTransactionForm
 
 
-class TransactionType(ABC):
-    """An abstract transaction type."""
+class TransactionOperator(ABC):
+    """The base transaction operator."""
     CHECK_ORDER: int = -1
-    """The order when checking the transaction type."""
+    """The order when checking the transaction operator."""
 
     @property
     @abstractmethod
@@ -90,10 +90,10 @@ class TransactionType(ABC):
             entry_index="ENTRY_INDEX")
 
 
-class IncomeTransaction(TransactionType):
+class IncomeTransaction(TransactionOperator):
     """An income transaction."""
     CHECK_ORDER: int = 2
-    """The order when checking the transaction type."""
+    """The order when checking the transaction operator."""
 
     @property
     def form(self) -> t.Type[TransactionForm]:
@@ -159,10 +159,10 @@ class IncomeTransaction(TransactionType):
             credit_total="-")
 
 
-class ExpenseTransaction(TransactionType):
+class ExpenseTransaction(TransactionOperator):
     """An expense transaction."""
     CHECK_ORDER: int = 1
-    """The order when checking the transaction type."""
+    """The order when checking the transaction operator."""
 
     @property
     def form(self) -> t.Type[TransactionForm]:
@@ -228,10 +228,10 @@ class ExpenseTransaction(TransactionType):
             debit_total="-")
 
 
-class TransferTransaction(TransactionType):
+class TransferTransaction(TransactionOperator):
     """A transfer transaction."""
     CHECK_ORDER: int = 3
-    """The order when checking the transaction type."""
+    """The order when checking the transaction operator."""
 
     @property
     def form(self) -> t.Type[TransactionForm]:
@@ -297,17 +297,17 @@ class TransferTransaction(TransactionType):
             debit_total="-", credit_total="-")
 
 
-TXN_ENUM_TO_OP: dict[TransactionTypeEnum, TransactionType] \
+TXN_ENUM_TO_OP: dict[TransactionTypeEnum, TransactionOperator] \
     = {TransactionTypeEnum.CASH_INCOME: IncomeTransaction(),
        TransactionTypeEnum.CASH_EXPENSE: ExpenseTransaction(),
        TransactionTypeEnum.TRANSFER: TransferTransaction()}
-"""The map from the transaction type enum to its operator."""
+"""The map from the transaction types to their operators."""
 
 
-def get_txn_type_op(txn: Transaction) -> TransactionType:
-    """Returns the transaction type operator that may be specified in the "as"
-    query parameter.  If it is not specified, check the transaction type from
-    the transaction.
+def get_txn_op(txn: Transaction) -> TransactionOperator:
+    """Returns the transaction operator that may be specified in the "as" query
+    parameter.  If it is not specified, check the transaction type from the
+     transaction.
 
     :param txn: The transaction.
     :return: None.
