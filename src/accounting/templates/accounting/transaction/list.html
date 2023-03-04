@@ -38,16 +38,16 @@ First written: 2023/2/18
       </button>
       <ul class="dropdown-menu">
         <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=types.expense)|accounting_append_next }}">
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=txn_types.CASH_EXPENSE)|accounting_append_next }}">
             {{ A_("Cash Expense") }}</a>
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=types.income)|accounting_append_next }}">
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=txn_types.CASH_INCOME)|accounting_append_next }}">
             {{ A_("Cash Income") }}
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=types.transfer)|accounting_append_next }}">
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=txn_types.TRANSFER)|accounting_append_next }}">
             {{ A_("Transfer") }}
           </a>
         </li>

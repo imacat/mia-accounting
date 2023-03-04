@@ -24,15 +24,14 @@ from flask import render_template, request, abort
 from flask_wtf import FlaskForm
 
 from accounting.models import Transaction
+from accounting.template_globals import default_currency_code
+from accounting.utils.txn_types import TransactionTypeEnum
 from .forms import TransactionForm, IncomeTransactionForm, \
     ExpenseTransactionForm, TransferTransactionForm
-from accounting.template_globals import default_currency_code
 
 
 class TransactionType(ABC):
     """An abstract transaction type."""
-    ID: str = ""
-    """The transaction type ID."""
     CHECK_ORDER: int = -1
     """The order when checking the transaction type."""
 
@@ -93,8 +92,6 @@ class TransactionType(ABC):
 
 class IncomeTransaction(TransactionType):
     """An income transaction."""
-    ID: str = "income"
-    """The transaction type ID."""
     CHECK_ORDER: int = 2
     """The order when checking the transaction type."""
 
@@ -113,7 +110,8 @@ class IncomeTransaction(TransactionType):
         :return: the form to create a transaction.
         """
         return render_template("accounting/transaction/income/create.html",
-                               form=form, txn_type=self,
+                               form=form,
+                               txn_type=TransactionTypeEnum.CASH_INCOME,
                                currency_template=self.__currency_template,
                                entry_template=self._entry_template)
 
@@ -163,8 +161,6 @@ class IncomeTransaction(TransactionType):
 
 class ExpenseTransaction(TransactionType):
     """An expense transaction."""
-    ID: str = "expense"
-    """The transaction type ID."""
     CHECK_ORDER: int = 1
     """The order when checking the transaction type."""
 
@@ -183,7 +179,8 @@ class ExpenseTransaction(TransactionType):
         :return: the form to create a transaction.
         """
         return render_template("accounting/transaction/expense/create.html",
-                               form=form, txn_type=self,
+                               form=form,
+                               txn_type=TransactionTypeEnum.CASH_EXPENSE,
                                currency_template=self.__currency_template,
                                entry_template=self._entry_template)
 
@@ -233,8 +230,6 @@ class ExpenseTransaction(TransactionType):
 
 class TransferTransaction(TransactionType):
     """A transfer transaction."""
-    ID: str = "transfer"
-    """The transaction type ID."""
     CHECK_ORDER: int = 3
     """The order when checking the transaction type."""
 
@@ -253,7 +248,8 @@ class TransferTransaction(TransactionType):
         :return: the form to create a transaction.
         """
         return render_template("accounting/transaction/transfer/create.html",
-                               form=form, txn_type=self,
+                               form=form,
+                               txn_type=TransactionTypeEnum.TRANSFER,
                                currency_template=self.__currency_template,
                                entry_template=self._entry_template)
 
@@ -301,44 +297,28 @@ class TransferTransaction(TransactionType):
             debit_total="-", credit_total="-")
 
 
-class TransactionTypes:
-    """The transaction types, as object properties."""
-
-    def __init__(self, income: IncomeTransaction, expense: ExpenseTransaction,
-                 transfer: TransferTransaction):
-        """Constructs the transaction types as object properties.
-
-        :param income: The income transaction type.
-        :param expense: The expense transaction type.
-        :param transfer: The transfer transaction type.
-        """
-        self.income: IncomeTransaction = income
-        self.expense: ExpenseTransaction = expense
-        self.transfer: TransferTransaction = transfer
+TXN_ENUM_TO_OP: dict[TransactionTypeEnum, TransactionType] \
+    = {TransactionTypeEnum.CASH_INCOME: IncomeTransaction(),
+       TransactionTypeEnum.CASH_EXPENSE: ExpenseTransaction(),
+       TransactionTypeEnum.TRANSFER: TransferTransaction()}
+"""The map from the transaction type enum to its operator."""
 
 
-TXN_TYPE_DICT: dict[str, TransactionType] \
-    = {x.ID: x() for x in {IncomeTransaction,
-                           ExpenseTransaction,
-                           TransferTransaction}}
-"""The transaction types, as a dictionary."""
-TXN_TYPE_OBJ: TransactionTypes = TransactionTypes(**TXN_TYPE_DICT)
-"""The transaction types, as an object."""
-
-
-def get_txn_type(txn: Transaction) -> TransactionType:
-    """Returns the transaction type that may be specified in the "as" query
-    parameter.  If it is not specified, check the transaction type from the
-    transaction.
+def get_txn_type_op(txn: Transaction) -> TransactionType:
+    """Returns the transaction type operator that may be specified in the "as"
+    query parameter.  If it is not specified, check the transaction type from
+    the transaction.
 
     :param txn: The transaction.
     :return: None.
     """
     if "as" in request.args:
-        if request.args["as"] not in TXN_TYPE_DICT:
+        type_dict: dict[str, TransactionTypeEnum] \
+            = {x.value: x for x in TransactionTypeEnum}
+        if request.args["as"] not in type_dict:
             abort(404)
-        return TXN_TYPE_DICT[request.args["as"]]
-    for txn_type in sorted(TXN_TYPE_DICT.values(),
+        return TXN_ENUM_TO_OP[type_dict[request.args["as"]]]
+    for txn_type in sorted(TXN_ENUM_TO_OP.values(),
                            key=lambda x: x.CHECK_ORDER):
         if txn_type.is_my_type(txn):
             return txn_type

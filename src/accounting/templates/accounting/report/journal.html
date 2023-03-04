@@ -40,16 +40,16 @@ First written: 2023/3/4
       </button>
       <ul class="dropdown-menu">
         <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.expense)|accounting_append_next }}">
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
             {{ A_("Cash Expense") }}</a>
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.income)|accounting_append_next }}">
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
             {{ A_("Cash Income") }}
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.transfer)|accounting_append_next }}">
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
             {{ A_("Transfer") }}
           </a>
         </li>
@@ -69,7 +69,7 @@ First written: 2023/3/4
   </a>
 </div>
 
-{% with types = report.txn_types %}
+{% with txn_types = report.txn_types %}
   {% include "accounting/include/add-txn-material-fab.html" %}
 {% endwith %}
 

@@ -27,13 +27,14 @@ from flask_sqlalchemy.query import Query
 
 from accounting import db
 from accounting.models import JournalEntry, Transaction, Account, Currency
-from accounting.transaction.dispatcher import TXN_TYPE_OBJ, TransactionTypes
 from accounting.utils.pagination import Pagination
+from accounting.utils.txn_types import TransactionTypeEnum
 from .period import Period
 from .period_choosers import PeriodChooser, \
     JournalPeriodChooser
 from .report_chooser import ReportChooser, ReportType
 from .report_rows import ReportRow, JournalRow
+import typing as t
 
 
 class JournalEntryReport(ABC):
@@ -104,12 +105,12 @@ class JournalEntryReport(ABC):
         """
 
     @property
-    def txn_types(self) -> TransactionTypes:
+    def txn_types(self) -> t.Type[TransactionTypeEnum]:
         """Returns the transaction types.
 
         :return: The transaction types.
         """
-        return TXN_TYPE_OBJ
+        return TransactionTypeEnum
 
     def as_csv_download(self) -> Response:
         """Returns the journal entries as CSV download.
