@@ -131,7 +131,7 @@ class JournalEntryReport(ABC):
 
 
 class Journal(JournalEntryReport):
-    """A journal."""
+    """The journal."""
 
     def get_entries(self) -> list[JournalEntry]:
         conditions: list[sa.BinaryExpression] = []
