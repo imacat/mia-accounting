@@ -25,7 +25,7 @@ from flask_wtf import FlaskForm
 
 from accounting.models import Transaction
 from accounting.template_globals import default_currency_code
-from accounting.utils.txn_types import TransactionTypeEnum
+from accounting.utils.txn_types import TransactionType
 from .forms import TransactionForm, IncomeTransactionForm, \
     ExpenseTransactionForm, TransferTransactionForm
 
@@ -111,7 +111,7 @@ class IncomeTransaction(TransactionOperator):
         """
         return render_template("accounting/transaction/income/create.html",
                                form=form,
-                               txn_type=TransactionTypeEnum.CASH_INCOME,
+                               txn_type=TransactionType.CASH_INCOME,
                                currency_template=self.__currency_template,
                                entry_template=self._entry_template)
 
@@ -180,7 +180,7 @@ class ExpenseTransaction(TransactionOperator):
         """
         return render_template("accounting/transaction/expense/create.html",
                                form=form,
-                               txn_type=TransactionTypeEnum.CASH_EXPENSE,
+                               txn_type=TransactionType.CASH_EXPENSE,
                                currency_template=self.__currency_template,
                                entry_template=self._entry_template)
 
@@ -249,7 +249,7 @@ class TransferTransaction(TransactionOperator):
         """
         return render_template("accounting/transaction/transfer/create.html",
                                form=form,
-                               txn_type=TransactionTypeEnum.TRANSFER,
+                               txn_type=TransactionType.TRANSFER,
                                currency_template=self.__currency_template,
                                entry_template=self._entry_template)
 
@@ -297,10 +297,10 @@ class TransferTransaction(TransactionOperator):
             debit_total="-", credit_total="-")
 
 
-TXN_ENUM_TO_OP: dict[TransactionTypeEnum, TransactionOperator] \
-    = {TransactionTypeEnum.CASH_INCOME: IncomeTransaction(),
-       TransactionTypeEnum.CASH_EXPENSE: ExpenseTransaction(),
-       TransactionTypeEnum.TRANSFER: TransferTransaction()}
+TXN_TYPE_TO_OP: dict[TransactionType, TransactionOperator] \
+    = {TransactionType.CASH_INCOME: IncomeTransaction(),
+       TransactionType.CASH_EXPENSE: ExpenseTransaction(),
+       TransactionType.TRANSFER: TransferTransaction()}
 """The map from the transaction types to their operators."""
 
 
@@ -313,12 +313,12 @@ def get_txn_op(txn: Transaction) -> TransactionOperator:
     :return: None.
     """
     if "as" in request.args:
-        type_dict: dict[str, TransactionTypeEnum] \
-            = {x.value: x for x in TransactionTypeEnum}
+        type_dict: dict[str, TransactionType] \
+            = {x.value: x for x in TransactionType}
         if request.args["as"] not in type_dict:
             abort(404)
-        return TXN_ENUM_TO_OP[type_dict[request.args["as"]]]
-    for txn_type in sorted(TXN_ENUM_TO_OP.values(),
+        return TXN_TYPE_TO_OP[type_dict[request.args["as"]]]
+    for txn_type in sorted(TXN_TYPE_TO_OP.values(),
                            key=lambda x: x.CHECK_ORDER):
         if txn_type.is_my_type(txn):
             return txn_type

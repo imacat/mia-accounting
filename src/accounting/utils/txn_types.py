@@ -20,7 +20,7 @@
 from enum import Enum
 
 
-class TransactionTypeEnum(Enum):
+class TransactionType(Enum):
     """The transaction types."""
     CASH_INCOME: str = "income"
     """The cash income transaction."""

@@ -24,7 +24,7 @@ from werkzeug.routing import BaseConverter
 
 from accounting import db
 from accounting.models import Transaction
-from accounting.utils.txn_types import TransactionTypeEnum
+from accounting.utils.txn_types import TransactionType
 
 
 class TransactionConverter(BaseConverter):
@@ -55,20 +55,20 @@ class TransactionTypeConverter(BaseConverter):
     """The transaction converter to convert the transaction type ID from and to
     the corresponding transaction type in the routes."""
 
-    def to_python(self, value: str) -> TransactionTypeEnum:
+    def to_python(self, value: str) -> TransactionType:
         """Converts a transaction ID to a transaction.
 
         :param value: The transaction ID.
         :return: The corresponding transaction.
         """
-        type_dict: dict[str, TransactionTypeEnum] \
-            = {x.value: x for x in TransactionTypeEnum}
-        txn_type: TransactionTypeEnum | None = type_dict.get(value)
+        type_dict: dict[str, TransactionType] \
+            = {x.value: x for x in TransactionType}
+        txn_type: TransactionType | None = type_dict.get(value)
         if txn_type is None:
             abort(404)
         return txn_type
 
-    def to_url(self, value: TransactionTypeEnum) -> str:
+    def to_url(self, value: TransactionType) -> str:
         """Converts a transaction type to its ID.
 
         :param value: The transaction type.

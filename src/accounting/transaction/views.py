@@ -32,9 +32,9 @@ from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
-from accounting.utils.txn_types import TransactionTypeEnum
+from accounting.utils.txn_types import TransactionType
 from accounting.utils.user import get_current_user_pk
-from .operators import TransactionOperator, TXN_ENUM_TO_OP, get_txn_op
+from .operators import TransactionOperator, TXN_TYPE_TO_OP, get_txn_op
 from .forms import sort_transactions_in, TransactionReorderForm
 from .queries import get_transaction_query
 from .template_filters import with_type, to_transfer, format_amount_input, \
@@ -60,18 +60,18 @@ def list_transactions() -> str:
     pagination: Pagination = Pagination[Transaction](transactions)
     return render_template("accounting/transaction/list.html",
                            list=pagination.list, pagination=pagination,
-                           txn_types=TransactionTypeEnum)
+                           txn_types=TransactionType)
 
 
 @bp.get("/create/<transactionType:txn_type>", endpoint="create")
 @has_permission(can_edit)
-def show_add_transaction_form(txn_type: TransactionTypeEnum) -> str:
+def show_add_transaction_form(txn_type: TransactionType) -> str:
     """Shows the form to add a transaction.
 
     :param txn_type: The transaction type.
     :return: The form to add a transaction.
     """
-    txn_op: TransactionOperator = TXN_ENUM_TO_OP[txn_type]
+    txn_op: TransactionOperator = TXN_TYPE_TO_OP[txn_type]
     form: txn_op.form
     if "form" in session:
         form = txn_op.form(ImmutableMultiDict(parse_qsl(session["form"])))
@@ -84,14 +84,14 @@ def show_add_transaction_form(txn_type: TransactionTypeEnum) -> str:
 
 @bp.post("/store/<transactionType:txn_type>", endpoint="store")
 @has_permission(can_edit)
-def add_transaction(txn_type: TransactionTypeEnum) -> redirect:
+def add_transaction(txn_type: TransactionType) -> redirect:
     """Adds a transaction.
 
     :param txn_type: The transaction type.
     :return: The redirection to the transaction detail on success, or the
         transaction creation form on error.
     """
-    txn_op: TransactionOperator = TXN_ENUM_TO_OP[txn_type]
+    txn_op: TransactionOperator = TXN_TYPE_TO_OP[txn_type]
     form: txn_op.form = txn_op.form(request.form)
     if not form.validate():
         flash_form_errors(form)
