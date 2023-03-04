@@ -37,34 +37,34 @@ First written: 2023/2/28
           {# Tab navigation #}
           <ul class="nav nav-tabs mb-2">
             <li class="nav-item">
-              <span id="accounting-summary-editor-{{ summary_editor.type }}-general-tab" class="nav-link active accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="page">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-general-tab" class="nav-link active accounting-clickable" aria-current="page">
                 {{ A_("General") }}
               </span>
             </li>
             <li class="nav-item">
-              <span id="accounting-summary-editor-{{ summary_editor.type }}-travel-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-travel-tab" class="nav-link accounting-clickable" aria-current="false">
                 {{ A_("Travel") }}
               </span>
             </li>
             <li class="nav-item">
-              <span id="accounting-summary-editor-{{ summary_editor.type }}-bus-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-bus-tab" class="nav-link accounting-clickable" aria-current="false">
                 {{ A_("Bus") }}
               </span>
             </li>
             <li class="nav-item">
-              <span id="accounting-summary-editor-{{ summary_editor.type }}-regular-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-regular-tab" class="nav-link accounting-clickable" aria-current="false">
                 {{ A_("Regular") }}
               </span>
             </li>
             <li class="nav-item">
-              <span id="accounting-summary-editor-{{ summary_editor.type }}-annotation-tab" class="nav-link accounting-clickable accounting-summary-editor-{{ summary_editor.type }}-tab" aria-current="false">
+              <span id="accounting-summary-editor-{{ summary_editor.type }}-annotation-tab" class="nav-link accounting-clickable" aria-current="false">
                 {{ A_("Annotation") }}
               </span>
             </li>
           </ul>
 
           {# A general summary with a tag #}
-          <div id="accounting-summary-editor-{{ summary_editor.type }}-general-page" class="accounting-summary-editor-{{ summary_editor.type }}-page" aria-current="page" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-general-tab">
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-general-page" aria-current="page" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-general-tab">
             <div class="form-floating mb-2">
               <input id="accounting-summary-editor-{{ summary_editor.type }}-general-tag" class="form-control" type="text" value="" placeholder=" ">
               <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-general-tag">{{ A_("Tag") }}</label>
@@ -81,7 +81,7 @@ First written: 2023/2/28
           </div>
 
           {# A general trip with the origin and distination #}
-          <div id="accounting-summary-editor-{{ summary_editor.type }}-travel-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-travel-tab">
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-travel-page" class="d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-travel-tab">
             <div class="form-floating mb-2">
               <input id="accounting-summary-editor-{{ summary_editor.type }}-travel-tag" class="form-control" type="text" value="" placeholder=" ">
               <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-travel-tag">{{ A_("Tag") }}</label>
@@ -115,7 +115,7 @@ First written: 2023/2/28
           </div>
 
           {# A bus trip with the route name or route number, the origin and distination #}
-          <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-bus-tab">
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-bus-page" class="d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-bus-tab">
             <div class="d-flex justify-content-between mb-2">
               <div class="form-floating me-2">
                 <input id="accounting-summary-editor-{{ summary_editor.type }}-bus-tag" class="form-control" type="text" value="" placeholder=" ">
@@ -152,12 +152,12 @@ First written: 2023/2/28
           </div>
 
           {# A regular income or payment #}
-          <div id="accounting-summary-editor-{{ summary_editor.type }}-regular-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-regular-tab">
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-regular-page" class="d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-regular-tab">
             {# TODO: To be done #}
           </div>
 
           {# The annotation #}
-          <div id="accounting-summary-editor-{{ summary_editor.type }}-annotation-page" class="accounting-summary-editor-{{ summary_editor.type }}-page d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-annotation-tab">
+          <div id="accounting-summary-editor-{{ summary_editor.type }}-annotation-page" class="d-none" aria-current="false" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-annotation-tab">
             <div class="form-floating">
               <input id="accounting-summary-editor-{{ summary_editor.type }}-annotation-number" class="form-control" type="number" min="1" value="" placeholder=" ">
               <label class="form-label" for="accounting-summary-editor-{{ summary_editor.type }}-annotation-number">{{ A_("The number of items") }}</label>
