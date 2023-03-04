@@ -44,15 +44,15 @@ function initializeMouseDragAndDropReordering(list, onReorder) {
     let dragged = null;
     for (const item of items) {
         item.draggable = true;
-        item.addEventListener("dragstart", function () {
+        item.addEventListener("dragstart", () => {
             dragged = item;
             dragged.classList.add("accounting-dragged");
         });
-        item.addEventListener("dragover", function () {
+        item.addEventListener("dragover", () => {
             onDragOver(dragged, item);
             onReorder();
         });
-        item.addEventListener("dragend", function () {
+        item.addEventListener("dragend", () => {
             dragged.classList.remove("accounting-dragged");
             dragged = null;
         });
@@ -69,16 +69,16 @@ function initializeMouseDragAndDropReordering(list, onReorder) {
 function initializeTouchDragAndDropReordering(list, onReorder) {
     const items = Array.from(list.children);
     for (const item of items) {
-        item.addEventListener("touchstart", function () {
+        item.addEventListener("touchstart", () => {
             item.classList.add("accounting-dragged");
         });
-        item.addEventListener("touchmove", function (event) {
+        item.addEventListener("touchmove", (event) => {
             const touch = event.targetTouches[0];
             const target = document.elementFromPoint(touch.pageX, touch.pageY);
             onDragOver(item, target);
             onReorder();
         });
-        item.addEventListener("touchend", function () {
+        item.addEventListener("touchend", () => {
             item.classList.remove("accounting-dragged");
         });
     }
