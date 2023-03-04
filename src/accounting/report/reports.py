@@ -32,8 +32,9 @@ from accounting.utils.pagination import Pagination
 from accounting.utils.txn_types import TransactionType
 from .period import Period
 from .period_choosers import PeriodChooser, JournalPeriodChooser
-from .report_chooser import ReportChooser, ReportType
+from .report_chooser import ReportChooser
 from .report_rows import ReportRow, JournalRow
+from .report_type import ReportType
 
 
 class JournalEntryReport(ABC):

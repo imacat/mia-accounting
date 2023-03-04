@@ -21,7 +21,6 @@ This file is largely taken from the NanoParma ERP project, first written in
 
 """
 import typing as t
-from enum import Enum
 
 from flask import url_for
 from flask_babel import LazyString
@@ -31,12 +30,7 @@ from accounting.locale import gettext
 from accounting.models import Currency
 from accounting.template_globals import default_currency_code
 from .period import Period
-
-
-class ReportType(Enum):
-    """The report types."""
-    JOURNAL: str = "journal"
-    """The journal."""
+from .report_type import ReportType
 
 
 class ReportLink:
