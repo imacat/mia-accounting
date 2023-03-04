@@ -22,7 +22,7 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     initializeBaseAccountSelector();
     document.getElementById("accounting-base-code")
         .onchange = validateBase;
@@ -44,7 +44,7 @@ function initializeBaseAccountSelector() {
     const baseContent = document.getElementById("accounting-base-content");
     const options = Array.from(document.getElementsByClassName("accounting-base-option"));
     const btnClear = document.getElementById("accounting-btn-clear-base");
-    selector.addEventListener("show.bs.modal", function () {
+    selector.addEventListener("show.bs.modal", () => {
         base.classList.add("accounting-not-empty");
         for (const option of options) {
             option.classList.remove("active");
@@ -54,13 +54,13 @@ function initializeBaseAccountSelector() {
             selected.classList.add("active");
         }
     });
-    selector.addEventListener("hidden.bs.modal", function () {
+    selector.addEventListener("hidden.bs.modal", () => {
         if (baseCode.value === "") {
             base.classList.remove("accounting-not-empty");
         }
     });
     for (const option of options) {
-        option.onclick = function () {
+        option.onclick = () => {
             baseCode.value = option.dataset.code;
             baseContent.innerText = option.dataset.content;
             btnClear.classList.add("btn-danger");
@@ -70,7 +70,7 @@ function initializeBaseAccountSelector() {
             bootstrap.Modal.getInstance(selector).hide();
         };
     }
-    btnClear.onclick = function () {
+    btnClear.onclick = () => {
         baseCode.value = "";
         baseContent.innerText = "";
         btnClear.classList.add("btn-secondary")
@@ -92,7 +92,7 @@ function initializeBaseAccountQuery() {
     const optionList = document.getElementById("accounting-base-option-list");
     const options = Array.from(document.getElementsByClassName("accounting-base-option"));
     const queryNoResult = document.getElementById("accounting-base-option-no-result");
-    query.addEventListener("input", function () {
+    query.addEventListener("input", () => {
         if (query.value === "") {
             for (const option of options) {
                 option.classList.remove("d-none");
