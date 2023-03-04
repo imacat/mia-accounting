@@ -22,7 +22,7 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     AccountSelector.initialize();
 });
 
@@ -65,13 +65,12 @@ class AccountSelector {
         const more = document.getElementById(this.#prefix + "-more");
         const btnClear = document.getElementById(this.#prefix + "-btn-clear");
         const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
-        const selector1 = this
-        more.onclick = function () {
+        more.onclick = () => {
             more.classList.add("d-none");
-            selector1.#filterAccountOptions();
+            this.#filterAccountOptions();
         };
         this.#initializeAccountQuery();
-        btnClear.onclick = function () {
+        btnClear.onclick = () => {
             formAccountControl.classList.remove("accounting-not-empty");
             formAccount.innerText = "";
             formAccount.dataset.code = "";
@@ -79,7 +78,7 @@ class AccountSelector {
             validateJournalEntryAccount();
         };
         for (const option of options) {
-            option.onclick = function () {
+            option.onclick = () => {
                 formAccountControl.classList.add("accounting-not-empty");
                 formAccount.innerText = option.dataset.content;
                 formAccount.dataset.code = option.dataset.code;
@@ -95,9 +94,8 @@ class AccountSelector {
      */
     #initializeAccountQuery() {
         const query = document.getElementById(this.#prefix + "-query");
-        const selector = this;
-        query.addEventListener("input", function () {
-            selector.#filterAccountOptions();
+        query.addEventListener("input", () => {
+            this.#filterAccountOptions();
         });
     }
 
@@ -159,7 +157,7 @@ class AccountSelector {
      * @return {boolean} true if the account option should show, or false otherwise
      */
     #shouldAccountOptionShow(option, more, inUse, query) {
-        const isQueryMatched = function () {
+        const isQueryMatched = () => {
             if (query.value === "") {
                 return true;
             }
@@ -171,7 +169,7 @@ class AccountSelector {
             }
             return false;
         };
-        const isMoreMatched = function () {
+        const isMoreMatched = () => {
             if (more.classList.contains("d-none")) {
                 return true;
             }
@@ -237,10 +235,7 @@ class AccountSelector {
     static #initializeTransactionForm() {
         const entryForm = document.getElementById("accounting-entry-form");
         const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-        const selectors = this.#selectors;
-        formAccountControl.onclick = function () {
-            selectors[entryForm.dataset.entryType].initShow();
-        };
+        formAccountControl.onclick = () => this.#selectors[entryForm.dataset.entryType].initShow();
     }
     /**
      * Initializes the account selector for the journal entry form.
