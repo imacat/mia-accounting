@@ -18,6 +18,7 @@
 
 """
 import csv
+import typing as t
 from abc import ABC, abstractmethod
 from io import StringIO
 
@@ -30,11 +31,9 @@ from accounting.models import JournalEntry, Transaction, Account, Currency
 from accounting.utils.pagination import Pagination
 from accounting.utils.txn_types import TransactionType
 from .period import Period
-from .period_choosers import PeriodChooser, \
-    JournalPeriodChooser
+from .period_choosers import PeriodChooser, JournalPeriodChooser
 from .report_chooser import ReportChooser, ReportType
 from .report_rows import ReportRow, JournalRow
-import typing as t
 
 
 class JournalEntryReport(ABC):
