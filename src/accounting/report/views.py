@@ -30,9 +30,9 @@ bp: Blueprint = Blueprint("report", __name__)
 @bp.get("journal", endpoint="journal-default")
 @has_permission(can_view)
 def get_default_journal_list() -> str | Response:
-    """Returns the journal.
+    """Returns the journal in the default period.
 
-    :return: The journal in the period.
+    :return: The journal in the default period.
     """
     return __get_journal_list(Period.get_instance())
 
