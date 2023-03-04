@@ -49,7 +49,7 @@ def get_journal_list(period: Period) -> str | Response:
 
 
 def __get_journal_list(period: Period) -> str | Response:
-    """Returns journal.
+    """Returns the journal.
 
     :param period: The period.
     :return: The journal in the period.
