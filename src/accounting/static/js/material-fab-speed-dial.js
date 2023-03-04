@@ -22,7 +22,7 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     initializeMaterialFabSpeedDial();
 });
 
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function initializeMaterialFabSpeedDial() {
     const btnFab = document.getElementById("accounting-btn-material-fab-speed-dial");
     const fab = document.getElementById(btnFab.dataset.target);
-    btnFab.onclick = function () {
+    btnFab.onclick = () => {
         if (fab.classList.contains("show")) {
             fab.classList.remove("show");
         } else {

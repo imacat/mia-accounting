@@ -22,10 +22,10 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     const list = document.getElementById("accounting-order-list");
     if (list !== null) {
-        const onReorder = function () {
+        const onReorder = () => {
             const accounts = Array.from(list.children);
             for (let i = 0; i < accounts.length; i++) {
                 const no = document.getElementById("accounting-order-" + accounts[i].dataset.id + "-no");

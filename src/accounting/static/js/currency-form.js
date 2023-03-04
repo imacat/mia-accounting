@@ -22,7 +22,7 @@
  */
 
 // Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("accounting-code")
         .onchange = validateCode;
     document.getElementById("accounting-name")
