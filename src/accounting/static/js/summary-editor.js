@@ -39,6 +39,12 @@ class SummaryEditor {
     #form;
 
     /**
+     * The prefix of the HTML ID and class
+     * @type {string}
+     */
+    prefix;
+
+    /**
      * The modal of the summary editor
      * @type {HTMLFormElement}
      */
@@ -49,12 +55,6 @@ class SummaryEditor {
      * @type {string}
      */
     #entryType;
-
-    /**
-     * The prefix of the HTML ID and class
-     * @type {string}
-     */
-    prefix;
 
     /**
      * The current tab.
