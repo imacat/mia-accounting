@@ -123,12 +123,6 @@ class SummaryEditor {
     #formSummary;
 
     /**
-     * The tab plane classes
-     * @type {typeof TabPlane[]}
-     */
-    #TAB_CLASES = [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, AnnotationTab]
-
-    /**
      * The tab planes
      * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, regular: RegularPaymentTab, annotation: AnnotationTab}}
      */
@@ -157,7 +151,7 @@ class SummaryEditor {
         this.#formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
         this.#formSummary = document.getElementById("accounting-entry-form-summary");
 
-        for (const cls of this.#TAB_CLASES) {
+        for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, AnnotationTab]) {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
         }

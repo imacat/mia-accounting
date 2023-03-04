@@ -109,6 +109,20 @@
     border-top: thick double slategray;
 }
 
+/* The accounting report */
+.accounting-ledger-table thead {
+    border-bottom: 1px double black;
+}
+.accounting-amount {
+    text-align: right;
+}
+td.accounting-amount {
+    font-style: italic;
+}
+.accounting-mobile-journal-credit {
+    padding-left: 1rem;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
     position: relative;

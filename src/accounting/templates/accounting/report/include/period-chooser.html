@@ -1,0 +1,150 @@
+{#
+The Mia! Accounting Flask Project
+period-chooser.html: The period chooser
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/4
+#}
+<div id="accounting-period-chooser-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-period-chooser-modal-label" aria-hidden="true" data-url-template="{{ period_chooser.url_template }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="accounting-period-chooser-modal-label">{{ A_("Period Chooser") }}</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ A_("Close") }}"></button>
+      </div>
+      <div class="modal-body">
+        {# Tab navigation #}
+        <ul class="nav nav-tabs mb-2">
+          <li class="nav-item">
+            <span id="accounting-period-chooser-month-tab" class="nav-link {% if period.is_type_month %} active {% endif %} accounting-clickable" aria-current="{% if period.is_type_month %} page {% else %} false {% endif %}" data-tab-id="month">
+              {{ A_("Month") }}
+            </span>
+          </li>
+          <li class="nav-item">
+            <span id="accounting-period-chooser-year-tab" class="nav-link {% if period.is_a_year %} active {% endif %} accounting-clickable" aria-current="{% if period.is_a_year %} page {% else %} false {% endif %}" data-tab-id="year">
+              {{ A_("Year") }}
+            </span>
+          </li>
+          <li class="nav-item">
+            <span id="accounting-period-chooser-day-tab" class="nav-link {% if period.is_a_day %} active {% endif %} accounting-clickable" aria-current="{% if period.is_a_day %} page {% else %} false {% endif %}" data-tab-id="day">
+              {{ A_("Day") }}
+            </span>
+          </li>
+          <li class="nav-item">
+            <span id="accounting-period-chooser-custom-tab" class="nav-link {% if period.is_type_arbitrary %} active {% endif %} accounting-clickable" aria-current="{% if period.is_type_arbitrary %} page {% else %} false {% endif %}" data-tab-id="custom">
+              {{ A_("Custom") }}
+            </span>
+          </li>
+        </ul>
+
+        {# The month periods #}
+        <div id="accounting-period-chooser-month-page" {% if period.is_type_month %} aria-current="page" {% else %} class="d-none" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-month-tab">
+          <div>
+            <a class="btn {% if period.is_this_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.this_month_url }}">
+              {{ A_("This month") }}
+            </a>
+            {% if period_chooser.has_last_month %}
+              <a class="btn {% if period.is_last_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.last_month_url }}">
+                {{ A_("Last month") }}
+              </a>
+              <a class="btn {% if period.is_since_last_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.since_last_month_url }}">
+                {{ A_("Since last month") }}
+              </a>
+            {% endif %}
+          </div>
+          {% if period_chooser.has_data %}
+            <div id="accounting-period-chooser-month-chooser" class="mt-3" data-start="{{ period_chooser.data_start }}" data-default="{{ period.start }}"></div>
+          {% endif %}
+        </div>
+
+        {# The year periods #}
+        <div id="accounting-period-chooser-year-page" {% if period.is_a_year %} aria-current="page" {% else %} class="d-none" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-year-tab">
+          <a class="btn {% if period.is_this_year %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.this_year_url }}">
+            {{ A_("This year") }}
+          </a>
+          {% if period_chooser.has_last_year %}
+            <a class="btn {% if period.is_last_year %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.last_year_url }}">
+              {{ A_("Last year") }}
+            </a>
+          {% endif %}
+          {% if period_chooser.available_years %}
+            <ul class="nav nav-pills mt-3">
+              {% for year in period_chooser.available_years %}
+                <li class="nav-item">
+                  <a class="nav-link {% if period.is_year(year) %} active {% endif %}" href="{{ period_chooser.year_url(year) }}">{{ year }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        {# The day periods #}
+        <div id="accounting-period-chooser-day-page" {% if period.is_a_day %} aria-current="page" {% else %} class="d-none" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-day-tab">
+          <div>
+            <a class="btn {% if period.is_today %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.today_url }}">
+              {{ A_("Today") }}
+            </a>
+            {% if period_chooser.has_yesterday %}
+              <a class="btn {% if period.is_yesterday %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.yesterday_url }}">
+                {{ A_("Yesterday") }}
+              </a>
+            {% endif %}
+          </div>
+          {% if period_chooser.has_data %}
+            <div class="mt-3">
+              <div class="form-floating mb-3">
+                <input id="accounting-period-chooser-day-date" class="form-control" type="date" value="{{ "" if period.start is none else period.start }}" min="{{ period_chooser.data_start }}" required="required">
+                <label for="accounting-period-chooser-day-date" class="form-label">{{ A_("Date") }}</label>
+                <div id="accounting-period-chooser-day-date-error" class="invalid-feedback"></div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        {# The custom periods #}
+        <div id="accounting-period-chooser-custom-page" {% if period.is_type_arbitrary %} aria-current="page" {% else %} class="d-none" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-custom-tab">
+          <div>
+            <a class="btn {% if period.is_all %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ period_chooser.all_url }}">
+              {{ A_("All") }}
+            </a>
+          </div>
+          {% if period_chooser.has_data %}
+            <div class="mt-3">
+              <div class="form-floating mb-3">
+                <input id="accounting-period-chooser-custom-start" class="form-control" type="date" value="{{ "" if period.start is none else period.start }}" min="{{ period_chooser.data_start }}" max="{{ period.end }}" required="required">
+                <label for="accounting-period-chooser-custom-start" class="form-label">{{ A_("From") }}</label>
+                <div id="accounting-period-chooser-custom-start-error" class="invalid-feedback"></div>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input id="accounting-period-chooser-custom-end" class="form-control" type="date" value="{{ "" if period.end is none else period.end }}" min="{{ period.start }}" required="required">
+                <label for="accounting-period-chooser-custom-end" class="form-label">{{ A_("To") }}</label>
+                <div id="accounting-period-chooser-custom-end-error" class="invalid-feedback"></div>
+              </div>
+
+              <div>
+                <button id="accounting-period-chooser-custom-confirm" class="btn btn-primary" type="submit">
+                  {{ A_("Confirm") }}
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

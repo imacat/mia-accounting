@@ -89,4 +89,7 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     from . import transaction
     transaction.init_app(app, bp)
 
+    from . import report
+    report.init_app(app, bp)
+
     app.register_blueprint(bp)
