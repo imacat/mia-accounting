@@ -34,7 +34,7 @@ from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
 from accounting.utils.txn_types import TransactionTypeEnum
 from accounting.utils.user import get_current_user_pk
-from .dispatcher import TransactionOperator, TXN_ENUM_TO_OP, get_txn_op
+from .operators import TransactionOperator, TXN_ENUM_TO_OP, get_txn_op
 from .forms import sort_transactions_in, TransactionReorderForm
 from .queries import get_transaction_query
 from .template_filters import with_type, to_transfer, format_amount_input, \
