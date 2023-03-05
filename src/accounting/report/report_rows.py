@@ -95,6 +95,8 @@ class LedgerRow(ReportRow):
         """The credit amount."""
         self.balance: Decimal | None = None
         """The balance."""
+        self.note: str | None = None
+        """The note."""
         if entry is not None:
             self.entry = entry
             self.summary = entry.summary
@@ -107,9 +109,11 @@ class LedgerRow(ReportRow):
                     "Summary": None,
                     "Debit": self.debit,
                     "Credit": self.credit,
-                    "Balance": self.balance}
+                    "Balance": self.balance,
+                    "Note": None}
         return {"Date": self.date,
                 "Summary": self.summary,
                 "Debit": self.debit,
                 "Credit": self.credit,
-                "Balance": self.balance}
+                "Balance": self.balance,
+                "Note": self.note}

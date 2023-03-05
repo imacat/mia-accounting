@@ -342,10 +342,11 @@ class Ledger(JournalEntryReport[LedgerRow]):
             if row.entry is not None:
                 row.transaction = transactions[row.entry.transaction_id]
                 row.date = row.transaction.date
+                row.note = row.transaction.note
 
     @property
     def csv_field_names(self) -> list[str]:
-        return ["Date", "Summary", "Debit", "Credit", "Balance"]
+        return ["Date", "Summary", "Debit", "Credit", "Balance", "Note"]
 
     @property
     def csv_filename(self) -> str:
