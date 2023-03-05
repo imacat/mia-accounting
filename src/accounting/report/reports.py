@@ -36,9 +36,10 @@ from accounting.utils.txn_types import TransactionType
 from .option_link import OptionLink
 from .period import Period
 from .period_choosers import PeriodChooser, JournalPeriodChooser, \
-    LedgerPeriodChooser, IncomeExpensesPeriodChooser
+    LedgerPeriodChooser, IncomeExpensesPeriodChooser, TrialBalancePeriodChooser
 from .report_chooser import ReportChooser
-from .report_rows import ReportRow, JournalRow, LedgerRow, IncomeExpensesRow
+from .report_rows import ReportRow, JournalRow, LedgerRow, IncomeExpensesRow, \
+    TrialBalanceRow
 from .report_type import ReportType
 
 T = t.TypeVar("T", bound=ReportRow)
@@ -629,3 +630,135 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
         return [OptionLink(str(x), get_url(x), x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
                 .order_by(Account.base_code, Account.no).all()]
+
+
+class TrialBalance(JournalEntryReport[TrialBalanceRow]):
+    """The trial balance."""
+
+    def __init__(self, currency: Currency, period: Period):
+        """Constructs a trial balance.
+
+        :param currency: The currency.
+        :param period: The period.
+        """
+        super().__init__(period)
+        self.currency: Currency = currency
+        """The currency."""
+        self.total_row: TrialBalanceRow | None = None
+        """The total row."""
+
+    def get_rows(self) -> list[TrialBalanceRow]:
+        rows: list[TrialBalanceRow] = self.__query_balances()
+        self.__populate_url(rows)
+        total_row: TrialBalanceRow = self.__get_total_row(rows)
+        rows.append(total_row)
+        return rows
+
+    def __query_balances(self) -> list[TrialBalanceRow]:
+        """Queries and returns the balances.
+
+        :return: The balances.
+        """
+        conditions: list[sa.BinaryExpression] \
+            = [JournalEntry.currency_code == self.currency.code]
+        if self.period.start is not None:
+            conditions.append(Transaction.date >= self.period.start)
+        if self.period.end is not None:
+            conditions.append(Transaction.date <= self.period.end)
+        balance_func: sa.Function = sa.func.sum(sa.case(
+            (JournalEntry.is_debit, JournalEntry.amount),
+            else_=-JournalEntry.amount)).label("balance")
+        select_trial_balance: sa.Select \
+            = sa.select(JournalEntry.account_id, balance_func)\
+            .join(Transaction)\
+            .filter(*conditions)\
+            .group_by(JournalEntry.account_id)
+        balances: list[sa.Row] = db.session.execute(select_trial_balance).all()
+        accounts: dict[int, Account] \
+            = {x.id: x for x in Account.query
+               .filter(Account.id.in_([x.account_id for x in balances])).all()}
+        return [TrialBalanceRow(accounts[x.account_id], x.balance)
+                for x in balances]
+
+    def __populate_url(self, rows: list[TrialBalanceRow]) -> None:
+        """Populates the URL of the trial balance rows.
+
+        :param rows: The trial balance rows.
+        :return: None.
+        """
+        def get_url(account: Account) -> str:
+            """Returns the ledger URL of an account.
+
+            :param account: The account.
+            :return: The ledger URL of the account.
+            """
+            if self.period.is_default:
+                return url_for("accounting.report.ledger-default",
+                               currency=self.currency, account=account)
+            return url_for("accounting.report.ledger",
+                           currency=self.currency, account=account,
+                           period=self.period)
+
+        for row in rows:
+            row.url = get_url(row.account)
+
+    @staticmethod
+    def __get_total_row(rows: list[TrialBalanceRow]) -> TrialBalanceRow:
+        """Composes the total row.
+
+        :param rows: The rows.
+        :return: None.
+        """
+        row: TrialBalanceRow = TrialBalanceRow()
+        row.is_total = True
+        row.debit = sum([x.debit for x in rows if x.debit is not None])
+        row.credit = sum([x.credit for x in rows if x.credit is not None])
+        return row
+
+    def populate_rows(self, rows: list[T]) -> None:
+        pass
+
+    @property
+    def csv_field_names(self) -> list[str]:
+        return ["Account", "Debit", "Credit"]
+
+    @property
+    def csv_filename(self) -> str:
+        return f"trial-balance-{self.period.spec}.csv"
+
+    @property
+    def period_chooser(self) -> PeriodChooser:
+        return TrialBalancePeriodChooser(self.currency)
+
+    @property
+    def report_chooser(self) -> ReportChooser:
+        return ReportChooser(ReportType.TRIAL_BALANCE, period=self.period)
+
+    def as_html_page(self) -> str:
+        pagination: Pagination = Pagination[TrialBalanceRow](self.rows)
+        rows: list[TrialBalanceRow] = pagination.list
+        if len(rows) > 0 and rows[-1].is_total:
+            self.total_row = rows[-1]
+            rows = rows[:-1]
+        return render_template("accounting/report/trial-balance.html",
+                               list=rows, pagination=pagination, report=self)
+
+    @property
+    def currency_options(self) -> list[OptionLink]:
+        """Returns the currency options.
+
+        :return: The currency options.
+        """
+        def get_url(currency: Currency):
+            if self.period.is_default:
+                return url_for("accounting.report.trial-balance-default",
+                               currency=currency)
+            return url_for("accounting.report.trial-balance",
+                           currency=currency, period=self.period)
+
+        in_use: set[str] = set(db.session.scalars(
+            sa.select(JournalEntry.currency_code)
+            .group_by(JournalEntry.currency_code)).all())
+        return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
+                for x in Currency.query.filter(Currency.code.in_(in_use))
+                .order_by(Currency.code).all()]

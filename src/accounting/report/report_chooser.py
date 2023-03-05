@@ -67,6 +67,7 @@ class ReportChooser:
         self.__reports.append(self.__journal)
         self.__reports.append(self.__ledger)
         self.__reports.append(self.__income_expenses)
+        self.__reports.append(self.__trial_balance)
         for report in self.__reports:
             if report.is_active:
                 self.current_report = report.title
@@ -112,6 +113,20 @@ class ReportChooser:
                          period=self.__period)
         return OptionLink(gettext("Income and Expenses"), url,
                           self.__active_report == ReportType.INCOME_EXPENSES)
+
+    @property
+    def __trial_balance(self) -> OptionLink:
+        """Returns the trial balance.
+
+        :return: The trial balance.
+        """
+        url: str = url_for("accounting.report.trial-balance-default",
+                           currency=self.__currency) \
+            if self.__period.is_default \
+            else url_for("accounting.report.trial-balance",
+                         currency=self.__currency, period=self.__period)
+        return OptionLink(gettext("Trial Balance"), url,
+                          self.__active_report == ReportType.TRIAL_BALANCE)
 
     def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.

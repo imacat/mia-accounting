@@ -22,7 +22,7 @@ from flask import Blueprint, request, Response
 from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
 from .period import Period
-from .reports import Journal, Ledger, IncomeExpenses
+from .reports import Journal, Ledger, IncomeExpenses, TrialBalance
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
@@ -145,6 +145,46 @@ def __get_income_expenses_list(currency: Currency, account: Account,
     :return: The income and expenses in the period.
     """
     report: IncomeExpenses = IncomeExpenses(currency, account, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.as_csv_download()
+    return report.as_html_page()
+
+
+@bp.get("trial-balance/<currency:currency>",
+        endpoint="trial-balance-default")
+@has_permission(can_view)
+def get_default_trial_balance_list(currency: Currency) -> str | Response:
+    """Returns the trial balance in the default period.
+
+    :param currency: The currency.
+    :return: The trial balance in the default period.
+    """
+    return __get_trial_balance_list(currency, Period.get_instance())
+
+
+@bp.get("trial-balance/<currency:currency>/<period:period>",
+        endpoint="trial-balance")
+@has_permission(can_view)
+def get_trial_balance_list(currency: Currency, period: Period) \
+        -> str | Response:
+    """Returns the trial balance.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The trial balance in the period.
+    """
+    return __get_trial_balance_list(currency, period)
+
+
+def __get_trial_balance_list(currency: Currency, period: Period) \
+        -> str | Response:
+    """Returns the trial balance.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The trial balance in the period.
+    """
+    report: TrialBalance = TrialBalance(currency, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.as_csv_download()
     return report.as_html_page()

@@ -22,6 +22,7 @@ from abc import ABC, abstractmethod
 from datetime import date
 from decimal import Decimal
 
+from accounting.locale import gettext
 from accounting.models import JournalEntry, Transaction, Account, Currency
 
 
@@ -169,3 +170,39 @@ class IncomeExpensesRow(ReportRow):
                 "Expense": self.expense,
                 "Balance": self.balance,
                 "Note": self.note}
+
+
+class TrialBalanceRow(ReportRow):
+    """A row in the trial balance."""
+
+    def __init__(self, account: Account | None = None,
+                 balance: Decimal | None = None):
+        """Constructs the row in the trial balance.
+
+        :param account: The account.
+        :param balance: The balance.
+        """
+        self.is_total: bool = False
+        """Whether this is the total row."""
+        self.account: Account | None = account
+        """The date."""
+        self.debit: Decimal | None = None
+        """The debit amount."""
+        self.credit: Decimal | None = None
+        """The credit amount."""
+        self.url: str | None = None
+        """The URL."""
+        if balance is not None:
+            if balance > 0:
+                self.debit = balance
+            if balance < 0:
+                self.credit = -balance
+
+    def as_dict(self) -> dict[str, t.Any]:
+        if self.is_total:
+            return {"Account": gettext("Total"),
+                    "Debit": self.debit,
+                    "Credit": self.credit}
+        return {"Account": str(self.account).title(),
+                "Debit": self.debit,
+                "Credit": self.credit}
