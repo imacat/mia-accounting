@@ -732,7 +732,9 @@ class TrialBalance(JournalEntryReport[TrialBalanceRow]):
 
     @property
     def report_chooser(self) -> ReportChooser:
-        return ReportChooser(ReportType.TRIAL_BALANCE, period=self.period)
+        return ReportChooser(ReportType.TRIAL_BALANCE,
+                             currency=self.currency,
+                             period=self.period)
 
     def as_html_page(self) -> str:
         pagination: Pagination = Pagination[TrialBalanceRow](self.rows)
