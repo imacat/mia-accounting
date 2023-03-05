@@ -40,7 +40,7 @@ First written: 2023/2/1
     <input type="hidden" name="next" value="{{ request.args["next"] }}">
   {% endif %}
   <div class="form-floating mb-3">
-    <input id="accounting-base-code" type="hidden" name="base_code" value="{{ "" if form.base_code.data is none else form.base_code.data }}">
+    <input id="accounting-base-code" type="hidden" name="base_code" value="{{ form.base_code.data|accounting_default }}">
     <div id="accounting-base" class="form-control accounting-clickable accounting-material-text-field {% if form.base_code.data %} accounting-not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-base-selector-modal">
       <label class="form-label" for="accounting-base">{{ A_("Base account") }}</label>
       <div id="accounting-base-content">
@@ -57,7 +57,7 @@ First written: 2023/2/1
   </div>
 
   <div class="form-floating mb-3">
-    <input id="accounting-title" class="form-control {% if form.title.errors %} is-invalid {% endif %}" type="text" name="title" value="{{ "" if form.title.data is none else form.title.data }}" placeholder=" " required="required">
+    <input id="accounting-title" class="form-control {% if form.title.errors %} is-invalid {% endif %}" type="text" name="title" value="{{ form.title.data|accounting_default }}" placeholder=" " required="required">
     <label class="form-label" for="accounting-title">{{ A_("Title") }}</label>
     <div id="accounting-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
   </div>

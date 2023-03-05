@@ -108,7 +108,7 @@ First written: 2023/3/4
       <td>{{ item.transaction.date|accounting_format_date }}</td>
       <td>{{ item.currency.name }}</td>
       <td>{{ item.account.title|title }}</td>
-      <td>{{ "" if item.summary is none else item.summary }}</td>
+      <td>{{ item.summary|accounting_default }}</td>
       <td class="accounting-amount">{{ "" if not item.is_debit else item.amount|accounting_format_amount }}</td>
       <td class="accounting-amount">{{ "" if item.is_debit else item.amount|accounting_format_amount }}</td>
     </tr>

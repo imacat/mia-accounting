@@ -50,14 +50,14 @@ First written: 2023/2/25
                     entry_index = loop.index,
                     only_one_entry_form = debit_forms|length == 1,
                     entry_id = entry_form.eid.data,
-                    account_code_data = "" if entry_form.account_code.data is none else entry_form.account_code.data,
+                    account_code_data = entry_form.account_code.data|accounting_default,
                     account_code_error = entry_form.account_code.errors,
                     account_text = entry_form.account_text,
-                    summary_data = "" if entry_form.summary.data is none else entry_form.summary.data,
+                    summary_data = entry_form.summary.data|accounting_default,
                     summary_errors = entry_form.summary.errors,
                     amount_data = entry_form.amount.data|accounting_txn_format_amount_input,
                     amount_errors = entry_form.amount.errors,
-                    amount_text = entry_form.amount.data|accounting_format_amount,
+                    amount_text = entry_form.amount.data|accounting_format_amount|accounting_default("-"),
                     entry_errors = entry_form.all_errors %}
               {% include "accounting/transaction/include/form-entry-item.html" %}
             {% endwith %}

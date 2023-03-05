@@ -17,8 +17,9 @@
 """The template filters.
 
 """
-from decimal import Decimal
+import typing as t
 from datetime import date, timedelta
+from decimal import Decimal
 
 from flask_babel import get_locale
 
@@ -68,3 +69,13 @@ def format_date(value: date) -> str:
         return "{}/{}/{}({})".format(
             value.year, value.month, value.day, weekday)
     return "{}/{}({})".format(value.month, value.day, weekday)
+
+
+def default(value: t.Any, default_value: t.Any = "") -> t.Any:
+    """Returns the default value if the given value is None.
+
+    :param value: The value.
+    :param default_value: The default value when the given value is None.
+    :return: The value, or the default value if the given value is None.
+    """
+    return default_value if value is None else value

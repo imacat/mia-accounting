@@ -32,7 +32,7 @@ First written: 2023/2/25
     <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-control" class="form-control clickable d-flex justify-content-between accounting-entry-control {% if entry_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal">
       <div>
         <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account-text" class="small">{{ account_text }}</div>
-        <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary-text">{{ "" if summary_data is none else summary_data }}</div>
+        <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary-text">{{ summary_data }}</div>
       </div>
       <div><span id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount-text" class="badge rounded-pill bg-primary">{{ amount_text }}</span></div>
     </div>

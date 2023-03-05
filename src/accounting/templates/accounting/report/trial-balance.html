@@ -134,8 +134,8 @@ First written: 2023/3/5
         <a class="list-group-item d-flex justify-content-between accounting-report-row accounting-trial-balance-row" href="{{ item.url }}">
           <div>{{ item.account|title }}</div>
           <div class="d-flex justify-content-between">
-            <div class="accounting-amount">{{ "" if item.debit is none else item.debit|accounting_format_amount }}</div>
-            <div class="accounting-amount">{{ "" if item.credit is none else item.credit|accounting_format_amount }}</div>
+            <div class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
           </div>
         </a>
       {% endfor %}

@@ -44,7 +44,7 @@ First written: 2023/2/26
   {% endif %}
 
   <div class="form-floating mb-3">
-    <input id="accounting-date" class="form-control {% if form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ "" if form.date.data is none else form.date.data }}" placeholder=" " required="required">
+    <input id="accounting-date" class="form-control {% if form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ form.date.data|accounting_default }}" placeholder=" " required="required">
     <label class="form-label" for="accounting-date">{{ A_("Date") }}</label>
     <div id="accounting-date-error" class="invalid-feedback">{% if form.date.errors %}{{ form.date.errors[0] }}{% endif %}</div>
   </div>
@@ -67,7 +67,7 @@ First written: 2023/2/26
   </div>
 
   <div class="form-floating mb-3">
-    <textarea id="accounting-note" class="form-control form-control-lg {% if form.note.errors %} is-invalid {% endif %}" name="note" rows="5" placeholder=" ">{{ "" if form.note.data is none else form.note.data }}</textarea>
+    <textarea id="accounting-note" class="form-control form-control-lg {% if form.note.errors %} is-invalid {% endif %}" name="note" rows="5" placeholder=" ">{{ form.note.data|accounting_default }}</textarea>
     <label class="form-label" for="accounting-note">{{ A_("Note") }}</label>
     <div id="accounting-note-error" class="invalid-feedback">{% if form.note.errors %}{{ form.note.errors[0] }}{% endif %}</div>
   </div>

@@ -163,9 +163,9 @@ First written: 2023/3/5
   {% for item in list %}
     <tr {% if item.transaction is not none %} class="accounting-clickable accounting-table-row-link" data-href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}" {% endif %}>
       <td>{{ item.date|accounting_format_date }}</td>
-      <td>{{ "" if item.summary is none else item.summary }}</td>
-      <td class="accounting-amount">{{ "" if item.debit is none else item.debit|accounting_format_amount }}</td>
-      <td class="accounting-amount">{{ "" if item.credit is none else item.credit|accounting_format_amount }}</td>
+      <td>{{ item.summary|accounting_default }}</td>
+      <td class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</td>
+      <td class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</td>
       <td class="accounting-amount">{{ item.balance|accounting_format_amount }}</td>
     </tr>
   {% endfor %}

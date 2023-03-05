@@ -107,7 +107,7 @@ First written: 2023/3/4
           {% if period_chooser.has_data %}
             <div class="mt-3">
               <div class="form-floating mb-3">
-                <input id="accounting-period-chooser-day-date" class="form-control" type="date" value="{{ "" if period.start is none else period.start }}" min="{{ period_chooser.data_start }}" required="required">
+                <input id="accounting-period-chooser-day-date" class="form-control" type="date" value="{{ period.start|accounting_default }}" min="{{ period_chooser.data_start }}" required="required">
                 <label for="accounting-period-chooser-day-date" class="form-label">{{ A_("Date") }}</label>
                 <div id="accounting-period-chooser-day-date-error" class="invalid-feedback"></div>
               </div>
@@ -125,13 +125,13 @@ First written: 2023/3/4
           {% if period_chooser.has_data %}
             <div class="mt-3">
               <div class="form-floating mb-3">
-                <input id="accounting-period-chooser-custom-start" class="form-control" type="date" value="{{ "" if period.start is none else period.start }}" min="{{ period_chooser.data_start }}" max="{{ period.end }}" required="required">
+                <input id="accounting-period-chooser-custom-start" class="form-control" type="date" value="{{ period.start|accounting_default }}" min="{{ period_chooser.data_start }}" max="{{ period.end }}" required="required">
                 <label for="accounting-period-chooser-custom-start" class="form-label">{{ A_("From") }}</label>
                 <div id="accounting-period-chooser-custom-start-error" class="invalid-feedback"></div>
               </div>
 
               <div class="form-floating mb-3">
-                <input id="accounting-period-chooser-custom-end" class="form-control" type="date" value="{{ "" if period.end is none else period.end }}" min="{{ period.start }}" required="required">
+                <input id="accounting-period-chooser-custom-end" class="form-control" type="date" value="{{ period.end|accounting_default }}" min="{{ period.start }}" required="required">
                 <label for="accounting-period-chooser-custom-end" class="form-label">{{ A_("To") }}</label>
                 <div id="accounting-period-chooser-custom-end-error" class="invalid-feedback"></div>
               </div>
