@@ -20,6 +20,7 @@ This file is largely taken from the NanoParma ERP project, first written in
 2021/9/16 by imacat (imacat@nanoparma.com).
 
 """
+import re
 import typing as t
 
 from flask import url_for
@@ -105,11 +106,14 @@ class ReportChooser:
 
         :return: The income and expenses.
         """
+        account: Account = self.__account
+        if not re.match(r"[12][12]", account.base_code):
+            account: Account = Account.find_by_code("1111-001")
         url: str = url_for("accounting.report.income-expenses-default",
-                           currency=self.__currency, account=self.__account) \
+                           currency=self.__currency, account=account) \
             if self.__period.is_default \
             else url_for("accounting.report.income-expenses",
-                         currency=self.__currency, account=self.__account,
+                         currency=self.__currency, account=account,
                          period=self.__period)
         return OptionLink(gettext("Income and Expenses"), url,
                           self.__active_report == ReportType.INCOME_EXPENSES)
