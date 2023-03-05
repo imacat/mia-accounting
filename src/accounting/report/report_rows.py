@@ -47,28 +47,28 @@ class JournalRow(ReportRow):
         """
         self.entry: JournalEntry = entry
         """The journal entry."""
-        self.summary: str | None = entry.summary
-        """The summary."""
-        self.currency_code: str = entry.currency_code
-        """The currency code."""
-        self.is_debit: bool = entry.is_debit
-        """True for a debit journal entry, or False for a credit entry."""
-        self.amount: Decimal = entry.amount
-        """The amount."""
         self.transaction: Transaction | None = None
         """The transaction."""
         self.currency: Currency | None = None
         """The currency."""
         self.account: Account | None = None
         """The account."""
+        self.summary: str | None = entry.summary
+        """The summary."""
+        self.debit: Decimal | None = entry.amount if entry.is_debit else None
+        """The debit amount."""
+        self.credit: Decimal | None = None if entry.is_debit else entry.amount
+        """The credit amount."""
+        self.amount: Decimal = entry.amount
+        """The amount."""
 
     def as_dict(self) -> dict[str, t.Any]:
         return {"Date": self.transaction.date,
-                "Currency": self.currency_code,
+                "Currency": self.currency.code,
                 "Account": str(self.account).title(),
                 "Summary": self.summary,
-                "Debit": self.amount if self.is_debit else None,
-                "Credit": None if self.is_debit else self.amount,
+                "Debit": self.debit,
+                "Credit": self.credit,
                 "Note": self.transaction.note}
 
 
