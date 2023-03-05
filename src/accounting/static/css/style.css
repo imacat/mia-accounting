@@ -111,7 +111,7 @@
 
 /* The accounting report */
 .accounting-ledger-table thead {
-    border-bottom: 1px double black;
+    border-bottom: thick double slategray;
 }
 .accounting-amount {
     text-align: right;
@@ -123,7 +123,7 @@ td.accounting-amount {
     padding-left: 1rem;
 }
 .accounting-ledger-table tfoot {
-    border-top: 1px double black;
+    border-top: thick double slategray;
     font-weight: bolder;
     font-style: italic;
 }
