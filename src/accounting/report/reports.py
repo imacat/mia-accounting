@@ -389,9 +389,8 @@ class Ledger(JournalEntryReport[LedgerRow]):
                            currency=currency, account=self.account,
                            period=self.period)
 
-        in_use: set[str] = set(db.session.scalars(
-            sa.select(JournalEntry.currency_code)
-            .group_by(JournalEntry.currency_code)).all())
+        in_use: sa.Select = sa.Select(JournalEntry.currency_code)\
+            .group_by(JournalEntry.currency_code)
         return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
                 for x in Currency.query.filter(Currency.code.in_(in_use))
                 .order_by(Currency.code).all()]
@@ -410,10 +409,9 @@ class Ledger(JournalEntryReport[LedgerRow]):
                            currency=self.currency, account=account,
                            period=self.period)
 
-        in_use: set[int] = set(db.session.scalars(
-            sa.select(JournalEntry.account_id)
-            .filter(JournalEntry.currency_code == self.currency.code)
-            .group_by(JournalEntry.account_id)).all())
+        in_use: sa.Select = sa.Select(JournalEntry.account_id)\
+            .filter(JournalEntry.currency_code == self.currency.code)\
+            .group_by(JournalEntry.account_id)
         return [OptionLink(str(x), get_url(x), x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
                 .order_by(Account.base_code, Account.no).all()]
@@ -621,15 +619,14 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
                            currency=self.currency, account=account,
                            period=self.period)
 
-        in_use: set[int] = set(db.session.scalars(
-            sa.Select(JournalEntry.account_id)
-            .join(Account)
+        in_use: sa.Select = sa.Select(JournalEntry.account_id)\
+            .join(Account)\
             .filter(JournalEntry.currency_code == self.currency.code,
                     sa.or_(Account.base_code.startswith("11"),
                            Account.base_code.startswith("12"),
                            Account.base_code.startswith("21"),
-                           Account.base_code.startswith("22")))
-            .group_by(JournalEntry.account_id)).all())
+                           Account.base_code.startswith("22")))\
+            .group_by(JournalEntry.account_id)
         return [OptionLink(str(x), get_url(x), x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
                 .order_by(Account.base_code, Account.no).all()]
