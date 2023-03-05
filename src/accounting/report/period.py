@@ -176,7 +176,7 @@ class Period:
         :return: The period specification as a month range.
         :raise ValueError: The period is not a month range.
         """
-        if self.start.day != 1 or self.end != month_end(self.end):
+        if self.start.day != 1 or self.end != _month_end(self.end):
             raise ValueError
         if self.start.year == self.end.year \
                 and self.start.month == self.end.month:
