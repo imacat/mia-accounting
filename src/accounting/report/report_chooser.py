@@ -27,27 +27,11 @@ from flask_babel import LazyString
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency
+from accounting.models import Currency, Account
 from accounting.template_globals import default_currency_code
+from .option_link import OptionLink
 from .period import Period
 from .report_type import ReportType
-
-
-class ReportLink:
-    """A link of a report."""
-
-    def __init__(self, name: str | LazyString, url: str):
-        """Constructs a report.
-
-        :param name: The report name.
-        :param url: The URL.
-        """
-        self.name: str | LazyString = name
-        """The report name."""
-        self.url: str = url
-        """The URL."""
-        self.is_active: bool = False
-        """Whether the report is the current report."""
 
 
 class ReportChooser:
@@ -55,12 +39,14 @@ class ReportChooser:
 
     def __init__(self, active_report: ReportType,
                  period: Period | None = None,
-                 currency: Currency | None = None):
+                 currency: Currency | None = None,
+                 account: Account | None = None):
         """Constructs the report chooser.
 
         :param active_report: The active report.
         :param period: The period.
         :param currency: The currency.
+        :param account: The account.
         """
         self.__active_report: ReportType = active_report
         """The currently active report."""
@@ -71,17 +57,21 @@ class ReportChooser:
             Currency, default_currency_code()) \
             if currency is None else currency
         """The currency."""
-        self.__reports: list[ReportLink] = []
+        self.__account: Account = Account.find_by_code("1111-001") \
+            if account is None else account
+        """The currency."""
+        self.__reports: list[OptionLink] = []
         """The links to the reports."""
-        self.__reports.append(self.__journal)
         self.current_report: str | LazyString = ""
-        """The name of the current report."""
+        """The title of the current report."""
+        self.__reports.append(self.__journal)
+        self.__reports.append(self.__ledger)
         for report in self.__reports:
             if report.is_active:
-                self.current_report = report.name
+                self.current_report = report.title
 
     @property
-    def __journal(self) -> ReportLink:
+    def __journal(self) -> OptionLink:
         """Returns the journal.
 
         :return: The journal.
@@ -89,12 +79,25 @@ class ReportChooser:
         url: str = url_for("accounting.report.journal-default") \
             if self.__period.is_default \
             else url_for("accounting.report.journal", period=self.__period)
-        report = ReportLink(gettext("Journal"), url)
-        if self.__active_report == ReportType.JOURNAL:
-            report.is_active = True
-        return report
+        return OptionLink(gettext("Journal"), url,
+                          self.__active_report == ReportType.JOURNAL)
 
-    def __iter__(self) -> t.Iterator[ReportLink]:
+    @property
+    def __ledger(self) -> OptionLink:
+        """Returns the ledger.
+
+        :return: The ledger.
+        """
+        url: str = url_for("accounting.report.ledger-default",
+                           currency=self.__currency, account=self.__account) \
+            if self.__period.is_default \
+            else url_for("accounting.report.ledger",
+                         currency=self.__currency, account=self.__account,
+                         period=self.__period)
+        return OptionLink(gettext("Ledger"), url,
+                          self.__active_report == ReportType.LEDGER)
+
+    def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.
 
         :return: The iteration of the reports.

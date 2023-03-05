@@ -41,7 +41,8 @@ First written: 2023/3/4
       <ul class="dropdown-menu">
         <li>
           <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
-            {{ A_("Cash Expense") }}</a>
+            {{ A_("Cash Expense") }}
+          </a>
         </li>
         <li>
           <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
@@ -61,9 +62,9 @@ First written: 2023/3/4
   {% endwith %}
   <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
     <i class="fa-solid fa-calendar-day"></i>
-    {{ report.period.desc }}
+    {{ report.period.desc|title }}
   </button>
-  <a class="btn btn-primary" role="button" href="?as=csv">
+  <a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
     <i class="fa-solid fa-download"></i>
     {{ A_("Download") }}
   </a>
@@ -106,7 +107,7 @@ First written: 2023/3/4
     <tr class="accounting-clickable accounting-table-row-link" data-href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
       <td>{{ item.transaction.date|accounting_format_date }}</td>
       <td>{{ item.currency.name }}</td>
-      <td>{{ item.account.title }}</td>
+      <td>{{ item.account }}</td>
       <td>{{ "" if item.summary is none else item.summary }}</td>
       <td class="accounting-amount">{{ "" if not item.is_debit else item.amount|accounting_format_amount }}</td>
       <td class="accounting-amount">{{ "" if item.is_debit else item.amount|accounting_format_amount }}</td>
@@ -124,7 +125,7 @@ First written: 2023/3/4
             {{ item.transaction.date|accounting_format_date }}
             {{ item.account.title }}
             {% if item.currency_code != accounting_default_currency_code() %}
-              <span class="badge rounded-pill bg-info">{{ item.currency.code }}</span>
+              <span class="badge rounded-pill bg-info">{{ item.currency_code }}</span>
             {% endif %}
           </div>
           {% if item.summary is not none %}

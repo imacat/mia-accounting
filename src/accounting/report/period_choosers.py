@@ -26,7 +26,7 @@ from datetime import date
 
 from flask import url_for
 
-from accounting.models import Transaction
+from accounting.models import Currency, Account, Transaction
 from .period import YearPeriod, Period, ThisMonth, LastMonth, SinceLastMonth, \
     ThisYear, LastYear, Today, Yesterday, TemplatePeriod
 
@@ -116,3 +116,26 @@ class JournalPeriodChooser(PeriodChooser):
         if period.is_default:
             return url_for("accounting.report.journal-default")
         return url_for("accounting.report.journal", period=period)
+
+
+class LedgerPeriodChooser(PeriodChooser):
+    """The ledger period chooser."""
+
+    def __init__(self, currency: Currency, account: Account):
+        """Constructs the ledger period chooser."""
+        self.currency: Currency = currency
+        """The currency."""
+        self.account: Account = account
+        """The account."""
+        first: Transaction | None \
+            = Transaction.query.order_by(Transaction.date).first()
+        super(LedgerPeriodChooser, self).__init__(
+            None if first is None else first.date)
+
+    def _url_for(self, period: Period) -> str:
+        if period.is_default:
+            return url_for("accounting.report.ledger-default",
+                           currency=self.currency, account=self.account)
+        return url_for("accounting.report.ledger",
+                       currency=self.currency, account=self.account,
+                       period=period)

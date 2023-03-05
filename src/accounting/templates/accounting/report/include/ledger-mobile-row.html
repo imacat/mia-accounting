@@ -1,0 +1,41 @@
+{#
+The Mia! Accounting Flask Project
+ledger-mobile-row.html: The row in the ledger for the mobile devices
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/5
+#}
+<div>
+  {% if item.date is not none %}
+    <div class="text-muted small">
+      {{ item.date|accounting_format_date }}
+    </div>
+  {% endif %}
+  {% if item.summary is not none %}
+    <div>{{ item.summary }}</div>
+  {% endif %}
+</div>
+
+<div>
+  {% if item.debit is not none %}
+    <span class="badge rounded-pill bg-success">+{{ item.debit|accounting_format_amount }}</span>
+  {% endif %}
+  {% if item.credit is not none %}
+    <span class="badge rounded-pill bg-warning">-{{ item.credit|accounting_format_amount }}</span>
+  {% endif %}
+  <span class="badge rounded-pill bg-primary">{{ item.balance|accounting_format_amount }}</span>
+</div>

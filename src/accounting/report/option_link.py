@@ -1,5 +1,5 @@
 # The Mia! Accounting Flask Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/4
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/5
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,15 +14,21 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The report types.
+"""The option link.
 
 """
-from enum import Enum
 
 
-class ReportType(Enum):
-    """The report types."""
-    JOURNAL: str = "journal"
-    """The journal."""
-    LEDGER: str = "ledger"
-    """The ledger."""
+class OptionLink:
+    """An option link."""
+
+    def __init__(self, title: str, url: str, is_active: bool):
+        """Constructs an option link.
+
+        :param title: The title.
+        :param url: The URI.
+        :param is_active: True if active, or False otherwise
+        """
+        self.title: str = title
+        self.url: str = url
+        self.is_active: bool = is_active

@@ -1,0 +1,211 @@
+{#
+The Mia! Accounting Flask Project
+ledger.html: The ledger
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/5
+#}
+{% extends "accounting/base.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/material-fab-speed-dial.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/table-row-link.js") }}"></script>
+{% endblock %}
+
+{% block header %}{% block title %}{{ _("Ledger of %(account)s in %(currency)s %(period)s", currency=report.currency, account=report.account|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-2 d-none d-md-inline-flex">
+  {% if accounting_can_edit() %}
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-plus"></i>
+        {{ A_("New") }}
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
+            {{ A_("Cash Expense") }}
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
+            {{ A_("Cash Income") }}
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
+            {{ A_("Transfer") }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  {% endif %}
+  {% with report_chooser = report.report_chooser %}
+    {% include "accounting/report/include/report-chooser.html" %}
+  {% endwith %}
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-money-bill-wave"></i>
+      {{ report.currency.name|title }}
+    </button>
+    <ul class="dropdown-menu">
+      {% for currency in report.currency_options %}
+        <li>
+          <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
+            {{ currency.title|title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-book"></i>
+      {{ report.account.title|title }}
+    </button>
+    <ul class="dropdown-menu">
+      {% for account in report.account_options %}
+        <li>
+          <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
+            {{ account.title|title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
+    <i class="fa-solid fa-calendar-day"></i>
+    {{ report.period.desc|title }}
+  </button>
+  <a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
+    <i class="fa-solid fa-download"></i>
+    {{ A_("Download") }}
+  </a>
+</div>
+
+{% with txn_types = report.txn_types %}
+  {% include "accounting/include/add-txn-material-fab.html" %}
+{% endwith %}
+
+<div class="btn-group btn-actions mb-3 d-md-none">
+  {% with report_chooser = report.report_chooser %}
+    {% include "accounting/report/include/report-chooser.html" %}
+  {% endwith %}
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-money-bill-wave"></i>
+      {{ A_("Currency") }}
+    </button>
+    <ul class="dropdown-menu">
+      {% for currency in report.currency_options %}
+        <li>
+          <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
+            {{ currency.title|title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-book"></i>
+      {{ A_("Account") }}
+    </button>
+    <ul class="dropdown-menu">
+      {% for account in report.account_options %}
+        <li>
+          <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
+            {{ account.title|title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
+    <i class="fa-solid fa-calendar-day"></i>
+    {{ A_("Period") }}
+  </button>
+</div>
+
+{% with period = report.period, period_chooser = report.period_chooser %}
+  {% include "accounting/report/include/period-chooser.html" %}
+{% endwith %}
+
+{% if list %}
+  {% include "accounting/include/pagination.html" %}
+
+  <table class="table table-striped table-hover d-none d-md-table accounting-ledger-table">
+  <thead>
+  <tr>
+    <th scope="col">{{ A_("Date") }}</th>
+    <th scope="col">{{ A_("Summary") }}</th>
+    <th class="accounting-amount" scope="col">{{ A_("Debit") }}</th>
+    <th class="accounting-amount" scope="col">{{ A_("Credit") }}</th>
+    <th class="accounting-amount" scope="col">{{ A_("Balance") }}</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for item in list %}
+    <tr {% if item.transaction is not none %} class="accounting-clickable accounting-table-row-link" data-href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}" {% endif %}>
+      <td>{{ item.date|accounting_format_date }}</td>
+      <td>{{ "" if item.summary is none else item.summary }}</td>
+      <td class="accounting-amount">{{ "" if item.debit is none else item.debit|accounting_format_amount }}</td>
+      <td class="accounting-amount">{{ "" if item.credit is none else item.credit|accounting_format_amount }}</td>
+      <td class="accounting-amount">{{ item.balance|accounting_format_amount }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  {% if report.total_row is not none %}
+    <tfoot>
+    <tr>
+      <td colspan="2">{{ A_("Total") }}</td>
+      <td class="accounting-amount">{{ report.total_row.debit|accounting_format_amount }}</td>
+      <td class="accounting-amount">{{ report.total_row.credit|accounting_format_amount }}</td>
+      <td class="accounting-amount">{{ report.total_row.balance|accounting_format_amount }}</td>
+    </tr>
+    </tfoot>
+  {% endif %}
+  </table>
+
+  <div class="list-group d-md-none">
+  {% for item in list %}
+    {% if item.transaction is not none %}
+      <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
+        {% include "accounting/report/include/ledger-mobile-row.html" %}
+      </a>
+    {% else %}
+      <div class="list-group-item list-group-item-action d-flex justify-content-between">
+        {% include "accounting/report/include/ledger-mobile-row.html" %}
+      </div>
+    {% endif %}
+  {% endfor %}
+  {% if report.total_row is not none %}
+    {% with item = report.total_row %}
+      <div class="list-group-item list-group-item-action d-flex justify-content-between">
+        {% include "accounting/report/include/ledger-mobile-row.html" %}
+      </div>
+    {% endwith %}
+  {% endif %}
+  </div>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
+
+{% endblock %}

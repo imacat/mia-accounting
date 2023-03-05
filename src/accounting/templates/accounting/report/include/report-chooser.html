@@ -27,7 +27,7 @@ First written: 2023/3/4
   </button>
   <ul class="dropdown-menu" aria-labelledby="accounting-report-chooser">
     {% for report in report_chooser %}
-      <li><a class="dropdown-item {% if report.is_active %} active {% endif %}" href="{{ report.url }}">{{ report.name }}</a></li>
+      <li><a class="dropdown-item {% if report.is_active %} active {% endif %}" href="{{ report.url }}">{{ report.title }}</a></li>
     {% endfor %}
   </ul>
 </div>

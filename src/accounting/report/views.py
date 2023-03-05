@@ -19,9 +19,10 @@
 """
 from flask import Blueprint, request, Response
 
+from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
 from .period import Period
-from .reports import Journal
+from .reports import Journal, Ledger
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
@@ -55,6 +56,50 @@ def __get_journal_list(period: Period) -> str | Response:
     :return: The journal in the period.
     """
     report: Journal = Journal(period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.as_csv_download()
+    return report.as_html_page()
+
+
+@bp.get("ledger/<currency:currency>/<account:account>",
+        endpoint="ledger-default")
+@has_permission(can_view)
+def get_default_ledger_list(currency: Currency, account: Account) \
+        -> str | Response:
+    """Returns the ledger in the default period.
+
+    :param currency: The currency.
+    :param account: The account.
+    :return: The ledger in the default period.
+    """
+    return __get_ledger_list(currency, account, Period.get_instance())
+
+
+@bp.get("ledger/<currency:currency>/<account:account>/<period:period>",
+        endpoint="ledger")
+@has_permission(can_view)
+def get_ledger_list(currency: Currency, account: Account, period: Period) \
+        -> str | Response:
+    """Returns the ledger.
+
+    :param currency: The currency.
+    :param account: The account.
+    :param period: The period.
+    :return: The ledger in the period.
+    """
+    return __get_ledger_list(currency, account, period)
+
+
+def __get_ledger_list(currency: Currency, account: Account, period: Period) \
+        -> str | Response:
+    """Returns the ledger.
+
+    :param currency: The currency.
+    :param account: The account.
+    :param period: The period.
+    :return: The ledger in the period.
+    """
+    report: Ledger = Ledger(currency, account, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.as_csv_download()
     return report.as_html_page()

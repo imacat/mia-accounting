@@ -122,6 +122,11 @@ td.accounting-amount {
 .accounting-mobile-journal-credit {
     padding-left: 1rem;
 }
+.accounting-ledger-table tfoot {
+    border-top: 1px double black;
+    font-weight: bolder;
+    font-style: italic;
+}
 
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
