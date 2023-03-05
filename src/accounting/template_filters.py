@@ -25,13 +25,15 @@ from flask_babel import get_locale
 from accounting.locale import gettext
 
 
-def format_amount(value: Decimal | None) -> str:
+def format_amount(value: Decimal | None) -> str | None:
     """Formats an amount for readability.
 
     :param value: The amount.
     :return: The formatted amount text.
     """
-    if value is None or value == 0:
+    if value is None:
+        return None
+    if value == 0:
         return "-"
     whole: int = int(value)
     frac: Decimal = (value - whole).normalize()
