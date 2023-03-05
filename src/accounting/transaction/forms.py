@@ -574,7 +574,8 @@ class IncomeCurrencyForm(CurrencyForm):
 
 class IncomeTransactionForm(TransactionForm):
     """The form to create or edit a cash income transaction."""
-    date = DateField(default=date.today())
+    date = DateField(
+        validators=[DataRequired(lazy_gettext("Please fill in the date."))])
     """The date."""
     currencies = FieldList(FormField(IncomeCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
@@ -647,7 +648,8 @@ class ExpenseCurrencyForm(CurrencyForm):
 
 class ExpenseTransactionForm(TransactionForm):
     """The form to create or edit a cash expense transaction."""
-    date = DateField(default=date.today())
+    date = DateField(
+        validators=[DataRequired(lazy_gettext("Please fill in the date."))])
     """The date."""
     currencies = FieldList(FormField(ExpenseCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
@@ -756,7 +758,8 @@ class TransferCurrencyForm(CurrencyForm):
 
 class TransferTransactionForm(TransactionForm):
     """The form to create or edit a transfer transaction."""
-    date = DateField(default=date.today())
+    date = DateField(
+        validators=[DataRequired(lazy_gettext("Please fill in the date."))])
     """The date."""
     currencies = FieldList(FormField(TransferCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])

@@ -79,6 +79,7 @@ def show_add_transaction_form(txn_type: TransactionType) -> str:
         form.validate()
     else:
         form = txn_op.form()
+        form.date.data = date.today()
     return txn_op.render_create_template(form)
 
 
