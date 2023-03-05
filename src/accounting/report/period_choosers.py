@@ -142,10 +142,10 @@ class LedgerPeriodChooser(PeriodChooser):
 
 
 class IncomeExpensesPeriodChooser(PeriodChooser):
-    """The income-expenses period chooser."""
+    """The income and expenses period chooser."""
 
     def __init__(self, currency: Currency, account: Account):
-        """Constructs the income-expenses period chooser."""
+        """Constructs the income and expenses period chooser."""
         self.currency: Currency = currency
         """The currency."""
         self.account: Account = account
