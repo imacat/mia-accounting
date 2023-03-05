@@ -35,7 +35,7 @@ First written: 2023/3/5
   {% endif %}
 </div>
 
-<div>
+<div class="text-nowrap">
   {% if item.income is not none %}
     <span class="badge rounded-pill bg-success">+{{ item.income|accounting_format_amount }}</span>
   {% endif %}
