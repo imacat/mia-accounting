@@ -39,8 +39,8 @@ First written: 2023/2/26
 
 <form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post" data-currency-template="{{ currency_template }}" data-entry-template="{{ entry_template }}">
   {{ form.csrf_token }}
-  {% if "next" in request.args %}
-    <input type="hidden" name="next" value="{{ request.args["next"] }}">
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
   {% endif %}
 
   <div class="form-floating mb-3">

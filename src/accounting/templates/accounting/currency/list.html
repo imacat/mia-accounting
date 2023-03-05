@@ -21,7 +21,7 @@ First written: 2023/2/6
 #}
 {% extends "accounting/base.html" %}
 
-{% block header %}{% block title %}{% if "q" in request.args %}{{ A_("Search Result for \"%(query)s\"", query=request.args["q"]) }}{% else %}{{ A_("Currency Management") }}{% endif %}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if request.args.q %}{{ A_("Search Result for \"%(query)s\"", query=request.args.q) }}{% else %}{{ A_("Currency Management") }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -33,7 +33,7 @@ First written: 2023/2/6
     </a>
   {% endif %}
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.currency.list") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
-    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
+    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label for="accounting-search-desktop" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -45,7 +45,7 @@ First written: 2023/2/6
 
 <div class="btn-group mb-2 d-md-none">
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.currency.list") }}" method="get" role="search" aria-label="{{ A_("Search for Mobile") }}">
-    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
+    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label for="accounting-search-mobile" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>

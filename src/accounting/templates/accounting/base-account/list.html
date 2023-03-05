@@ -21,13 +21,13 @@ First written: 2023/1/26
 #}
 {% extends "accounting/base.html" %}
 
-{% block header %}{% block title %}{% if "q" in request.args %}{{ A_("Search Result for \"%(query)s\"", query=request.args["q"]) }}{% else %}{{ A_("Base Account Managements") }}{% endif %}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if request.args.q %}{{ A_("Search Result for \"%(query)s\"", query=request.args.q) }}{% else %}{{ A_("Base Account Managements") }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
 <div class="btn-group mb-2">
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.base-account.list") }}" method="get" role="search" aria-label="{{ A_("Search") }}">
-    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
+    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label for="accounting-search" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>

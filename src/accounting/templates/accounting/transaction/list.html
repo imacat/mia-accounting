@@ -25,7 +25,7 @@ First written: 2023/2/18
   <script src="{{ url_for("accounting.static", filename="js/material-fab-speed-dial.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{% if "q" in request.args %}{{ A_("Search Result for \"%(query)s\"", query=request.args["q"]) }}{% else %}{{ A_("Transaction Management") }}{% endif %}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if request.args.q %}{{ A_("Search Result for \"%(query)s\"", query=request.args.q) }}{% else %}{{ A_("Transaction Management") }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -55,7 +55,7 @@ First written: 2023/2/18
     </div>
   {% endif %}
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.transaction.list") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
-    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
+    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label for="accounting-search-desktop" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -67,7 +67,7 @@ First written: 2023/2/18
 
 <div class="btn-group mb-2 d-md-none">
   <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.transaction.list") }}" method="get" role="search" aria-label="{{ A_("Search for Mobile") }}">
-    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args["q"] if "q" in request.args else "" }}" placeholder=" " required="required">
+    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label for="accounting-search-mobile" class="accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>

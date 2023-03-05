@@ -40,8 +40,8 @@ First written: 2023/2/2
 {% if base.accounts|length > 1 and accounting_can_edit() %}
   <form action="{{ url_for("accounting.account.sort", base=base) }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% if "next" in request.args %}
-      <input type="hidden" name="next" value="{{ request.args["next"] }}">
+    {% if request.args.next %}
+      <input type="hidden" name="next" value="{{ request.args.next }}">
     {% endif %}
     <ul id="accounting-order-list" class="list-group mb-3" data-base-code="{{ base.code }}">
       {% for account in base.accounts|sort(attribute="no") %}

@@ -36,8 +36,8 @@ First written: 2023/2/6
 
 <form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post">
   {{ form.csrf_token }}
-  {% if "next" in request.args %}
-    <input type="hidden" name="next" value="{{ request.args["next"] }}">
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
   {% endif %}
   <div class="form-floating mb-3">
     <input id="accounting-code" class="form-control {% if form.code.errors %} is-invalid {% endif %}" type="text" name="code" value="{{ form.code.data|accounting_default }}" placeholder=" " required="required" data-exists-url="{{ url_for("accounting.currency-api.exists") }}" data-original="{% block original_code %}{% endblock %}" data-blocklist="{{ form.CODE_BLOCKLIST|tojson|forceescape }}">

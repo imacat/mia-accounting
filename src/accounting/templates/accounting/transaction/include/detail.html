@@ -60,8 +60,8 @@ First written: 2023/2/26
 {% if accounting_can_edit() %}
   <form action="{{ url_for("accounting.transaction.delete", txn=obj) }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% if "next" in request.args %}
-      <input type="hidden" name="next" value="{{ request.args["next"] }}">
+    {% if request.args.next %}
+      <input type="hidden" name="next" value="{{ request.args.next }}">
     {% endif %}
     <div class="modal fade" id="accounting-delete-modal" tabindex="-1" aria-labelledby="accounting-delete-modal-label" aria-hidden="true">
       <div class="modal-dialog">

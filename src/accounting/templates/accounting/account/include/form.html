@@ -36,8 +36,8 @@ First written: 2023/2/1
 
 <form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post">
   {{ form.csrf_token }}
-  {% if "next" in request.args %}
-    <input type="hidden" name="next" value="{{ request.args["next"] }}">
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
   {% endif %}
   <div class="form-floating mb-3">
     <input id="accounting-base-code" type="hidden" name="base_code" value="{{ form.base_code.data|accounting_default }}">
