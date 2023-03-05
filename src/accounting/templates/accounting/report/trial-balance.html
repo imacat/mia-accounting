@@ -26,7 +26,7 @@ First written: 2023/3/5
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ _("Trial Balance of %(currency)s %(period)s", currency=report.currency, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ _("Trial Balance of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -68,7 +68,7 @@ First written: 2023/3/5
       {% for currency in report.currency_options %}
         <li>
           <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
-            {{ currency.title|title }}
+            {{ currency.title }}
           </a>
         </li>
       {% endfor %}
@@ -100,7 +100,7 @@ First written: 2023/3/5
       {% for currency in report.currency_options %}
         <li>
           <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
-            {{ currency.title|title }}
+            {{ currency.title }}
           </a>
         </li>
       {% endfor %}
@@ -119,7 +119,7 @@ First written: 2023/3/5
 {% if list %}
   <div class="accounting-report-card">
     <div class="d-none d-sm-flex justify-content-center mb-3">
-      <h2 class="text-center">{{ _("Trial Balance of %(currency)s %(period)s", currency=report.currency, period=report.period.desc|title) }}</h2>
+      <h2 class="text-center">{{ _("Trial Balance of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
     </div>
 
     <div class="list-group accounting-list-group-stripped accounting-list-group-hover">

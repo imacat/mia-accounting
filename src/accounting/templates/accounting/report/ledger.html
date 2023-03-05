@@ -27,7 +27,7 @@ First written: 2023/3/5
   <script src="{{ url_for("accounting.static", filename="js/table-row-link.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ _("Ledger of %(account)s in %(currency)s %(period)s", currency=report.currency, account=report.account|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ _("Ledger of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -69,7 +69,7 @@ First written: 2023/3/5
       {% for currency in report.currency_options %}
         <li>
           <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
-            {{ currency.title|title }}
+            {{ currency.title }}
           </a>
         </li>
       {% endfor %}
@@ -116,7 +116,7 @@ First written: 2023/3/5
       {% for currency in report.currency_options %}
         <li>
           <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
-            {{ currency.title|title }}
+            {{ currency.title }}
           </a>
         </li>
       {% endfor %}
