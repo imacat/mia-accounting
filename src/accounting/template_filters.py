@@ -35,7 +35,7 @@ def format_amount(value: Decimal | None) -> str:
         return "-"
     whole: int = int(value)
     frac: Decimal = (value - whole).normalize()
-    return "{:,}".format(whole) + str(frac)[1:]
+    return "{:,}".format(whole) + str(abs(frac))[1:]
 
 
 def format_date(value: date) -> str:
