@@ -623,7 +623,12 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
 
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntry.account_id)
-            .filter(JournalEntry.currency_code == self.currency.code)
+            .join(Account)
+            .filter(JournalEntry.currency_code == self.currency.code,
+                    sa.or_(Account.base_code.startswith("11"),
+                           Account.base_code.startswith("12"),
+                           Account.base_code.startswith("21"),
+                           Account.base_code.startswith("22")))
             .group_by(JournalEntry.account_id)).all())
         return [OptionLink(str(x), get_url(x), x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
