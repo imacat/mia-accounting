@@ -63,7 +63,7 @@ class JournalRow(ReportRow):
 
     def as_dict(self) -> dict[str, t.Any]:
         return {"Date": self.transaction.date,
-                "Currency": str(self.currency),
+                "Currency": self.currency_code,
                 "Account": str(self.account),
                 "Summary": self.summary,
                 "Debit": self.amount if self.is_debit else None,
