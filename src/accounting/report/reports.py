@@ -480,21 +480,20 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
 
         :return: The journal entries.
         """
-        conditions1: list[sa.BinaryExpression] \
+        conditions: list[sa.BinaryExpression] \
             = [JournalEntry.currency_code == self.currency.code,
                JournalEntry.account_id == self.account.id]
         if self.period.start is not None:
-            conditions1.append(Transaction.date >= self.period.start)
+            conditions.append(Transaction.date >= self.period.start)
         if self.period.end is not None:
-            conditions1.append(Transaction.date <= self.period.end)
-        select1: sa.Select = sa.Select(Transaction.id).join(JournalEntry)\
-            .filter(*conditions1)
+            conditions.append(Transaction.date <= self.period.end)
+        txn_with_account: sa.Select = sa.Select(Transaction.id).\
+            join(JournalEntry).filter(*conditions)
 
-        conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.transaction_id.in_(select1),
-               JournalEntry.currency_code == self.currency.code,
-               JournalEntry.account_id != self.account.id]
-        return JournalEntry.query.join(Transaction).filter(*conditions)\
+        return JournalEntry.query.join(Transaction)\
+            .filter(JournalEntry.transaction_id.in_(txn_with_account),
+                    JournalEntry.currency_code == self.currency.code,
+                    JournalEntry.account_id != self.account.id)\
             .order_by(Transaction.date,
                       sa.desc(JournalEntry.is_debit),
                       JournalEntry.no)
