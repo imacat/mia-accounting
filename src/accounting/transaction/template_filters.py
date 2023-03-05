@@ -57,12 +57,14 @@ def to_transfer(uri: str) -> str:
     return urlunparse(parts)
 
 
-def format_amount_input(value: Decimal) -> str:
+def format_amount_input(value: Decimal | None) -> str:
     """Format an amount for an input value.
 
     :param value: The amount.
     :return: The formatted amount text for an input value.
     """
+    if value is None:
+        return ""
     whole: int = int(value)
     frac: Decimal = (value - whole).normalize()
     return str(whole) + str(frac)[1:]
