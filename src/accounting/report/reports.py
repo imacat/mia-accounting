@@ -226,7 +226,7 @@ class Ledger(JournalEntryReport[LedgerRow]):
     """The ledger."""
 
     def __init__(self, currency: Currency, account: Account, period: Period):
-        """Constructs a journal.
+        """Constructs a ledger.
 
         :param currency: The currency.
         :param account: The account.
