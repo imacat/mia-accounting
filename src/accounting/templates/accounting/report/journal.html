@@ -107,7 +107,7 @@ First written: 2023/3/4
     <tr class="accounting-clickable accounting-table-row-link" data-href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
       <td>{{ item.transaction.date|accounting_format_date }}</td>
       <td>{{ item.currency.name }}</td>
-      <td>{{ item.account }}</td>
+      <td>{{ item.account.title|title }}</td>
       <td>{{ "" if item.summary is none else item.summary }}</td>
       <td class="accounting-amount">{{ "" if not item.is_debit else item.amount|accounting_format_amount }}</td>
       <td class="accounting-amount">{{ "" if item.is_debit else item.amount|accounting_format_amount }}</td>
@@ -123,7 +123,7 @@ First written: 2023/3/4
         <div {% if not item.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>
           <div class="text-muted small">
             {{ item.transaction.date|accounting_format_date }}
-            {{ item.account.title }}
+            {{ item.account.title|title }}
             {% if item.currency_code != accounting_default_currency_code() %}
               <span class="badge rounded-pill bg-info">{{ item.currency_code }}</span>
             {% endif %}
