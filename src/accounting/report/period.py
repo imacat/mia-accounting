@@ -342,7 +342,7 @@ class ThisMonth(Period):
         today: datetime.date = datetime.date.today()
         this_month_start: datetime.date \
             = datetime.date(today.year, today.month, 1)
-        super(ThisMonth, self).__init__(this_month_start, _month_end(today))
+        super().__init__(this_month_start, _month_end(today))
         self.is_default = True
         self.is_this_month = True
 
@@ -363,7 +363,7 @@ class LastMonth(Period):
             year = year - 1
             month = 12
         start: datetime.date = datetime.date(year, month, 1)
-        super(LastMonth, self).__init__(start, _month_end(start))
+        super().__init__(start, _month_end(start))
         self.is_last_month = True
 
     def _set_properties(self) -> None:
@@ -383,7 +383,7 @@ class SinceLastMonth(Period):
             year = year - 1
             month = 12
         start: datetime.date = datetime.date(year, month, 1)
-        super(SinceLastMonth, self).__init__(start, None)
+        super().__init__(start, None)
         self.is_since_last_month = True
 
     def _set_properties(self) -> None:
@@ -398,7 +398,7 @@ class ThisYear(Period):
         year: int = datetime.date.today().year
         start: datetime.date = datetime.date(year, 1, 1)
         end: datetime.date = datetime.date(year, 12, 31)
-        super(ThisYear, self).__init__(start, end)
+        super().__init__(start, end)
         self.is_this_year = True
 
     def _set_properties(self) -> None:
@@ -413,7 +413,7 @@ class LastYear(Period):
         year: int = datetime.date.today().year
         start: datetime.date = datetime.date(year - 1, 1, 1)
         end: datetime.date = datetime.date(year - 1, 12, 31)
-        super(LastYear, self).__init__(start, end)
+        super().__init__(start, end)
         self.is_last_year = True
 
     def _set_properties(self) -> None:
@@ -426,7 +426,7 @@ class Today(Period):
     """The period of today."""
     def __init__(self):
         today: datetime.date = datetime.date.today()
-        super(Today, self).__init__(today, today)
+        super().__init__(today, today)
         self.is_this_year = True
 
     def _set_properties(self) -> None:
@@ -441,7 +441,7 @@ class Yesterday(Period):
     def __init__(self):
         yesterday: datetime.date \
             = datetime.date.today() - datetime.timedelta(days=1)
-        super(Yesterday, self).__init__(yesterday, yesterday)
+        super().__init__(yesterday, yesterday)
         self.is_this_year = True
 
     def _set_properties(self) -> None:
@@ -454,7 +454,7 @@ class Yesterday(Period):
 class TemplatePeriod(Period):
     """The period template."""
     def __init__(self):
-        super(TemplatePeriod, self).__init__(None, None)
+        super().__init__(None, None)
 
     def _set_properties(self) -> None:
         self.spec = "PERIOD"
@@ -469,7 +469,7 @@ class YearPeriod(Period):
         """
         start: datetime.date = datetime.date(year, 1, 1)
         end: datetime.date = datetime.date(year, 12, 31)
-        super(YearPeriod, self).__init__(start, end)
+        super().__init__(start, end)
         self.spec = str(year)
         self.is_a_year = True
 
