@@ -622,7 +622,7 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
                            period=self.period)
 
         in_use: set[int] = set(db.session.scalars(
-            sa.select(JournalEntry.account_id)
+            sa.Select(JournalEntry.account_id)
             .join(Account)
             .filter(JournalEntry.currency_code == self.currency.code,
                     sa.or_(Account.base_code.startswith("11"),
