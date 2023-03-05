@@ -42,5 +42,9 @@ First written: 2023/3/5
   {% if item.expense is not none %}
     <span class="badge rounded-pill bg-warning">-{{ item.expense|accounting_format_amount }}</span>
   {% endif %}
-  <span class="badge rounded-pill bg-primary">{{ item.balance|accounting_format_amount }}</span>
+  {% if item.balance < 0 %}
+    <span class="badge rounded-pill bg-danger">{{ item.balance|accounting_format_amount }}</span>
+  {% else %}
+    <span class="badge rounded-pill bg-primary">{{ item.balance|accounting_format_amount }}</span>
+  {% endif %}
 </div>
