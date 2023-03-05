@@ -498,7 +498,7 @@ def _parse_period_spec(text: str) \
     m = re.match(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?-$", text)
     if m is not None:
         return __get_start(m[1], m[2], m[3]), None
-    m = re.match(r"-^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
+    m = re.match(r"-(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
     if m is not None:
         return None, __get_end(m[1], m[2], m[3])
     m = re.match(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?-(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
