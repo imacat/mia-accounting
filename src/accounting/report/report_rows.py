@@ -62,13 +62,13 @@ class JournalRow(ReportRow):
         """The account."""
 
     def as_dict(self) -> dict[str, t.Any]:
-        return {"date": self.transaction.date,
-                "currency": str(self.currency),
-                "account": str(self.account),
-                "summary": self.summary,
-                "debit": self.amount if self.is_debit else None,
-                "credit": None if self.is_debit else self.amount,
-                "note": self.transaction.note}
+        return {"Date": self.transaction.date,
+                "Currency": str(self.currency),
+                "Account": str(self.account),
+                "Summary": self.summary,
+                "Debit": self.amount if self.is_debit else None,
+                "Credit": None if self.is_debit else self.amount,
+                "Note": self.transaction.note}
 
 
 class LedgerRow(ReportRow):
@@ -103,13 +103,13 @@ class LedgerRow(ReportRow):
 
     def as_dict(self) -> dict[str, t.Any]:
         if self.is_total:
-            return {"date": "Total",
-                    "summary": None,
-                    "debit": self.debit,
-                    "credit": self.credit,
-                    "balance": self.balance}
-        return {"date": self.date,
-                "summary": self.summary,
-                "debit": self.debit,
-                "credit": self.credit,
-                "balance": self.balance}
+            return {"Date": "Total",
+                    "Summary": None,
+                    "Debit": self.debit,
+                    "Credit": self.credit,
+                    "Balance": self.balance}
+        return {"Date": self.date,
+                "Summary": self.summary,
+                "Debit": self.debit,
+                "Credit": self.credit,
+                "Balance": self.balance}

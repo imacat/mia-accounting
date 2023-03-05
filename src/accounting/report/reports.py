@@ -198,8 +198,8 @@ class Journal(JournalEntryReport[JournalRow]):
 
     @property
     def csv_field_names(self) -> list[str]:
-        return ["date", "currency", "account", "summary", "debit", "credit",
-                "note"]
+        return ["Date", "Currency", "Account", "Summary", "Debit", "Credit",
+                "Note"]
 
     @property
     def csv_filename(self) -> str:
@@ -345,7 +345,7 @@ class Ledger(JournalEntryReport[LedgerRow]):
 
     @property
     def csv_field_names(self) -> list[str]:
-        return ["date", "summary", "debit", "credit", "balance"]
+        return ["Date", "Summary", "Debit", "Credit", "Balance"]
 
     @property
     def csv_filename(self) -> str:
