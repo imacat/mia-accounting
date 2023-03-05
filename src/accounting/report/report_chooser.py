@@ -66,6 +66,7 @@ class ReportChooser:
         """The title of the current report."""
         self.__reports.append(self.__journal)
         self.__reports.append(self.__ledger)
+        self.__reports.append(self.__income_expenses)
         for report in self.__reports:
             if report.is_active:
                 self.current_report = report.title
@@ -96,6 +97,21 @@ class ReportChooser:
                          period=self.__period)
         return OptionLink(gettext("Ledger"), url,
                           self.__active_report == ReportType.LEDGER)
+
+    @property
+    def __income_expenses(self) -> OptionLink:
+        """Returns the income and expenses.
+
+        :return: The income and expenses.
+        """
+        url: str = url_for("accounting.report.income-expenses-default",
+                           currency=self.__currency, account=self.__account) \
+            if self.__period.is_default \
+            else url_for("accounting.report.income-expenses",
+                         currency=self.__currency, account=self.__account,
+                         period=self.__period)
+        return OptionLink(gettext("Income and Expenses"), url,
+                          self.__active_report == ReportType.INCOME_EXPENSES)
 
     def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.

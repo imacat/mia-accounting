@@ -26,3 +26,5 @@ class ReportType(Enum):
     """The journal."""
     LEDGER: str = "ledger"
     """The ledger."""
+    INCOME_EXPENSES: str = "income-expenses"
+    """The income and expenses."""

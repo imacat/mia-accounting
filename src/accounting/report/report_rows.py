@@ -117,3 +117,55 @@ class LedgerRow(ReportRow):
                 "Credit": self.credit,
                 "Balance": self.balance,
                 "Note": self.note}
+
+
+class IncomeExpensesRow(ReportRow):
+    """A row in the income and expenses."""
+
+    def __init__(self, entry: JournalEntry | None = None):
+        """Constructs the row in the income and expenses.
+
+        :param entry: The journal entry.
+        """
+        self.entry: JournalEntry | None = None
+        """The journal entry."""
+        self.transaction: Transaction | None = None
+        """The transaction."""
+        self.is_total: bool = False
+        """Whether this is the total row."""
+        self.date: date | None = None
+        """The date."""
+        self.account: Account | None = None
+        """The date."""
+        self.summary: str | None = None
+        """The summary."""
+        self.income: Decimal | None = None
+        """The income amount."""
+        self.expense: Decimal | None = None
+        """The expense amount."""
+        self.balance: Decimal | None = None
+        """The balance."""
+        self.note: str | None = None
+        """The note."""
+        if entry is not None:
+            self.entry = entry
+            self.summary = entry.summary
+            self.income = None if entry.is_debit else entry.amount
+            self.expense = entry.amount if entry.is_debit else None
+
+    def as_dict(self) -> dict[str, t.Any]:
+        if self.is_total:
+            return {"Date": "Total",
+                    "Account": None,
+                    "Summary": None,
+                    "Income": self.income,
+                    "Expense": self.expense,
+                    "Balance": self.balance,
+                    "Note": None}
+        return {"Date": self.date,
+                "Account": str(self.account),
+                "Summary": self.summary,
+                "Income": self.income,
+                "Expense": self.expense,
+                "Balance": self.balance,
+                "Note": self.note}

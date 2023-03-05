@@ -22,7 +22,7 @@ from flask import Blueprint, request, Response
 from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
 from .period import Period
-from .reports import Journal, Ledger
+from .reports import Journal, Ledger, IncomeExpenses
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
@@ -100,6 +100,51 @@ def __get_ledger_list(currency: Currency, account: Account, period: Period) \
     :return: The ledger in the period.
     """
     report: Ledger = Ledger(currency, account, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.as_csv_download()
+    return report.as_html_page()
+
+
+@bp.get("income-expenses/<currency:currency>/<account:account>",
+        endpoint="income-expenses-default")
+@has_permission(can_view)
+def get_default_income_expenses_list(currency: Currency, account: Account) \
+        -> str | Response:
+    """Returns the income and expenses in the default period.
+
+    :param currency: The currency.
+    :param account: The account.
+    :return: The income and expenses in the default period.
+    """
+    return __get_income_expenses_list(currency, account, Period.get_instance())
+
+
+@bp.get(
+    "income-expenses/<currency:currency>/<account:account>/<period:period>",
+    endpoint="income-expenses")
+@has_permission(can_view)
+def get_income_expenses_list(currency: Currency, account: Account,
+                             period: Period) -> str | Response:
+    """Returns the income and expenses.
+
+    :param currency: The currency.
+    :param account: The account.
+    :param period: The period.
+    :return: The income and expenses in the period.
+    """
+    return __get_income_expenses_list(currency, account, period)
+
+
+def __get_income_expenses_list(currency: Currency, account: Account,
+                               period: Period) -> str | Response:
+    """Returns the income and expenses.
+
+    :param currency: The currency.
+    :param account: The account.
+    :param period: The period.
+    :return: The income and expenses in the period.
+    """
+    report: IncomeExpenses = IncomeExpenses(currency, account, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.as_csv_download()
     return report.as_html_page()

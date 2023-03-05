@@ -139,3 +139,26 @@ class LedgerPeriodChooser(PeriodChooser):
         return url_for("accounting.report.ledger",
                        currency=self.currency, account=self.account,
                        period=period)
+
+
+class IncomeExpensesPeriodChooser(PeriodChooser):
+    """The income-expenses period chooser."""
+
+    def __init__(self, currency: Currency, account: Account):
+        """Constructs the income-expenses period chooser."""
+        self.currency: Currency = currency
+        """The currency."""
+        self.account: Account = account
+        """The account."""
+        first: Transaction | None \
+            = Transaction.query.order_by(Transaction.date).first()
+        super(IncomeExpensesPeriodChooser, self).__init__(
+            None if first is None else first.date)
+
+    def _url_for(self, period: Period) -> str:
+        if period.is_default:
+            return url_for("accounting.report.income-expenses-default",
+                           currency=self.currency, account=self.account)
+        return url_for("accounting.report.income-expenses",
+                       currency=self.currency, account=self.account,
+                       period=period)
