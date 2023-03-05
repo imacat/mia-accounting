@@ -26,7 +26,7 @@ from accounting.models import JournalEntry, Transaction, Account, Currency
 
 
 class ReportRow(ABC):
-    """A report row."""
+    """A row in the report."""
 
     @abstractmethod
     def as_dict(self) -> dict[str, t.Any]:
@@ -37,10 +37,10 @@ class ReportRow(ABC):
 
 
 class JournalRow(ReportRow):
-    """A row in the journal report."""
+    """A row in the journal."""
 
     def __init__(self, entry: JournalEntry):
-        """Constructs the row in the journal report.
+        """Constructs the row in the journal.
 
         :param entry: The journal entry.
         """
@@ -72,10 +72,10 @@ class JournalRow(ReportRow):
 
 
 class LedgerRow(ReportRow):
-    """A row in the ledger report."""
+    """A row in the ledger."""
 
     def __init__(self, entry: JournalEntry | None = None):
-        """Constructs the row in the journal report.
+        """Constructs the row in the ledger.
 
         :param entry: The journal entry.
         """
