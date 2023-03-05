@@ -58,6 +58,15 @@
     font-size: 1.4rem;
     color: #373b3e;
 }
+.accounting-sheet {
+    padding: 2em 1.5em;
+    margin: 1em;
+    background-color: #F8F9FA;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.accounting-sheet h2 {
+    border-bottom: thick double slategray;
+}
 
 /** The option selector */
 .accounting-selector-list {
@@ -78,15 +87,6 @@
 }
 .accounting-entry-control {
     border-color: transparent;
-}
-.accounting-transaction-card {
-    padding: 2em 1.5em;
-    margin: 1em;
-    background-color: #F8F9FA;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-.accounting-transaction-card h2 {
-    border-bottom: thick double slategray;
 }
 .accounting-list-group-stripped .list-group-item:nth-child(2n+1) {
     background-color: #f2f2f2;
@@ -126,15 +126,6 @@ td.accounting-amount {
     border-top: 1px double black;
     font-weight: bolder;
     font-style: italic;
-}
-.accounting-report-card {
-    padding: 2em 1.5em;
-    margin: 1em;
-    background-color: #F8F9FA;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-.accounting-report-card h2 {
-    border-bottom: thick double slategray;
 }
 .accounting-report-row {
     border: none;
