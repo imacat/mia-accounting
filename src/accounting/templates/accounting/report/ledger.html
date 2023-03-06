@@ -180,7 +180,7 @@ First written: 2023/3/5
         {% endif %}
       {% endfor %}
     </div>
-    {% if report.total_row is not none %}
+    {% if report.total_row %}
       <div class="accounting-report-table-footer">
         <div class="accounting-report-table-row">
           <div>{{ A_("Total") }}</div>
