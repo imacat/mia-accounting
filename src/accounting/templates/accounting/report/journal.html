@@ -88,8 +88,10 @@ First written: 2023/3/4
   {% include "accounting/report/include/period-chooser.html" %}
 {% endwith %}
 
-{% if list %}
-  {% include "accounting/include/pagination.html" %}
+{% if report.has_data %}
+  {% with pagination = report.pagination %}
+    {% include "accounting/include/pagination.html" %}
+  {% endwith %}
 
   <div class="d-none d-md-block accounting-report-table accounting-journal-table">
     <div class="accounting-report-table-header">
@@ -103,7 +105,7 @@ First written: 2023/3/4
       </div>
     </div>
     <div class="accounting-report-table-body">
-      {% for item in list %}
+      {% for item in report.data_rows %}
         <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
           <div>{{ item.transaction.date|accounting_format_date }}</div>
           <div>{{ item.currency.name }}</div>
@@ -117,7 +119,7 @@ First written: 2023/3/4
   </div>
 
   <div class="list-group d-md-none">
-  {% for item in list %}
+  {% for item in report.data_rows %}
     <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
       <div class="d-flex justify-content-between">
         <div {% if not item.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>

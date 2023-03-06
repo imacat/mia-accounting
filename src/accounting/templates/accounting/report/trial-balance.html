@@ -116,7 +116,7 @@ First written: 2023/3/5
   {% include "accounting/report/include/period-chooser.html" %}
 {% endwith %}
 
-{% if list %}
+{% if report.has_data %}
   <div class="accounting-sheet">
     <div class="d-none d-sm-flex justify-content-center mb-3">
       <h2 class="text-center">{{ _("Trial Balance of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
@@ -131,7 +131,7 @@ First written: 2023/3/5
         </div>
       </div>
       <div class="accounting-report-table-body">
-        {% for item in list %}
+        {% for item in report.data_rows %}
           <a class="accounting-report-table-row" href="{{ item.url }}">
             <div>
               <span class="d-none d-md-inline">{{ item.account.code }}</span>
@@ -145,8 +145,8 @@ First written: 2023/3/5
       <div class="accounting-report-table-footer">
         <div class="accounting-report-table-row">
           <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount">{{ report.total_row.debit|accounting_format_amount }}</div>
-          <div class="accounting-amount">{{ report.total_row.credit|accounting_format_amount }}</div>
+          <div class="accounting-amount">{{ report.total.debit|accounting_format_amount }}</div>
+          <div class="accounting-amount">{{ report.total.credit|accounting_format_amount }}</div>
       </div>
       </div>
     </div>

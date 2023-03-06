@@ -22,56 +22,48 @@ import typing as t
 from abc import ABC, abstractmethod
 from decimal import Decimal
 from io import StringIO
-from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
-    urlunparse
 
 import sqlalchemy as sa
-from flask import Response, render_template, request, url_for
+from flask import Response, render_template, url_for
 
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
-from accounting.utils.pagination import Pagination
-from accounting.utils.txn_types import TransactionType
-from .option_link import OptionLink
-from .period import Period
-from .period_choosers import PeriodChooser, JournalPeriodChooser, \
-    LedgerPeriodChooser, IncomeExpensesPeriodChooser, TrialBalancePeriodChooser
-from .report_chooser import ReportChooser
-from .report_rows import ReportRow, JournalRow, LedgerRow, IncomeExpensesRow, \
-    TrialBalanceRow
-from .report_type import ReportType
+from accounting.report.period import Period
+from accounting.report.report_params import JournalParams, LedgerParams, \
+    IncomeExpensesParams, TrialBalanceParams
+from accounting.report.report_rows import JournalRow, LedgerRow, \
+    IncomeExpensesRow, TrialBalanceRow
 
-T = t.TypeVar("T", bound=ReportRow)
-"""The row class in the report."""
+T = t.TypeVar("T")
 
 
-class JournalEntryReport(t.Generic[T], ABC):
-    """A report based on a journal entry."""
+class Report(t.Generic[T], ABC):
+    """A report."""
 
-    def __init__(self, period: Period):
-        """Constructs a journal.
-
-        :param period: The period.
-        """
-        self.period: Period = period
-        """The period."""
-        self.__rows: list[T] | None = None
-        """The rows in the report."""
+    def __init__(self):
+        """Constructs a report."""
+        self.data_rows: list[T]
+        """The data rows."""
+        self.brought_forward: T | None
+        """The brought-forward row."""
+        self.total: T | None
+        """The total row."""
+        self.data_rows, self.brought_forward, self.total = self.get_rows()
 
     @abstractmethod
-    def get_rows(self) -> list[T]:
-        """Returns the rows, without pagination.
+    def get_rows(self) -> tuple[list[T], T | None, T | None]:
+        """Returns the data rows, the brought-forward row, and the total row.
 
-        :return: The rows.
+        :return: The data rows, the brought-forward row, and the total row.
         """
 
+    @staticmethod
     @abstractmethod
-    def populate_rows(self, rows: list[T]) -> None:
-        """Populates the transaction, currency, account, and other data to the
-        given rows.
+    def populate_rows(rows: list[JournalRow]) -> None:
+        """Fills in the related data to the data rows.
 
-        :param rows: The rows.
+        :param rows: The data rows.
         :return: None.
         """
 
@@ -86,103 +78,71 @@ class JournalEntryReport(t.Generic[T], ABC):
     @property
     @abstractmethod
     def csv_filename(self) -> str:
-        """Returns the CSV file name.
+        """Returns the CSV download file name.
 
-        :return: The CSV file name.
+        :return: The CSV download file name.
         """
 
-    @property
-    @abstractmethod
-    def period_chooser(self) -> PeriodChooser:
-        """Returns the period chooser.
+    def csv(self) -> Response:
+        """Returns the report as CSV for download.
 
-        :return: The period chooser.
+        :return: The response of the report for download.
         """
-
-    @property
-    @abstractmethod
-    def report_chooser(self) -> ReportChooser:
-        """Returns the report chooser.
-
-        :return: The report chooser.
-        """
-
-    @abstractmethod
-    def as_html_page(self) -> str:
-        """Returns the report as an HTML page.
-
-        :return: The report as an HTML page.
-        """
-
-    @property
-    def rows(self) -> list[T]:
-        """Returns the journal entries.
-
-        :return: The journal entries.
-        """
-        if self.__rows is None:
-            self.__rows = self.get_rows()
-        return self.__rows
-
-    @property
-    def txn_types(self) -> t.Type[TransactionType]:
-        """Returns the transaction types.
-
-        :return: The transaction types.
-        """
-        return TransactionType
-
-    @property
-    def csv_uri(self) -> str:
-        """Returns the URI to download the report as CSV.
-
-        :return: The URI to download the report as CSV.
-        """
-        uri: str = request.full_path if request.query_string else request.path
-        uri_p: ParseResult = urlparse(uri)
-        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
-        params = [x for x in params if x[0] != "as"]
-        params.append(("as", "csv"))
-        parts: list[str] = list(uri_p)
-        parts[4] = urlencode(params)
-        return urlunparse(parts)
-
-    def as_csv_download(self) -> Response:
-        """Returns the report as CSV download.
-
-        :return: The CSV download response.
-        """
-        self.populate_rows(self.rows)
+        rows: list[T] = []
+        if self.brought_forward is not None:
+            rows.append(self.brought_forward)
+        rows.extend(self.data_rows)
+        if self.total is not None:
+            rows.append(self.total)
+        self.populate_rows(rows)
         with StringIO() as fp:
             writer: csv.DictWriter = csv.DictWriter(
                 fp, fieldnames=self.csv_field_names)
             writer.writeheader()
-            writer.writerows([x.as_dict() for x in self.rows])
+            writer.writerows([x.as_dict() for x in rows])
             fp.seek(0)
             response: Response = Response(fp.read(), mimetype="text/csv")
             response.headers["Content-Disposition"] \
                 = f"attachment; filename={self.csv_filename}"
             return response
 
+    @abstractmethod
+    def html(self) -> str:
+        """Composes and returns the report as HTML.
 
-class Journal(JournalEntryReport[JournalRow]):
+        :return: The report as HTML.
+        """
+
+
+class Journal(Report[JournalRow]):
     """The journal."""
 
-    def get_rows(self) -> list[JournalRow]:
+    def __init__(self, period: Period):
+        """Constructs a journal.
+
+        :param period: The period.
+        """
+        self.period: Period = period
+        """The period."""
+        super().__init__()
+
+    def get_rows(self) -> tuple[list[T], T | None, T | None]:
         conditions: list[sa.BinaryExpression] = []
         if self.period.start is not None:
             conditions.append(Transaction.date >= self.period.start)
         if self.period.end is not None:
             conditions.append(Transaction.date <= self.period.end)
-        return [JournalRow(x) for x in db.session
-                .query(JournalEntry)
-                .join(Transaction)
-                .filter(*conditions)
-                .order_by(Transaction.date,
-                          JournalEntry.is_debit.desc(),
-                          JournalEntry.no).all()]
+        rows: list[JournalRow] = [JournalRow(x) for x in db.session
+                                  .query(JournalEntry)
+                                  .join(Transaction)
+                                  .filter(*conditions)
+                                  .order_by(Transaction.date,
+                                            JournalEntry.is_debit.desc(),
+                                            JournalEntry.no).all()]
+        return rows, None, None
 
-    def populate_rows(self, rows: list[JournalRow]) -> None:
+    @staticmethod
+    def populate_rows(rows: list[JournalRow]) -> None:
         transactions: dict[int, Transaction] \
             = {x.id: x for x in Transaction.query.filter(
                Transaction.id.in_({x.entry.transaction_id for x in rows}))}
@@ -206,24 +166,16 @@ class Journal(JournalEntryReport[JournalRow]):
     def csv_filename(self) -> str:
         return f"journal-{self.period.spec}.csv"
 
-    @property
-    def period_chooser(self) -> PeriodChooser:
-        return JournalPeriodChooser()
-
-    @property
-    def report_chooser(self) -> ReportChooser:
-        return ReportChooser(ReportType.JOURNAL,
-                             period=self.period)
-
-    def as_html_page(self) -> str:
-        pagination: Pagination = Pagination[JournalRow](self.rows)
-        rows: list[JournalRow] = pagination.list
-        self.populate_rows(rows)
+    def html(self) -> str:
+        params: JournalParams = JournalParams(
+            period=self.period,
+            data_rows=self.data_rows,
+            filler=self.populate_rows)
         return render_template("accounting/report/journal.html",
-                               list=rows, pagination=pagination, report=self)
+                               report=params)
 
 
-class Ledger(JournalEntryReport[LedgerRow]):
+class Ledger(Report[LedgerRow]):
     """The ledger."""
 
     def __init__(self, currency: Currency, account: Account, period: Period):
@@ -233,23 +185,20 @@ class Ledger(JournalEntryReport[LedgerRow]):
         :param account: The account.
         :param period: The period.
         """
-        super().__init__(period)
         self.currency: Currency = currency
         """The currency."""
         self.account: Account = account
         """The account."""
-        self.total_row: LedgerRow | None = None
-        """The total row to show on the template."""
+        self.period: Period = period
+        """The period."""
+        super().__init__()
 
-    def get_rows(self) -> list[LedgerRow]:
+    def get_rows(self) -> tuple[list[T], T | None, T | None]:
         brought_forward: LedgerRow | None = self.__get_brought_forward_row()
         rows: list[LedgerRow] = [LedgerRow(x) for x in self.__query_entries()]
         total: LedgerRow = self.__get_total_row(brought_forward, rows)
         self.__populate_balance(brought_forward, rows)
-        if brought_forward is not None:
-            rows.insert(0, brought_forward)
-        rows.append(total)
-        return rows
+        return rows, brought_forward, total
 
     def __get_brought_forward_row(self) -> LedgerRow | None:
         """Queries, composes and returns the brought-forward row.
@@ -334,7 +283,8 @@ class Ledger(JournalEntryReport[LedgerRow]):
                 balance = balance - row.credit
             row.balance = balance
 
-    def populate_rows(self, rows: list[LedgerRow]) -> None:
+    @staticmethod
+    def populate_rows(rows: list[LedgerRow]) -> None:
         transactions: dict[int, Transaction] \
             = {x.id: x for x in Transaction.query.filter(
                Transaction.id.in_({x.entry.transaction_id for x in rows
@@ -355,70 +305,20 @@ class Ledger(JournalEntryReport[LedgerRow]):
             currency=self.currency.code, account=self.account.code,
             period=self.period.spec)
 
-    @property
-    def period_chooser(self) -> PeriodChooser:
-        return LedgerPeriodChooser(self.currency, self.account)
-
-    @property
-    def report_chooser(self) -> ReportChooser:
-        return ReportChooser(ReportType.LEDGER,
-                             currency=self.currency,
-                             account=self.account,
-                             period=self.period)
-
-    def as_html_page(self) -> str:
-        pagination: Pagination = Pagination[LedgerRow](self.rows)
-        rows: list[LedgerRow] = pagination.list
-        self.populate_rows(rows)
-        if len(rows) > 0 and rows[-1].is_total:
-            self.total_row = rows[-1]
-            rows = rows[:-1]
+    def html(self) -> str:
+        params: LedgerParams = LedgerParams(
+            currency=self.currency,
+            account=self.account,
+            period=self.period,
+            data_rows=self.data_rows,
+            filler=self.populate_rows,
+            brought_forward=self.brought_forward,
+            total=self.total)
         return render_template("accounting/report/ledger.html",
-                               list=rows, pagination=pagination, report=self)
-
-    @property
-    def currency_options(self) -> list[OptionLink]:
-        """Returns the currency options.
-
-        :return: The currency options.
-        """
-        def get_url(currency: Currency):
-            if self.period.is_default:
-                return url_for("accounting.report.ledger-default",
-                               currency=currency, account=self.account)
-            return url_for("accounting.report.ledger",
-                           currency=currency, account=self.account,
-                           period=self.period)
-
-        in_use: sa.Select = sa.Select(JournalEntry.currency_code)\
-            .group_by(JournalEntry.currency_code)
-        return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
-                for x in Currency.query.filter(Currency.code.in_(in_use))
-                .order_by(Currency.code).all()]
-
-    @property
-    def account_options(self) -> list[OptionLink]:
-        """Returns the account options.
-
-        :return: The account options.
-        """
-        def get_url(account: Account):
-            if self.period.is_default:
-                return url_for("accounting.report.ledger-default",
-                               currency=self.currency, account=account)
-            return url_for("accounting.report.ledger",
-                           currency=self.currency, account=account,
-                           period=self.period)
-
-        in_use: sa.Select = sa.Select(JournalEntry.account_id)\
-            .filter(JournalEntry.currency_code == self.currency.code)\
-            .group_by(JournalEntry.account_id)
-        return [OptionLink(str(x), get_url(x), x.id == self.account.id)
-                for x in Account.query.filter(Account.id.in_(in_use))
-                .order_by(Account.base_code, Account.no).all()]
+                               report=params)
 
 
-class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
+class IncomeExpenses(Report[IncomeExpensesRow]):
     """The income and expenses."""
 
     def __init__(self, currency: Currency, account: Account, period: Period):
@@ -428,25 +328,22 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
         :param account: The account.
         :param period: The period.
         """
-        super().__init__(period)
         self.currency: Currency = currency
         """The currency."""
         self.account: Account = account
         """The account."""
-        self.total_row: IncomeExpensesRow | None = None
-        """The total row to show on the template."""
+        self.period: Period = period
+        """The period."""
+        super().__init__()
 
-    def get_rows(self) -> list[IncomeExpensesRow]:
+    def get_rows(self) -> tuple[list[T], T | None, T | None]:
         brought_forward: IncomeExpensesRow | None \
             = self.__get_brought_forward_row()
         rows: list[IncomeExpensesRow] \
             = [IncomeExpensesRow(x) for x in self.__query_entries()]
         total: IncomeExpensesRow = self.__get_total_row(brought_forward, rows)
         self.__populate_balance(brought_forward, rows)
-        if brought_forward is not None:
-            rows.insert(0, brought_forward)
-        rows.append(total)
-        return rows
+        return rows, brought_forward, total
 
     def __get_brought_forward_row(self) -> IncomeExpensesRow | None:
         """Queries, composes and returns the brought-forward row.
@@ -468,6 +365,7 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
             return None
         row: IncomeExpensesRow = IncomeExpensesRow()
         row.date = self.period.start
+        row.account = Account.find_by_code("3351-001")
         row.summary = gettext("Brought forward")
         if balance > 0:
             row.income = balance
@@ -536,7 +434,8 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
                 balance = balance - row.expense
             row.balance = balance
 
-    def populate_rows(self, rows: list[IncomeExpensesRow]) -> None:
+    @staticmethod
+    def populate_rows(rows: list[IncomeExpensesRow]) -> None:
         transactions: dict[int, Transaction] \
             = {x.id: x for x in Transaction.query.filter(
                Transaction.id.in_({x.entry.transaction_id for x in rows
@@ -563,96 +462,39 @@ class IncomeExpenses(JournalEntryReport[IncomeExpensesRow]):
             currency=self.currency.code, account=self.account.code,
             period=self.period.spec)
 
-    @property
-    def period_chooser(self) -> PeriodChooser:
-        return IncomeExpensesPeriodChooser(self.currency, self.account)
-
-    @property
-    def report_chooser(self) -> ReportChooser:
-        return ReportChooser(ReportType.INCOME_EXPENSES,
-                             currency=self.currency,
-                             account=self.account,
-                             period=self.period)
-
-    def as_html_page(self) -> str:
-        pagination: Pagination = Pagination[IncomeExpensesRow](self.rows)
-        rows: list[IncomeExpensesRow] = pagination.list
-        self.populate_rows(rows)
-        if len(rows) > 0 and rows[-1].is_total:
-            self.total_row = rows[-1]
-            rows = rows[:-1]
+    def html(self) -> str:
+        params: IncomeExpensesParams = IncomeExpensesParams(
+            currency=self.currency,
+            account=self.account,
+            period=self.period,
+            data_rows=self.data_rows,
+            filler=self.populate_rows,
+            brought_forward=self.brought_forward,
+            total=self.total)
         return render_template("accounting/report/income-expenses.html",
-                               list=rows, pagination=pagination, report=self)
-
-    @property
-    def currency_options(self) -> list[OptionLink]:
-        """Returns the currency options.
-
-        :return: The currency options.
-        """
-        def get_url(currency: Currency):
-            if self.period.is_default:
-                return url_for("accounting.report.income-expenses-default",
-                               currency=currency, account=self.account)
-            return url_for("accounting.report.income-expenses",
-                           currency=currency, account=self.account,
-                           period=self.period)
-
-        in_use: set[str] = set(db.session.scalars(
-            sa.select(JournalEntry.currency_code)
-            .group_by(JournalEntry.currency_code)).all())
-        return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
-                for x in Currency.query.filter(Currency.code.in_(in_use))
-                .order_by(Currency.code).all()]
-
-    @property
-    def account_options(self) -> list[OptionLink]:
-        """Returns the account options.
-
-        :return: The account options.
-        """
-        def get_url(account: Account):
-            if self.period.is_default:
-                return url_for("accounting.report.income-expenses-default",
-                               currency=self.currency, account=account)
-            return url_for("accounting.report.income-expenses",
-                           currency=self.currency, account=account,
-                           period=self.period)
-
-        in_use: sa.Select = sa.Select(JournalEntry.account_id)\
-            .join(Account)\
-            .filter(JournalEntry.currency_code == self.currency.code,
-                    sa.or_(Account.base_code.startswith("11"),
-                           Account.base_code.startswith("12"),
-                           Account.base_code.startswith("21"),
-                           Account.base_code.startswith("22")))\
-            .group_by(JournalEntry.account_id)
-        return [OptionLink(str(x), get_url(x), x.id == self.account.id)
-                for x in Account.query.filter(Account.id.in_(in_use))
-                .order_by(Account.base_code, Account.no).all()]
+                               report=params)
 
 
-class TrialBalance(JournalEntryReport[TrialBalanceRow]):
+class TrialBalance(Report[TrialBalanceRow]):
     """The trial balance."""
 
     def __init__(self, currency: Currency, period: Period):
-        """Constructs a trial balance.
+        """Constructs an income and expenses.
 
         :param currency: The currency.
         :param period: The period.
         """
-        super().__init__(period)
         self.currency: Currency = currency
         """The currency."""
-        self.total_row: TrialBalanceRow | None = None
-        """The total row."""
+        self.period: Period = period
+        """The period."""
+        super().__init__()
 
-    def get_rows(self) -> list[TrialBalanceRow]:
+    def get_rows(self) -> tuple[list[T], T | None, T | None]:
         rows: list[TrialBalanceRow] = self.__query_balances()
         self.__populate_url(rows)
         total_row: TrialBalanceRow = self.__get_total_row(rows)
-        rows.append(total_row)
-        return rows
+        return rows, None, total_row
 
     def __query_balances(self) -> list[TrialBalanceRow]:
         """Queries and returns the balances.
@@ -670,9 +512,10 @@ class TrialBalance(JournalEntryReport[TrialBalanceRow]):
             else_=-JournalEntry.amount)).label("balance")
         select_trial_balance: sa.Select \
             = sa.select(JournalEntry.account_id, balance_func)\
-            .join(Transaction)\
+            .join(Transaction).join(Account)\
             .filter(*conditions)\
-            .group_by(JournalEntry.account_id)
+            .group_by(JournalEntry.account_id)\
+            .order_by(Account.base_code, Account.no)
         balances: list[sa.Row] = db.session.execute(select_trial_balance).all()
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query
@@ -715,7 +558,8 @@ class TrialBalance(JournalEntryReport[TrialBalanceRow]):
         row.credit = sum([x.credit for x in rows if x.credit is not None])
         return row
 
-    def populate_rows(self, rows: list[T]) -> None:
+    @staticmethod
+    def populate_rows(rows: list[JournalRow]) -> None:
         pass
 
     @property
@@ -726,41 +570,11 @@ class TrialBalance(JournalEntryReport[TrialBalanceRow]):
     def csv_filename(self) -> str:
         return f"trial-balance-{self.period.spec}.csv"
 
-    @property
-    def period_chooser(self) -> PeriodChooser:
-        return TrialBalancePeriodChooser(self.currency)
-
-    @property
-    def report_chooser(self) -> ReportChooser:
-        return ReportChooser(ReportType.TRIAL_BALANCE,
-                             currency=self.currency,
-                             period=self.period)
-
-    def as_html_page(self) -> str:
-        pagination: Pagination = Pagination[TrialBalanceRow](self.rows)
-        rows: list[TrialBalanceRow] = pagination.list
-        if len(rows) > 0 and rows[-1].is_total:
-            self.total_row = rows[-1]
-            rows = rows[:-1]
+    def html(self) -> str:
+        params: TrialBalanceParams = TrialBalanceParams(
+            currency=self.currency,
+            period=self.period,
+            data_rows=self.data_rows,
+            total=self.total)
         return render_template("accounting/report/trial-balance.html",
-                               list=rows, pagination=pagination, report=self)
-
-    @property
-    def currency_options(self) -> list[OptionLink]:
-        """Returns the currency options.
-
-        :return: The currency options.
-        """
-        def get_url(currency: Currency):
-            if self.period.is_default:
-                return url_for("accounting.report.trial-balance-default",
-                               currency=currency)
-            return url_for("accounting.report.trial-balance",
-                           currency=currency, period=self.period)
-
-        in_use: set[str] = set(db.session.scalars(
-            sa.select(JournalEntry.currency_code)
-            .group_by(JournalEntry.currency_code)).all())
-        return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
-                for x in Currency.query.filter(Currency.code.in_(in_use))
-                .order_by(Currency.code).all()]
+                               report=params)

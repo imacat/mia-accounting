@@ -146,8 +146,10 @@ First written: 2023/3/5
   {% include "accounting/report/include/period-chooser.html" %}
 {% endwith %}
 
-{% if list %}
-  {% include "accounting/include/pagination.html" %}
+{% if report.has_data %}
+  {% with pagination = report.pagination %}
+    {% include "accounting/include/pagination.html" %}
+  {% endwith %}
 
   <div class="d-none d-md-block accounting-report-table accounting-ledger-table">
     <div class="accounting-report-table-header">
@@ -160,16 +162,8 @@ First written: 2023/3/5
       </div>
     </div>
     <div class="accounting-report-table-body">
-      {% for item in list %}
-        {% if item.transaction %}
-          <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
-            <div>{{ item.date|accounting_format_date }}</div>
-            <div>{{ item.summary|accounting_default }}</div>
-            <div class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ item.balance|accounting_format_amount }}</div>
-          </a>
-        {% else %}
+      {% if report.brought_forward %}
+        {% with item = report.brought_forward %}
           <div class="accounting-report-table-row">
             <div>{{ item.date|accounting_format_date }}</div>
             <div>{{ item.summary|accounting_default }}</div>
@@ -177,35 +171,47 @@ First written: 2023/3/5
             <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
             <div class="accounting-amount">{{ item.balance|accounting_format_amount }}</div>
           </div>
-        {% endif %}
+        {% endwith %}
+      {% endif %}
+      {% for item in report.data_rows %}
+        <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
+          <div>{{ item.date|accounting_format_date }}</div>
+          <div>{{ item.summary|accounting_default }}</div>
+          <div class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount">{{ item.balance|accounting_format_amount }}</div>
+        </a>
       {% endfor %}
     </div>
-    {% if report.total_row %}
-      <div class="accounting-report-table-footer">
-        <div class="accounting-report-table-row">
-          <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount">{{ report.total_row.debit|accounting_format_amount }}</div>
-          <div class="accounting-amount">{{ report.total_row.credit|accounting_format_amount }}</div>
-          <div class="accounting-amount">{{ report.total_row.balance|accounting_format_amount }}</div>
+    {% if report.total %}
+      {% with item = report.total %}
+        <div class="accounting-report-table-footer">
+          <div class="accounting-report-table-row">
+            <div>{{ A_("Total") }}</div>
+            <div class="accounting-amount">{{ item.debit|accounting_format_amount }}</div>
+            <div class="accounting-amount">{{ item.credit|accounting_format_amount }}</div>
+            <div class="accounting-amount">{{ item.balance|accounting_format_amount }}</div>
+          </div>
         </div>
-      </div>
+      {% endwith %}
     {% endif %}
   </div>
 
   <div class="list-group d-md-none">
-  {% for item in list %}
-    {% if item.transaction is not none %}
-      <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
-        {% include "accounting/report/include/ledger-mobile-row.html" %}
-      </a>
-    {% else %}
+  {% if report.brought_forward %}
+    {% with item = report.brought_forward %}
       <div class="list-group-item list-group-item-action d-flex justify-content-between">
         {% include "accounting/report/include/ledger-mobile-row.html" %}
       </div>
-    {% endif %}
+    {% endwith %}
+  {% endif %}
+  {% for item in report.data_rows %}
+    <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
+      {% include "accounting/report/include/ledger-mobile-row.html" %}
+    </a>
   {% endfor %}
-  {% if report.total_row is not none %}
-    {% with item = report.total_row %}
+  {% if report.total is not none %}
+    {% with item = report.total %}
       <div class="list-group-item list-group-item-action d-flex justify-content-between">
         {% include "accounting/report/include/ledger-mobile-row.html" %}
       </div>

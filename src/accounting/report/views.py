@@ -57,8 +57,8 @@ def __get_journal_list(period: Period) -> str | Response:
     """
     report: Journal = Journal(period)
     if "as" in request.args and request.args["as"] == "csv":
-        return report.as_csv_download()
-    return report.as_html_page()
+        return report.csv()
+    return report.html()
 
 
 @bp.get("ledger/<currency:currency>/<account:account>",
@@ -101,8 +101,8 @@ def __get_ledger_list(currency: Currency, account: Account, period: Period) \
     """
     report: Ledger = Ledger(currency, account, period)
     if "as" in request.args and request.args["as"] == "csv":
-        return report.as_csv_download()
-    return report.as_html_page()
+        return report.csv()
+    return report.html()
 
 
 @bp.get("income-expenses/<currency:currency>/<account:account>",
@@ -146,8 +146,8 @@ def __get_income_expenses_list(currency: Currency, account: Account,
     """
     report: IncomeExpenses = IncomeExpenses(currency, account, period)
     if "as" in request.args and request.args["as"] == "csv":
-        return report.as_csv_download()
-    return report.as_html_page()
+        return report.csv()
+    return report.html()
 
 
 @bp.get("trial-balance/<currency:currency>",
@@ -186,5 +186,5 @@ def __get_trial_balance_list(currency: Currency, period: Period) \
     """
     report: TrialBalance = TrialBalance(currency, period)
     if "as" in request.args and request.args["as"] == "csv":
-        return report.as_csv_download()
-    return report.as_html_page()
+        return report.csv()
+    return report.html()
