@@ -158,36 +158,13 @@ a.accounting-report-table-row {
 .accounting-income-expenses-table .accounting-report-table-footer .accounting-report-table-row {
     grid-template-columns: 7fr 1fr 1fr 1fr;
 }
+.accounting-trial-balance-table .accounting-report-table-row {
+    grid-template-columns: 3fr 1fr 1fr;
+}
 
 /* The accounting report */
 .accounting-mobile-journal-credit {
     padding-left: 1rem;
-}
-.accounting-report-row {
-    border: none;
-}
-a.accounting-report-row:hover {
-    color: inherit;
-}
-.accounting-trial-balance-row.accounting-trial-balance-header {
-    border-bottom: thick double slategray;
-    font-weight: bolder;
-    font-size: 1.2rem;
-}
-.accounting-trial-balance-row.accounting-trial-balance-header .accounting-amount {
-    font-style: normal;
-}
-.accounting-trial-balance-row > div {
-    width: 50%;
-}
-.accounting-trial-balance-row .accounting-amount {
-    width: 50%;
-    font-style: italic;
-}
-.accounting-trial-balance-row.accounting-trial-balance-total {
-    border-top: thick double slategray;
-    font-weight: bolder;
-    font-size: 1.2rem;
 }
 
 /* The Material Design text field (floating form control in Bootstrap) */

@@ -122,29 +122,32 @@ First written: 2023/3/5
       <h2 class="text-center">{{ _("Trial Balance of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
     </div>
 
-    <div class="list-group accounting-list-group-stripped accounting-list-group-hover">
-      <div class="list-group-item d-flex justify-content-between accounting-report-row accounting-trial-balance-row accounting-trial-balance-header">
-        <div>{{ A_("Account") }}</div>
-        <div class="d-flex justify-content-between">
+    <div class="accounting-report-table accounting-trial-balance-table">
+      <div class="accounting-report-table-header">
+        <div class="accounting-report-table-row">
+          <div>{{ A_("Account") }}</div>
           <div class="accounting-amount">{{ A_("Debit") }}</div>
           <div class="accounting-amount">{{ A_("Credit") }}</div>
         </div>
       </div>
-      {% for item in list %}
-        <a class="list-group-item d-flex justify-content-between accounting-report-row accounting-trial-balance-row" href="{{ item.url }}">
-          <div>{{ item.account|title }}</div>
-          <div class="d-flex justify-content-between">
+      <div class="accounting-report-table-body">
+        {% for item in list %}
+          <a class="accounting-report-table-row" href="{{ item.url }}">
+            <div>
+              <span class="d-none d-md-inline">{{ item.account.code }}</span>
+              {{ item.account.title|title }}
+            </div>
             <div class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</div>
             <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
-          </div>
-        </a>
-      {% endfor %}
-      <div class="list-group-item d-flex justify-content-between accounting-report-row accounting-trial-balance-row accounting-trial-balance-total">
-        <div>{{ A_("Total") }}</div>
-        <div class="d-flex justify-content-between">
+          </a>
+        {% endfor %}
+      </div>
+      <div class="accounting-report-table-footer">
+        <div class="accounting-report-table-row">
+          <div>{{ A_("Total") }}</div>
           <div class="accounting-amount">{{ report.total_row.debit|accounting_format_amount }}</div>
           <div class="accounting-amount">{{ report.total_row.credit|accounting_format_amount }}</div>
-        </div>
+      </div>
       </div>
     </div>
   </div>
