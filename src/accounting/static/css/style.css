@@ -109,23 +109,59 @@
     border-top: thick double slategray;
 }
 
-/* The accounting report */
-.accounting-ledger-table thead {
+/* The report table */
+.accounting-report-table-header, .accounting-report-table-footer {
+    font-size: 1.2rem;
+    font-weight: bolder;
+}
+.accounting-report-table-header {
     border-bottom: thick double slategray;
 }
-.accounting-amount {
+.accounting-report-table-footer {
+    font-style: italic;
+    border-top: thick double slategray;
+}
+.accounting-report-table-row {
+    display: grid;
+}
+a.accounting-report-table-row {
+    color: inherit;
+    text-decoration: none;
+}
+.accounting-report-table-row > div {
+    padding: .5rem;
+}
+.accounting-report-table .accounting-amount {
     text-align: right;
 }
-td.accounting-amount {
+.accounting-report-table-body .accounting-amount {
     font-style: italic;
 }
+.accounting-report-table-body .accounting-report-table-row:nth-child(2n+1) {
+    background-color: #f2f2f2;
+}
+.accounting-report-table-body .accounting-report-table-row:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+.accounting-journal-table .accounting-report-table-row {
+    grid-template-columns: 1fr 1fr 2fr 4fr 1fr 1fr;
+}
+.accounting-ledger-table .accounting-report-table-row {
+    grid-template-columns: 1fr 4fr 1fr 1fr 1fr;
+}
+.accounting-ledger-table .accounting-report-table-footer .accounting-report-table-row {
+    grid-template-columns: 5fr 1fr 1fr 1fr;
+}
+.accounting-income-expenses-table .accounting-report-table-row {
+    grid-template-columns: 1fr 2fr 4fr 1fr 1fr 1fr;
+}
+.accounting-income-expenses-table .accounting-report-table-footer .accounting-report-table-row {
+    grid-template-columns: 7fr 1fr 1fr 1fr;
+}
+
+/* The accounting report */
 .accounting-mobile-journal-credit {
     padding-left: 1rem;
-}
-.accounting-ledger-table tfoot {
-    border-top: thick double slategray;
-    font-weight: bolder;
-    font-style: italic;
 }
 .accounting-report-row {
     border: none;
