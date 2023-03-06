@@ -479,7 +479,7 @@ class TrialBalance(Report[TrialBalanceRow]):
     """The trial balance."""
 
     def __init__(self, currency: Currency, period: Period):
-        """Constructs an income and expenses.
+        """Constructs a trial balance.
 
         :param currency: The currency.
         :param period: The period.
