@@ -185,7 +185,7 @@ class TrialBalanceRow(ReportRow):
         self.is_total: bool = False
         """Whether this is the total row."""
         self.account: Account | None = account
-        """The date."""
+        """The account."""
         self.debit: Decimal | None = None
         """The debit amount."""
         self.credit: Decimal | None = None
