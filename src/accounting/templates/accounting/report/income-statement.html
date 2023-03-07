@@ -129,40 +129,38 @@ First written: 2023/3/7
         </div>
       </div>
       <div class="accounting-report-table-body">
-        {% for item in report.data_rows %}
-          {% if item.is_category %}
-            <div class="accounting-report-table-row accounting-income-statement-category">
+        {% for section in report.sections %}
+          <div class="accounting-report-table-row accounting-income-statement-section">
+            <div>
+              <span class="d-none d-md-inline">{{ section.title.code }}</span>
+              {{ section.title.title|title }}
+            </div>
+          </div>
+          {% for subsection in section.subsections %}
+            <div class="accounting-report-table-row accounting-income-statement-subsection">
               <div>
-                <span class="d-none d-md-inline">{{ item.code }}</span>
-                {{ item.title|title }}
+                <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
+                {{ subsection.title.title|title }}
               </div>
             </div>
-          {% elif item.is_total %}
-            <div class="accounting-report-table-row accounting-income-statement-total">
-              <div>{{ item.title|title }}</div>
-              <div class="accounting-amount">{{ item.amount|accounting_format_amount }}</div>
-            </div>
-          {% elif item.is_subcategory %}
-            <div class="accounting-report-table-row accounting-income-statement-subcategory">
-              <div>
-                <span class="d-none d-md-inline">{{ item.code }}</span>
-                {{ item.title|title }}
-              </div>
-            </div>
-          {% elif item.is_subtotal %}
+            {% for account in subsection.accounts %}
+              <a class="accounting-report-table-row accounting-income-statement-account" href="{{ account.url }}">
+                <div>
+                  <span class="d-none d-md-inline">{{ account.account.code }}</span>
+                  {{ account.account.title|title }}
+                </div>
+                <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+              </a>
+            {% endfor %}
             <div class="accounting-report-table-row accounting-income-statement-subtotal">
               <div>{{ A_("Total") }}</div>
-              <div class="accounting-amount">{{ item.amount|accounting_format_amount }}</div>
+              <div class="accounting-amount">{{ subsection.total|accounting_format_amount }}</div>
             </div>
-          {% else %}
-            <a class="accounting-report-table-row accounting-income-statement-account" href="{{ item.url }}">
-              <div>
-                <span class="d-none d-md-inline">{{ item.code }}</span>
-                {{ item.title|title }}
-              </div>
-              <div class="accounting-amount">{{ item.amount|accounting_format_amount }}</div>
-            </a>
-          {% endif %}
+          {% endfor %}
+          <div class="accounting-report-table-row accounting-income-statement-total">
+            <div>{{ section.accumulated.title|title }}</div>
+            <div class="accounting-amount">{{ section.accumulated.amount|accounting_format_amount }}</div>
+          </div>
         {% endfor %}
       </div>
     </div>

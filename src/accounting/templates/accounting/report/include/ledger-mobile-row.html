@@ -20,22 +20,22 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/5
 #}
 <div>
-  {% if item.date is not none %}
+  {% if entry.date %}
     <div class="text-muted small">
-      {{ item.date|accounting_format_date }}
+      {{ entry.date|accounting_format_date }}
     </div>
   {% endif %}
-  {% if item.summary is not none %}
-    <div>{{ item.summary }}</div>
+  {% if entry.summary %}
+    <div>{{ entry.summary }}</div>
   {% endif %}
 </div>
 
 <div>
-  {% if item.debit is not none %}
-    <span class="badge rounded-pill bg-success">+{{ item.debit|accounting_format_amount }}</span>
+  {% if entry.debit %}
+    <span class="badge rounded-pill bg-success">+{{ entry.debit|accounting_format_amount }}</span>
   {% endif %}
-  {% if item.credit is not none %}
-    <span class="badge rounded-pill bg-warning">-{{ item.credit|accounting_format_amount }}</span>
+  {% if entry.credit %}
+    <span class="badge rounded-pill bg-warning">-{{ entry.credit|accounting_format_amount }}</span>
   {% endif %}
-  <span class="badge rounded-pill bg-primary">{{ item.balance|accounting_format_amount }}</span>
+  <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
 </div>

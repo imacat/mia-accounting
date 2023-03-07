@@ -175,18 +175,21 @@ a.accounting-report-table-row {
     display: flex;
     justify-content: space-between;
 }
-.accounting-income-statement-category, .accounting-income-statement-total {
+.accounting-income-statement-table .accounting-report-table-header .accounting-report-table-row {
+    display: block;
+}
+.accounting-income-statement-section, .accounting-income-statement-total {
     font-size: 1.2rem;
     font-weight: bolder;
 }
-.accounting-income-statement-subcategory, .accounting-income-statement-subtotal {
+.accounting-income-statement-subsection, .accounting-income-statement-subtotal {
     font-size: 1.1rem;
 }
 .accounting-income-statement-subtotal {
     border-top: thin solid darkslategray;
 }
 /* Indents */
-.accounting-income-statement-subcategory {
+.accounting-income-statement-subsection {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
 }
@@ -195,10 +198,10 @@ a.accounting-report-table-row {
     margin-right: 1rem;
 }
 /* A visual blank line between categories */
-.accounting-income-statement-category {
+.accounting-income-statement-section {
     margin-top: 2rem;
 }
-.accounting-income-statement-category:first-child {
+.accounting-income-statement-section:first-child {
     margin-top: 0;
 }
 .accounting-income-statement-total {

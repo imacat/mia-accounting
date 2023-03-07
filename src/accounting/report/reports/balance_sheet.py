@@ -1,5 +1,5 @@
 # The Mia! Accounting Flask Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/4
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/7
 
 #  Copyright (c) 2023 imacat.
 #
@@ -18,24 +18,22 @@
 
 """
 import csv
-import typing as t
 from decimal import Decimal
 from io import StringIO
-from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
-    urlunparse
 
 import sqlalchemy as sa
-from flask import url_for, render_template, Response, request
+from flask import url_for, render_template, Response
 
 from accounting import db
+from accounting.locale import gettext
 from accounting.models import Currency, BaseAccount, Account, Transaction, \
     JournalEntry
-from accounting.utils.txn_types import TransactionType
-from .option_link import OptionLink
-from .period import Period
-from .period_choosers import BalanceSheetPeriodChooser
-from .report_chooser import ReportChooser
-from .report_type import ReportType
+from accounting.report.option_link import OptionLink
+from accounting.report.page_params import PageParams
+from accounting.report.period import Period
+from accounting.report.period_choosers import BalanceSheetPeriodChooser
+from accounting.report.report_chooser import ReportChooser
+from accounting.report.report_type import ReportType
 
 
 class BalanceSheetAccount:
@@ -100,6 +98,168 @@ class BalanceSheetSection:
         return sum([x.total for x in self.subsections])
 
 
+class AccountCollector:
+    """The balance sheet account collector."""
+
+    def __init__(self, currency: Currency, period: Period):
+        """Constructs the balance sheet account collector.
+
+        :param currency: The currency.
+        :param period: The period.
+        """
+        self.__currency: Currency = currency
+        """The currency."""
+        self.__period: Period = period
+        """The period."""
+        self.accounts: list[BalanceSheetAccount] = self.__query_balances()
+        """The balance sheet accounts."""
+
+    def __query_balances(self) -> list[BalanceSheetAccount]:
+        """Queries and returns the balances.
+
+        :return: The balances.
+        """
+        sub_conditions: list[sa.BinaryExpression] \
+            = [Account.base_code.startswith(x) for x in {"1", "2", "3"}]
+        conditions: list[sa.BinaryExpression] \
+            = [JournalEntry.currency_code == self.__currency.code,
+               sa.or_(*sub_conditions)]
+        if self.__period.end is not None:
+            conditions.append(Transaction.date <= self.__period.end)
+        balance_func: sa.Function = sa.func.sum(sa.case(
+            (JournalEntry.is_debit, JournalEntry.amount),
+            else_=-JournalEntry.amount)).label("balance")
+        select_balance: sa.Select \
+            = sa.select(Account.id, Account.base_code, Account.no,
+                        balance_func)\
+            .join(Transaction).join(Account)\
+            .filter(*conditions)\
+            .group_by(Account.id, Account.base_code, Account.no)\
+            .order_by(Account.base_code, Account.no)
+        account_balances: list[sa.Row] \
+            = db.session.execute(select_balance).all()
+        self.__all_accounts: list[Account] = Account.query\
+            .filter(sa.or_(Account.id.in_({x.id for x in account_balances}),
+                           Account.base_code == "3351",
+                           Account.base_code == "3353")).all()
+        account_by_id: dict[int, Account] \
+            = {x.id: x for x in self.__all_accounts}
+
+        def get_url(account: Account) -> str:
+            """Returns the ledger URL of an account.
+
+            :param account: The account.
+            :return: The ledger URL of the account.
+            """
+            if self.__period.is_default:
+                return url_for("accounting.report.ledger-default",
+                               currency=self.__currency, account=account)
+            return url_for("accounting.report.ledger",
+                           currency=self.__currency, account=account,
+                           period=self.__period)
+
+        self.accounts: list[BalanceSheetAccount] \
+            = [BalanceSheetAccount(account=account_by_id[x.id],
+                                   amount=x.balance,
+                                   url=get_url(account_by_id[x.id]))
+               for x in account_balances]
+        self.__add_accumulated()
+        self.__add_current_period()
+        self.accounts.sort(key=lambda x: (x.account.base_code, x.account.no))
+        for balance in self.accounts:
+            if not balance.account.base_code.startswith("1"):
+                balance.amount = -balance.amount
+        return self.accounts
+
+    def __add_accumulated(self) -> None:
+        """Adds the accumulated profit or loss to the balances.
+
+        :return: None.
+        """
+        code: str = "3351-001"
+        amount: Decimal | None = self.__query_accumulated()
+        url: str = url_for("accounting.report.income-statement",
+                           currency=self.__currency,
+                           period=self.__period.before)
+        self.__add_owner_s_equity(code, amount, url)
+
+    def __query_accumulated(self) -> Decimal | None:
+        """Queries and returns the accumulated profit or loss.
+
+        :return: The accumulated profit or loss.
+        """
+        if self.__period.start is None:
+            return None
+        conditions: list[sa.BinaryExpression] \
+            = [JournalEntry.currency_code == self.__currency.code,
+               Transaction.date < self.__period.start]
+        conditions.extend([sa.not_(Account.base_code.startswith(x))
+                           for x in {"1", "2"}])
+        balance_func: sa.Function = sa.func.sum(sa.case(
+            (JournalEntry.is_debit, JournalEntry.amount),
+            else_=-JournalEntry.amount)).label("balance")
+        select_balance: sa.Select = sa.select(balance_func)\
+            .join(Transaction).join(Account).filter(*conditions)
+        return db.session.scalar(select_balance)
+
+    def __add_current_period(self) -> None:
+        """Adds the accumulated profit or loss to the balances.
+
+        :return: None.
+        """
+        code: str = "3353-001"
+        amount: Decimal | None = self.__query_currency_period()
+        url: str = url_for("accounting.report.income-statement",
+                           currency=self.__currency, period=self.__period)
+        self.__add_owner_s_equity(code, amount, url)
+
+    def __query_currency_period(self) -> Decimal | None:
+        """Queries and returns the net income or loss for current period.
+
+        :return: The net income or loss for current period.
+        """
+        conditions: list[sa.BinaryExpression] \
+            = [JournalEntry.currency_code == self.__currency.code]
+        if self.__period.start is not None:
+            conditions.append(Transaction.date >= self.__period.start)
+        if self.__period.end is not None:
+            conditions.append(Transaction.date <= self.__period.end)
+        conditions.extend([sa.not_(Account.base_code.startswith(x))
+                           for x in {"1", "2"}])
+        balance_func: sa.Function = sa.func.sum(sa.case(
+            (JournalEntry.is_debit, JournalEntry.amount),
+            else_=-JournalEntry.amount)).label("balance")
+        select_balance: sa.Select = sa.select(balance_func)\
+            .join(Transaction).join(Account).filter(*conditions)
+        return db.session.scalar(select_balance)
+
+    def __add_owner_s_equity(self, code: str, amount: Decimal | None,
+                             url: str) -> None:
+        """Adds an owner's equity balance.
+
+        :param code: The code of the account to add.
+        :param amount: The amount.
+        :return: None.
+        """
+        # There is an existing balance.
+        account_balance_by_code: dict[str, BalanceSheetAccount] \
+            = {x.account.code: x for x in self.accounts}
+        if code in account_balance_by_code:
+            balance: BalanceSheetAccount = account_balance_by_code[code]
+            balance.url = url
+            if amount is not None:
+                balance.amount = balance.amount + amount
+            return
+        # Add a new balance
+        if amount is None:
+            return
+        account_by_code: dict[str, Account] \
+            = {x.code: x for x in self.__all_accounts}
+        self.accounts.append(BalanceSheetAccount(account=account_by_code[code],
+                                                 amount=amount,
+                                                 url=url))
+
+
 class CSVHalfRow:
     """A half row in the CSV balance sheet."""
 
@@ -139,7 +299,7 @@ class CSVRow:
                 self.liability_title, self.liability_amount]
 
 
-class BalanceSheetPageParams:
+class BalanceSheetPageParams(PageParams):
     """The HTML parameters of the balance sheet."""
 
     def __init__(self, currency: Currency,
@@ -161,7 +321,7 @@ class BalanceSheetPageParams:
         """The currency."""
         self.period: Period = period
         """The period."""
-        self.has_data: bool = has_data
+        self.__has_data: bool = has_data
         """True if there is any data, or False otherwise."""
         self.assets: BalanceSheetSection = assets
         """The assets."""
@@ -172,25 +332,24 @@ class BalanceSheetPageParams:
         self.period_chooser: BalanceSheetPeriodChooser \
             = BalanceSheetPeriodChooser(currency)
         """The period chooser."""
-        self.report_chooser: ReportChooser \
-            = ReportChooser(ReportType.BALANCE_SHEET,
-                            currency=currency,
-                            period=period)
-        """The report chooser."""
-        self.txn_types: t.Type[TransactionType] = TransactionType
-        """The transaction types."""
 
     @property
-    def csv_uri(self) -> str:
-        uri: str = request.full_path if request.query_string \
-            else request.path
-        uri_p: ParseResult = urlparse(uri)
-        params: list[tuple[str, str]] = parse_qsl(uri_p.query)
-        params = [x for x in params if x[0] != "as"]
-        params.append(("as", "csv"))
-        parts: list[str] = list(uri_p)
-        parts[4] = urlencode(params)
-        return urlunparse(parts)
+    def has_data(self) -> bool:
+        """Returns whether there is any data on the page.
+
+        :return: True if there is any data, or False otherwise.
+        """
+        return self.__has_data
+
+    @property
+    def report_chooser(self) -> ReportChooser:
+        """Returns the report chooser.
+
+        :return: The report chooser.
+        """
+        return ReportChooser(ReportType.BALANCE_SHEET,
+                             currency=self.currency,
+                             period=self.period)
 
     @property
     def currency_options(self) -> list[OptionLink]:
@@ -222,19 +381,28 @@ class BalanceSheet:
         :param currency: The currency.
         :param period: The period.
         """
-        self.currency: Currency = currency
+        self.__currency: Currency = currency
         """The currency."""
-        self.period: Period = period
+        self.__period: Period = period
         """The period."""
+        self.__has_data: bool
+        """True if there is any data, or False otherwise."""
+        self.__assets: BalanceSheetSection
+        """The assets."""
+        self.__liabilities: BalanceSheetSection
+        """The liabilities."""
+        self.__owner_s_equity: BalanceSheetSection
+        """The owner's equity."""
         self.__set_data()
 
     def __set_data(self) -> None:
         """Queries and sets assets, the liabilities, and the owner's equity
         sections in the balance sheet.
 
-        :return: The assets, the liabilities, and the owner's equity sections.
+        :return: None.
         """
-        balances: list[BalanceSheetAccount] = self.__query_balances()
+        balances: list[BalanceSheetAccount] = AccountCollector(
+            self.__currency, self.__period).accounts
 
         titles: list[BaseAccount] = BaseAccount.query\
             .filter(BaseAccount.code.in_({"1", "2", "3"})).all()
@@ -251,164 +419,10 @@ class BalanceSheet:
         for balance in balances:
             subsections[balance.account.base_code[:2]].accounts.append(balance)
 
-        self.__has_data: bool = len(balances) > 0
-        self.__assets: BalanceSheetSection = sections["1"]
-        self.__liabilities: BalanceSheetSection = sections["2"]
-        self.__owner_s_equity: BalanceSheetSection = sections["3"]
-
-    def __query_balances(self) -> list[BalanceSheetAccount]:
-        """Queries and returns the balances.
-
-        :return: The balances.
-        """
-        sub_conditions: list[sa.BinaryExpression] \
-            = [Account.base_code.startswith(x) for x in {"1", "2", "3"}]
-        conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.currency.code,
-               sa.or_(*sub_conditions)]
-        if self.period.end is not None:
-            conditions.append(Transaction.date <= self.period.end)
-        balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
-        select_balance: sa.Select \
-            = sa.select(Account.id, Account.base_code, Account.no,
-                        balance_func)\
-            .join(Transaction).join(Account)\
-            .filter(*conditions)\
-            .group_by(Account.id, Account.base_code, Account.no)\
-            .order_by(Account.base_code, Account.no)
-        account_balances: list[sa.Row] \
-            = db.session.execute(select_balance).all()
-        account_by_id: dict[int, Account] \
-            = {x.id: x for x in Account.query
-               .filter(sa.or_(Account.id.in_({x.id for x in account_balances}),
-                              Account.base_code == "3351",
-                              Account.base_code == "3353")).all()}
-
-        def get_url(account: Account) -> str:
-            """Returns the ledger URL of an account.
-
-            :param account: The account.
-            :return: The ledger URL of the account.
-            """
-            if self.period.is_default:
-                return url_for("accounting.report.ledger-default",
-                               currency=self.currency, account=account)
-            return url_for("accounting.report.ledger",
-                           currency=self.currency, account=account,
-                           period=self.period)
-
-        balances: list[BalanceSheetAccount] \
-            = [BalanceSheetAccount(account=account_by_id[x.id],
-                                   amount=x.balance,
-                                   url=get_url(account_by_id[x.id]))
-               for x in account_balances]
-        self.__add_accumulated(balances, list(account_by_id.values()))
-        self.__add_current_period(balances, list(account_by_id.values()))
-        for balance in balances:
-            if not balance.account.base_code.startswith("1"):
-                balance.amount = -balance.amount
-        return balances
-
-    def __add_accumulated(self, balances: list[BalanceSheetAccount],
-                          accounts: list[Account]) -> None:
-        """Adds the accumulated profit or loss to the balances.
-
-        :param balances: The accounts on the balance sheet.
-        :param accounts: The accounts.
-        :return: None.
-        """
-        code: str = "3351-001"
-        amount: Decimal | None = self.__query_accumulated()
-        url: str = url_for("accounting.report.income-statement",
-                           currency=self.currency, period=self.period.before)
-        self.__add_owner_s_equity(balances, accounts, code, amount, url)
-
-    def __query_accumulated(self) -> Decimal | None:
-        """Queries and returns the accumulated profit or loss.
-
-        :return: The accumulated profit or loss.
-        """
-        if self.period.start is None:
-            return None
-        conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.currency.code,
-               Transaction.date < self.period.start]
-        conditions.extend([sa.not_(Account.base_code.startswith(x))
-                           for x in {"1", "2"}])
-        balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
-        select_balance: sa.Select = sa.select(balance_func)\
-            .join(Transaction).join(Account).filter(*conditions)
-        return db.session.scalar(select_balance)
-
-    def __add_current_period(self, balances: list[BalanceSheetAccount],
-                             accounts: list[Account]) -> None:
-        """Adds the accumulated profit or loss to the balances.
-
-        :param balances: The accounts on the balance sheet.
-        :param accounts: The accounts.
-        :return: None.
-        """
-        code: str = "3353-001"
-        amount: Decimal | None = self.__query_currency_period()
-        url: str = url_for("accounting.report.income-statement",
-                           currency=self.currency, period=self.period)
-        self.__add_owner_s_equity(balances, accounts, code, amount, url)
-
-    def __query_currency_period(self) -> Decimal | None:
-        """Queries and returns the net income or loss for current period.
-
-        :return: The net income or loss for current period.
-        """
-        conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.currency.code]
-        if self.period.start is not None:
-            conditions.append(Transaction.date >= self.period.start)
-        if self.period.end is not None:
-            conditions.append(Transaction.date <= self.period.end)
-        conditions.extend([sa.not_(Account.base_code.startswith(x))
-                           for x in {"1", "2"}])
-        balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
-        select_balance: sa.Select = sa.select(balance_func)\
-            .join(Transaction).join(Account).filter(*conditions)
-        return db.session.scalar(select_balance)
-
-    @staticmethod
-    def __add_owner_s_equity(balances: list[BalanceSheetAccount],
-                             accounts: list[Account],
-                             code: str,
-                             amount: Decimal | None,
-                             url: str):
-        """Adds an owner's equity balance.
-
-        :param balances: The accounts on the balance sheet.
-        :param accounts: The accounts.
-        :param code: The code of the account to add.
-        :param amount: The amount.
-        :return: None.
-        """
-        # There is an existing balance.
-        balance_by_code: dict[str, BalanceSheetAccount] \
-            = {x.account.code: x for x in balances}
-        if code in balance_by_code:
-            balance: BalanceSheetAccount = balance_by_code[code]
-            balance.url = url
-            if amount is not None:
-                balance.amount = balance.amount + amount
-            return
-        # Add a new balance
-        if amount is None:
-            return
-        account_by_code: dict[str, Account] = {x.code: x for x in accounts}
-        balances.append(BalanceSheetAccount(
-            account=account_by_code[code],
-            amount=amount,
-            url=url))
+        self.__has_data = len(balances) > 0
+        self.__assets = sections["1"]
+        self.__liabilities = sections["2"]
+        self.__owner_s_equity = sections["3"]
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -416,7 +430,7 @@ class BalanceSheet:
         :return: The response of the report for download.
         """
         filename: str = "balance-sheet-{currency}-{period}.csv"\
-            .format(currency=self.currency.code, period=self.period.spec)
+            .format(currency=self.__currency.code, period=self.__period.spec)
         rows: list[CSVRow] = self.__get_csv_rows()
         with StringIO() as fp:
             writer = csv.writer(fp)
@@ -435,10 +449,12 @@ class BalanceSheet:
         asset_rows: list[CSVHalfRow] = self.__section_csv_rows(self.__assets)
         liability_rows: list[CSVHalfRow] = []
         liability_rows.extend(self.__section_csv_rows(self.__liabilities))
-        liability_rows.append(CSVHalfRow("Total", self.__liabilities.total))
+        liability_rows.append(CSVHalfRow(gettext("Total"),
+                                         self.__liabilities.total))
         liability_rows.append(CSVHalfRow(None, None))
         liability_rows.extend(self.__section_csv_rows(self.__owner_s_equity))
-        liability_rows.append(CSVHalfRow("Total", self.__owner_s_equity.total))
+        liability_rows.append(CSVHalfRow(gettext("Total"),
+                                         self.__owner_s_equity.total))
         rows: list[CSVRow] = [CSVRow() for _ in
                               range(max(len(asset_rows), len(liability_rows)))]
         for i in range(len(rows)):
@@ -449,9 +465,9 @@ class BalanceSheet:
                 rows[i].liability_title = liability_rows[i].title
                 rows[i].liability_amount = liability_rows[i].amount
         total: CSVRow = CSVRow()
-        total.asset_title = "Total"
+        total.asset_title = gettext("Total")
         total.asset_amount = self.__assets.total
-        total.liability_title = "Total"
+        total.liability_title = gettext("Total")
         total.liability_amount \
             = self.__liabilities.total + self.__owner_s_equity.total
         rows.append(total)
@@ -479,8 +495,8 @@ class BalanceSheet:
         :return: The report as HTML.
         """
         params: BalanceSheetPageParams = BalanceSheetPageParams(
-            currency=self.currency,
-            period=self.period,
+            currency=self.__currency,
+            period=self.__period,
             has_data=self.__has_data,
             assets=self.__assets,
             liabilities=self.__liabilities,

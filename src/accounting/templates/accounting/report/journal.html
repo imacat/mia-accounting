@@ -105,38 +105,41 @@ First written: 2023/3/4
       </div>
     </div>
     <div class="accounting-report-table-body">
-      {% for item in report.data_rows %}
-        <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
-          <div>{{ item.transaction.date|accounting_format_date }}</div>
-          <div>{{ item.currency.name }}</div>
-          <div>{{ item.account.title|title }}</div>
-          <div>{{ item.summary|accounting_default }}</div>
-          <div class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</div>
-          <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
+      {% for entry in report.entries %}
+        <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
+          <div>{{ entry.transaction.date|accounting_format_date }}</div>
+          <div>{{ entry.currency.name }}</div>
+          <div>
+            <span class="d-none d-md-inline">{{ entry.account.code }}</span>
+            {{ entry.account.title|title }}
+          </div>
+          <div>{{ entry.summary|accounting_default }}</div>
+          <div class="accounting-amount">{{ entry.debit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount">{{ entry.credit|accounting_format_amount|accounting_default }}</div>
         </a>
       {% endfor %}
     </div>
   </div>
 
   <div class="list-group d-md-none">
-  {% for item in report.data_rows %}
-    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.transaction.detail", txn=item.transaction)|accounting_append_next }}">
+  {% for entry in report.entries %}
+    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
       <div class="d-flex justify-content-between">
-        <div {% if not item.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>
+        <div {% if not entry.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>
           <div class="text-muted small">
-            {{ item.transaction.date|accounting_format_date }}
-            {{ item.account.title|title }}
-            {% if item.currency_code != accounting_default_currency_code() %}
-              <span class="badge rounded-pill bg-info">{{ item.currency_code }}</span>
+            {{ entry.transaction.date|accounting_format_date }}
+            {{ entry.account.title|title }}
+            {% if entry.currency.code != accounting_default_currency_code() %}
+              <span class="badge rounded-pill bg-info">{{ entry.currency.code }}</span>
             {% endif %}
           </div>
-          {% if item.summary is not none %}
-            <div>{{ item.summary }}</div>
+          {% if entry.summary is not none %}
+            <div>{{ entry.summary }}</div>
           {% endif %}
         </div>
 
         <div>
-          <span class="badge rounded-pill bg-info">{{ item.amount|accounting_format_amount }}</span>
+          <span class="badge rounded-pill bg-info">{{ entry.amount|accounting_format_amount }}</span>
         </div>
       </div>
     </a>

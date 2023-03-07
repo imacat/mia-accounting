@@ -131,14 +131,14 @@ First written: 2023/3/5
         </div>
       </div>
       <div class="accounting-report-table-body">
-        {% for item in report.data_rows %}
-          <a class="accounting-report-table-row" href="{{ item.url }}">
+        {% for account in report.accounts %}
+          <a class="accounting-report-table-row" href="{{ account.url }}">
             <div>
-              <span class="d-none d-md-inline">{{ item.account.code }}</span>
-              {{ item.account.title|title }}
+              <span class="d-none d-md-inline">{{ account.account.code }}</span>
+              {{ account.account.title|title }}
             </div>
-            <div class="accounting-amount">{{ item.debit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ item.credit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount">{{ account.debit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount">{{ account.credit|accounting_format_amount|accounting_default }}</div>
           </a>
         {% endfor %}
       </div>

@@ -333,7 +333,7 @@ class Period:
         """
         if self.start is None:
             return None
-        return self.__class__(None, self.start - datetime.timedelta(days=1))
+        return Period(None, self.start - datetime.timedelta(days=1))
 
 
 class ThisMonth(Period):
