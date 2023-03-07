@@ -588,7 +588,7 @@ class Transaction(db.Model):
         for currency in self.currencies:
             if len(currency.debit) > 1:
                 return False
-            if currency.debit[0].account.code != "1111-001":
+            if currency.debit[0].account.code != Account.CASH:
                 return False
         return True
 
@@ -602,7 +602,7 @@ class Transaction(db.Model):
         for currency in self.currencies:
             if len(currency.credit) > 1:
                 return False
-            if currency.credit[0].account.code != "1111-001":
+            if currency.credit[0].account.code != Account.CASH:
                 return False
         return True
 

@@ -58,8 +58,8 @@ class ReportChooser:
             Currency, default_currency_code()) \
             if currency is None else currency
         """The currency."""
-        self.__account: Account = Account.find_by_code("1111-001") \
-            if account is None else account
+        self.__account: Account = Account.cash() if account is None \
+            else account
         """The currency."""
         self.__reports: list[OptionLink] = []
         """The links to the reports."""
@@ -110,7 +110,7 @@ class ReportChooser:
         """
         account: Account = self.__account
         if not re.match(r"[12][12]", account.base_code):
-            account: Account = Account.find_by_code("1111-001")
+            account: Account = Account.cash()
         url: str = url_for("accounting.report.income-expenses-default",
                            currency=self.__currency, account=account) \
             if self.__period.is_default \
