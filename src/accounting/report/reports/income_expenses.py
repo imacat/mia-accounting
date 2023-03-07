@@ -93,7 +93,7 @@ class EntryCollector:
         """The brought-forward entry."""
         self.entries: list[Entry]
         """The log entries."""
-        self.total: Entry
+        self.total: Entry | None
         """The total entry."""
         self.brought_forward = self.__get_brought_forward_entry()
         self.entries = self.__query_entries()
@@ -154,11 +154,13 @@ class EntryCollector:
                           JournalEntry.is_debit,
                           JournalEntry.no)]
 
-    def __get_total_entry(self) -> Entry:
+    def __get_total_entry(self) -> Entry | None:
         """Composes the total entry.
 
-        :return: None.
+        :return: The total entry, or None if there is no data.
         """
+        if self.brought_forward is None and len(self.entries) == 0:
+            return None
         entry: Entry = Entry()
         entry.is_total = True
         entry.summary = gettext("Total")
@@ -383,7 +385,7 @@ class IncomeExpenses:
         """The brought-forward entry."""
         self.__entries: list[Entry] = collector.entries
         """The log entries."""
-        self.__total: Entry = collector.total
+        self.__total: Entry | None = collector.total
         """The total entry."""
 
     def csv(self) -> Response:
@@ -417,9 +419,10 @@ class IncomeExpenses:
         rows.extend([CSVRow(x.date, str(x.account).title(), x.summary,
                             x.income, x.expense, x.balance, x.note)
                      for x in self.__entries])
-        rows.append(CSVRow(gettext("Total"), None, None,
-                           self.__total.income, self.__total.expense,
-                           self.__total.balance, None))
+        if self.__total is not None:
+            rows.append(CSVRow(gettext("Total"), None, None,
+                               self.__total.income, self.__total.expense,
+                               self.__total.balance, None))
         return rows
 
     def html(self) -> str:
@@ -431,17 +434,18 @@ class IncomeExpenses:
         if self.__brought_forward is not None:
             all_entries.append(self.__brought_forward)
         all_entries.extend(self.__entries)
-        all_entries.append(self.__total)
+        if self.__total is not None:
+            all_entries.append(self.__total)
         pagination: Pagination[Entry] = Pagination[Entry](all_entries)
         page_entries: list[Entry] = pagination.list
         has_data: bool = len(page_entries) > 0
         _populate_entries(page_entries)
         brought_forward: Entry | None = None
-        if page_entries[0].is_brought_forward:
+        if len(page_entries) > 0 and page_entries[0].is_brought_forward:
             brought_forward = page_entries[0]
             page_entries = page_entries[1:]
         total: Entry | None = None
-        if page_entries[-1].is_total:
+        if len(page_entries) > 0 and page_entries[-1].is_total:
             total = page_entries[-1]
             page_entries = page_entries[:-1]
         params: IncomeExpensesPageParams = IncomeExpensesPageParams(
