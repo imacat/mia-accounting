@@ -353,7 +353,6 @@ class IncomeStatementParams(ReportParams[IncomeStatementRow]):
         :param currency: The currency.
         :param period: The period.
         :param data_rows: The data rows.
-        :param total: The total row, if any.
         """
         super().__init__(
             period_chooser=IncomeStatementPeriodChooser(currency),
