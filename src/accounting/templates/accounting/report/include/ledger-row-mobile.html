@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Flask Project
-income-expenses-mobile-row.html: The row in the income and expenses for the mobile devices
+ledger-row-mobile.html: The row in the ledger for the mobile devices
 
  Copyright (c) 2023 imacat.
 
@@ -20,14 +20,9 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/5
 #}
 <div>
-  {% if entry.date or entry.account %}
+  {% if entry.date %}
     <div class="text-muted small">
-      {% if entry.date %}
-        {{ entry.date|accounting_format_date }}
-      {% endif %}
-      {% if entry.account %}
-        {{ entry.account.title|title }}
-      {% endif %}
+      {{ entry.date|accounting_format_date }}
     </div>
   {% endif %}
   {% if entry.summary %}
@@ -35,16 +30,12 @@ First written: 2023/3/5
   {% endif %}
 </div>
 
-<div class="text-nowrap">
-  {% if entry.income %}
-    <span class="badge rounded-pill bg-success">+{{ entry.income|accounting_format_amount }}</span>
+<div>
+  {% if entry.debit %}
+    <span class="badge rounded-pill bg-success">+{{ entry.debit|accounting_format_amount }}</span>
   {% endif %}
-  {% if entry.expense %}
-    <span class="badge rounded-pill bg-warning">-{{ entry.expense|accounting_format_amount }}</span>
+  {% if entry.credit %}
+    <span class="badge rounded-pill bg-warning">-{{ entry.credit|accounting_format_amount }}</span>
   {% endif %}
-  {% if entry.balance < 0 %}
-    <span class="badge rounded-pill bg-danger">{{ entry.balance|accounting_format_amount }}</span>
-  {% else %}
-    <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
-  {% endif %}
+  <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
 </div>

@@ -206,19 +206,19 @@ First written: 2023/3/5
   {% if report.brought_forward %}
     {% with entry = report.brought_forward %}
       <div class="list-group-item list-group-item-action d-flex justify-content-between">
-        {% include "accounting/report/include/income-expenses-mobile-row.html" %}
+        {% include "accounting/report/include/income-expenses-row-mobile.html" %}
       </div>
     {% endwith %}
   {% endif %}
   {% for entry in report.entries %}
     <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
-      {% include "accounting/report/include/income-expenses-mobile-row.html" %}
+      {% include "accounting/report/include/income-expenses-row-mobile.html" %}
     </a>
   {% endfor %}
   {% if report.total %}
     {% with entry = report.total %}
       <div class="list-group-item list-group-item-action d-flex justify-content-between">
-        {% include "accounting/report/include/income-expenses-mobile-row.html" %}
+        {% include "accounting/report/include/income-expenses-row-mobile.html" %}
       </div>
     {% endwith %}
   {% endif %}
