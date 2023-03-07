@@ -17,9 +17,7 @@
 """The balance sheet.
 
 """
-import csv
 from decimal import Decimal
-from io import StringIO
 
 import sqlalchemy as sa
 from flask import url_for, render_template, Response
@@ -29,6 +27,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, BaseAccount, Account, Transaction, \
     JournalEntry
 from accounting.report.period import Period
+from .utils.csv_export import BaseCSVRow, csv_download
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
 from .utils.period_choosers import BalanceSheetPeriodChooser
@@ -275,7 +274,7 @@ class CSVHalfRow:
         """The amount."""
 
 
-class CSVRow:
+class CSVRow(BaseCSVRow):
     """A row in the CSV balance sheet."""
 
     def __init__(self):
@@ -431,15 +430,7 @@ class BalanceSheet:
         """
         filename: str = "balance-sheet-{currency}-{period}.csv"\
             .format(currency=self.__currency.code, period=self.__period.spec)
-        rows: list[CSVRow] = self.__get_csv_rows()
-        with StringIO() as fp:
-            writer = csv.writer(fp)
-            writer.writerows([x.values for x in rows])
-            fp.seek(0)
-            response: Response = Response(fp.read(), mimetype="text/csv")
-            response.headers["Content-Disposition"] \
-                = f"attachment; filename={filename}"
-            return response
+        return csv_download(filename, self.__get_csv_rows())
 
     def __get_csv_rows(self) -> list[CSVRow]:
         """Composes and returns the CSV rows.

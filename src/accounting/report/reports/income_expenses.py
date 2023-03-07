@@ -17,10 +17,8 @@
 """The income and expenses log.
 
 """
-import csv
 from datetime import date
 from decimal import Decimal
-from io import StringIO
 
 import sqlalchemy as sa
 from flask import url_for, render_template, Response
@@ -30,6 +28,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
+from .utils.csv_export import BaseCSVRow, csv_download
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
 from .utils.period_choosers import IncomeExpensesPeriodChooser
@@ -187,7 +186,7 @@ class EntryCollector:
             entry.balance = balance
 
 
-class CSVRow:
+class CSVRow(BaseCSVRow):
     """A row in the CSV income and expenses log."""
 
     def __init__(self, txn_date: date | str | None,
@@ -395,15 +394,7 @@ class IncomeExpenses:
         filename: str = "income-expenses-{currency}-{account}-{period}.csv"\
             .format(currency=self.__currency.code, account=self.__account.code,
                     period=self.__period.spec)
-        rows: list[CSVRow] = self.__get_csv_rows()
-        with StringIO() as fp:
-            writer = csv.writer(fp)
-            writer.writerows([x.values for x in rows])
-            fp.seek(0)
-            response: Response = Response(fp.read(), mimetype="text/csv")
-            response.headers["Content-Disposition"] \
-                = f"attachment; filename={filename}"
-            return response
+        return csv_download(filename, self.__get_csv_rows())
 
     def __get_csv_rows(self) -> list[CSVRow]:
         """Composes and returns the CSV rows.
