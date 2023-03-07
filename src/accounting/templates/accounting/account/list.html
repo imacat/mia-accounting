@@ -32,7 +32,7 @@ First written: 2023/1/30
       {{ A_("New") }}
     </a>
   {% endif %}
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
+  <form class="btn btn-primary d-flex input-group accounting-search-desktop-form" action="{{ url_for("accounting.account.list") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
     <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label for="accounting-search-desktop" class="accounting-search-label">
       <button type="submit">
