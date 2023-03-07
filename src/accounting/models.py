@@ -143,14 +143,8 @@ class Account(db.Model):
 
     CASH = "1111-001"
     """The code of the cash account,"""
-    RECEIVABLE = "1141-001"
-    """The code of the receivable account,"""
-    PAYABLE = "2141-001"
-    """The code of the payable account,"""
     ACCUMULATED_CHANGE = "3351-001"
     """The code of the accumulated-change account,"""
-    BROUGHT_FORWARD = "3352-001"
-    """The code of the brought-forward account,"""
     NET_CHANGE = "3353-001"
     """The code of the net-change account,"""
 
@@ -274,44 +268,12 @@ class Account(db.Model):
         return cls.find_by_code(cls.CASH)
 
     @classmethod
-    def receivable(cls) -> t.Self:
-        """Returns the receivable account.
-
-        :return: The receivable account
-        """
-        return cls.find_by_code(cls.RECEIVABLE)
-
-    @classmethod
-    def payable(cls) -> t.Self:
-        """Returns the payable account.
-
-        :return: The payable account
-        """
-        return cls.find_by_code(cls.PAYABLE)
-
-    @classmethod
     def accumulated_change(cls) -> t.Self:
         """Returns the accumulated-change account.
 
         :return: The accumulated-change account
         """
         return cls.find_by_code(cls.ACCUMULATED_CHANGE)
-
-    @classmethod
-    def brought_forward(cls) -> t.Self:
-        """Returns the brought-forward account.
-
-        :return: The brought-forward account
-        """
-        return cls.find_by_code(cls.BROUGHT_FORWARD)
-
-    @classmethod
-    def net_change(cls) -> t.Self:
-        """Returns the net-change account.
-
-        :return: The net-change account
-        """
-        return cls.find_by_code(cls.NET_CHANGE)
 
     @property
     def is_modified(self) -> bool:
