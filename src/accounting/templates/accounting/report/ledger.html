@@ -57,9 +57,7 @@ First written: 2023/3/5
       </ul>
     </div>
   {% endif %}
-  {% with report_chooser = report.report_chooser %}
-    {% include "accounting/report/include/report-chooser.html" %}
-  {% endwith %}
+  {% include "accounting/report/include/report-chooser.html" %}
   {% include "accounting/report/include/currency-chooser.html" %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -91,9 +89,7 @@ First written: 2023/3/5
 {% endwith %}
 
 <div class="btn-group btn-actions mb-3 d-md-none">
-  {% with report_chooser = report.report_chooser %}
-    {% include "accounting/report/include/report-chooser.html" %}
-  {% endwith %}
+  {% include "accounting/report/include/report-chooser.html" %}
   {% include "accounting/report/include/currency-chooser.html" %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

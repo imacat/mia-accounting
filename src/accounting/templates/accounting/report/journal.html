@@ -57,9 +57,7 @@ First written: 2023/3/4
       </ul>
     </div>
   {% endif %}
-  {% with report_chooser = report.report_chooser %}
-    {% include "accounting/report/include/report-chooser.html" %}
-  {% endwith %}
+  {% include "accounting/report/include/report-chooser.html" %}
   <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
     <i class="fa-solid fa-calendar-day"></i>
     {{ report.period.desc|title }}
@@ -75,9 +73,7 @@ First written: 2023/3/4
 {% endwith %}
 
 <div class="btn-group btn-actions mb-3 d-md-none">
-  {% with report_chooser = report.report_chooser %}
-    {% include "accounting/report/include/report-chooser.html" %}
-  {% endwith %}
+  {% include "accounting/report/include/report-chooser.html" %}
   <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
     <i class="fa-solid fa-calendar-day"></i>
     {{ A_("Period") }}
