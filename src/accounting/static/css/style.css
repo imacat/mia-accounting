@@ -184,18 +184,18 @@ a.accounting-report-table-row {
 .accounting-income-statement-subcategory, .accounting-income-statement-subtotal {
     font-size: 1.1rem;
 }
-.accounting-income-statement-subcategory > :first-child {
-    padding-left: 1rem;
-}
 .accounting-income-statement-subtotal {
     border-top: thin solid darkslategray;
 }
-.accounting-income-statement-account > :first-child, .accounting-income-statement-subtotal > :first-child {
-    padding-left: 2rem;
+/* Indents */
+.accounting-income-statement-subcategory {
+    margin-left: 0.5rem;
 }
-.accounting-income-statement-account > .accounting-amount, .accounting-income-statement-subtotal .accounting-amount {
-    padding-right: 2rem;
+.accounting-income-statement-account, .accounting-income-statement-subtotal {
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
+/* A visual blank line between categories */
 .accounting-income-statement-category {
     margin-top: 2rem;
 }
