@@ -24,9 +24,11 @@ from accounting.utils.permission import has_permission, can_view
 from .period import Period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet
+from .template_filters import format_amount
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
+bp.add_app_template_filter(format_amount, "accounting_report_format_amount")
 
 
 @bp.get("journal", endpoint="journal-default")

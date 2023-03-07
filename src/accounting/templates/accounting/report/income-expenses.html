@@ -171,7 +171,7 @@ First written: 2023/3/5
             <div>{{ entry.summary|accounting_default }}</div>
             <div class="accounting-amount">{{ entry.income|accounting_format_amount|accounting_default }}</div>
             <div class="accounting-amount">{{ entry.expense|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ entry.balance|accounting_format_amount }}</div>
+            <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
           </div>
         {% endwith %}
       {% endif %}
@@ -182,7 +182,7 @@ First written: 2023/3/5
           <div>{{ entry.summary|accounting_default }}</div>
           <div class="accounting-amount">{{ entry.income|accounting_format_amount|accounting_default }}</div>
           <div class="accounting-amount">{{ entry.expense|accounting_format_amount|accounting_default }}</div>
-          <div class="accounting-amount">{{ entry.balance|accounting_format_amount }}</div>
+          <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
         </a>
       {% endfor %}
     </div>
@@ -193,7 +193,7 @@ First written: 2023/3/5
             <div>{{ A_("Total") }}</div>
             <div class="accounting-amount">{{ entry.income|accounting_format_amount }}</div>
             <div class="accounting-amount">{{ entry.expense|accounting_format_amount }}</div>
-            <div class="accounting-amount">{{ entry.balance|accounting_format_amount }}</div>
+            <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
           </div>
         </div>
       {% endwith %}

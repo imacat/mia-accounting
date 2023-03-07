@@ -149,17 +149,17 @@ First written: 2023/3/7
                   <span class="d-none d-md-inline">{{ account.account.code }}</span>
                   {{ account.account.title|title }}
                 </div>
-                <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
               </a>
             {% endfor %}
             <div class="accounting-report-table-row accounting-income-statement-subtotal">
               <div>{{ A_("Total") }}</div>
-              <div class="accounting-amount">{{ subsection.total|accounting_format_amount }}</div>
+              <div class="accounting-amount {% if subsection.total < 0 %} text-danger {% endif %}">{{ subsection.total|accounting_report_format_amount }}</div>
             </div>
           {% endfor %}
           <div class="accounting-report-table-row accounting-income-statement-total">
             <div>{{ section.accumulated.title|title }}</div>
-            <div class="accounting-amount">{{ section.accumulated.amount|accounting_format_amount }}</div>
+            <div class="accounting-amount {% if section.accumulated.amount < 0 %} text-danger {% endif %}">{{ section.accumulated.amount|accounting_report_format_amount }}</div>
           </div>
         {% endfor %}
       </div>

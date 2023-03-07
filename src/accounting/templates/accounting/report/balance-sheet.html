@@ -142,14 +142,14 @@ First written: 2023/3/7
                     <span class="d-none d-md-inline">{{ account.account.code }}</span>
                     {{ account.account.title|title }}
                   </div>
-                  <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                  <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
                 </a>
               {% endfor %}
             {% endfor %}
           </div>
           <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
             <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount">{{ report.assets.total|accounting_format_amount }}</div>
+            <div class="accounting-amount {% if report.assets.total < 0 %} text-danger {% endif %}">{{ report.assets.total|accounting_report_format_amount }}</div>
           </div>
         {% endif %}
       </div>
@@ -173,14 +173,14 @@ First written: 2023/3/7
                     <span class="d-none d-md-inline">{{ account.account.code }}</span>
                     {{ account.account.title|title }}
                   </div>
-                  <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                  <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
                 </a>
               {% endfor %}
             {% endfor %}
           </div>
           <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
             <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount">{{ report.liabilities.total|accounting_format_amount }}</div>
+            <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}">{{ report.liabilities.total|accounting_report_format_amount }}</div>
           </div>
         {% endif %}
 
@@ -202,20 +202,20 @@ First written: 2023/3/7
                     <span class="d-none d-md-inline">{{ account.account.code }}</span>
                     {{ account.account.title|title }}
                   </div>
-                  <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                  <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
                 </a>
               {% endfor %}
             {% endfor %}
           </div>
           <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
             <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount">{{ report.owner_s_equity.total|accounting_format_amount }}</div>
+            <div class="accounting-amount {% if report.owner_s_equity.total < 0 %} text-danger {% endif %}">{{ report.owner_s_equity.total|accounting_report_format_amount }}</div>
           </div>
         {% endif %}
 
         <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
           <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_format_amount }}</div>
+          <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_report_format_amount }}</div>
         </div>
       </div>
     </div>
@@ -224,14 +224,14 @@ First written: 2023/3/7
       <div class="col-sm-6">
         <div class="d-flex justify-content-between accounting-balance-sheet-total">
           <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount">{{ report.assets.total|accounting_format_amount }}</div>
+          <div class="accounting-amount {% if report.assets.total < 0 %} text-danger {% endif %}">{{ report.assets.total|accounting_report_format_amount }}</div>
         </div>
       </div>
 
       <div class="col-sm-6">
         <div class="d-flex justify-content-between accounting-balance-sheet-total">
           <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_format_amount }}</div>
+          <div class="accounting-amount {% if report.liabilities.total + report.owner_s_equity.total < 0 %} text-danger {% endif %}">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_report_format_amount }}</div>
         </div>
       </div>
     </div>
