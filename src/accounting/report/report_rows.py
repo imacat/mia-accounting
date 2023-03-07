@@ -250,15 +250,6 @@ class IncomeStatementRow(ReportRow):
         self.url: str | None = url
         """The URL."""
 
-    @property
-    def is_account(self) -> bool:
-        """Returns whether the row represents an account.
-
-        :return: True if the row represents an account, or False otherwise.
-        """
-        return not self.is_category and not self.is_total \
-            and not self.is_subcategory and not self.is_subtotal
-
     def as_dict(self) -> dict[str, t.Any]:
         if self.is_subtotal:
             return {"": "Total",
