@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Flask Project
-journal.html: The journal
+search.html: The search result
 
  Copyright (c) 2023 imacat.
 
@@ -17,17 +17,16 @@ journal.html: The journal
  limitations under the License.
 
 Author: imacat@mail.imacat.idv.tw (imacat)
-First written: 2023/3/4
+First written: 2023/3/8
 #}
 {% extends "accounting/base.html" %}
 
 {% block accounting_scripts %}
   <script src="{{ url_for("accounting.static", filename="js/material-fab-speed-dial.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
-  {# <script src="{{ url_for("accounting.static", filename="js/table-row-link.js") }}"></script> #}
 {% endblock %}
 
-{% block header %}{% block title %}{{ _("Journal %(period)s", period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Search Result for \"%(query)s\"", query=request.args.q) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -60,10 +59,15 @@ First written: 2023/3/4
   {% with report_chooser = report.report_chooser %}
     {% include "accounting/report/include/report-chooser.html" %}
   {% endwith %}
-  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
-    <i class="fa-solid fa-calendar-day"></i>
-    {{ report.period.desc|title }}
-  </button>
+  <form class="btn btn-primary d-flex input-group accounting-search-desktop-form" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
+    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
+    <label for="accounting-search-desktop" class="accounting-search-label">
+      <button type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        {{ A_("Search") }}
+      </button>
+    </label>
+  </form>
   <a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
     <i class="fa-solid fa-download"></i>
     {{ A_("Download") }}
@@ -78,15 +82,16 @@ First written: 2023/3/4
   {% with report_chooser = report.report_chooser %}
     {% include "accounting/report/include/report-chooser.html" %}
   {% endwith %}
-  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
-    <i class="fa-solid fa-calendar-day"></i>
-    {{ A_("Period") }}
-  </button>
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-label="{{ A_("Search for Mobile") }}">
+    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
+    <label for="accounting-search-mobile" class="accounting-search-label">
+      <button type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        {{ A_("Search") }}
+      </button>
+    </label>
+  </form>
 </div>
-
-{% with period = report.period, period_chooser = report.period_chooser %}
-  {% include "accounting/report/include/period-chooser.html" %}
-{% endwith %}
 
 {% include "accounting/report/include/search-modal.html" %}
 

@@ -146,6 +146,8 @@ First written: 2023/3/5
   {% include "accounting/report/include/period-chooser.html" %}
 {% endwith %}
 
+{% include "accounting/report/include/search-modal.html" %}
+
 {% if report.has_data %}
   {% with pagination = report.pagination %}
     {% include "accounting/include/pagination.html" %}

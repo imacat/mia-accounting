@@ -34,3 +34,5 @@ class ReportType(Enum):
     """The income statement."""
     BALANCE_SHEET: str = "balance-sheet"
     """The balance sheet."""
+    SEARCH: str = "search"
+    """The balance sheet."""

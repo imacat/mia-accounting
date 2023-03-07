@@ -22,4 +22,5 @@ from .income_expenses import IncomeExpenses
 from .income_statement import IncomeStatement
 from .journal import Journal
 from .ledger import Ledger
+from .search import Search
 from .trial_balance import TrialBalance

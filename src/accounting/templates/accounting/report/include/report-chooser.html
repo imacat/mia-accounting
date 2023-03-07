@@ -29,5 +29,10 @@ First written: 2023/3/4
     {% for report in report_chooser %}
       <li><a class="dropdown-item {% if report.is_active %} active {% endif %}" href="{{ report.url }}">{{ report.title }}</a></li>
     {% endfor %}
+    <li>
+      <span class="dropdown-item accounting-clickable" data-bs-toggle="modal" data-bs-target="#accounting-search-modal">
+        {{ A_("Search") }}
+      </span>
+    </li>
   </ul>
 </div>

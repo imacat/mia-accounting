@@ -24,7 +24,7 @@ from accounting.utils.permission import has_permission, can_view
 from .income_expense_account import IncomeExpensesAccount
 from .period import Period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
-    IncomeStatement, BalanceSheet
+    IncomeStatement, BalanceSheet, Search
 from .template_filters import format_amount
 
 bp: Blueprint = Blueprint("report", __name__)
@@ -275,3 +275,17 @@ def __get_balance_sheet_list(currency: Currency, period: Period) \
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
+
+
+@bp.get("search", endpoint="search")
+@has_permission(can_view)
+def search() -> str | Response:
+    """Returns the search result.
+
+    :return: The search result.
+    """
+    report: Search = Search()
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.csv()
+    return report.html()
+
