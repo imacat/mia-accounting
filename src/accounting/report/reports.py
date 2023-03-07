@@ -705,18 +705,6 @@ class IncomeStatement(Report[IncomeStatementRow]):
                                            is_total=True))
         return rows
 
-    def __get_category(self, category: BaseAccount,
-                       subcategory_dict: dict[str, BaseAccount],
-                       balances: list[IncomeStatementRow]) \
-            -> list[IncomeStatementRow]:
-        """Returns the rows in the category.
-
-        :param category: The category.
-        :param subcategory_dict: The subcategories
-        :param balances: The balances.
-        :return: The rows in the category.
-        """
-
     @staticmethod
     def populate_rows(rows: list[JournalRow]) -> None:
         pass
