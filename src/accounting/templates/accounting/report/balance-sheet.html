@@ -127,28 +127,9 @@ First written: 2023/3/7
     <div class="row accounting-report-table accounting-balance-sheet-table">
       <div class="col-sm-6">
         {% if report.assets.subsections %}
-          <div class="accounting-report-table-row accounting-balance-sheet-section">
-            <div>{{ report.assets.title.title|title }}</div>
-          </div>
-          <div class="accounting-report-table-body">
-            {% for subsection in report.assets.subsections %}
-              <div class="accounting-report-table-row accounting-balance-sheet-subsection">
-                <div>
-                  <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
-                  {{ subsection.title.title|title }}
-                </div>
-              </div>
-              {% for account in subsection.accounts %}
-                <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
-                  <div>
-                    <span class="d-none d-md-inline">{{ account.account.code }}</span>
-                    {{ account.account.title|title }}
-                  </div>
-                  <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
-                </a>
-              {% endfor %}
-            {% endfor %}
-          </div>
+          {% with section = report.assets %}
+            {% include "accounting/report/include/balance-sheet-section.html" %}
+          {% endwith %}
           <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
             <div>{{ A_("Total") }}</div>
             <div class="accounting-amount {% if report.assets.total < 0 %} text-danger {% endif %}">{{ report.assets.total|accounting_report_format_amount }}</div>
@@ -158,28 +139,9 @@ First written: 2023/3/7
 
       <div class="col-sm-6">
         {% if report.liabilities.subsections %}
-          <div class="accounting-report-table-row accounting-balance-sheet-section">
-            <div>{{ report.liabilities.title.title|title }}</div>
-          </div>
-          <div class="accounting-report-table-body">
-            {% for subsection in report.liabilities.subsections %}
-              <div class="accounting-report-table-row accounting-balance-sheet-subsection">
-                <div>
-                  <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
-                  {{ subsection.title.title|title }}
-                </div>
-              </div>
-              {% for account in subsection.accounts %}
-                <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
-                  <div>
-                    <span class="d-none d-md-inline">{{ account.account.code }}</span>
-                    {{ account.account.title|title }}
-                  </div>
-                  <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
-                </a>
-              {% endfor %}
-            {% endfor %}
-          </div>
+          {% with section = report.liabilities %}
+            {% include "accounting/report/include/balance-sheet-section.html" %}
+          {% endwith %}
           <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
             <div>{{ A_("Total") }}</div>
             <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}">{{ report.liabilities.total|accounting_report_format_amount }}</div>
@@ -187,28 +149,9 @@ First written: 2023/3/7
         {% endif %}
 
         {% if report.owner_s_equity.subsections %}
-          <div class="accounting-report-table-row accounting-balance-sheet-section">
-            <div>{{ report.owner_s_equity.title.title|title }}</div>
-          </div>
-          <div class="accounting-report-table-body">
-            {% for subsection in report.owner_s_equity.subsections %}
-              <div class="accounting-report-table-row accounting-balance-sheet-subsection">
-                <div>
-                  <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
-                  {{ subsection.title.title|title }}
-                </div>
-              </div>
-              {% for account in subsection.accounts %}
-                <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
-                  <div>
-                    <span class="d-none d-md-inline">{{ account.account.code }}</span>
-                    {{ account.account.title|title }}
-                  </div>
-                  <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
-                </a>
-              {% endfor %}
-            {% endfor %}
-          </div>
+          {% with section = report.owner_s_equity %}
+            {% include "accounting/report/include/balance-sheet-section.html" %}
+          {% endwith %}
           <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
             <div>{{ A_("Total") }}</div>
             <div class="accounting-amount {% if report.owner_s_equity.total < 0 %} text-danger {% endif %}">{{ report.owner_s_equity.total|accounting_report_format_amount }}</div>

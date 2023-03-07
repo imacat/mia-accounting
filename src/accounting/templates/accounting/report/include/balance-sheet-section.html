@@ -1,0 +1,43 @@
+{#
+The Mia! Accounting Flask Project
+balance-sheet-section.html: A section in the balance sheet.
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/8
+#}
+<div class="accounting-report-table-row accounting-balance-sheet-section">
+  <div>{{ section.title.title|title }}</div>
+</div>
+<div class="accounting-report-table-body">
+  {% for subsection in section.subsections %}
+    <div class="accounting-report-table-row accounting-balance-sheet-subsection">
+      <div>
+        <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
+        {{ subsection.title.title|title }}
+      </div>
+    </div>
+    {% for account in subsection.accounts %}
+      <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
+        <div>
+          <span class="d-none d-md-inline">{{ account.account.code }}</span>
+          {{ account.account.title|title }}
+        </div>
+        <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
+      </a>
+    {% endfor %}
+  {% endfor %}
+</div>
