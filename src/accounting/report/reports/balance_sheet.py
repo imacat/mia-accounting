@@ -176,12 +176,11 @@ class AccountCollector:
 
         :return: None.
         """
-        code: str = "3351-001"
         amount: Decimal | None = self.__query_accumulated()
         url: str = url_for("accounting.report.income-statement",
                            currency=self.__currency,
                            period=self.__period.before)
-        self.__add_owner_s_equity(code, amount, url)
+        self.__add_owner_s_equity(Account.ACCUMULATED_CHANGE, amount, url)
 
     def __query_accumulated(self) -> Decimal | None:
         """Queries and returns the accumulated profit or loss.
@@ -207,11 +206,10 @@ class AccountCollector:
 
         :return: None.
         """
-        code: str = "3353-001"
         amount: Decimal | None = self.__query_currency_period()
         url: str = url_for("accounting.report.income-statement",
                            currency=self.__currency, period=self.__period)
-        self.__add_owner_s_equity(code, amount, url)
+        self.__add_owner_s_equity(Account.ACCUMULATED_CHANGE, amount, url)
 
     def __query_currency_period(self) -> Decimal | None:
         """Queries and returns the net income or loss for current period.

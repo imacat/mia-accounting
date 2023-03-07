@@ -125,7 +125,7 @@ class EntryCollector:
         entry: Entry = Entry()
         entry.is_brought_forward = True
         entry.date = self.__period.start
-        entry.account = Account.find_by_code("3351-001")
+        entry.account = Account.accumulated_change()
         entry.summary = gettext("Brought forward")
         if balance > 0:
             entry.income = balance
