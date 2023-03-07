@@ -104,9 +104,9 @@ class ReportChooser:
 
     @property
     def __income_expenses(self) -> OptionLink:
-        """Returns the income and expenses.
+        """Returns the income and expenses log.
 
-        :return: The income and expenses.
+        :return: The income and expenses log.
         """
         account: Account = self.__account
         if not re.match(r"[12][12]", account.base_code):
@@ -117,7 +117,7 @@ class ReportChooser:
             else url_for("accounting.report.income-expenses",
                          currency=self.__currency, account=account,
                          period=self.__period)
-        return OptionLink(gettext("Income and Expenses"), url,
+        return OptionLink(gettext("Income and Expenses Log"), url,
                           self.__active_report == ReportType.INCOME_EXPENSES)
 
     @property

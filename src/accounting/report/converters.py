@@ -52,8 +52,8 @@ class PeriodConverter(BaseConverter):
 
 
 class IncomeExpensesAccountConverter(BaseConverter):
-    """The supplier converter to convert the income and expenses pseudo account
-    code from and to the corresponding pseudo account in the routes."""
+    """The supplier converter to convert the income and expenses log pseudo
+    account code from and to the corresponding pseudo account in the routes."""
 
     def to_python(self, value: str) -> IncomeExpensesAccount:
         """Converts an account code to an account.

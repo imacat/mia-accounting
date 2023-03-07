@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Flask Project
-income-expenses.html: The income and expenses
+income-expenses.html: The income and expenses log
 
  Copyright (c) 2023 imacat.
 
@@ -27,7 +27,7 @@ First written: 2023/3/5
   <script src="{{ url_for("accounting.static", filename="js/table-row-link.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ _("Income and Expenses of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ _("Income and Expenses Log of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 

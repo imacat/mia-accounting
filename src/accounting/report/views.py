@@ -115,11 +115,11 @@ def __get_ledger_list(currency: Currency, account: Account, period: Period) \
 def get_default_income_expenses_list(currency: Currency,
                                      account: IncomeExpensesAccount) \
         -> str | Response:
-    """Returns the income and expenses in the default period.
+    """Returns the income and expenses log in the default period.
 
     :param currency: The currency.
     :param account: The account.
-    :return: The income and expenses in the default period.
+    :return: The income and expenses log in the default period.
     """
     return __get_income_expenses_list(currency, account, Period.get_instance())
 
@@ -131,12 +131,12 @@ def get_default_income_expenses_list(currency: Currency,
 def get_income_expenses_list(currency: Currency,
                              account: IncomeExpensesAccount,
                              period: Period) -> str | Response:
-    """Returns the income and expenses.
+    """Returns the income and expenses log.
 
     :param currency: The currency.
     :param account: The account.
     :param period: The period.
-    :return: The income and expenses in the period.
+    :return: The income and expenses log in the period.
     """
     return __get_income_expenses_list(currency, account, period)
 
@@ -144,12 +144,12 @@ def get_income_expenses_list(currency: Currency,
 def __get_income_expenses_list(currency: Currency,
                                account: IncomeExpensesAccount,
                                period: Period) -> str | Response:
-    """Returns the income and expenses.
+    """Returns the income and expenses log.
 
     :param currency: The currency.
     :param account: The account.
     :param period: The period.
-    :return: The income and expenses in the period.
+    :return: The income and expenses log in the period.
     """
     report: IncomeExpenses = IncomeExpenses(currency, account, period)
     if "as" in request.args and request.args["as"] == "csv":

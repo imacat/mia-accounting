@@ -27,7 +27,7 @@ class ReportType(Enum):
     LEDGER: str = "ledger"
     """The ledger."""
     INCOME_EXPENSES: str = "income-expenses"
-    """The income and expenses."""
+    """The income and expenses log."""
     TRIAL_BALANCE: str = "trial-balance"
     """The trial balance."""
     INCOME_STATEMENT: str = "income-statement"

@@ -367,9 +367,9 @@ class IncomeExpensesPageParams(PageParams):
 
 
 def _populate_entries(entries: list[Entry]) -> None:
-    """Populates the income and expenses entries with relative data.
+    """Populates the income and expenses log entries with relative data.
 
-    :param entries: The income and expenses entries.
+    :param entries: The income and expenses log entries.
     :return: None.
     """
     transactions: dict[int, Transaction] \
