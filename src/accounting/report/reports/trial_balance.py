@@ -26,6 +26,7 @@ from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
 from accounting.report.period import Period
+from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
@@ -162,7 +163,7 @@ class TrialBalancePageParams(PageParams):
                 .order_by(Currency.code).all()]
 
 
-class TrialBalance:
+class TrialBalance(BaseReport):
     """The trial balance."""
 
     def __init__(self, currency: Currency, period: Period):

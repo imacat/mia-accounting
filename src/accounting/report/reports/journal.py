@@ -28,6 +28,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
+from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download
 from .utils.page_params import PageParams
 from .utils.period_choosers import JournalPeriodChooser
@@ -172,7 +173,7 @@ def _populate_entries(entries: list[Entry]) -> None:
         entry.currency = currencies[entry.entry.currency_code]
 
 
-class Journal:
+class Journal(BaseReport):
     """The journal."""
 
     def __init__(self, period: Period):

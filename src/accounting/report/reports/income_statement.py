@@ -27,6 +27,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, BaseAccount, Account, Transaction, \
     JournalEntry
 from accounting.report.period import Period
+from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
@@ -200,7 +201,7 @@ class IncomeStatementPageParams(PageParams):
                 .order_by(Currency.code).all()]
 
 
-class IncomeStatement:
+class IncomeStatement(BaseReport):
     """The income statement."""
 
     def __init__(self, currency: Currency, period: Period):

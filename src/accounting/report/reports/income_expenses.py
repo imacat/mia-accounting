@@ -29,6 +29,7 @@ from accounting.models import Currency, Account, Transaction, JournalEntry
 from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
+from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
@@ -387,7 +388,7 @@ def _populate_entries(entries: list[Entry]) -> None:
             entry.account = accounts[entry.entry.account_id]
 
 
-class IncomeExpenses:
+class IncomeExpenses(BaseReport):
     """The income and expenses log."""
 
     def __init__(self, currency: Currency, account: IncomeExpensesAccount,
