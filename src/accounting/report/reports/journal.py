@@ -28,12 +28,12 @@ from flask import render_template, Response
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
-from accounting.report.page_params import PageParams
 from accounting.report.period import Period
-from accounting.report.period_choosers import JournalPeriodChooser
-from accounting.report.report_chooser import ReportChooser
-from accounting.report.report_type import ReportType
 from accounting.utils.pagination import Pagination
+from .utils.page_params import PageParams
+from .utils.period_choosers import JournalPeriodChooser
+from .utils.report_chooser import ReportChooser
+from .utils.report_type import ReportType
 
 
 class Entry:

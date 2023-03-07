@@ -27,8 +27,9 @@ from datetime import date
 from flask import url_for
 
 from accounting.models import Currency, Account, Transaction
-from .period import YearPeriod, Period, ThisMonth, LastMonth, SinceLastMonth, \
-    ThisYear, LastYear, Today, Yesterday, TemplatePeriod
+from accounting.report.period import YearPeriod, Period, ThisMonth, \
+    LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
+    TemplatePeriod
 
 
 class PeriodChooser(ABC):

@@ -29,9 +29,9 @@ from flask_babel import LazyString
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account
+from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
 from .option_link import OptionLink
-from .period import Period
 from .report_type import ReportType
 
 

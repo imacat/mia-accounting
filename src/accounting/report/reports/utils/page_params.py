@@ -17,15 +17,15 @@
 """The page parameters of a report.
 
 """
+import typing as t
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
     urlunparse
 
 from flask import request
-import typing as t
 
-from accounting.report.report_chooser import ReportChooser
 from accounting.utils.txn_types import TransactionType
+from .report_chooser import ReportChooser
 
 
 class PageParams(ABC):
