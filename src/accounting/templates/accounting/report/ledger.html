@@ -60,21 +60,7 @@ First written: 2023/3/5
   {% with report_chooser = report.report_chooser %}
     {% include "accounting/report/include/report-chooser.html" %}
   {% endwith %}
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-money-bill-wave"></i>
-      {{ report.currency.name|title }}
-    </button>
-    <ul class="dropdown-menu">
-      {% for currency in report.currency_options %}
-        <li>
-          <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
-            {{ currency.title }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
+  {% include "accounting/report/include/currency-chooser.html" %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-clipboard"></i>
@@ -108,20 +94,7 @@ First written: 2023/3/5
   {% with report_chooser = report.report_chooser %}
     {% include "accounting/report/include/report-chooser.html" %}
   {% endwith %}
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-money-bill-wave"></i>
-    </button>
-    <ul class="dropdown-menu">
-      {% for currency in report.currency_options %}
-        <li>
-          <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
-            {{ currency.title }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
+  {% include "accounting/report/include/currency-chooser.html" %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-clipboard"></i>
