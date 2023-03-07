@@ -167,21 +167,13 @@ First written: 2023/3/5
       {% if report.brought_forward %}
         {% with entry = report.brought_forward %}
           <div class="accounting-report-table-row">
-            <div>{{ entry.date|accounting_format_date }}</div>
-            <div>{{ entry.summary|accounting_default }}</div>
-            <div class="accounting-amount">{{ entry.debit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ entry.credit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
+            {% include "accounting/report/include/ledger-row-desktop.html" %}
           </div>
         {% endwith %}
       {% endif %}
       {% for entry in report.entries %}
         <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
-          <div>{{ entry.date|accounting_format_date }}</div>
-          <div>{{ entry.summary|accounting_default }}</div>
-          <div class="accounting-amount">{{ entry.debit|accounting_format_amount|accounting_default }}</div>
-          <div class="accounting-amount">{{ entry.credit|accounting_format_amount|accounting_default }}</div>
-          <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
+          {% include "accounting/report/include/ledger-row-desktop.html" %}
         </a>
       {% endfor %}
     </div>
