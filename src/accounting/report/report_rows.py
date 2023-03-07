@@ -206,3 +206,65 @@ class TrialBalanceRow(ReportRow):
         return {"Account": str(self.account).title(),
                 "Debit": self.debit,
                 "Credit": self.credit}
+
+
+class IncomeStatementRow(ReportRow):
+    """A row in the income statement."""
+
+    def __init__(self,
+                 code: str | None = None,
+                 title: str | None = None,
+                 amount: Decimal | None = None,
+                 is_category: bool = False,
+                 is_total: bool = False,
+                 is_subcategory: bool = False,
+                 is_subtotal: bool = False,
+                 url: str | None = None):
+        """Constructs the row in the income statement.
+
+        :param code: The account code.
+        :param title: The account title.
+        :param amount: The amount.
+        :param is_category: True for a category, or False otherwise.
+        :param is_total: True for a total, or False otherwise.
+        :param is_subcategory: True for a subcategory, or False otherwise.
+        :param is_subtotal: True for a subtotal, or False otherwise.
+        :param url: The URL for the account.
+        """
+        self.is_total: bool = False
+        """Whether this is the total row."""
+        self.code: str | None = code
+        """The account code."""
+        self.title: str | None = title
+        """The account code."""
+        self.amount: Decimal | None = amount
+        """The amount."""
+        self.is_category: bool = is_category
+        """True if this row is a category, or False otherwise."""
+        self.is_total: bool = is_total
+        """True if this row is a total, or False otherwise."""
+        self.is_subcategory: bool = is_subcategory
+        """True if this row is a subcategory, or False otherwise."""
+        self.is_subtotal: bool = is_subtotal
+        """True if this row is a subtotal, or False otherwise."""
+        self.url: str | None = url
+        """The URL."""
+
+    @property
+    def is_account(self) -> bool:
+        """Returns whether the row represents an account.
+
+        :return: True if the row represents an account, or False otherwise.
+        """
+        return not self.is_category and not self.is_total \
+            and not self.is_subcategory and not self.is_subtotal
+
+    def as_dict(self) -> dict[str, t.Any]:
+        if self.is_subtotal:
+            return {"": "Total",
+                    "Amount": self.amount}
+        if self.is_total:
+            return {"": self.title,
+                    "Amount": self.amount}
+        return {"": f"{self.code} {self.title}",
+                "Amount": self.amount}

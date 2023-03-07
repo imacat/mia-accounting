@@ -29,10 +29,10 @@ from accounting.report.option_link import OptionLink
 from accounting.report.period import Period
 from accounting.report.period_choosers import PeriodChooser, \
     JournalPeriodChooser, LedgerPeriodChooser, IncomeExpensesPeriodChooser, \
-    TrialBalancePeriodChooser
+    TrialBalancePeriodChooser, IncomeStatementPeriodChooser
 from accounting.report.report_chooser import ReportChooser
 from accounting.report.report_rows import JournalRow, LedgerRow, \
-    IncomeExpensesRow, TrialBalanceRow
+    IncomeExpensesRow, TrialBalanceRow, IncomeStatementRow
 from accounting.report.report_type import ReportType
 from accounting.utils.pagination import Pagination
 from accounting.utils.txn_types import TransactionType
@@ -331,6 +331,53 @@ class TrialBalanceParams(ReportParams[TrialBalanceRow]):
                 return url_for("accounting.report.trial-balance-default",
                                currency=currency)
             return url_for("accounting.report.trial-balance",
+                           currency=currency, period=self.period)
+
+        in_use: set[str] = set(db.session.scalars(
+            sa.select(JournalEntry.currency_code)
+            .group_by(JournalEntry.currency_code)).all())
+        return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
+                for x in Currency.query.filter(Currency.code.in_(in_use))
+                .order_by(Currency.code).all()]
+
+
+class IncomeStatementParams(ReportParams[IncomeStatementRow]):
+    """The parameters of an income statement page."""
+
+    def __init__(self,
+                 currency: Currency,
+                 period: Period,
+                 data_rows: list[IncomeStatementRow]):
+        """Constructs the parameters for the income statement page.
+
+        :param currency: The currency.
+        :param period: The period.
+        :param data_rows: The data rows.
+        :param total: The total row, if any.
+        """
+        super().__init__(
+            period_chooser=IncomeStatementPeriodChooser(currency),
+            report_chooser=ReportChooser(ReportType.INCOME_STATEMENT,
+                                         currency=currency,
+                                         period=period),
+            data_rows=data_rows,
+            is_paged=False)
+        self.currency: Currency = currency
+        """The currency."""
+        self.period: Period | None = period
+        """The period."""
+
+    @property
+    def currency_options(self) -> list[OptionLink]:
+        """Returns the currency options.
+
+        :return: The currency options.
+        """
+        def get_url(currency: Currency):
+            if self.period.is_default:
+                return url_for("accounting.report.income-statement-default",
+                               currency=currency)
+            return url_for("accounting.report.income-statement",
                            currency=currency, period=self.period)
 
         in_use: set[str] = set(db.session.scalars(

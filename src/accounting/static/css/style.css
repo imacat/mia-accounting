@@ -115,11 +115,11 @@
     font-weight: bolder;
 }
 .accounting-report-table-header {
-    border-bottom: thick double slategray;
+    border-bottom: thin solid slategray;
 }
 .accounting-report-table-footer {
     font-style: italic;
-    border-top: thick double slategray;
+    border-top: thin solid slategray;
 }
 .accounting-report-table-row {
     display: grid;
@@ -158,8 +158,55 @@ a.accounting-report-table-row {
 .accounting-income-expenses-table .accounting-report-table-footer .accounting-report-table-row {
     grid-template-columns: 7fr 1fr 1fr 1fr;
 }
+.accounting-trial-balance-table .accounting-report-table-header {
+    border-bottom: thick double slategray;
+}
+.accounting-trial-balance-table .accounting-report-table-footer {
+    border-top: thick double slategray;
+}
 .accounting-trial-balance-table .accounting-report-table-row {
     grid-template-columns: 3fr 1fr 1fr;
+}
+.accounting-income-statement-table .accounting-report-table-body {
+    border-top: thick double slategray;
+    border-bottom: thick double slategray;
+}
+.accounting-income-statement-table .accounting-report-table-row {
+    grid-template-columns: 3fr 1fr;
+}
+.accounting-income-statement-table .accounting-report-table-header .accounting-report-table-row, .accounting-income-statement-table .accounting-report-table-row.accounting-income-statement-category, .accounting-income-statement-table .accounting-report-table-row.accounting-income-statement-subcategory {
+    grid-template-columns: 1fr;
+}
+.accounting-income-statement-category, .accounting-income-statement-total {
+    font-size: 1.2rem;
+    font-weight: bolder;
+}
+.accounting-income-statement-subcategory, .accounting-income-statement-subtotal {
+    font-size: 1.1rem;
+}
+.accounting-income-statement-subcategory > :first-child {
+    padding-left: 1rem;
+}
+.accounting-income-statement-subtotal {
+    border-top: thin solid darkslategray;
+}
+.accounting-income-statement-account > :first-child, .accounting-income-statement-subtotal > :first-child {
+    padding-left: 2rem;
+}
+.accounting-income-statement-account > .accounting-amount, .accounting-income-statement-subtotal .accounting-amount {
+    padding-right: 2rem;
+}
+.accounting-income-statement-category {
+    margin-top: 2rem;
+}
+.accounting-income-statement-category:first-child {
+    margin-top: 0;
+}
+.accounting-income-statement-total {
+    margin-bottom: 2rem;
+}
+.accounting-income-statement-total:last-child {
+    margin-bottom: 0;
 }
 
 /* The accounting report */

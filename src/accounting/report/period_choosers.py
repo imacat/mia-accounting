@@ -178,3 +178,22 @@ class TrialBalancePeriodChooser(PeriodChooser):
                            currency=self.currency)
         return url_for("accounting.report.trial-balance",
                        currency=self.currency, period=period)
+
+
+class IncomeStatementPeriodChooser(PeriodChooser):
+    """The income statement period chooser."""
+
+    def __init__(self, currency: Currency):
+        """Constructs the income statement period chooser."""
+        self.currency: Currency = currency
+        """The currency."""
+        first: Transaction | None \
+            = Transaction.query.order_by(Transaction.date).first()
+        super().__init__(None if first is None else first.date)
+
+    def _url_for(self, period: Period) -> str:
+        if period.is_default:
+            return url_for("accounting.report.income-statement-default",
+                           currency=self.currency)
+        return url_for("accounting.report.income-statement",
+                       currency=self.currency, period=period)

@@ -28,12 +28,13 @@ from flask import Response, render_template, url_for
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.models import Currency, BaseAccount, Account, Transaction, \
+    JournalEntry
 from accounting.report.period import Period
 from accounting.report.report_params import JournalParams, LedgerParams, \
-    IncomeExpensesParams, TrialBalanceParams
+    IncomeExpensesParams, TrialBalanceParams, IncomeStatementParams
 from accounting.report.report_rows import JournalRow, LedgerRow, \
-    IncomeExpensesRow, TrialBalanceRow
+    IncomeExpensesRow, TrialBalanceRow, IncomeStatementRow
 
 T = t.TypeVar("T")
 
@@ -577,4 +578,161 @@ class TrialBalance(Report[TrialBalanceRow]):
             data_rows=self.data_rows,
             total=self.total)
         return render_template("accounting/report/trial-balance.html",
+                               report=params)
+
+
+class IncomeStatement(Report[IncomeStatementRow]):
+    """The income statement."""
+
+    def __init__(self, currency: Currency, period: Period):
+        """Constructs an income statement.
+
+        :param currency: The currency.
+        :param period: The period.
+        """
+        self.currency: Currency = currency
+        """The currency."""
+        self.period: Period = period
+        """The period."""
+        super().__init__()
+
+    def get_rows(self) -> tuple[list[T], T | None, T | None]:
+        rows: list[IncomeStatementRow] = self.__query_balances()
+        rows = self.__get_income_statement_rows(rows)
+        return rows, None, None
+
+    def __query_balances(self) -> list[IncomeStatementRow]:
+        """Queries and returns the balances.
+
+        :return: The balances.
+        """
+        sub_conditions: list[sa.BinaryExpression] \
+            = [Account.base_code.startswith(str(x)) for x in range(4, 10)]
+        conditions: list[sa.BinaryExpression] \
+            = [JournalEntry.currency_code == self.currency.code,
+               sa.or_(*sub_conditions)]
+        if self.period.start is not None:
+            conditions.append(Transaction.date >= self.period.start)
+        if self.period.end is not None:
+            conditions.append(Transaction.date <= self.period.end)
+        balance_func: sa.Function = sa.func.sum(sa.case(
+            (JournalEntry.is_debit, JournalEntry.amount),
+            else_=-JournalEntry.amount)).label("balance")
+        select_balance: sa.Select \
+            = sa.select(JournalEntry.account_id, balance_func)\
+            .join(Transaction).join(Account)\
+            .filter(*conditions)\
+            .group_by(JournalEntry.account_id)\
+            .order_by(Account.base_code, Account.no)
+        balances: list[sa.Row] = db.session.execute(select_balance).all()
+        accounts: dict[int, Account] \
+            = {x.id: x for x in Account.query
+               .filter(Account.id.in_([x.account_id for x in balances])).all()}
+
+        def get_url(account: Account) -> str:
+            """Returns the ledger URL of an account.
+
+            :param account: The account.
+            :return: The ledger URL of the account.
+            """
+            if self.period.is_default:
+                return url_for("accounting.report.ledger-default",
+                               currency=self.currency, account=account)
+            return url_for("accounting.report.ledger",
+                           currency=self.currency, account=account,
+                           period=self.period)
+
+        return [IncomeStatementRow(code=accounts[x.account_id].code,
+                                   title=accounts[x.account_id].title,
+                                   amount=x.balance,
+                                   url=get_url(accounts[x.account_id]))
+                for x in balances]
+
+    @staticmethod
+    def __get_income_statement_rows(balances: list[IncomeStatementRow]) \
+            -> list[IncomeStatementRow]:
+        """Composes the categories and totals from the balance rows.
+
+        :param balances: The balance rows.
+        :return: None.
+        """
+        categories: list[BaseAccount] \
+            = BaseAccount.query\
+               .filter(BaseAccount.code.in_([str(x) for x in range(4, 10)]))\
+               .order_by(BaseAccount.code).all()
+        subcategory_codes: set[str] = {x.code[:2] for x in balances}
+        subcategory_dict: dict[str, BaseAccount] \
+            = {x.code: x for x in BaseAccount.query
+               .filter(BaseAccount.code.in_({x.code[:2] for x in balances}))}
+
+        balances_by_subcategory: dict[str, list[IncomeStatementRow]] \
+            = {x: [] for x in subcategory_codes}
+        for balance in balances:
+            balances_by_subcategory[balance.code[:2]].append(balance)
+
+        subcategories_by_category: dict[str, list[BaseAccount]] \
+            = {x.code: [] for x in categories}
+        for subcategory in subcategory_dict.values():
+            subcategories_by_category[subcategory.code[0]].append(subcategory)
+
+        total_titles: dict[str, str] \
+            = {"4": "total revenue",
+               "5": "gross income",
+               "6": "operating income",
+               "7": "before tax income",
+               "8": "after tax income",
+               "9": "net income or loss for current period"}
+
+        rows: list[IncomeStatementRow] = []
+        total: Decimal = Decimal(0)
+        for category in categories:
+            rows.append(IncomeStatementRow(code=category.code,
+                                           title=category.title,
+                                           is_category=True))
+            for subcategory in subcategories_by_category[category.code]:
+                rows.append(IncomeStatementRow(code=subcategory.code,
+                                               title=subcategory.title,
+                                               is_subcategory=True))
+                subtotal: Decimal = Decimal(0)
+                for balance in balances_by_subcategory[subcategory.code]:
+                    rows.append(balance)
+                    subtotal = subtotal + balance.amount
+                rows.append(IncomeStatementRow(amount=subtotal,
+                                               is_subtotal=True))
+                total = total + subtotal
+            rows.append(IncomeStatementRow(title=total_titles[category.code],
+                                           amount=total,
+                                           is_total=True))
+        return rows
+
+    def __get_category(self, category: BaseAccount,
+                       subcategory_dict: dict[str, BaseAccount],
+                       balances: list[IncomeStatementRow]) \
+            -> list[IncomeStatementRow]:
+        """Returns the rows in the category.
+
+        :param category: The category.
+        :param subcategory_dict: The subcategories
+        :param balances: The balances.
+        :return: The rows in the category.
+        """
+
+    @staticmethod
+    def populate_rows(rows: list[JournalRow]) -> None:
+        pass
+
+    @property
+    def csv_field_names(self) -> list[str]:
+        return ["", "Amount"]
+
+    @property
+    def csv_filename(self) -> str:
+        return f"income-statement-{self.period.spec}.csv"
+
+    def html(self) -> str:
+        params: IncomeStatementParams = IncomeStatementParams(
+            currency=self.currency,
+            period=self.period,
+            data_rows=self.data_rows)
+        return render_template("accounting/report/income-statement.html",
                                report=params)

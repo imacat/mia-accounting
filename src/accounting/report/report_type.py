@@ -30,3 +30,5 @@ class ReportType(Enum):
     """The income and expenses."""
     TRIAL_BALANCE: str = "trial-balance"
     """The trial balance."""
+    INCOME_STATEMENT: str = "income-statement"
+    """The income statement."""

@@ -22,7 +22,8 @@ from flask import Blueprint, request, Response
 from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
 from .period import Period
-from .reports import Journal, Ledger, IncomeExpenses, TrialBalance
+from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
+    IncomeStatement
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
@@ -185,6 +186,46 @@ def __get_trial_balance_list(currency: Currency, period: Period) \
     :return: The trial balance in the period.
     """
     report: TrialBalance = TrialBalance(currency, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.csv()
+    return report.html()
+
+
+@bp.get("income-statement/<currency:currency>",
+        endpoint="income-statement-default")
+@has_permission(can_view)
+def get_default_income_statement_list(currency: Currency) -> str | Response:
+    """Returns the income statement in the default period.
+
+    :param currency: The currency.
+    :return: The income statement in the default period.
+    """
+    return __get_income_statement_list(currency, Period.get_instance())
+
+
+@bp.get("income-statement/<currency:currency>/<period:period>",
+        endpoint="income-statement")
+@has_permission(can_view)
+def get_income_statement_list(currency: Currency, period: Period) \
+        -> str | Response:
+    """Returns the income statement.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The income statement in the period.
+    """
+    return __get_income_statement_list(currency, period)
+
+
+def __get_income_statement_list(currency: Currency, period: Period) \
+        -> str | Response:
+    """Returns the income statement.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The income statement in the period.
+    """
+    report: IncomeStatement = IncomeStatement(currency, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
