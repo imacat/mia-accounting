@@ -21,6 +21,7 @@ from flask import Blueprint, request, Response
 
 from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
+from .balance_sheet import BalanceSheet
 from .period import Period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement
@@ -226,6 +227,46 @@ def __get_income_statement_list(currency: Currency, period: Period) \
     :return: The income statement in the period.
     """
     report: IncomeStatement = IncomeStatement(currency, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.csv()
+    return report.html()
+
+
+@bp.get("balance-sheet/<currency:currency>",
+        endpoint="balance-sheet-default")
+@has_permission(can_view)
+def get_default_balance_sheet_list(currency: Currency) -> str | Response:
+    """Returns the balance sheet in the default period.
+
+    :param currency: The currency.
+    :return: The balance sheet in the default period.
+    """
+    return __get_balance_sheet_list(currency, Period.get_instance())
+
+
+@bp.get("balance-sheet/<currency:currency>/<period:period>",
+        endpoint="balance-sheet")
+@has_permission(can_view)
+def get_balance_sheet_list(currency: Currency, period: Period) \
+        -> str | Response:
+    """Returns the balance sheet.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The balance sheet in the period.
+    """
+    return __get_balance_sheet_list(currency, period)
+
+
+def __get_balance_sheet_list(currency: Currency, period: Period) \
+        -> str | Response:
+    """Returns the balance sheet.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The balance sheet in the period.
+    """
+    report: BalanceSheet = BalanceSheet(currency, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()

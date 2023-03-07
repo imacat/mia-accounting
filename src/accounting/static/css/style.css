@@ -207,6 +207,27 @@ a.accounting-report-table-row {
 .accounting-income-statement-total:last-child {
     margin-bottom: 0;
 }
+.accounting-balance-sheet-section, .accounting-balance-sheet-total {
+    font-size: 1.2rem;
+    font-weight: bolder;
+}
+.accounting-balance-sheet-section {
+    border-bottom: thick double darkslategray;
+}
+.accounting-balance-sheet-total {
+    border-top: thick double darkslategray;
+}
+.accounting-balance-sheet-subtotal {
+    font-size: 1.1rem;
+    font-weight: bolder;
+    border-top: thick double darkslategray;
+}
+.accounting-balance-sheet-account {
+    margin-left: 0.5rem;
+}
+.accounting-balance-sheet-total .accounting-amount, .accounting-balance-sheet-subtotal, .accounting-amount {
+    font-style: italic;
+}
 
 /* The accounting report */
 .accounting-mobile-journal-credit {

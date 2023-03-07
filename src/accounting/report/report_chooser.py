@@ -70,6 +70,7 @@ class ReportChooser:
         self.__reports.append(self.__income_expenses)
         self.__reports.append(self.__trial_balance)
         self.__reports.append(self.__income_statement)
+        self.__reports.append(self.__balance_sheet)
         for report in self.__reports:
             if report.is_active:
                 self.current_report = report.title
@@ -146,6 +147,20 @@ class ReportChooser:
                          currency=self.__currency, period=self.__period)
         return OptionLink(gettext("Income Statement"), url,
                           self.__active_report == ReportType.INCOME_STATEMENT)
+
+    @property
+    def __balance_sheet(self) -> OptionLink:
+        """Returns the balance sheet.
+
+        :return: The balance sheet.
+        """
+        url: str = url_for("accounting.report.balance-sheet-default",
+                           currency=self.__currency) \
+            if self.__period.is_default \
+            else url_for("accounting.report.balance-sheet",
+                         currency=self.__currency, period=self.__period)
+        return OptionLink(gettext("Balance Sheet"), url,
+                          self.__active_report == ReportType.BALANCE_SHEET)
 
     def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.

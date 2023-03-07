@@ -1,0 +1,243 @@
+{#
+The Mia! Accounting Flask Project
+income-statement.html: The income statement
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/7
+#}
+{% extends "accounting/base.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/material-fab-speed-dial.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
+{% endblock %}
+
+{% block header %}{% block title %}{{ _("Balance Sheet of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-2 d-none d-md-inline-flex">
+  {% if accounting_can_edit() %}
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-plus"></i>
+        {{ A_("New") }}
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
+            {{ A_("Cash Expense") }}
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
+            {{ A_("Cash Income") }}
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
+            {{ A_("Transfer") }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  {% endif %}
+  {% with report_chooser = report.report_chooser %}
+    {% include "accounting/report/include/report-chooser.html" %}
+  {% endwith %}
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-money-bill-wave"></i>
+      {{ report.currency.name|title }}
+    </button>
+    <ul class="dropdown-menu">
+      {% for currency in report.currency_options %}
+        <li>
+          <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
+            {{ currency.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
+    <i class="fa-solid fa-calendar-day"></i>
+    {{ report.period.desc|title }}
+  </button>
+  <a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
+    <i class="fa-solid fa-download"></i>
+    {{ A_("Download") }}
+  </a>
+</div>
+
+{% with txn_types = report.txn_types %}
+  {% include "accounting/include/add-txn-material-fab.html" %}
+{% endwith %}
+
+<div class="btn-group btn-actions mb-3 d-md-none">
+  {% with report_chooser = report.report_chooser %}
+    {% include "accounting/report/include/report-chooser.html" %}
+  {% endwith %}
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-money-bill-wave"></i>
+    </button>
+    <ul class="dropdown-menu">
+      {% for currency in report.currency_options %}
+        <li>
+          <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
+            {{ currency.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
+    <i class="fa-solid fa-calendar-day"></i>
+    {{ A_("Period") }}
+  </button>
+</div>
+
+{% with period = report.period, period_chooser = report.period_chooser %}
+  {% include "accounting/report/include/period-chooser.html" %}
+{% endwith %}
+
+{% if report.has_data %}
+  <div class="accounting-sheet">
+    <div class="d-none d-sm-flex justify-content-center mb-3">
+      <h2 class="text-center">{{ _("Balance Sheet of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
+    </div>
+
+    <div class="row accounting-report-table accounting-balance-sheet-table">
+      <div class="col-sm-6">
+        {% if report.assets.subsections %}
+          <div class="accounting-report-table-row accounting-balance-sheet-section">
+            <div>{{ report.assets.title.title|title }}</div>
+          </div>
+          <div class="accounting-report-table-body">
+            {% for subsection in report.assets.subsections %}
+              <div class="accounting-report-table-row accounting-balance-sheet-subsection">
+                <div>
+                  <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
+                  {{ subsection.title.title|title }}
+                </div>
+              </div>
+              {% for account in subsection.accounts %}
+                <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
+                  <div>
+                    <span class="d-none d-md-inline">{{ account.account.code }}</span>
+                    {{ account.account.title|title }}
+                  </div>
+                  <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                </a>
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
+            <div>{{ A_("Total") }}</div>
+            <div class="accounting-amount">{{ report.assets.total|accounting_format_amount }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-sm-6">
+        {% if report.liabilities.subsections %}
+          <div class="accounting-report-table-row accounting-balance-sheet-section">
+            <div>{{ report.liabilities.title.title|title }}</div>
+          </div>
+          <div class="accounting-report-table-body">
+            {% for subsection in report.liabilities.subsections %}
+              <div class="accounting-report-table-row accounting-balance-sheet-subsection">
+                <div>
+                  <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
+                  {{ subsection.title.title|title }}
+                </div>
+              </div>
+              {% for account in subsection.accounts %}
+                <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
+                  <div>
+                    <span class="d-none d-md-inline">{{ account.account.code }}</span>
+                    {{ account.account.title|title }}
+                  </div>
+                  <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                </a>
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
+            <div>{{ A_("Total") }}</div>
+            <div class="accounting-amount">{{ report.liabilities.total|accounting_format_amount }}</div>
+          </div>
+        {% endif %}
+
+        {% if report.owner_s_equity.subsections %}
+          <div class="accounting-report-table-row accounting-balance-sheet-section">
+            <div>{{ report.owner_s_equity.title.title|title }}</div>
+          </div>
+          <div class="accounting-report-table-body">
+            {% for subsection in report.owner_s_equity.subsections %}
+              <div class="accounting-report-table-row accounting-balance-sheet-subsection">
+                <div>
+                  <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
+                  {{ subsection.title.title|title }}
+                </div>
+              </div>
+              {% for account in subsection.accounts %}
+                <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
+                  <div>
+                    <span class="d-none d-md-inline">{{ account.account.code }}</span>
+                    {{ account.account.title|title }}
+                  </div>
+                  <div class="accounting-amount">{{ account.amount|accounting_format_amount }}</div>
+                </a>
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
+            <div>{{ A_("Total") }}</div>
+            <div class="accounting-amount">{{ report.owner_s_equity.total|accounting_format_amount }}</div>
+          </div>
+        {% endif %}
+
+        <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
+          <div>{{ A_("Total") }}</div>
+          <div class="accounting-amount">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_format_amount }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row d-none d-md-flex">
+      <div class="col-sm-6">
+        <div class="d-flex justify-content-between accounting-balance-sheet-total">
+          <div>{{ A_("Total") }}</div>
+          <div class="accounting-amount">{{ report.assets.total|accounting_format_amount }}</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <div class="d-flex justify-content-between accounting-balance-sheet-total">
+          <div>{{ A_("Total") }}</div>
+          <div class="accounting-amount">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_format_amount }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
+
+{% endblock %}
