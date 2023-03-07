@@ -141,17 +141,17 @@ class Account(db.Model):
     entries = db.relationship("JournalEntry", back_populates="account")
     """The journal entries."""
 
-    __CASH = "1111-001"
+    CASH = "1111-001"
     """The code of the cash account,"""
-    __RECEIVABLE = "1141-001"
+    RECEIVABLE = "1141-001"
     """The code of the receivable account,"""
-    __PAYABLE = "2141-001"
+    PAYABLE = "2141-001"
     """The code of the payable account,"""
-    __ACCUMULATED_CHANGE = "3351-001"
+    ACCUMULATED_CHANGE = "3351-001"
     """The code of the accumulated-change account,"""
-    __BROUGHT_FORWARD = "3352-001"
+    BROUGHT_FORWARD = "3352-001"
     """The code of the brought-forward account,"""
-    __NET_CHANGE = "3353-001"
+    NET_CHANGE = "3353-001"
     """The code of the net-change account,"""
 
     def __str__(self) -> str:
@@ -271,7 +271,7 @@ class Account(db.Model):
 
         :return: The cash account
         """
-        return cls.find_by_code(cls.__CASH)
+        return cls.find_by_code(cls.CASH)
 
     @classmethod
     def receivable(cls) -> t.Self:
@@ -279,7 +279,7 @@ class Account(db.Model):
 
         :return: The receivable account
         """
-        return cls.find_by_code(cls.__RECEIVABLE)
+        return cls.find_by_code(cls.RECEIVABLE)
 
     @classmethod
     def payable(cls) -> t.Self:
@@ -287,7 +287,7 @@ class Account(db.Model):
 
         :return: The payable account
         """
-        return cls.find_by_code(cls.__PAYABLE)
+        return cls.find_by_code(cls.PAYABLE)
 
     @classmethod
     def accumulated_change(cls) -> t.Self:
@@ -295,7 +295,7 @@ class Account(db.Model):
 
         :return: The accumulated-change account
         """
-        return cls.find_by_code(cls.__ACCUMULATED_CHANGE)
+        return cls.find_by_code(cls.ACCUMULATED_CHANGE)
 
     @classmethod
     def brought_forward(cls) -> t.Self:
@@ -303,7 +303,7 @@ class Account(db.Model):
 
         :return: The brought-forward account
         """
-        return cls.find_by_code(cls.__BROUGHT_FORWARD)
+        return cls.find_by_code(cls.BROUGHT_FORWARD)
 
     @classmethod
     def net_change(cls) -> t.Self:
@@ -311,7 +311,7 @@ class Account(db.Model):
 
         :return: The net-change account
         """
-        return cls.find_by_code(cls.__NET_CHANGE)
+        return cls.find_by_code(cls.NET_CHANGE)
 
     @property
     def is_modified(self) -> bool:
