@@ -272,8 +272,8 @@ class IncomeStatement:
         if self.__period.end is not None:
             conditions.append(Transaction.date <= self.__period.end)
         balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
+            (JournalEntry.is_debit, -JournalEntry.amount),
+            else_=JournalEntry.amount)).label("balance")
         select_balance: sa.Select \
             = sa.select(JournalEntry.account_id, balance_func)\
             .join(Transaction).join(Account)\
