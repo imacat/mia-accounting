@@ -188,8 +188,8 @@ First written: 2023/3/5
         <div class="accounting-report-table-footer">
           <div class="accounting-report-table-row">
             <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount">{{ entry.debit|accounting_default }}</div>
-            <div class="accounting-amount">{{ entry.credit|accounting_default }}</div>
+            <div class="accounting-amount">{{ entry.debit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount">{{ entry.credit|accounting_format_amount|accounting_default }}</div>
             <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
           </div>
         </div>
