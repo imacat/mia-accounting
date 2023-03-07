@@ -21,6 +21,7 @@ from flask import Blueprint, request, Response
 
 from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
+from .income_expense_account import IncomeExpensesAccount
 from .period import Period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet
@@ -108,10 +109,11 @@ def __get_ledger_list(currency: Currency, account: Account, period: Period) \
     return report.html()
 
 
-@bp.get("income-expenses/<currency:currency>/<account:account>",
+@bp.get("income-expenses/<currency:currency>/<ioAccount:account>",
         endpoint="income-expenses-default")
 @has_permission(can_view)
-def get_default_income_expenses_list(currency: Currency, account: Account) \
+def get_default_income_expenses_list(currency: Currency,
+                                     account: IncomeExpensesAccount) \
         -> str | Response:
     """Returns the income and expenses in the default period.
 
@@ -123,10 +125,11 @@ def get_default_income_expenses_list(currency: Currency, account: Account) \
 
 
 @bp.get(
-    "income-expenses/<currency:currency>/<account:account>/<period:period>",
+    "income-expenses/<currency:currency>/<ioAccount:account>/<period:period>",
     endpoint="income-expenses")
 @has_permission(can_view)
-def get_income_expenses_list(currency: Currency, account: Account,
+def get_income_expenses_list(currency: Currency,
+                             account: IncomeExpensesAccount,
                              period: Period) -> str | Response:
     """Returns the income and expenses.
 
@@ -138,7 +141,8 @@ def get_income_expenses_list(currency: Currency, account: Account,
     return __get_income_expenses_list(currency, account, period)
 
 
-def __get_income_expenses_list(currency: Currency, account: Account,
+def __get_income_expenses_list(currency: Currency,
+                               account: IncomeExpensesAccount,
                                period: Period) -> str | Response:
     """Returns the income and expenses.
 

@@ -17,9 +17,13 @@
 """The path converters for the report management.
 
 """
+import re
+
 from flask import abort
 from werkzeug.routing import BaseConverter
 
+from accounting.models import Account
+from .income_expense_account import IncomeExpensesAccount
 from .period import Period
 
 
@@ -45,3 +49,31 @@ class PeriodConverter(BaseConverter):
         :return: Its specification.
         """
         return value.spec
+
+
+class IncomeExpensesAccountConverter(BaseConverter):
+    """The supplier converter to convert the income and expenses pseudo account
+    code from and to the corresponding pseudo account in the routes."""
+
+    def to_python(self, value: str) -> IncomeExpensesAccount:
+        """Converts an account code to an account.
+
+        :param value: The account code.
+        :return: The corresponding account.
+        """
+        if value == IncomeExpensesAccount.CURRENT_AL_CODE:
+            return IncomeExpensesAccount.current_assets_and_liabilities()
+        if not re.match("^[12][12]", value):
+            abort(404)
+        account: Account | None = Account.find_by_code(value)
+        if account is None:
+            abort(404)
+        return IncomeExpensesAccount(account)
+
+    def to_url(self, value: IncomeExpensesAccount) -> str:
+        """Converts an account to account code.
+
+        :param value: The account.
+        :return: Its code.
+        """
+        return value.code

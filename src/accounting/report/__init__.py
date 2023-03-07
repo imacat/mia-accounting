@@ -27,8 +27,9 @@ def init_app(app: Flask, bp: Blueprint) -> None:
     :param bp: The blueprint of the accounting application.
     :return: None.
     """
-    from .converters import PeriodConverter
+    from .converters import PeriodConverter, IncomeExpensesAccountConverter
     app.url_map.converters["period"] = PeriodConverter
+    app.url_map.converters["ioAccount"] = IncomeExpensesAccountConverter
 
     from .views import bp as report_bp
     bp.register_blueprint(report_bp, url_prefix="/reports")

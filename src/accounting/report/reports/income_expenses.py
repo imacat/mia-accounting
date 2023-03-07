@@ -26,6 +26,7 @@ from flask import url_for, render_template, Response
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
 from .utils.csv_export import BaseCSVRow, csv_download
@@ -76,7 +77,8 @@ class Entry:
 class EntryCollector:
     """The income and expenses log entry collector."""
 
-    def __init__(self, currency: Currency, account: Account, period: Period):
+    def __init__(self, currency: Currency, account: IncomeExpensesAccount,
+                 period: Period):
         """Constructs the income and expenses log entry collector.
 
         :param currency: The currency.
@@ -85,7 +87,7 @@ class EntryCollector:
         """
         self.__currency: Currency = currency
         """The currency."""
-        self.__account: Account = account
+        self.__account: IncomeExpensesAccount = account
         """The account."""
         self.__period: Period = period
         """The period"""
@@ -111,9 +113,10 @@ class EntryCollector:
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount))
-        select: sa.Select = sa.Select(balance_func).join(Transaction)\
+        select: sa.Select = sa.Select(balance_func)\
+            .join(Transaction).join(Account)\
             .filter(JournalEntry.currency_code == self.__currency.code,
-                    JournalEntry.account_id == self.__account.id,
+                    self.__account_condition,
                     Transaction.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
@@ -137,22 +140,31 @@ class EntryCollector:
         """
         conditions: list[sa.BinaryExpression] \
             = [JournalEntry.currency_code == self.__currency.code,
-               JournalEntry.account_id == self.__account.id]
+               self.__account_condition]
         if self.__period.start is not None:
             conditions.append(Transaction.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Transaction.date <= self.__period.end)
         txn_with_account: sa.Select = sa.Select(Transaction.id).\
-            join(JournalEntry).filter(*conditions)
+            join(JournalEntry).join(Account).filter(*conditions)
 
         return [Entry(x)
-                for x in JournalEntry.query.join(Transaction)
+                for x in JournalEntry.query.join(Transaction).join(Account)
                 .filter(JournalEntry.transaction_id.in_(txn_with_account),
                         JournalEntry.currency_code == self.__currency.code,
-                        JournalEntry.account_id != self.__account.id)
+                        sa.not_(self.__account_condition))
                 .order_by(Transaction.date,
                           JournalEntry.is_debit,
                           JournalEntry.no)]
+
+    @property
+    def __account_condition(self) -> sa.BinaryExpression:
+        if self.__account.code == IncomeExpensesAccount.CURRENT_AL_CODE:
+            return sa.or_(Account.base_code.startswith("11"),
+                          Account.base_code.startswith("12"),
+                          Account.base_code.startswith("21"),
+                          Account.base_code.startswith("22"))
+        return Account.id == self.__account.id
 
     def __get_total_entry(self) -> Entry | None:
         """Composes the total entry.
@@ -237,7 +249,7 @@ class IncomeExpensesPageParams(PageParams):
     """The HTML parameters of the income and expenses log."""
 
     def __init__(self, currency: Currency,
-                 account: Account,
+                 account: IncomeExpensesAccount,
                  period: Period,
                  has_data: bool,
                  pagination: Pagination[Entry],
@@ -256,7 +268,7 @@ class IncomeExpensesPageParams(PageParams):
         """
         self.currency: Currency = currency
         """The currency."""
-        self.account: Account = account
+        self.account: IncomeExpensesAccount = account
         """The account."""
         self.period: Period = period
         """The period."""
@@ -288,9 +300,14 @@ class IncomeExpensesPageParams(PageParams):
 
         :return: The report chooser.
         """
+        if self.account.account is None:
+            return ReportChooser(ReportType.INCOME_EXPENSES,
+                                 currency=self.currency,
+                                 account=Account.cash(),
+                                 period=self.period)
         return ReportChooser(ReportType.INCOME_EXPENSES,
                              currency=self.currency,
-                             account=self.account,
+                             account=self.account.account,
                              period=self.period)
 
     @property
@@ -320,7 +337,7 @@ class IncomeExpensesPageParams(PageParams):
 
         :return: The account options.
         """
-        def get_url(account: Account):
+        def get_url(account: IncomeExpensesAccount):
             if self.period.is_default:
                 return url_for("accounting.report.income-expenses-default",
                                currency=self.currency, account=account)
@@ -328,6 +345,11 @@ class IncomeExpensesPageParams(PageParams):
                            currency=self.currency, account=account,
                            period=self.period)
 
+        current_al: IncomeExpensesAccount \
+            = IncomeExpensesAccount.current_assets_and_liabilities()
+        options: list[OptionLink] \
+            = [OptionLink(str(current_al), get_url(current_al),
+                          self.account.id == 0)]
         in_use: sa.Select = sa.Select(JournalEntry.account_id)\
             .join(Account)\
             .filter(JournalEntry.currency_code == self.currency.code,
@@ -336,9 +358,11 @@ class IncomeExpensesPageParams(PageParams):
                            Account.base_code.startswith("21"),
                            Account.base_code.startswith("22")))\
             .group_by(JournalEntry.account_id)
-        return [OptionLink(str(x), get_url(x), x.id == self.account.id)
-                for x in Account.query.filter(Account.id.in_(in_use))
-                .order_by(Account.base_code, Account.no).all()]
+        options.extend([OptionLink(str(x), get_url(IncomeExpensesAccount(x)),
+                                   x.id == self.account.id)
+                        for x in Account.query.filter(Account.id.in_(in_use))
+                       .order_by(Account.base_code, Account.no).all()])
+        return options
 
 
 def _populate_entries(entries: list[Entry]) -> None:
@@ -366,7 +390,8 @@ def _populate_entries(entries: list[Entry]) -> None:
 class IncomeExpenses:
     """The income and expenses log."""
 
-    def __init__(self, currency: Currency, account: Account, period: Period):
+    def __init__(self, currency: Currency, account: IncomeExpensesAccount,
+                 period: Period):
         """Constructs an income and expenses log.
 
         :param currency: The currency.
@@ -375,7 +400,7 @@ class IncomeExpenses:
         """
         self.__currency: Currency = currency
         """The currency."""
-        self.__account: Account = account
+        self.__account: IncomeExpensesAccount = account
         """The account."""
         self.__period: Period = period
         """The period."""

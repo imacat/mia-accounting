@@ -27,6 +27,7 @@ from datetime import date
 from flask import url_for
 
 from accounting.models import Currency, Account, Transaction
+from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
@@ -143,11 +144,11 @@ class LedgerPeriodChooser(PeriodChooser):
 class IncomeExpensesPeriodChooser(PeriodChooser):
     """The income and expenses period chooser."""
 
-    def __init__(self, currency: Currency, account: Account):
+    def __init__(self, currency: Currency, account: IncomeExpensesAccount):
         """Constructs the income and expenses period chooser."""
         self.currency: Currency = currency
         """The currency."""
-        self.account: Account = account
+        self.account: IncomeExpensesAccount = account
         """The account."""
         first: Transaction | None \
             = Transaction.query.order_by(Transaction.date).first()
