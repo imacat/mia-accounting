@@ -55,8 +55,8 @@ class ReportAccount:
         """The URL to the ledger of the account."""
 
 
-class TrialBalanceTotal:
-    """The total in the trial balance."""
+class Total:
+    """The totals."""
 
     def __init__(self, debit: Decimal, credit: Decimal):
         """Constructs the total in the trial balance.
@@ -104,7 +104,7 @@ class PageParams(BasePageParams):
     def __init__(self, currency: Currency,
                  period: Period,
                  accounts: list[ReportAccount],
-                 total: TrialBalanceTotal):
+                 total: Total):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
@@ -118,7 +118,7 @@ class PageParams(BasePageParams):
         """The period."""
         self.accounts: list[ReportAccount] = accounts
         """The accounts in the trial balance."""
-        self.total: TrialBalanceTotal = total
+        self.total: Total = total
         """The total of the trial balance."""
         self.period_chooser: TrialBalancePeriodChooser \
             = TrialBalancePeriodChooser(currency)
@@ -178,7 +178,7 @@ class TrialBalance(BaseReport):
         """The period."""
         self.__accounts: list[ReportAccount]
         """The accounts in the trial balance."""
-        self.__total: TrialBalanceTotal
+        self.__total: Total
         """The total of the trial balance."""
         self.__set_data()
 
@@ -224,7 +224,7 @@ class TrialBalance(BaseReport):
                                          amount=x.balance,
                                          url=get_url(accounts[x.id]))
                            for x in balances]
-        self.__total = TrialBalanceTotal(
+        self.__total = Total(
             sum([x.debit for x in self.__accounts if x.debit is not None]),
             sum([x.credit for x in self.__accounts if x.credit is not None]))
 
