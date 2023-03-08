@@ -24,7 +24,7 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", () => {
-    new PeriodChooser();
+    PeriodChooser.initialize();
 });
 
 /**
@@ -62,6 +62,20 @@ class PeriodChooser {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
         }
+    }
+
+    /**
+     * The period chooser.
+     * @type {PeriodChooser}
+     */
+    static #chooser;
+
+    /**
+     * Initializes the period chooser.
+     *
+     */
+    static initialize() {
+        this.#chooser = new PeriodChooser();
     }
 }
 
@@ -144,6 +158,12 @@ class TabPlane {
 class MonthTab extends TabPlane {
 
     /**
+     * The month chooser.
+     * @type {tempusDominus.TempusDominus}
+     */
+    #monthChooser
+
+    /**
      * Constructs a tab plane.
      *
      * @param chooser {PeriodChooser} the period chooser
@@ -152,7 +172,7 @@ class MonthTab extends TabPlane {
         super(chooser);
         const monthChooser = document.getElementById(this.prefix + "-chooser");
         let start = monthChooser.dataset.start;
-        new tempusDominus.TempusDominus(monthChooser, {
+        this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
             restrictions: {
                 minDate: start,
             },
