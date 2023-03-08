@@ -26,7 +26,7 @@ from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
 from flask import request
 from werkzeug.routing import RequestRedirect
 
-from accounting.locale import gettext, pgettext
+from accounting.locale import pgettext
 
 
 class Link:
