@@ -206,26 +206,25 @@ class Period:
 
         :return: The period description.
         """
-        cls: t.Type[t.Self] = self.__class__
         if self.start is None:
             if self.end is None:
                 return gettext("for all time")
             else:
                 if self.end != _month_end(self.end):
                     return gettext("until %(end)s",
-                                   end=cls.__format_date(self.end))
+                                   end=self.__format_date(self.end))
                 if self.end.month != 12:
                     return gettext("until %(end)s",
-                                   end=cls.__format_month(self.end))
+                                   end=self.__format_month(self.end))
                 return gettext("until %(end)s", end=str(self.end.year))
         else:
             if self.end is None:
                 if self.start.day != 1:
                     return gettext("since %(start)s",
-                                   start=cls.__format_date(self.start))
+                                   start=self.__format_date(self.start))
                 if self.start.month != 1:
                     return gettext("since %(start)s",
-                                   start=cls.__format_month(self.start))
+                                   start=self.__format_month(self.start))
                 return gettext("since %(start)s", start=str(self.start.year))
             else:
                 try:
