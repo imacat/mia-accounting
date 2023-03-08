@@ -40,12 +40,12 @@ from .utils.report_type import ReportType
 class ReportEntry:
     """An entry in the report."""
 
-    def __init__(self, entry: JournalEntry | None = None):
+    def __init__(self, entry: JournalEntry):
         """Constructs the entry in the report.
 
         :param entry: The journal entry.
         """
-        self.entry: JournalEntry | None = None
+        self.entry: JournalEntry = entry
         """The journal entry."""
         self.transaction: Transaction | None = None
         """The transaction."""
@@ -53,23 +53,16 @@ class ReportEntry:
         """Whether this is the total entry."""
         self.currency: Currency | None = None
         """The account."""
-        self.account: Account | None = None
+        self.account: Account = entry.account
         """The account."""
-        self.summary: str | None = None
+        self.summary: str | None = entry.summary
         """The summary."""
-        self.debit: Decimal | None = None
+        self.debit: Decimal | None = entry.amount if entry.is_debit else None
         """The debit amount."""
-        self.credit: Decimal | None = None
+        self.credit: Decimal | None = None if entry.is_debit else entry.amount
         """The credit amount."""
-        self.amount: Decimal | None = None
+        self.amount: Decimal = entry.amount
         """The amount."""
-        if entry is not None:
-            self.entry = entry
-            self.account = entry.account
-            self.summary = entry.summary
-            self.debit = entry.amount if entry.is_debit else None
-            self.credit = None if entry.is_debit else entry.amount
-            self.amount = entry.amount
 
 
 class CSVRow(BaseCSVRow):
