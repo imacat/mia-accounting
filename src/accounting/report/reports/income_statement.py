@@ -54,11 +54,11 @@ class IncomeStatementAccount:
         """The URL to the ledger of the account."""
 
 
-class IncomeStatementAccumulatedTotal:
-    """An accumulated total in the income statement."""
+class AccumulatedTotal:
+    """An accumulated total."""
 
     def __init__(self, title: str):
-        """Constructs an accumulated total in the income statement.
+        """Constructs an accumulated total.
 
         :param title: The title.
         """
@@ -68,11 +68,11 @@ class IncomeStatementAccumulatedTotal:
         """The amount of the account."""
 
 
-class IncomeStatementSubsection:
-    """A subsection in the income statement."""
+class Subsection:
+    """A subsection."""
 
     def __init__(self, title: BaseAccount):
-        """Constructs a subsection in the income statement.
+        """Constructs a subsection.
 
         :param title: The title account.
         """
@@ -90,21 +90,21 @@ class IncomeStatementSubsection:
         return sum([x.amount for x in self.accounts])
 
 
-class IncomeStatementSection:
-    """A section in the income statement."""
+class Section:
+    """A section."""
 
     def __init__(self, title: BaseAccount, accumulated_title: str):
-        """Constructs a section in the income statement.
+        """Constructs a section.
 
         :param title: The title account.
         :param accumulated_title: The title for the accumulated total.
         """
         self.title: BaseAccount = title
         """The title account."""
-        self.subsections: list[IncomeStatementSubsection] = []
+        self.subsections: list[Subsection] = []
         """The subsections in the section."""
-        self.accumulated: IncomeStatementAccumulatedTotal \
-            = IncomeStatementAccumulatedTotal(accumulated_title)
+        self.accumulated: AccumulatedTotal \
+            = AccumulatedTotal(accumulated_title)
 
     @property
     def total(self) -> Decimal:
@@ -144,7 +144,7 @@ class PageParams(BasePageParams):
     def __init__(self, currency: Currency,
                  period: Period,
                  has_data: bool,
-                 sections: list[IncomeStatementSection],):
+                 sections: list[Section], ):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
@@ -157,7 +157,7 @@ class PageParams(BasePageParams):
         """The period."""
         self.__has_data: bool = has_data
         """True if there is any data, or False otherwise."""
-        self.sections: list[IncomeStatementSection] = sections
+        self.sections: list[Section] = sections
         self.period_chooser: IncomeStatementPeriodChooser \
             = IncomeStatementPeriodChooser(currency)
         """The period chooser."""
@@ -216,7 +216,7 @@ class IncomeStatement(BaseReport):
         """The period."""
         self.__has_data: bool
         """True if there is any data, or False otherwise."""
-        self.__sections: list[IncomeStatementSection]
+        self.__sections: list[Section]
         """The sections."""
         self.__set_data()
 
@@ -241,11 +241,10 @@ class IncomeStatement(BaseReport):
                "8": gettext("after tax income"),
                "9": gettext("net income or loss for current period")}
 
-        sections: dict[str, IncomeStatementSection] \
-            = {x.code: IncomeStatementSection(x, total_titles[x.code])
-               for x in titles}
-        subsections: dict[str, IncomeStatementSubsection] \
-            = {x.code: IncomeStatementSubsection(x) for x in subtitles}
+        sections: dict[str, Section] \
+            = {x.code: Section(x, total_titles[x.code]) for x in titles}
+        subsections: dict[str, Subsection] \
+            = {x.code: Subsection(x) for x in subtitles}
         for subsection in subsections.values():
             sections[subsection.title.code[0]].subsections.append(subsection)
         for balance in balances:
