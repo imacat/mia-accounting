@@ -73,7 +73,7 @@ class PeriodChooser(ABC):
         """Whether there is data in last year."""
         self.has_yesterday: bool = False
         """Whether there is data in yesterday."""
-        self.available_years: t.Iterator[int] = []
+        self.available_years: list[int] = []
         """The available years."""
 
         if self.has_data is not None:
@@ -81,7 +81,6 @@ class PeriodChooser(ABC):
             self.has_last_month = start < date(today.year, today.month, 1)
             self.has_last_year = start.year < today.year
             self.has_yesterday = start < today
-            self.available_years: t.Iterator[int] = []
             if start.year < today.year - 1:
                 self.available_years \
                     = reversed(range(start.year, today.year - 1))
