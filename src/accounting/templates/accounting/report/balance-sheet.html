@@ -51,9 +51,7 @@ First written: 2023/3/7
   {% endwith %}
 </div>
 
-{% with period = report.period, period_chooser = report.period_chooser %}
-  {% include "accounting/report/include/period-chooser.html" %}
-{% endwith %}
+{% include "accounting/report/include/period-chooser.html" %}
 
 {% include "accounting/report/include/search-modal.html" %}
 
