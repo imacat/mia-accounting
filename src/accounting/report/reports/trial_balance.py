@@ -35,11 +35,11 @@ from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
 
-class TrialBalanceAccount:
-    """An account in the trial balance."""
+class ReportAccount:
+    """An account in the report."""
 
     def __init__(self, account: Account, amount: Decimal, url: str):
-        """Constructs an account in the trial balance.
+        """Constructs an account in the report.
 
         :param account: The account.
         :param amount: The amount.
@@ -103,7 +103,7 @@ class PageParams(BasePageParams):
 
     def __init__(self, currency: Currency,
                  period: Period,
-                 accounts: list[TrialBalanceAccount],
+                 accounts: list[ReportAccount],
                  total: TrialBalanceTotal):
         """Constructs the HTML page parameters.
 
@@ -116,7 +116,7 @@ class PageParams(BasePageParams):
         """The currency."""
         self.period: Period = period
         """The period."""
-        self.accounts: list[TrialBalanceAccount] = accounts
+        self.accounts: list[ReportAccount] = accounts
         """The accounts in the trial balance."""
         self.total: TrialBalanceTotal = total
         """The total of the trial balance."""
@@ -176,7 +176,7 @@ class TrialBalance(BaseReport):
         """The currency."""
         self.__period: Period = period
         """The period."""
-        self.__accounts: list[TrialBalanceAccount]
+        self.__accounts: list[ReportAccount]
         """The accounts in the trial balance."""
         self.__total: TrialBalanceTotal
         """The total of the trial balance."""
@@ -220,9 +220,9 @@ class TrialBalance(BaseReport):
                            currency=self.__currency, account=account,
                            period=self.__period)
 
-        self.__accounts = [TrialBalanceAccount(account=accounts[x.id],
-                                               amount=x.balance,
-                                               url=get_url(accounts[x.id]))
+        self.__accounts = [ReportAccount(account=accounts[x.id],
+                                         amount=x.balance,
+                                         url=get_url(accounts[x.id]))
                            for x in balances]
         self.__total = TrialBalanceTotal(
             sum([x.debit for x in self.__accounts if x.debit is not None]),

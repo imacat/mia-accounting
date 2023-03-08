@@ -36,11 +36,11 @@ from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
 
-class BalanceSheetAccount:
-    """An account in the balance sheet."""
+class ReportAccount:
+    """An account in the report."""
 
     def __init__(self, account: Account, amount: Decimal, url: str):
-        """Constructs an account in the balance sheet.
+        """Constructs an account in the report.
 
         :param account: The account.
         :param amount: The amount.
@@ -64,7 +64,7 @@ class Subsection:
         """
         self.title: BaseAccount = title
         """The title account."""
-        self.accounts: list[BalanceSheetAccount] = []
+        self.accounts: list[ReportAccount] = []
         """The accounts in the subsection."""
 
     @property
@@ -111,10 +111,10 @@ class AccountCollector:
         """The currency."""
         self.__period: Period = period
         """The period."""
-        self.accounts: list[BalanceSheetAccount] = self.__query_balances()
+        self.accounts: list[ReportAccount] = self.__query_balances()
         """The balance sheet accounts."""
 
-    def __query_balances(self) -> list[BalanceSheetAccount]:
+    def __query_balances(self) -> list[ReportAccount]:
         """Queries and returns the balances.
 
         :return: The balances.
@@ -158,10 +158,10 @@ class AccountCollector:
                            currency=self.__currency, account=account,
                            period=self.__period)
 
-        self.accounts: list[BalanceSheetAccount] \
-            = [BalanceSheetAccount(account=account_by_id[x.id],
-                                   amount=x.balance,
-                                   url=get_url(account_by_id[x.id]))
+        self.accounts: list[ReportAccount] \
+            = [ReportAccount(account=account_by_id[x.id],
+                             amount=x.balance,
+                             url=get_url(account_by_id[x.id]))
                for x in account_balances]
         self.__add_accumulated()
         self.__add_current_period()
@@ -240,10 +240,10 @@ class AccountCollector:
         :return: None.
         """
         # There is an existing balance.
-        account_balance_by_code: dict[str, BalanceSheetAccount] \
+        account_balance_by_code: dict[str, ReportAccount] \
             = {x.account.code: x for x in self.accounts}
         if code in account_balance_by_code:
-            balance: BalanceSheetAccount = account_balance_by_code[code]
+            balance: ReportAccount = account_balance_by_code[code]
             balance.url = url
             if amount is not None:
                 balance.amount = balance.amount + amount
@@ -253,9 +253,9 @@ class AccountCollector:
             return
         account_by_code: dict[str, Account] \
             = {x.code: x for x in self.__all_accounts}
-        self.accounts.append(BalanceSheetAccount(account=account_by_code[code],
-                                                 amount=amount,
-                                                 url=url))
+        self.accounts.append(ReportAccount(account=account_by_code[code],
+                                           amount=amount,
+                                           url=url))
 
 
 class CSVHalfRow:
@@ -399,7 +399,7 @@ class BalanceSheet(BaseReport):
 
         :return: None.
         """
-        balances: list[BalanceSheetAccount] = AccountCollector(
+        balances: list[ReportAccount] = AccountCollector(
             self.__currency, self.__period).accounts
 
         titles: list[BaseAccount] = BaseAccount.query\

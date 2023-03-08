@@ -36,11 +36,11 @@ from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
 
-class IncomeStatementAccount:
-    """An account in the income statement."""
+class ReportAccount:
+    """An account in the report."""
 
     def __init__(self, account: Account, amount: Decimal, url: str):
-        """Constructs an account in the income statement.
+        """Constructs an account in the report.
 
         :param account: The account.
         :param amount: The amount.
@@ -78,7 +78,7 @@ class Subsection:
         """
         self.title: BaseAccount = title
         """The title account."""
-        self.accounts: list[IncomeStatementAccount] = []
+        self.accounts: list[ReportAccount] = []
         """The accounts in the subsection."""
 
     @property
@@ -225,7 +225,7 @@ class IncomeStatement(BaseReport):
 
         :return: None.
         """
-        balances: list[IncomeStatementAccount] = self.__query_balances()
+        balances: list[ReportAccount] = self.__query_balances()
 
         titles: list[BaseAccount] = BaseAccount.query\
             .filter(BaseAccount.code.in_({"4", "5", "6", "7", "8", "9"})).all()
@@ -257,7 +257,7 @@ class IncomeStatement(BaseReport):
             total = total + section.total
             section.accumulated.amount = total
 
-    def __query_balances(self) -> list[IncomeStatementAccount]:
+    def __query_balances(self) -> list[ReportAccount]:
         """Queries and returns the balances.
 
         :return: The balances.
@@ -298,9 +298,9 @@ class IncomeStatement(BaseReport):
                            currency=self.__currency, account=account,
                            period=self.__period)
 
-        return [IncomeStatementAccount(account=accounts[x.account_id],
-                                       amount=x.balance,
-                                       url=get_url(accounts[x.account_id]))
+        return [ReportAccount(account=accounts[x.account_id],
+                              amount=x.balance,
+                              url=get_url(accounts[x.account_id]))
                 for x in balances]
 
     def csv(self) -> Response:
