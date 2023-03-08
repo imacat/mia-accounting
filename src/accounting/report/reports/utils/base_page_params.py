@@ -22,9 +22,13 @@ from abc import ABC, abstractmethod
 from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
     urlunparse
 
+import sqlalchemy as sa
 from flask import request
 
+from accounting import db
+from accounting.models import Currency, JournalEntry
 from accounting.utils.txn_types import TransactionType
+from .option_link import OptionLink
 from .report_chooser import ReportChooser
 
 
@@ -66,3 +70,19 @@ class BasePageParams(ABC):
         parts: list[str] = list(uri_p)
         parts[4] = urlencode(params)
         return urlunparse(parts)
+
+    @staticmethod
+    def _get_currency_options(get_url: t.Callable[[Currency], str],
+                              active_currency: Currency) -> list[OptionLink]:
+        """Returns the currency options.
+
+        :param get_url: The callback to return the URL of a currency.
+        :param active_currency: The active currency.
+        :return: The currency options.
+        """
+        in_use: set[str] = set(db.session.scalars(
+            sa.select(JournalEntry.currency_code)
+            .group_by(JournalEntry.currency_code)).all())
+        return [OptionLink(str(x), get_url(x), x.code == active_currency.code)
+                for x in Currency.query.filter(Currency.code.in_(in_use))
+                .order_by(Currency.code).all()]

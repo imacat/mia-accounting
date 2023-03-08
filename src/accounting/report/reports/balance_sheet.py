@@ -362,12 +362,7 @@ class PageParams(BasePageParams):
             return url_for("accounting.report.balance-sheet",
                            currency=currency, period=self.period)
 
-        in_use: set[str] = set(db.session.scalars(
-            sa.select(JournalEntry.currency_code)
-            .group_by(JournalEntry.currency_code)).all())
-        return [OptionLink(str(x), get_url(x), x.code == self.currency.code)
-                for x in Currency.query.filter(Currency.code.in_(in_use))
-                .order_by(Currency.code).all()]
+        return self._get_currency_options(get_url, self.currency)
 
 
 class BalanceSheet(BaseReport):
