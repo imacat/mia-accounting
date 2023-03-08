@@ -202,7 +202,7 @@ class EntryCollector:
 
 
 class CSVRow(BaseCSVRow):
-    """A row in the CSV income and expenses log."""
+    """A row in the CSV."""
 
     def __init__(self, txn_date: date | str | None,
                  account: str | None,
@@ -211,7 +211,7 @@ class CSVRow(BaseCSVRow):
                  expense: str | Decimal | None,
                  balance: str | Decimal | None,
                  note: str | None):
-        """Constructs a row in the CSV income and expenses log.
+        """Constructs a row in the CSV.
 
         :param txn_date: The transaction date.
         :param account: The account.

@@ -71,12 +71,12 @@ class TrialBalanceTotal:
 
 
 class CSVRow(BaseCSVRow):
-    """A row in the CSV trial balance."""
+    """A row in the CSV."""
 
     def __init__(self, text: str | None,
                  debit: str | Decimal | None,
                  credit: str | Decimal | None):
-        """Constructs a row in the CSV trial balance.
+        """Constructs a row in the CSV.
 
         :param text: The text.
         :param debit: The debit amount.

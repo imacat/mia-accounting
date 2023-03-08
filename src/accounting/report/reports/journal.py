@@ -71,7 +71,7 @@ class Entry:
 
 
 class CSVRow(BaseCSVRow):
-    """A row in the CSV journal."""
+    """A row in the CSV."""
 
     def __init__(self, txn_date: str | date,
                  currency: str,
@@ -80,7 +80,7 @@ class CSVRow(BaseCSVRow):
                  debit: str | Decimal | None,
                  credit: str | Decimal | None,
                  note: str | None):
-        """Constructs a row in the CSV journal.
+        """Constructs a row in the CSV.
 
         :param txn_date: The transaction date.
         :param summary: The summary.

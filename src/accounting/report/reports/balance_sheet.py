@@ -259,10 +259,10 @@ class AccountCollector:
 
 
 class CSVHalfRow:
-    """A half row in the CSV balance sheet."""
+    """A half row in the CSV."""
 
     def __init__(self, title: str | None, amount: Decimal | None):
-        """The constructs a half row in the CSV balance sheet.
+        """The constructs a half row in the CSV.
 
         :param title: The title.
         :param amount: The amount.
@@ -274,10 +274,10 @@ class CSVHalfRow:
 
 
 class CSVRow(BaseCSVRow):
-    """A row in the CSV balance sheet."""
+    """A row in the CSV."""
 
     def __init__(self):
-        """Constructs a row in the CSV balance sheet."""
+        """Constructs a row in the CSV."""
         self.asset_title: str | None = None
         """The title of the asset."""
         self.asset_amount: Decimal | None = None

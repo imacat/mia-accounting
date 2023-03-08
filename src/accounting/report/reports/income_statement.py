@@ -116,10 +116,10 @@ class IncomeStatementSection:
 
 
 class CSVRow(BaseCSVRow):
-    """A row in the CSV income statement."""
+    """A row in the CSV."""
 
     def __init__(self, text: str | None, amount: str | Decimal | None):
-        """Constructs a row in the CSV income statement.
+        """Constructs a row in the CSV.
 
         :param text: The text.
         :param amount: The amount.
