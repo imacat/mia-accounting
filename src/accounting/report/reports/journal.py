@@ -173,6 +173,24 @@ def populate_entries(entries: list[ReportEntry]) -> None:
         entry.currency = currencies[entry.entry.currency_code]
 
 
+def get_csv_rows(entries: list[ReportEntry]) -> list[CSVRow]:
+    """Composes and returns the CSV rows from the report entries.
+
+    :param entries: The report entries.
+    :return: The CSV rows.
+    """
+    populate_entries(entries)
+    rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
+                                 gettext("Account"), gettext("Summary"),
+                                 gettext("Debit"), gettext("Credit"),
+                                 gettext("Note"))]
+    rows.extend([CSVRow(x.transaction.date, x.currency.code,
+                        str(x.account).title(), x.summary,
+                        x.debit, x.credit, x.transaction.note)
+                 for x in entries])
+    return rows
+
+
 class Journal(BaseReport):
     """The journal."""
 
@@ -208,23 +226,7 @@ class Journal(BaseReport):
         :return: The response of the report for download.
         """
         filename: str = f"journal-{period_spec(self.__period)}.csv"
-        return csv_download(filename, self.__get_csv_rows())
-
-    def __get_csv_rows(self) -> list[CSVRow]:
-        """Composes and returns the CSV rows.
-
-        :return: The CSV rows.
-        """
-        populate_entries(self.__entries)
-        rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
-                                     gettext("Account"), gettext("Summary"),
-                                     gettext("Debit"), gettext("Credit"),
-                                     gettext("Note"))]
-        rows.extend([CSVRow(x.transaction.date, x.currency.code,
-                            str(x.account).title(), x.summary,
-                            x.debit, x.credit, x.transaction.note)
-                     for x in self.__entries])
-        return rows
+        return csv_download(filename, get_csv_rows(self.__entries))
 
     def html(self) -> str:
         """Composes and returns the report as HTML.

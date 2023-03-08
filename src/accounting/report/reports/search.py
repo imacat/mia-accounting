@@ -28,7 +28,7 @@ from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
     Transaction, JournalEntry
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
-from .journal import ReportEntry, CSVRow, populate_entries
+from .journal import ReportEntry, populate_entries, get_csv_rows
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import csv_download
@@ -182,23 +182,7 @@ class Search(BaseReport):
         :return: The response of the report for download.
         """
         filename: str = "search-{q}.csv".format(q=request.args["q"])
-        return csv_download(filename, self.__get_csv_rows())
-
-    def __get_csv_rows(self) -> list[CSVRow]:
-        """Composes and returns the CSV rows.
-
-        :return: The CSV rows.
-        """
-        populate_entries(self.__entries)
-        rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
-                                     gettext("Account"), gettext("Summary"),
-                                     gettext("Debit"), gettext("Credit"),
-                                     gettext("Note"))]
-        rows.extend([CSVRow(x.transaction.date, x.currency.code,
-                            str(x.account).title(), x.summary,
-                            x.debit, x.credit, x.transaction.note)
-                     for x in self.__entries])
-        return rows
+        return csv_download(filename, get_csv_rows(self.__entries))
 
     def html(self) -> str:
         """Composes and returns the report as HTML.
