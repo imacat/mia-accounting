@@ -62,7 +62,7 @@ First written: 2023/3/8
         </li>
       {% endfor %}
       <li>
-        <span class="dropdown-item accounting-clickable" data-bs-toggle="modal" data-bs-target="#accounting-search-modal">
+        <span class="dropdown-item {% if report.report_chooser.is_search %} active {% endif %} accounting-clickable" data-bs-toggle="modal" data-bs-target="#accounting-search-modal">
           <i class="fa-solid fa-magnifying-glass"></i>
           {{ A_("Search") }}
         </span>

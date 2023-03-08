@@ -65,6 +65,8 @@ class ReportChooser:
         """The links to the reports."""
         self.current_report: str | LazyString = ""
         """The title of the current report."""
+        self.is_search: bool = active_report == ReportType.SEARCH
+        """Whether the current report is the search page."""
         self.__reports.append(self.__journal)
         self.__reports.append(self.__ledger)
         self.__reports.append(self.__income_expenses)
