@@ -1741,7 +1741,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         """
         from accounting.models import Transaction, TransactionCurrency
         txn_id: int = add_txn(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{txn_id}?as=income&next=%2F_next"
+        detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update?as=income"
         form_0: dict[str, str] = self.__get_update_form(txn_id)
         form_0 = {x: form_0[x] for x in form_0 if "-debit-" not in x}
@@ -1840,7 +1840,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         """
         from accounting.models import Transaction, TransactionCurrency
         txn_id: int = add_txn(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{txn_id}?as=expense&next=%2F_next"
+        detail_uri: str = f"{PREFIX}/{txn_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{txn_id}/update?as=expense"
         form_0: dict[str, str] = self.__get_update_form(txn_id)
         form_0 = {x: form_0[x] for x in form_0 if "-credit-" not in x}

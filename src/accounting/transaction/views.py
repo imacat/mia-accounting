@@ -158,12 +158,12 @@ def update_transaction(txn: Transaction) -> redirect:
         form.populate_obj(txn)
     if not form.is_modified:
         flash(lazy_gettext("The transaction was not modified."), "success")
-        return redirect(inherit_next(with_type(__get_detail_uri(txn))))
+        return redirect(inherit_next(__get_detail_uri(txn)))
     txn.updated_by_id = get_current_user_pk()
     txn.updated_at = sa.func.now()
     db.session.commit()
     flash(lazy_gettext("The transaction is updated successfully."), "success")
-    return redirect(inherit_next(with_type(__get_detail_uri(txn))))
+    return redirect(inherit_next(__get_detail_uri(txn)))
 
 
 @bp.post("/<transaction:txn>/delete", endpoint="delete")
