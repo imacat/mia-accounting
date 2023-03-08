@@ -24,14 +24,13 @@ import sqlalchemy as sa
 from flask import render_template, Response
 from sqlalchemy.orm import selectinload
 
-from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
+from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import JournalPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
@@ -55,9 +54,9 @@ class ReportEntry:
         """The account."""
         self.summary: str | None = entry.summary
         """The summary."""
-        self.debit: Decimal | None = entry.amount if entry.is_debit else None
+        self.debit: Decimal | None = entry.debit
         """The debit amount."""
-        self.credit: Decimal | None = None if entry.is_debit else entry.amount
+        self.credit: Decimal | None = entry.credit
         """The credit amount."""
         self.amount: Decimal = entry.amount
         """The amount."""
@@ -110,8 +109,8 @@ class PageParams(BasePageParams):
     """The HTML page parameters."""
 
     def __init__(self, period: Period,
-                 pagination: Pagination[ReportEntry],
-                 entries: list[ReportEntry]):
+                 pagination: Pagination[JournalEntry],
+                 entries: list[JournalEntry]):
         """Constructs the HTML page parameters.
 
         :param period: The period.
@@ -119,9 +118,9 @@ class PageParams(BasePageParams):
         """
         self.period: Period = period
         """The period."""
-        self.pagination: Pagination[ReportEntry] = pagination
+        self.pagination: Pagination[JournalEntry] = pagination
         """The pagination."""
-        self.entries: list[ReportEntry] = entries
+        self.entries: list[JournalEntry] = entries
         """The entries."""
         self.period_chooser: JournalPeriodChooser \
             = JournalPeriodChooser()
@@ -145,7 +144,7 @@ class PageParams(BasePageParams):
                              period=self.period)
 
 
-def get_csv_rows(entries: list[ReportEntry]) -> list[CSVRow]:
+def get_csv_rows(entries: list[JournalEntry]) -> list[CSVRow]:
     """Composes and returns the CSV rows from the report entries.
 
     :param entries: The report entries.
@@ -172,10 +171,10 @@ class Journal(BaseReport):
         """
         self.__period: Period = period
         """The period."""
-        self.__entries: list[ReportEntry] = self.__query_entries()
+        self.__entries: list[JournalEntry] = self.__query_entries()
         """The journal entries."""
 
-    def __query_entries(self) -> list[ReportEntry]:
+    def __query_entries(self) -> list[JournalEntry]:
         """Queries and returns the journal entries.
 
         :return: The journal entries.
@@ -185,14 +184,14 @@ class Journal(BaseReport):
             conditions.append(Transaction.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Transaction.date <= self.__period.end)
-        return [ReportEntry(x) for x in db.session
-                .query(JournalEntry).join(Transaction).filter(*conditions)
-                .order_by(Transaction.date,
-                          JournalEntry.is_debit.desc(),
-                          JournalEntry.no)
-                .options(selectinload(JournalEntry.account),
-                         selectinload(JournalEntry.currency),
-                         selectinload(JournalEntry.transaction)).all()]
+        return JournalEntry.query.join(Transaction)\
+            .filter(*conditions)\
+            .order_by(Transaction.date,
+                      JournalEntry.is_debit.desc(),
+                      JournalEntry.no)\
+            .options(selectinload(JournalEntry.account),
+                     selectinload(JournalEntry.currency),
+                     selectinload(JournalEntry.transaction)).all()
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -207,8 +206,8 @@ class Journal(BaseReport):
 
         :return: The report as HTML.
         """
-        pagination: Pagination[ReportEntry] \
-            = Pagination[ReportEntry](self.__entries)
+        pagination: Pagination[JournalEntry] \
+            = Pagination[JournalEntry](self.__entries)
         params: PageParams = PageParams(period=self.__period,
                                         pagination=pagination,
                                         entries=pagination.list)

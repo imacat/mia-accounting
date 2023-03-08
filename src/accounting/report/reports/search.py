@@ -29,7 +29,7 @@ from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
     Transaction, JournalEntry
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
-from .journal import ReportEntry, get_csv_rows
+from .journal import get_csv_rows
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import csv_download
@@ -42,10 +42,10 @@ class EntryCollector:
 
     def __init__(self):
         """Constructs the report entry collector."""
-        self.entries: list[ReportEntry] = self.__query_entries()
+        self.entries: list[JournalEntry] = self.__query_entries()
         """The report entries."""
 
-    def __query_entries(self) -> list[ReportEntry]:
+    def __query_entries(self) -> list[JournalEntry]:
         """Queries and returns the journal entries.
 
         :return: The journal entries.
@@ -68,10 +68,10 @@ class EntryCollector:
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return [ReportEntry(x) for x in JournalEntry.query.filter(*conditions)
-                .options(selectinload(JournalEntry.account),
-                         selectinload(JournalEntry.currency),
-                         selectinload(JournalEntry.transaction))]
+        return JournalEntry.query.filter(*conditions)\
+            .options(selectinload(JournalEntry.account),
+                     selectinload(JournalEntry.currency),
+                     selectinload(JournalEntry.transaction)).all()
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -144,15 +144,15 @@ class EntryCollector:
 class PageParams(BasePageParams):
     """The HTML page parameters."""
 
-    def __init__(self, pagination: Pagination[ReportEntry],
-                 entries: list[ReportEntry]):
+    def __init__(self, pagination: Pagination[JournalEntry],
+                 entries: list[JournalEntry]):
         """Constructs the HTML page parameters.
 
         :param entries: The search result entries.
         """
-        self.pagination: Pagination[ReportEntry] = pagination
+        self.pagination: Pagination[JournalEntry] = pagination
         """The pagination."""
-        self.entries: list[ReportEntry] = entries
+        self.entries: list[JournalEntry] = entries
         """The entries."""
 
     @property
@@ -177,7 +177,7 @@ class Search(BaseReport):
 
     def __init__(self):
         """Constructs a search."""
-        self.__entries: list[ReportEntry] = EntryCollector().entries
+        self.__entries: list[JournalEntry] = EntryCollector().entries
         """The journal entries."""
 
     def csv(self) -> Response:
@@ -193,8 +193,8 @@ class Search(BaseReport):
 
         :return: The report as HTML.
         """
-        pagination: Pagination[ReportEntry] \
-            = Pagination[ReportEntry](self.__entries)
+        pagination: Pagination[JournalEntry] \
+            = Pagination[JournalEntry](self.__entries)
         params: PageParams = PageParams(pagination=pagination,
                                         entries=pagination.list)
         return render_template("accounting/report/search.html",

@@ -640,3 +640,19 @@ class JournalEntry(db.Model):
         :return: The account code.
         """
         return self.account.code
+
+    @property
+    def debit(self) -> Decimal | None:
+        """Returns the debit amount.
+
+        :return: The debit amount, or None if this is not a debit entry.
+        """
+        return self.amount if self.is_debit else None
+
+    @property
+    def credit(self) -> Decimal | None:
+        """Returns the credit amount.
+
+        :return: The credit amount, or None if this is not a credit entry.
+        """
+        return None if self.is_debit else self.amount
