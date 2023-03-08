@@ -26,7 +26,7 @@ First written: 2023/3/7
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ _("Income Statement of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Income Statement of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -58,7 +58,7 @@ First written: 2023/3/7
 {% if report.has_data %}
   <div class="accounting-sheet">
     <div class="d-none d-sm-flex justify-content-center mb-3">
-      <h2 class="text-center">{{ _("Income Statement of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
+      <h2 class="text-center">{{ A_("Income Statement of %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
     </div>
 
     <div class="accounting-report-table accounting-income-statement-table">

@@ -26,7 +26,7 @@ First written: 2023/3/4
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ _("Journal %(period)s", period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Journal %(period)s", period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
