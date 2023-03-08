@@ -291,7 +291,6 @@ class PeriodDescription:
 
         :return: The description without the end day.
         """
-
         def get_start_desc() -> str:
             """Returns the description of the start day.
 
