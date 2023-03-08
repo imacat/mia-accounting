@@ -85,7 +85,8 @@ class ReportChooser:
             if self.__period.is_default \
             else url_for("accounting.report.journal", period=self.__period)
         return OptionLink(gettext("Journal"), url,
-                          self.__active_report == ReportType.JOURNAL)
+                          self.__active_report == ReportType.JOURNAL,
+                          fa_icon="fa-solid fa-book")
 
     @property
     def __ledger(self) -> OptionLink:
@@ -100,7 +101,8 @@ class ReportChooser:
                          currency=self.__currency, account=self.__account,
                          period=self.__period)
         return OptionLink(gettext("Ledger"), url,
-                          self.__active_report == ReportType.LEDGER)
+                          self.__active_report == ReportType.LEDGER,
+                          fa_icon="fa-solid fa-clipboard")
 
     @property
     def __income_expenses(self) -> OptionLink:
@@ -118,7 +120,8 @@ class ReportChooser:
                          currency=self.__currency, account=account,
                          period=self.__period)
         return OptionLink(gettext("Income and Expenses Log"), url,
-                          self.__active_report == ReportType.INCOME_EXPENSES)
+                          self.__active_report == ReportType.INCOME_EXPENSES,
+                          fa_icon="fa-solid fa-money-bill-wave")
 
     @property
     def __trial_balance(self) -> OptionLink:
@@ -132,7 +135,8 @@ class ReportChooser:
             else url_for("accounting.report.trial-balance",
                          currency=self.__currency, period=self.__period)
         return OptionLink(gettext("Trial Balance"), url,
-                          self.__active_report == ReportType.TRIAL_BALANCE)
+                          self.__active_report == ReportType.TRIAL_BALANCE,
+                          fa_icon="fa-solid fa-scale-unbalanced")
 
     @property
     def __income_statement(self) -> OptionLink:
@@ -146,7 +150,8 @@ class ReportChooser:
             else url_for("accounting.report.income-statement",
                          currency=self.__currency, period=self.__period)
         return OptionLink(gettext("Income Statement"), url,
-                          self.__active_report == ReportType.INCOME_STATEMENT)
+                          self.__active_report == ReportType.INCOME_STATEMENT,
+                          fa_icon="fa-solid fa-file-invoice-dollar")
 
     @property
     def __balance_sheet(self) -> OptionLink:
@@ -160,7 +165,8 @@ class ReportChooser:
             else url_for("accounting.report.balance-sheet",
                          currency=self.__currency, period=self.__period)
         return OptionLink(gettext("Balance Sheet"), url,
-                          self.__active_report == ReportType.BALANCE_SHEET)
+                          self.__active_report == ReportType.BALANCE_SHEET,
+                          fa_icon="fa-solid fa-scale-balanced")
 
     def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.

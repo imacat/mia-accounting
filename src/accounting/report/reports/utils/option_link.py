@@ -22,7 +22,8 @@
 class OptionLink:
     """An option link."""
 
-    def __init__(self, title: str, url: str, is_active: bool):
+    def __init__(self, title: str, url: str, is_active: bool,
+                 fa_icon: str | None = None):
         """Constructs an option link.
 
         :param title: The title.
@@ -32,3 +33,4 @@ class OptionLink:
         self.title: str = title
         self.url: str = url
         self.is_active: bool = is_active
+        self.fa_icon: str | None = fa_icon
