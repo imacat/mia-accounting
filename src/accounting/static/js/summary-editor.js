@@ -763,7 +763,7 @@ class GeneralTripTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:[*×]\d+)?(?:\([^)]+\))?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -956,7 +956,7 @@ class BusTripTab extends TagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:[*×]\d+)?(?:\([^)]+\))?$/);
+        const found = this.editor.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -1141,7 +1141,7 @@ class AnnotationTab extends TabPlane {
      * @override
      */
     updateSummary() {
-        const found = this.editor.summary.value.match(/^(.*?)(?:[*×]\d+)?(?:\([^)]+\))?$/);
+        const found = this.editor.summary.value.match(/^(.*?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found !== null) {
             this.editor.summary.value = found[1];
         }
@@ -1170,7 +1170,7 @@ class AnnotationTab extends TabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^(.*?)(?:[*×](\d+))?(?:\(([^)]+)\))?$/);
+        const found = this.editor.summary.value.match(/^(.*?)(?:[*×](\d+))?(?:\(([^()]+)\))?$/);
         this.editor.summary.value = found[1];
         if (found[2] === undefined || parseInt(found[2]) === 1) {
             this.editor.number.value = "";
