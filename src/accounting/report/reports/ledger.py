@@ -22,6 +22,7 @@ from decimal import Decimal
 
 import sqlalchemy as sa
 from flask import url_for, render_template, Response
+from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
@@ -69,9 +70,12 @@ class ReportEntry:
         """The note."""
         if entry is not None:
             self.entry = entry
+            self.transaction = entry.transaction
+            self.date = entry.transaction.date
             self.summary = entry.summary
             self.debit = entry.amount if entry.is_debit else None
             self.credit = None if entry.is_debit else entry.amount
+            self.note = entry.transaction.note
 
 
 class EntryCollector:
@@ -146,7 +150,8 @@ class EntryCollector:
                 .filter(*conditions)
                 .order_by(Transaction.date,
                           JournalEntry.is_debit.desc(),
-                          JournalEntry.no).all()]
+                          JournalEntry.no)
+                .options(selectinload(JournalEntry.transaction)).all()]
 
     def __get_total_entry(self) -> ReportEntry | None:
         """Composes the total entry.
@@ -321,23 +326,6 @@ class PageParams(BasePageParams):
                 .order_by(Account.base_code, Account.no).all()]
 
 
-def populate_entries(entries: list[ReportEntry]) -> None:
-    """Populates the report entries with relative data.
-
-    :param entries: The report entries.
-    :return: None.
-    """
-    transactions: dict[int, Transaction] \
-        = {x.id: x for x in Transaction.query.filter(
-           Transaction.id.in_({x.entry.transaction_id for x in entries
-                               if x.entry is not None}))}
-    for entry in entries:
-        if entry.entry is not None:
-            entry.transaction = transactions[entry.entry.transaction_id]
-            entry.date = entry.transaction.date
-            entry.note = entry.transaction.note
-
-
 class Ledger(BaseReport):
     """The ledger."""
 
@@ -378,7 +366,6 @@ class Ledger(BaseReport):
 
         :return: The CSV rows.
         """
-        populate_entries(self.__entries)
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Summary"),
                                      gettext("Debit"), gettext("Credit"),
                                      gettext("Balance"), gettext("Note"))]
@@ -413,7 +400,6 @@ class Ledger(BaseReport):
             = Pagination[ReportEntry](all_entries)
         page_entries: list[ReportEntry] = pagination.list
         has_data: bool = len(page_entries) > 0
-        populate_entries(page_entries)
         brought_forward: ReportEntry | None = None
         if len(page_entries) > 0 and page_entries[0].is_brought_forward:
             brought_forward = page_entries[0]
