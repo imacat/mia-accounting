@@ -20,6 +20,7 @@
 /* Author: imacat@mail.imacat.idv.tw (imacat)
  * First written: 2023/3/4
  */
+"use strict";
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", () => {

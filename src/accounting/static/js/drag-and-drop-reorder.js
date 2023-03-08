@@ -20,6 +20,7 @@
 /* Author: imacat@mail.imacat.idv.tw (imacat)
  * First written: 2023/2/3
  */
+"use strict";
 
 /**
  * Initializes the drag-and-drop reordering on a list.
