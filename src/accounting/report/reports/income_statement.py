@@ -234,7 +234,7 @@ class IncomeStatement(BaseReport):
                                           for x in balances})).all()
 
         total_titles: dict[str, str] \
-            = {"4": gettext("total revenue"),
+            = {"4": gettext("total operating revenue"),
                "5": gettext("gross income"),
                "6": gettext("operating income"),
                "7": gettext("before tax income"),
