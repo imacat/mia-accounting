@@ -65,10 +65,10 @@ def period_spec(period: Period) -> str:
     """
     start: str | None = __get_start_str(period.start)
     end: str | None = __get_end_str(period.end)
-    if start == end:
-        return start
     if period.start is None and period.end is None:
         return "all-time"
+    if start == end:
+        return start
     if period.start is None:
         return f"until-{end}"
     if period.end is None:
