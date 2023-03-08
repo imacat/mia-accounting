@@ -181,7 +181,6 @@ class Journal(BaseReport):
 
         :param period: The period.
         """
-        """The account."""
         self.__period: Period = period
         """The period."""
         self.__entries: list[ReportEntry] = self.__query_entries()

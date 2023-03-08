@@ -173,7 +173,6 @@ class Search(BaseReport):
 
     def __init__(self):
         """Constructs a search."""
-        """The account."""
         self.__entries: list[ReportEntry] = EntryCollector().entries
         """The journal entries."""
 
