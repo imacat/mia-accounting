@@ -52,7 +52,7 @@ class BaseAccount(db.Model):
 
         :return: The string representation of the base account.
         """
-        return F"{self.code} {self.title}"
+        return f"{self.code} {self.title}"
 
     @property
     def title(self) -> str:
@@ -153,7 +153,7 @@ class Account(db.Model):
 
         :return: The string representation of this account.
         """
-        return F"{self.base_code}-{self.no:03d} {self.title}"
+        return f"{self.base_code}-{self.no:03d} {self.title}"
 
     @property
     def code(self) -> str:
@@ -161,7 +161,7 @@ class Account(db.Model):
 
         :return: The code.
         """
-        return F"{self.base_code}-{self.no:03d}"
+        return f"{self.base_code}-{self.no:03d}"
 
     @property
     def title(self) -> str:
@@ -354,7 +354,7 @@ class Currency(db.Model):
 
         :return: The string representation of the currency.
         """
-        return F"{self.name} ({self.code})"
+        return f"{self.name} ({self.code})"
 
     @property
     def name(self) -> str:
