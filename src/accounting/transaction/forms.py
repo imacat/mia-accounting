@@ -46,6 +46,9 @@ MISSING_CURRENCY: LazyString = lazy_gettext("Please select the currency.")
 """The error message when the currency code is empty."""
 MISSING_ACCOUNT: LazyString = lazy_gettext("Please select the account.")
 """The error message when the account code is empty."""
+DATE_REQUIRED: DataRequired = DataRequired(
+    lazy_gettext("Please fill in the date."))
+"""The validator to check if the date is empty."""
 
 
 class NeedSomeCurrencies:
@@ -574,8 +577,7 @@ class IncomeCurrencyForm(CurrencyForm):
 
 class IncomeTransactionForm(TransactionForm):
     """The form to create or edit a cash income transaction."""
-    date = DateField(
-        validators=[DataRequired(lazy_gettext("Please fill in the date."))])
+    date = DateField(validators=[DATE_REQUIRED])
     """The date."""
     currencies = FieldList(FormField(IncomeCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
@@ -648,8 +650,7 @@ class ExpenseCurrencyForm(CurrencyForm):
 
 class ExpenseTransactionForm(TransactionForm):
     """The form to create or edit a cash expense transaction."""
-    date = DateField(
-        validators=[DataRequired(lazy_gettext("Please fill in the date."))])
+    date = DateField(validators=[DATE_REQUIRED])
     """The date."""
     currencies = FieldList(FormField(ExpenseCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
@@ -758,8 +759,7 @@ class TransferCurrencyForm(CurrencyForm):
 
 class TransferTransactionForm(TransactionForm):
     """The form to create or edit a transfer transaction."""
-    date = DateField(
-        validators=[DataRequired(lazy_gettext("Please fill in the date."))])
+    date = DateField(validators=[DATE_REQUIRED])
     """The date."""
     currencies = FieldList(FormField(TransferCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
