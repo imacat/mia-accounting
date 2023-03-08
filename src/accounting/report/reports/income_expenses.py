@@ -280,7 +280,7 @@ class PageParams(BasePageParams):
         self.brought_forward: ReportEntry | None = brought_forward
         """The brought-forward entry."""
         self.entries: list[ReportEntry] = entries
-        """The entries."""
+        """The report entries."""
         self.total: ReportEntry | None = total
         """The total entry."""
         self.period_chooser: IncomeExpensesPeriodChooser \
@@ -410,7 +410,7 @@ class IncomeExpenses(BaseReport):
         self.__brought_forward: ReportEntry | None = collector.brought_forward
         """The brought-forward entry."""
         self.__entries: list[ReportEntry] = collector.entries
-        """The log entries."""
+        """The report entries."""
         self.__total: ReportEntry | None = collector.total
         """The total entry."""
 

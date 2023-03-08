@@ -241,7 +241,7 @@ class PageParams(BasePageParams):
         :param period: The period.
         :param has_data: True if there is any data, or False otherwise.
         :param brought_forward: The brought-forward entry.
-        :param entries: The ledger entries.
+        :param entries: The report entries.
         :param total: The total entry.
         """
         self.currency: Currency = currency
@@ -364,7 +364,7 @@ class Ledger(BaseReport):
         self.__brought_forward: ReportEntry | None = collector.brought_forward
         """The brought-forward entry."""
         self.__entries: list[ReportEntry] = collector.entries
-        """The ledger entries."""
+        """The report entries."""
         self.__total: ReportEntry | None = collector.total
         """The total entry."""
 
