@@ -179,7 +179,7 @@ def delete_transaction(txn: Transaction) -> redirect:
     sort_transactions_in(txn.date, txn.id)
     db.session.commit()
     flash(lazy_gettext("The transaction is deleted successfully."), "success")
-    return redirect(or_next(with_type(url_for("accounting.transaction.list"))))
+    return redirect(or_next(url_for("accounting.transaction.list")))
 
 
 @bp.get("/dates/<date:txn_date>", endpoint="order")
