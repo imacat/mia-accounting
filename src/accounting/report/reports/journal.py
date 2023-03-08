@@ -49,8 +49,6 @@ class ReportEntry:
         """The journal entry."""
         self.transaction: Transaction | None = None
         """The transaction."""
-        self.is_total: bool = False
-        """Whether this is the total entry."""
         self.currency: Currency | None = None
         """The account."""
         self.account: Account = entry.account
