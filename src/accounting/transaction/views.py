@@ -199,7 +199,7 @@ def show_transaction_order(txn_date: date) -> str:
 
 @bp.post("/dates/<date:txn_date>", endpoint="sort")
 @has_permission(can_edit)
-def sort_accounts(txn_date: date) -> redirect:
+def sort_transactions(txn_date: date) -> redirect:
     """Reorders the transactions in a date.
 
     :param txn_date: The date.
@@ -210,10 +210,10 @@ def sort_accounts(txn_date: date) -> redirect:
     form.save_order()
     if not form.is_modified:
         flash(lazy_gettext("The order was not modified."), "success")
-        return redirect(or_next(url_for("accounting.account.list")))
+        return redirect(or_next(url_for("accounting.transaction.list")))
     db.session.commit()
     flash(lazy_gettext("The order is updated successfully."), "success")
-    return redirect(or_next(url_for("accounting.account.list")))
+    return redirect(or_next(url_for("accounting.transaction.list")))
 
 
 def __get_detail_uri(txn: Transaction) -> str:
