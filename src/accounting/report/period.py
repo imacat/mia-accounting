@@ -173,34 +173,43 @@ class PeriodSpecification:
 
         :return: The period specification.
         """
+        if self.__start is None and self.__end is None:
+            return "-"
+        if self.__end is None:
+            return self.__get_since_spec()
         if self.__start is None:
-            if self.__end is None:
-                return "-"
-            else:
-                if self.__end.day != _month_end(self.__end).day:
-                    return "-%04d-%02d-%02d" % (
-                        self.__end.year, self.__end.month, self.__end.day)
-                if self.__end.month != 12:
-                    return "-%04d-%02d" % (self.__end.year, self.__end.month)
-                return "-%04d" % self.__end.year
-        else:
-            if self.__end is None:
-                if self.__start.day != 1:
-                    return "%04d-%02d-%02d-" % (
-                        self.__start.year, self.__start.month, self.__start.day)
-                if self.__start.month != 1:
-                    return "%04d-%02d-" % (self.__start.year, self.__start.month)
-                return "%04d-" % self.__start.year
-            else:
-                try:
-                    return self.__get_year_spec()
-                except ValueError:
-                    pass
-                try:
-                    return self.__get_month_spec()
-                except ValueError:
-                    pass
-                return self.__get_day_spec()
+            return self.__get_until_spec()
+        try:
+            return self.__get_year_spec()
+        except ValueError:
+            pass
+        try:
+            return self.__get_month_spec()
+        except ValueError:
+            pass
+        return self.__get_day_spec()
+
+    def __get_since_spec(self) -> str:
+        """Returns the period specification without the end day.
+
+        :return: The period specification without the end day
+        """
+        if self.__start.month == 1 and self.__start.day == 1:
+            return self.__start.strftime("%Y-")
+        if self.__start.day == 1:
+            return self.__start.strftime("%Y-%m-")
+        return self.__start.strftime("%Y-%m-%d-")
+
+    def __get_until_spec(self) -> str:
+        """Returns the period specification without the start day.
+
+        :return: The period specification without the start day
+        """
+        if self.__end.month == 12 and self.__end.day == 31:
+            return self.__end.strftime("-%Y")
+        if (self.__end + datetime.timedelta(days=1)).day == 1:
+            return self.__end.strftime("-%Y-%m")
+        return self.__end.strftime("-%Y-%m-%d")
 
     def __get_year_spec(self) -> str:
         """Returns the period specification as a year range.
