@@ -22,6 +22,7 @@ from decimal import Decimal
 
 import sqlalchemy as sa
 from flask import url_for, render_template, Response
+from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
@@ -70,6 +71,7 @@ class ReportEntry:
         """The note."""
         if entry is not None:
             self.entry = entry
+            self.account = entry.account
             self.summary = entry.summary
             self.income = None if entry.is_debit else entry.amount
             self.expense = entry.amount if entry.is_debit else None
@@ -156,7 +158,8 @@ class EntryCollector:
                         sa.not_(self.__account_condition))
                 .order_by(Transaction.date,
                           JournalEntry.is_debit,
-                          JournalEntry.no)]
+                          JournalEntry.no)
+                .options(selectinload(JournalEntry.account))]
 
     @property
     def __account_condition(self) -> sa.BinaryExpression:
@@ -371,16 +374,11 @@ def populate_entries(entries: list[ReportEntry]) -> None:
         = {x.id: x for x in Transaction.query.filter(
            Transaction.id.in_({x.entry.transaction_id for x in entries
                                if x.entry is not None}))}
-    accounts: dict[int, Account] \
-        = {x.id: x for x in Account.query.filter(
-           Account.id.in_({x.entry.account_id for x in entries
-                           if x.entry is not None}))}
     for entry in entries:
         if entry.entry is not None:
             entry.transaction = transactions[entry.entry.transaction_id]
             entry.date = entry.transaction.date
             entry.note = entry.transaction.note
-            entry.account = accounts[entry.entry.account_id]
 
 
 class IncomeExpenses(BaseReport):
