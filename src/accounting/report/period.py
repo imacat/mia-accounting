@@ -340,9 +340,7 @@ class PeriodDescription:
         :return: The description as a day range.
         :raise ValueError: The period is a month or year range.
         """
-        start: str = "{year}/{month}/{day}".format(
-            year=self.__start.year, month=self.__start.month,
-            day=self.__start.day)
+        start: str = self.__format_day(self.__start)
         if self.__start == self.__end:
             return gettext("in %(period)s", period=start)
         if self.__start.year == self.__end.year \
@@ -373,6 +371,15 @@ class PeriodDescription:
         :return: The formatted month.
         """
         return f"{month.year}/{month.month}"
+
+    @staticmethod
+    def __format_day(day: datetime.date) -> str:
+        """Formats a day.
+
+        :param day: The day.
+        :return: The formatted day.
+        """
+        return f"{day.year}/{day.month}/{day.day}"
 
 
 class ThisMonth(Period):
