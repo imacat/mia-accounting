@@ -28,7 +28,7 @@ from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
     Transaction, JournalEntry
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
-from .journal import Entry, CSVRow, populate_entries
+from .journal import ReportEntry, CSVRow, populate_entries
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import csv_download
@@ -39,15 +39,15 @@ from .utils.report_type import ReportType
 class PageParams(BasePageParams):
     """The HTML page parameters."""
 
-    def __init__(self, pagination: Pagination[Entry],
-                 entries: list[Entry]):
+    def __init__(self, pagination: Pagination[ReportEntry],
+                 entries: list[ReportEntry]):
         """Constructs the HTML page parameters.
 
         :param entries: The search result entries.
         """
-        self.pagination: Pagination[Entry] = pagination
+        self.pagination: Pagination[ReportEntry] = pagination
         """The pagination."""
-        self.entries: list[Entry] = entries
+        self.entries: list[ReportEntry] = entries
         """The entries."""
 
     @property
@@ -73,10 +73,10 @@ class Search(BaseReport):
     def __init__(self):
         """Constructs a search."""
         """The account."""
-        self.__entries: list[Entry] = self.__query_entries()
+        self.__entries: list[ReportEntry] = self.__query_entries()
         """The journal entries."""
 
-    def __query_entries(self) -> list[Entry]:
+    def __query_entries(self) -> list[ReportEntry]:
         """Queries and returns the journal entries.
 
         :return: The journal entries.
@@ -99,7 +99,7 @@ class Search(BaseReport):
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return [Entry(x) for x in JournalEntry.query.filter(*conditions)]
+        return [ReportEntry(x) for x in JournalEntry.query.filter(*conditions)]
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -197,8 +197,9 @@ class Search(BaseReport):
 
         :return: The report as HTML.
         """
-        pagination: Pagination[Entry] = Pagination[Entry](self.__entries)
-        page_entries: list[Entry] = pagination.list
+        pagination: Pagination[ReportEntry] \
+            = Pagination[ReportEntry](self.__entries)
+        page_entries: list[ReportEntry] = pagination.list
         populate_entries(page_entries)
         params: PageParams = PageParams(pagination=pagination,
                                         entries=page_entries)

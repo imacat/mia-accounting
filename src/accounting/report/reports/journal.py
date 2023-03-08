@@ -36,11 +36,11 @@ from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
 
-class Entry:
-    """An entry in the journal."""
+class ReportEntry:
+    """An entry in the report."""
 
     def __init__(self, entry: JournalEntry | None = None):
-        """Constructs the entry in the journal.
+        """Constructs the entry in the report.
 
         :param entry: The journal entry.
         """
@@ -117,8 +117,8 @@ class PageParams(BasePageParams):
     """The HTML page parameters."""
 
     def __init__(self, period: Period,
-                 pagination: Pagination[Entry],
-                 entries: list[Entry]):
+                 pagination: Pagination[ReportEntry],
+                 entries: list[ReportEntry]):
         """Constructs the HTML page parameters.
 
         :param period: The period.
@@ -126,9 +126,9 @@ class PageParams(BasePageParams):
         """
         self.period: Period = period
         """The period."""
-        self.pagination: Pagination[Entry] = pagination
+        self.pagination: Pagination[ReportEntry] = pagination
         """The pagination."""
-        self.entries: list[Entry] = entries
+        self.entries: list[ReportEntry] = entries
         """The entries."""
         self.period_chooser: JournalPeriodChooser \
             = JournalPeriodChooser()
@@ -152,7 +152,7 @@ class PageParams(BasePageParams):
                              period=self.period)
 
 
-def populate_entries(entries: list[Entry]) -> None:
+def populate_entries(entries: list[ReportEntry]) -> None:
     """Populates the report entries with relative data.
 
     :param entries: The report entries.
@@ -184,10 +184,10 @@ class Journal(BaseReport):
         """The account."""
         self.__period: Period = period
         """The period."""
-        self.__entries: list[Entry] = self.__query_entries()
+        self.__entries: list[ReportEntry] = self.__query_entries()
         """The journal entries."""
 
-    def __query_entries(self) -> list[Entry]:
+    def __query_entries(self) -> list[ReportEntry]:
         """Queries and returns the journal entries.
 
         :return: The journal entries.
@@ -197,7 +197,7 @@ class Journal(BaseReport):
             conditions.append(Transaction.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Transaction.date <= self.__period.end)
-        return [Entry(x) for x in db.session
+        return [ReportEntry(x) for x in db.session
                 .query(JournalEntry).join(Transaction).filter(*conditions)
                 .order_by(Transaction.date,
                           JournalEntry.is_debit.desc(),
@@ -232,8 +232,9 @@ class Journal(BaseReport):
 
         :return: The report as HTML.
         """
-        pagination: Pagination[Entry] = Pagination[Entry](self.__entries)
-        page_entries: list[Entry] = pagination.list
+        pagination: Pagination[ReportEntry] \
+            = Pagination[ReportEntry](self.__entries)
+        page_entries: list[ReportEntry] = pagination.list
         populate_entries(page_entries)
         params: PageParams = PageParams(period=self.__period,
                                         pagination=pagination,

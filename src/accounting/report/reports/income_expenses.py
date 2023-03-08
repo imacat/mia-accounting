@@ -38,11 +38,11 @@ from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
 
-class Entry:
-    """An entry in the income and expenses log."""
+class ReportEntry:
+    """An entry in the report."""
 
     def __init__(self, entry: JournalEntry | None = None):
-        """Constructs the entry in the income and expenses log.
+        """Constructs the entry in the report.
 
         :param entry: The journal entry.
         """
@@ -92,18 +92,18 @@ class EntryCollector:
         """The account."""
         self.__period: Period = period
         """The period"""
-        self.brought_forward: Entry | None
+        self.brought_forward: ReportEntry | None
         """The brought-forward entry."""
-        self.entries: list[Entry]
+        self.entries: list[ReportEntry]
         """The log entries."""
-        self.total: Entry | None
+        self.total: ReportEntry | None
         """The total entry."""
         self.brought_forward = self.__get_brought_forward_entry()
         self.entries = self.__query_entries()
         self.total = self.__get_total_entry()
         self.__populate_balance()
 
-    def __get_brought_forward_entry(self) -> Entry | None:
+    def __get_brought_forward_entry(self) -> ReportEntry | None:
         """Queries, composes and returns the brought-forward entry.
 
         :return: The brought-forward entry, or None if the period starts from
@@ -122,7 +122,7 @@ class EntryCollector:
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
-        entry: Entry = Entry()
+        entry: ReportEntry = ReportEntry()
         entry.is_brought_forward = True
         entry.date = self.__period.start
         entry.account = Account.accumulated_change()
@@ -134,7 +134,7 @@ class EntryCollector:
         entry.balance = balance
         return entry
 
-    def __query_entries(self) -> list[Entry]:
+    def __query_entries(self) -> list[ReportEntry]:
         """Queries and returns the log entries.
 
         :return: The log entries.
@@ -149,7 +149,7 @@ class EntryCollector:
         txn_with_account: sa.Select = sa.Select(Transaction.id).\
             join(JournalEntry).join(Account).filter(*conditions)
 
-        return [Entry(x)
+        return [ReportEntry(x)
                 for x in JournalEntry.query.join(Transaction).join(Account)
                 .filter(JournalEntry.transaction_id.in_(txn_with_account),
                         JournalEntry.currency_code == self.__currency.code,
@@ -167,14 +167,14 @@ class EntryCollector:
                           Account.base_code.startswith("22"))
         return Account.id == self.__account.id
 
-    def __get_total_entry(self) -> Entry | None:
+    def __get_total_entry(self) -> ReportEntry | None:
         """Composes the total entry.
 
         :return: The total entry, or None if there is no data.
         """
         if self.brought_forward is None and len(self.entries) == 0:
             return None
-        entry: Entry = Entry()
+        entry: ReportEntry = ReportEntry()
         entry.is_total = True
         entry.summary = gettext("Total")
         entry.income = sum([x.income for x in self.entries
@@ -253,10 +253,10 @@ class PageParams(BasePageParams):
                  account: IncomeExpensesAccount,
                  period: Period,
                  has_data: bool,
-                 pagination: Pagination[Entry],
-                 brought_forward: Entry | None,
-                 entries: list[Entry],
-                 total: Entry | None):
+                 pagination: Pagination[ReportEntry],
+                 brought_forward: ReportEntry | None,
+                 entries: list[ReportEntry],
+                 total: ReportEntry | None):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
@@ -275,13 +275,13 @@ class PageParams(BasePageParams):
         """The period."""
         self.__has_data: bool = has_data
         """True if there is any data, or False otherwise."""
-        self.pagination: Pagination[Entry] = pagination
+        self.pagination: Pagination[ReportEntry] = pagination
         """The pagination."""
-        self.brought_forward: Entry | None = brought_forward
+        self.brought_forward: ReportEntry | None = brought_forward
         """The brought-forward entry."""
-        self.entries: list[Entry] = entries
+        self.entries: list[ReportEntry] = entries
         """The entries."""
-        self.total: Entry | None = total
+        self.total: ReportEntry | None = total
         """The total entry."""
         self.period_chooser: IncomeExpensesPeriodChooser \
             = IncomeExpensesPeriodChooser(currency, account)
@@ -366,7 +366,7 @@ class PageParams(BasePageParams):
         return options
 
 
-def populate_entries(entries: list[Entry]) -> None:
+def populate_entries(entries: list[ReportEntry]) -> None:
     """Populates the report entries with relative data.
 
     :param entries: The report entries.
@@ -407,11 +407,11 @@ class IncomeExpenses(BaseReport):
         """The period."""
         collector: EntryCollector = EntryCollector(
             self.__currency, self.__account, self.__period)
-        self.__brought_forward: Entry | None = collector.brought_forward
+        self.__brought_forward: ReportEntry | None = collector.brought_forward
         """The brought-forward entry."""
-        self.__entries: list[Entry] = collector.entries
+        self.__entries: list[ReportEntry] = collector.entries
         """The log entries."""
-        self.__total: Entry | None = collector.total
+        self.__total: ReportEntry | None = collector.total
         """The total entry."""
 
     def csv(self) -> Response:
@@ -456,21 +456,22 @@ class IncomeExpenses(BaseReport):
 
         :return: The report as HTML.
         """
-        all_entries: list[Entry] = []
+        all_entries: list[ReportEntry] = []
         if self.__brought_forward is not None:
             all_entries.append(self.__brought_forward)
         all_entries.extend(self.__entries)
         if self.__total is not None:
             all_entries.append(self.__total)
-        pagination: Pagination[Entry] = Pagination[Entry](all_entries)
-        page_entries: list[Entry] = pagination.list
+        pagination: Pagination[ReportEntry] \
+            = Pagination[ReportEntry](all_entries)
+        page_entries: list[ReportEntry] = pagination.list
         has_data: bool = len(page_entries) > 0
         populate_entries(page_entries)
-        brought_forward: Entry | None = None
+        brought_forward: ReportEntry | None = None
         if len(page_entries) > 0 and page_entries[0].is_brought_forward:
             brought_forward = page_entries[0]
             page_entries = page_entries[1:]
-        total: Entry | None = None
+        total: ReportEntry | None = None
         if len(page_entries) > 0 and page_entries[-1].is_total:
             total = page_entries[-1]
             page_entries = page_entries[:-1]
