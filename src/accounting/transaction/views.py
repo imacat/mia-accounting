@@ -30,13 +30,11 @@ from accounting.locale import lazy_gettext
 from accounting.models import Transaction
 from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next, or_next
-from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
 from accounting.utils.txn_types import TransactionType
 from accounting.utils.user import get_current_user_pk
 from .forms import sort_transactions_in, TransactionReorderForm
 from .operators import TransactionOperator, TXN_TYPE_TO_OP, get_txn_op
-from .queries import get_transaction_query
 from .template_filters import with_type, to_transfer, format_amount_input, \
     text2html
 
@@ -47,20 +45,6 @@ bp.add_app_template_filter(to_transfer, "accounting_txn_to_transfer")
 bp.add_app_template_filter(format_amount_input,
                            "accounting_txn_format_amount_input")
 bp.add_app_template_filter(text2html, "accounting_txn_text2html")
-
-
-@bp.get("", endpoint="list")
-@has_permission(can_view)
-def list_transactions() -> str:
-    """Lists the transactions.
-
-    :return: The transaction list.
-    """
-    transactions: list[Transaction] = get_transaction_query()
-    pagination: Pagination = Pagination[Transaction](transactions)
-    return render_template("accounting/transaction/list.html",
-                           list=pagination.list, pagination=pagination,
-                           txn_types=TransactionType)
 
 
 @bp.get("/create/<transactionType:txn_type>", endpoint="create")

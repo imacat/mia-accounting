@@ -84,9 +84,6 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         update_form["csrf_token"] = csrf_token
         response: httpx.Response
 
-        response = client.get(PREFIX)
-        self.assertEqual(response.status_code, 403)
-
         response = client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 403)
 
@@ -119,9 +116,6 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         update_form["csrf_token"] = csrf_token
         response: httpx.Response
 
-        response = client.get(PREFIX)
-        self.assertEqual(response.status_code, 200)
-
         response = client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 200)
 
@@ -150,9 +144,6 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(txn_id)
         response: httpx.Response
-
-        response = self.client.get(PREFIX)
-        self.assertEqual(response.status_code, 200)
 
         response = self.client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 200)
@@ -645,9 +636,6 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         update_form["csrf_token"] = csrf_token
         response: httpx.Response
 
-        response = client.get(PREFIX)
-        self.assertEqual(response.status_code, 403)
-
         response = client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 403)
 
@@ -680,9 +668,6 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         update_form["csrf_token"] = csrf_token
         response: httpx.Response
 
-        response = client.get(PREFIX)
-        self.assertEqual(response.status_code, 200)
-
         response = client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 200)
 
@@ -711,9 +696,6 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(txn_id)
         response: httpx.Response
-
-        response = self.client.get(PREFIX)
-        self.assertEqual(response.status_code, 200)
 
         response = self.client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 200)
@@ -1213,9 +1195,6 @@ class TransferTransactionTestCase(unittest.TestCase):
         update_form["csrf_token"] = csrf_token
         response: httpx.Response
 
-        response = client.get(PREFIX)
-        self.assertEqual(response.status_code, 403)
-
         response = client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 403)
 
@@ -1248,9 +1227,6 @@ class TransferTransactionTestCase(unittest.TestCase):
         update_form["csrf_token"] = csrf_token
         response: httpx.Response
 
-        response = client.get(PREFIX)
-        self.assertEqual(response.status_code, 200)
-
         response = client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 200)
 
@@ -1279,9 +1255,6 @@ class TransferTransactionTestCase(unittest.TestCase):
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(txn_id)
         response: httpx.Response
-
-        response = self.client.get(PREFIX)
-        self.assertEqual(response.status_code, 200)
 
         response = self.client.get(f"{PREFIX}/{txn_id}")
         self.assertEqual(response.status_code, 200)
