@@ -49,7 +49,7 @@ class ReportEntry:
         """The journal entry."""
         self.transaction: Transaction | None = None
         """The transaction."""
-        self.currency: Currency | None = None
+        self.currency: Currency = entry.currency
         """The account."""
         self.account: Account = entry.account
         """The account."""
@@ -154,12 +154,8 @@ def populate_entries(entries: list[ReportEntry]) -> None:
     transactions: dict[int, Transaction] \
         = {x.id: x for x in Transaction.query.filter(
            Transaction.id.in_({x.entry.transaction_id for x in entries}))}
-    currencies: dict[int, Currency] \
-        = {x.code: x for x in Currency.query.filter(
-           Currency.code.in_({x.entry.currency_code for x in entries}))}
     for entry in entries:
         entry.transaction = transactions[entry.entry.transaction_id]
-        entry.currency = currencies[entry.entry.currency_code]
 
 
 def get_csv_rows(entries: list[ReportEntry]) -> list[CSVRow]:
@@ -208,7 +204,8 @@ class Journal(BaseReport):
                 .order_by(Transaction.date,
                           JournalEntry.is_debit.desc(),
                           JournalEntry.no)
-                .options(selectinload(JournalEntry.account)).all()]
+                .options(selectinload(JournalEntry.account),
+                         selectinload(JournalEntry.currency)).all()]
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.

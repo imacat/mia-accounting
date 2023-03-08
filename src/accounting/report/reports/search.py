@@ -69,7 +69,8 @@ class EntryCollector:
                 pass
             conditions.append(sa.or_(*sub_conditions))
         return [ReportEntry(x) for x in JournalEntry.query.filter(*conditions)
-                .options(selectinload(JournalEntry.account))]
+                .options(selectinload(JournalEntry.account),
+                         selectinload(JournalEntry.currency))]
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
