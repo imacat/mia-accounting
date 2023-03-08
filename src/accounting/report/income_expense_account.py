@@ -33,21 +33,15 @@ class IncomeExpensesAccount:
 
         :param account: The actual account.
         """
-        self.account: Account | None = None
-        self.id: int | None = None
+        self.account: Account | None = account
+        self.id: int = -1 if account is None else account.id
         """The ID."""
-        self.code: str | None = None
+        self.code: str = "" if account is None else account.code
         """The code."""
-        self.title: str | None = None
+        self.title: str = "" if account is None else account.title
         """The title."""
-        self.str: str = ""
+        self.str: str = "" if account is None else str(account)
         """The string representation of the account."""
-        if account is not None:
-            self.account = account
-            self.id = account.id
-            self.code = account.code
-            self.title = account.title
-            self.str = str(account)
 
     def __str__(self) -> str:
         """Returns the string representation of the account.
