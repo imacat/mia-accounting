@@ -19,7 +19,7 @@
 """
 import csv
 from abc import ABC, abstractmethod
-from datetime import timedelta
+from datetime import timedelta, date
 from decimal import Decimal
 from io import StringIO
 
@@ -63,22 +63,8 @@ def period_spec(period: Period) -> str:
     :param period: The period.
     :return: The period specification to be used in the filename.
     """
-    start: str | None = None
-    if period.start is not None:
-        if period.start.month == 1 and period.start.day == 1:
-            start = str(period.start.year)
-        elif period.start.day == 1:
-            start = period.start.strftime("%Y%m")
-        else:
-            start = period.start.strftime("%Y%m%d")
-    end: str | None = None
-    if period.end is not None:
-        if period.end.month == 12 and period.end.day == 31:
-            end = str(period.end.year)
-        elif (period.end + timedelta(days=1)).day == 1:
-            end = period.end.strftime("%Y%m")
-        else:
-            end = period.end.strftime("%Y%m%d")
+    start: str | None = __get_start_str(period.start)
+    end: str | None = __get_end_str(period.end)
     if start == end:
         return start
     if period.start is None and period.end is None:
@@ -88,3 +74,35 @@ def period_spec(period: Period) -> str:
     if period.end is None:
         return f"since-{start}"
     return f"{start}-{end}"
+
+
+def __get_start_str(start: date | None) -> str | None:
+    """Returns the string representation of the start date.
+
+    :param start: The start date.
+    :return: The string representation of the start date, or None if the start
+        date is None.
+    """
+    if start is None:
+        return None
+    if start.month == 1 and start.day == 1:
+        return str(start.year)
+    if start.day == 1:
+        return start.strftime("%Y%m")
+    return start.strftime("%Y%m%d")
+
+
+def __get_end_str(end: date | None) -> str | None:
+    """Returns the string representation of the end date.
+
+    :param end: The end date.
+    :return: The string representation of the end date, or None if the end
+        date is None.
+    """
+    if end is None:
+        return None
+    if end.month == 12 and end.day == 31:
+        return str(end.year)
+    if (end + timedelta(days=1)).day == 1:
+        return end.strftime("%Y%m")
+    return end.strftime("%Y%m%d")
