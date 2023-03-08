@@ -26,7 +26,7 @@ First written: 2023/3/5
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ A_("Ledger of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Ledger of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account.title|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
