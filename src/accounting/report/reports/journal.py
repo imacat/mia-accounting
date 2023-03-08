@@ -152,10 +152,10 @@ class PageParams(BasePageParams):
                              period=self.period)
 
 
-def _populate_entries(entries: list[Entry]) -> None:
-    """Populates the journal entries with relative data.
+def populate_entries(entries: list[Entry]) -> None:
+    """Populates the report entries with relative data.
 
-    :param entries: The journal entries.
+    :param entries: The report entries.
     :return: None.
     """
     transactions: dict[int, Transaction] \
@@ -216,7 +216,7 @@ class Journal(BaseReport):
 
         :return: The CSV rows.
         """
-        _populate_entries(self.__entries)
+        populate_entries(self.__entries)
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
                                      gettext("Account"), gettext("Summary"),
                                      gettext("Debit"), gettext("Credit"),
@@ -234,7 +234,7 @@ class Journal(BaseReport):
         """
         pagination: Pagination[Entry] = Pagination[Entry](self.__entries)
         page_entries: list[Entry] = pagination.list
-        _populate_entries(page_entries)
+        populate_entries(page_entries)
         params: PageParams = PageParams(period=self.__period,
                                         pagination=pagination,
                                         entries=page_entries)

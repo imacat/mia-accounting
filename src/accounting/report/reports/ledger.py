@@ -326,10 +326,10 @@ class PageParams(BasePageParams):
                 .order_by(Account.base_code, Account.no).all()]
 
 
-def _populate_entries(entries: list[Entry]) -> None:
-    """Populates the ledger entries with relative data.
+def populate_entries(entries: list[Entry]) -> None:
+    """Populates the report entries with relative data.
 
-    :param entries: The ledger entries.
+    :param entries: The report entries.
     :return: None.
     """
     transactions: dict[int, Transaction] \
@@ -383,7 +383,7 @@ class Ledger(BaseReport):
 
         :return: The CSV rows.
         """
-        _populate_entries(self.__entries)
+        populate_entries(self.__entries)
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Summary"),
                                      gettext("Debit"), gettext("Credit"),
                                      gettext("Balance"), gettext("Note"))]
@@ -417,7 +417,7 @@ class Ledger(BaseReport):
         pagination: Pagination[Entry] = Pagination[Entry](all_entries)
         page_entries: list[Entry] = pagination.list
         has_data: bool = len(page_entries) > 0
-        _populate_entries(page_entries)
+        populate_entries(page_entries)
         brought_forward: Entry | None = None
         if len(page_entries) > 0 and page_entries[0].is_brought_forward:
             brought_forward = page_entries[0]

@@ -366,10 +366,10 @@ class PageParams(BasePageParams):
         return options
 
 
-def _populate_entries(entries: list[Entry]) -> None:
-    """Populates the income and expenses log entries with relative data.
+def populate_entries(entries: list[Entry]) -> None:
+    """Populates the report entries with relative data.
 
-    :param entries: The income and expenses log entries.
+    :param entries: The report entries.
     :return: None.
     """
     transactions: dict[int, Transaction] \
@@ -429,7 +429,7 @@ class IncomeExpenses(BaseReport):
 
         :return: The CSV rows.
         """
-        _populate_entries(self.__entries)
+        populate_entries(self.__entries)
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Account"),
                                      gettext("Summary"), gettext("Income"),
                                      gettext("Expense"), gettext("Balance"),
@@ -465,7 +465,7 @@ class IncomeExpenses(BaseReport):
         pagination: Pagination[Entry] = Pagination[Entry](all_entries)
         page_entries: list[Entry] = pagination.list
         has_data: bool = len(page_entries) > 0
-        _populate_entries(page_entries)
+        populate_entries(page_entries)
         brought_forward: Entry | None = None
         if len(page_entries) > 0 and page_entries[0].is_brought_forward:
             brought_forward = page_entries[0]

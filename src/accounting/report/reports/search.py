@@ -143,10 +143,10 @@ class PageParams(BasePageParams):
         return ReportChooser(ReportType.SEARCH)
 
 
-def _populate_entries(entries: list[Entry]) -> None:
-    """Populates the search result entries with relative data.
+def populate_entries(entries: list[Entry]) -> None:
+    """Populates the report entries with relative data.
 
-    :param entries: The search result entries.
+    :param entries: The report entries.
     :return: None.
     """
     transactions: dict[int, Transaction] \
@@ -278,7 +278,7 @@ class Search(BaseReport):
 
         :return: The CSV rows.
         """
-        _populate_entries(self.__entries)
+        populate_entries(self.__entries)
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
                                      gettext("Account"), gettext("Summary"),
                                      gettext("Debit"), gettext("Credit"),
@@ -296,7 +296,7 @@ class Search(BaseReport):
         """
         pagination: Pagination[Entry] = Pagination[Entry](self.__entries)
         page_entries: list[Entry] = pagination.list
-        _populate_entries(page_entries)
+        populate_entries(page_entries)
         params: PageParams = PageParams(pagination=pagination,
                                         entries=page_entries)
         return render_template("accounting/report/search.html",
