@@ -30,7 +30,7 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
 from .utils.base_report import BaseReport
-from .utils.csv_export import BaseCSVRow, csv_download
+from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
 from .utils.period_choosers import IncomeExpensesPeriodChooser
@@ -421,7 +421,7 @@ class IncomeExpenses(BaseReport):
         """
         filename: str = "income-expenses-{currency}-{account}-{period}.csv"\
             .format(currency=self.__currency.code, account=self.__account.code,
-                    period=self.__period.spec)
+                    period=period_spec(self.__period))
         return csv_download(filename, self.__get_csv_rows())
 
     def __get_csv_rows(self) -> list[CSVRow]:

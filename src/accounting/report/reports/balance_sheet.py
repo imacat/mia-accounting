@@ -28,7 +28,7 @@ from accounting.models import Currency, BaseAccount, Account, Transaction, \
     JournalEntry
 from accounting.report.period import Period
 from .utils.base_report import BaseReport
-from .utils.csv_export import BaseCSVRow, csv_download
+from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
 from .utils.page_params import PageParams
 from .utils.period_choosers import BalanceSheetPeriodChooser
@@ -428,7 +428,8 @@ class BalanceSheet(BaseReport):
         :return: The response of the report for download.
         """
         filename: str = "balance-sheet-{currency}-{period}.csv"\
-            .format(currency=self.__currency.code, period=self.__period.spec)
+            .format(currency=self.__currency.code,
+                    period=period_spec(self.__period))
         return csv_download(filename, self.__get_csv_rows())
 
     def __get_csv_rows(self) -> list[CSVRow]:

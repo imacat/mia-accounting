@@ -19,10 +19,13 @@
 """
 import csv
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from decimal import Decimal
 from io import StringIO
 
 from flask import Response
+
+from accounting.report.period import Period
 
 
 class BaseCSVRow(ABC):
@@ -52,3 +55,36 @@ def csv_download(filename: str, rows: list[BaseCSVRow]) -> Response:
         response.headers["Content-Disposition"] \
             = f"attachment; filename={filename}"
         return response
+
+
+def period_spec(period: Period) -> str:
+    """Constructs the period specification to be used in the filename.
+
+    :param period: The period.
+    :return: The period specification to be used in the filename.
+    """
+    start: str | None = None
+    if period.start is not None:
+        if period.start.month == 1 and period.start.day == 1:
+            start = str(period.start.year)
+        elif period.start.day == 1:
+            start = period.start.strftime("%Y%m")
+        else:
+            start = period.start.strftime("%Y%m%d")
+    end: str | None = None
+    if period.end is not None:
+        if period.end.month == 12 and period.end.day == 31:
+            end = str(period.end.year)
+        elif (period.end + timedelta(days=1)).day == 1:
+            end = period.end.strftime("%Y%m")
+        else:
+            end = period.end.strftime("%Y%m%d")
+    if start == end:
+        return start
+    if period.start is None and period.end is None:
+        return "all-time"
+    if period.start is None:
+        return f"until-{end}"
+    if period.end is None:
+        return f"since-{start}"
+    return f"{start}-{end}"

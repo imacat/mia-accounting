@@ -29,7 +29,7 @@ from accounting.models import Currency, Account, Transaction, JournalEntry
 from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
 from .utils.base_report import BaseReport
-from .utils.csv_export import BaseCSVRow, csv_download
+from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.page_params import PageParams
 from .utils.period_choosers import JournalPeriodChooser
 from .utils.report_chooser import ReportChooser
@@ -208,7 +208,7 @@ class Journal(BaseReport):
 
         :return: The response of the report for download.
         """
-        filename: str = f"journal-{self.__period.spec}.csv"
+        filename: str = f"journal-{period_spec(self.__period)}.csv"
         return csv_download(filename, self.__get_csv_rows())
 
     def __get_csv_rows(self) -> list[CSVRow]:
