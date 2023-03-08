@@ -312,9 +312,8 @@ class PeriodDescription:
             raise ValueError
         start: str = str(self.__start.year)
         if self.__start.year == self.__end.year:
-            return gettext("in %(period)s", period=start)
-        end: str = str(self.__end.year)
-        return gettext("in %(start)s-%(end)s", start=start, end=end)
+            return self.__get_in_desc(start)
+        return self.__get_from_to_desc(start, str(self.__end.year))
 
     def __get_month_desc(self) -> str:
         """Returns the description as a month range.
@@ -324,15 +323,13 @@ class PeriodDescription:
         """
         if self.__start.day != 1 or self.__end != _month_end(self.__end):
             raise ValueError
-        start: str = f"{self.__start.year}/{self.__start.month}"
+        start: str = self.__format_month(self.__start)
         if self.__start.year == self.__end.year \
                 and self.__start.month == self.__end.month:
-            return gettext("in %(period)s", period=start)
+            return self.__get_in_desc(start)
         if self.__start.year == self.__end.year:
-            end_month: str = str(self.__end.month)
-            return gettext("in %(start)s-%(end)s", start=start, end=end_month)
-        end: str = f"{self.__end.year}/{self.__end.month}"
-        return gettext("in %(start)s-%(end)s", start=start, end=end)
+            return self.__get_from_to_desc(start, str(self.__end.month))
+        return self.__get_from_to_desc(start, self.__format_month(self.__end))
 
     def __get_day_desc(self) -> str:
         """Returns the description as a day range.
@@ -342,17 +339,14 @@ class PeriodDescription:
         """
         start: str = self.__format_day(self.__start)
         if self.__start == self.__end:
-            return gettext("in %(period)s", period=start)
+            return self.__get_in_desc(start)
         if self.__start.year == self.__end.year \
                 and self.__start.month == self.__end.month:
-            end_day: str = str(self.__end.day)
-            return gettext("in %(start)s-%(end)s", start=start, end=end_day)
+            return self.__get_from_to_desc(start, str(self.__end.day))
         if self.__start.year == self.__end.year:
             end_month_day: str = f"{self.__end.month}/{self.__end.day}"
-            return gettext("in %(start)s-%(end)s",
-                           start=start, end=end_month_day)
-        end: str = f"{self.__end.year}/{self.__end.month}/{self.__end.day}"
-        return gettext("in %(start)s-%(end)s", start=start, end=end)
+            return self.__get_from_to_desc(start, end_month_day)
+        return self.__get_from_to_desc(start, self.__format_day(self.__end))
 
     @staticmethod
     def __format_date(date: datetime.date) -> str:
@@ -380,6 +374,25 @@ class PeriodDescription:
         :return: The formatted day.
         """
         return f"{day.year}/{day.month}/{day.day}"
+
+    @staticmethod
+    def __get_in_desc(period: str) -> str:
+        """Returns the description of a whole year, month, or day.
+
+        :param period: The time period.
+        :return: The description of a whole year, month, or day.
+        """
+        return gettext("in %(period)s", period=period)
+
+    @staticmethod
+    def __get_from_to_desc(start: str, end: str) -> str:
+        """Returns the description of a separated start and end.
+
+        :param start: The start.
+        :param end: The end.
+        :return: The description of the separated start and end.
+        """
+        return gettext("in %(start)s-%(end)s", start=start, end=end)
 
 
 class ThisMonth(Period):
