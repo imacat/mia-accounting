@@ -29,7 +29,7 @@ from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
     Transaction, JournalEntry
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
-from .journal import ReportEntry, populate_entries, get_csv_rows
+from .journal import ReportEntry, get_csv_rows
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import csv_download
@@ -70,7 +70,8 @@ class EntryCollector:
             conditions.append(sa.or_(*sub_conditions))
         return [ReportEntry(x) for x in JournalEntry.query.filter(*conditions)
                 .options(selectinload(JournalEntry.account),
-                         selectinload(JournalEntry.currency))]
+                         selectinload(JournalEntry.currency),
+                         selectinload(JournalEntry.transaction))]
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -194,9 +195,7 @@ class Search(BaseReport):
         """
         pagination: Pagination[ReportEntry] \
             = Pagination[ReportEntry](self.__entries)
-        page_entries: list[ReportEntry] = pagination.list
-        populate_entries(page_entries)
         params: PageParams = PageParams(pagination=pagination,
-                                        entries=page_entries)
+                                        entries=pagination.list)
         return render_template("accounting/report/search.html",
                                report=params)

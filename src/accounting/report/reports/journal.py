@@ -47,7 +47,7 @@ class ReportEntry:
         """
         self.entry: JournalEntry = entry
         """The journal entry."""
-        self.transaction: Transaction | None = None
+        self.transaction: Transaction = entry.transaction
         """The transaction."""
         self.currency: Currency = entry.currency
         """The account."""
@@ -145,26 +145,12 @@ class PageParams(BasePageParams):
                              period=self.period)
 
 
-def populate_entries(entries: list[ReportEntry]) -> None:
-    """Populates the report entries with relative data.
-
-    :param entries: The report entries.
-    :return: None.
-    """
-    transactions: dict[int, Transaction] \
-        = {x.id: x for x in Transaction.query.filter(
-           Transaction.id.in_({x.entry.transaction_id for x in entries}))}
-    for entry in entries:
-        entry.transaction = transactions[entry.entry.transaction_id]
-
-
 def get_csv_rows(entries: list[ReportEntry]) -> list[CSVRow]:
     """Composes and returns the CSV rows from the report entries.
 
     :param entries: The report entries.
     :return: The CSV rows.
     """
-    populate_entries(entries)
     rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
                                  gettext("Account"), gettext("Summary"),
                                  gettext("Debit"), gettext("Credit"),
@@ -205,7 +191,8 @@ class Journal(BaseReport):
                           JournalEntry.is_debit.desc(),
                           JournalEntry.no)
                 .options(selectinload(JournalEntry.account),
-                         selectinload(JournalEntry.currency)).all()]
+                         selectinload(JournalEntry.currency),
+                         selectinload(JournalEntry.transaction)).all()]
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -222,10 +209,8 @@ class Journal(BaseReport):
         """
         pagination: Pagination[ReportEntry] \
             = Pagination[ReportEntry](self.__entries)
-        page_entries: list[ReportEntry] = pagination.list
-        populate_entries(page_entries)
         params: PageParams = PageParams(period=self.__period,
                                         pagination=pagination,
-                                        entries=page_entries)
+                                        entries=pagination.list)
         return render_template("accounting/report/journal.html",
                                report=params)
