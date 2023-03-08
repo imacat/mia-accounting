@@ -20,7 +20,6 @@ This file is largely taken from the NanoParma ERP project, first written in
 2021/9/16 by imacat (imacat@nanoparma.com).
 
 """
-import typing as t
 from abc import ABC, abstractmethod
 from datetime import date
 
