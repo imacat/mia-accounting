@@ -54,11 +54,11 @@ class BalanceSheetAccount:
         """The URL to the ledger of the account."""
 
 
-class BalanceSheetSubsection:
-    """A subsection in the balance sheet."""
+class Subsection:
+    """A subsection."""
 
     def __init__(self, title: BaseAccount):
-        """Constructs a subsection in the balance sheet.
+        """Constructs a subsection.
 
         :param title: The title account.
         """
@@ -76,17 +76,17 @@ class BalanceSheetSubsection:
         return sum([x.amount for x in self.accounts])
 
 
-class BalanceSheetSection:
-    """A section in the balance sheet."""
+class Section:
+    """A section."""
 
     def __init__(self, title: BaseAccount):
-        """Constructs a section in the balance sheet.
+        """Constructs a section.
 
         :param title: The title account.
         """
         self.title: BaseAccount = title
         """The title account."""
-        self.subsections: list[BalanceSheetSubsection] = []
+        self.subsections: list[Subsection] = []
         """The subsections in the section."""
 
     @property
@@ -303,9 +303,9 @@ class PageParams(BasePageParams):
     def __init__(self, currency: Currency,
                  period: Period,
                  has_data: bool,
-                 assets: BalanceSheetSection,
-                 liabilities: BalanceSheetSection,
-                 owner_s_equity: BalanceSheetSection):
+                 assets: Section,
+                 liabilities: Section,
+                 owner_s_equity: Section):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
@@ -321,11 +321,11 @@ class PageParams(BasePageParams):
         """The period."""
         self.__has_data: bool = has_data
         """True if there is any data, or False otherwise."""
-        self.assets: BalanceSheetSection = assets
+        self.assets: Section = assets
         """The assets."""
-        self.liabilities: BalanceSheetSection = liabilities
+        self.liabilities: Section = liabilities
         """The liabilities."""
-        self.owner_s_equity: BalanceSheetSection = owner_s_equity
+        self.owner_s_equity: Section = owner_s_equity
         """The owner's equity."""
         self.period_chooser: BalanceSheetPeriodChooser \
             = BalanceSheetPeriodChooser(currency)
@@ -385,11 +385,11 @@ class BalanceSheet(BaseReport):
         """The period."""
         self.__has_data: bool
         """True if there is any data, or False otherwise."""
-        self.__assets: BalanceSheetSection
+        self.__assets: Section
         """The assets."""
-        self.__liabilities: BalanceSheetSection
+        self.__liabilities: Section
         """The liabilities."""
-        self.__owner_s_equity: BalanceSheetSection
+        self.__owner_s_equity: Section
         """The owner's equity."""
         self.__set_data()
 
@@ -408,10 +408,9 @@ class BalanceSheet(BaseReport):
             .filter(BaseAccount.code.in_({x.account.base_code[:2]
                                           for x in balances})).all()
 
-        sections: dict[str, BalanceSheetSection] \
-            = {x.code: BalanceSheetSection(x) for x in titles}
-        subsections: dict[str, BalanceSheetSubsection] \
-            = {x.code: BalanceSheetSubsection(x) for x in subtitles}
+        sections: dict[str, Section] = {x.code: Section(x) for x in titles}
+        subsections: dict[str, Subsection] = {x.code: Subsection(x)
+                                              for x in subtitles}
         for subsection in subsections.values():
             sections[subsection.title.code[0]].subsections.append(subsection)
         for balance in balances:
@@ -465,7 +464,7 @@ class BalanceSheet(BaseReport):
         return rows
 
     @staticmethod
-    def __section_csv_rows(section: BalanceSheetSection) -> list[CSVHalfRow]:
+    def __section_csv_rows(section: Section) -> list[CSVHalfRow]:
         """Gathers the CSV rows for a section.
 
         :param section: The section.
