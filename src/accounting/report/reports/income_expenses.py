@@ -76,11 +76,11 @@ class ReportEntry:
 
 
 class EntryCollector:
-    """The income and expenses log entry collector."""
+    """The report entry collector."""
 
     def __init__(self, currency: Currency, account: IncomeExpensesAccount,
                  period: Period):
-        """Constructs the income and expenses log entry collector.
+        """Constructs the report entry collector.
 
         :param currency: The currency.
         :param account: The account.

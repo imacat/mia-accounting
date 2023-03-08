@@ -75,10 +75,10 @@ class ReportEntry:
 
 
 class EntryCollector:
-    """The ledger entry collector."""
+    """The report entry collector."""
 
     def __init__(self, currency: Currency, account: Account, period: Period):
-        """Constructs the ledger entry collector.
+        """Constructs the report entry collector.
 
         :param currency: The currency.
         :param account: The account.
@@ -93,7 +93,7 @@ class EntryCollector:
         self.brought_forward: ReportEntry | None
         """The brought-forward entry."""
         self.entries: list[ReportEntry]
-        """The ledger entries."""
+        """The report entries."""
         self.total: ReportEntry | None
         """The total entry."""
         self.brought_forward = self.__get_brought_forward_entry()
@@ -104,7 +104,7 @@ class EntryCollector:
     def __get_brought_forward_entry(self) -> ReportEntry | None:
         """Queries, composes and returns the brought-forward entry.
 
-        :return: The brought-forward entry, or None if the ledger starts from
+        :return: The brought-forward entry, or None if the report starts from
             the beginning.
         """
         if self.__period.start is None:
@@ -131,9 +131,9 @@ class EntryCollector:
         return entry
 
     def __query_entries(self) -> list[ReportEntry]:
-        """Queries and returns the ledger entries.
+        """Queries and returns the report entries.
 
-        :return: The ledger entries.
+        :return: The report entries.
         """
         conditions: list[sa.BinaryExpression] \
             = [JournalEntry.currency_code == self.__currency.code,
