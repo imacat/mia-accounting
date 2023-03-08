@@ -206,36 +206,21 @@ class Period:
 
         :return: The period description.
         """
+        if self.start is None and self.end is None:
+            return gettext("for all time")
         if self.start is None:
-            if self.end is None:
-                return gettext("for all time")
-            else:
-                if self.end != _month_end(self.end):
-                    return gettext("until %(end)s",
-                                   end=self.__format_date(self.end))
-                if self.end.month != 12:
-                    return gettext("until %(end)s",
-                                   end=self.__format_month(self.end))
-                return gettext("until %(end)s", end=str(self.end.year))
-        else:
-            if self.end is None:
-                if self.start.day != 1:
-                    return gettext("since %(start)s",
-                                   start=self.__format_date(self.start))
-                if self.start.month != 1:
-                    return gettext("since %(start)s",
-                                   start=self.__format_month(self.start))
-                return gettext("since %(start)s", start=str(self.start.year))
-            else:
-                try:
-                    return self.__get_year_desc()
-                except ValueError:
-                    pass
-                try:
-                    return self.__get_month_desc()
-                except ValueError:
-                    pass
-                return self.__get_day_desc()
+            return self.__get_until_desc()
+        if self.end is None:
+            return self.__get_since_desc()
+        try:
+            return self.__get_year_desc()
+        except ValueError:
+            pass
+        try:
+            return self.__get_month_desc()
+        except ValueError:
+            pass
+        return self.__get_day_desc()
 
     @staticmethod
     def __format_date(date: datetime.date) -> str:
@@ -254,6 +239,43 @@ class Period:
         :return: The formatted month.
         """
         return f"{month.year}/{month.month}"
+
+    def __get_since_desc(self) -> str:
+        """Returns the description without the end time.
+
+        :return: The description without the end time.
+        """
+
+        def get_start_desc() -> str:
+            """Returns the description of the start time.
+
+            :return: The description of the start time.
+            """
+            if self.start.month == 1 and self.start.day == 1:
+                return str(self.start.year)
+            if self.start.day == 1:
+                return self.__format_month(self.start)
+            return self.__format_date(self.start)
+
+        return gettext("since %(start)s", start=get_start_desc())
+
+    def __get_until_desc(self) -> str:
+        """Returns the description without the start time.
+
+        :return: The description without the start time.
+        """
+        def get_end_desc() -> str:
+            """Returns the description of the end time.
+
+            :return: The description of the end time.
+            """
+            if self.end.month == 12 and self.end.day == 31:
+                return str(self.end.year)
+            if (self.end + datetime.timedelta(days=1)).day == 1:
+                return self.__format_month(self.end)
+            return self.__format_date(self.end)
+
+        return gettext("until %(end)s", end=get_end_desc())
 
     def __get_year_desc(self) -> str:
         """Returns the description as a year range.
