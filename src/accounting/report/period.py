@@ -278,15 +278,15 @@ class PeriodDescription:
         return self.__get_day_desc()
 
     def __get_since_desc(self) -> str:
-        """Returns the description without the end time.
+        """Returns the description without the end day.
 
-        :return: The description without the end time.
+        :return: The description without the end day.
         """
 
         def get_start_desc() -> str:
-            """Returns the description of the start time.
+            """Returns the description of the start day.
 
-            :return: The description of the start time.
+            :return: The description of the start day.
             """
             if self.__start.month == 1 and self.__start.day == 1:
                 return str(self.__start.year)
@@ -297,14 +297,14 @@ class PeriodDescription:
         return gettext("since %(start)s", start=get_start_desc())
 
     def __get_until_desc(self) -> str:
-        """Returns the description without the start time.
+        """Returns the description without the start day.
 
-        :return: The description without the start time.
+        :return: The description without the start day.
         """
         def get_end_desc() -> str:
-            """Returns the description of the end time.
+            """Returns the description of the end day.
 
-            :return: The description of the end time.
+            :return: The description of the end day.
             """
             if self.__end.month == 12 and self.__end.day == 31:
                 return str(self.__end.year)
