@@ -17,7 +17,7 @@
 """The search.
 
 """
-from datetime import date, datetime
+from datetime import datetime
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -28,88 +28,12 @@ from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
     Transaction, JournalEntry
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
-from .utils.base_report import BaseReport
-from .utils.csv_export import BaseCSVRow, csv_download
+from .journal import Entry, CSVRow, populate_entries
 from .utils.base_page_params import BasePageParams
+from .utils.base_report import BaseReport
+from .utils.csv_export import csv_download
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
-
-
-class Entry:
-    """An entry in the search result."""
-
-    def __init__(self, entry: JournalEntry | None = None):
-        """Constructs the entry in the search result.
-
-        :param entry: The journal entry.
-        """
-        self.entry: JournalEntry | None = None
-        """The journal entry."""
-        self.transaction: Transaction | None = None
-        """The transaction."""
-        self.is_total: bool = False
-        """Whether this is the total entry."""
-        self.currency: Currency | None = None
-        """The account."""
-        self.account: Account | None = None
-        """The account."""
-        self.summary: str | None = None
-        """The summary."""
-        self.debit: Decimal | None = None
-        """The debit amount."""
-        self.credit: Decimal | None = None
-        """The credit amount."""
-        self.amount: Decimal | None = None
-        """The amount."""
-        if entry is not None:
-            self.entry = entry
-            self.summary = entry.summary
-            self.debit = entry.amount if entry.is_debit else None
-            self.credit = None if entry.is_debit else entry.amount
-            self.amount = entry.amount
-
-
-class CSVRow(BaseCSVRow):
-    """A row in the CSV."""
-
-    def __init__(self, txn_date: str | date,
-                 currency: str,
-                 account: str,
-                 summary: str | None,
-                 debit: str | Decimal | None,
-                 credit: str | Decimal | None,
-                 note: str | None):
-        """Constructs a row in the CSV.
-
-        :param txn_date: The transaction date.
-        :param summary: The summary.
-        :param debit: The debit amount.
-        :param credit: The credit amount.
-        :param note: The note.
-        """
-        self.date: str | date = txn_date
-        """The date."""
-        self.currency: str = currency
-        """The currency."""
-        self.account: str = account
-        """The account."""
-        self.summary: str | None = summary
-        """The summary."""
-        self.debit: str | Decimal | None = debit
-        """The debit amount."""
-        self.credit: str | Decimal | None = credit
-        """The credit amount."""
-        self.note: str | None = note
-        """The note."""
-
-    @property
-    def values(self) -> list[str | Decimal | None]:
-        """Returns the values of the row.
-
-        :return: The values of the row.
-        """
-        return [self.date, self.currency, self.account, self.summary,
-                self.debit, self.credit, self.note]
 
 
 class PageParams(BasePageParams):
@@ -141,27 +65,6 @@ class PageParams(BasePageParams):
         :return: The report chooser.
         """
         return ReportChooser(ReportType.SEARCH)
-
-
-def populate_entries(entries: list[Entry]) -> None:
-    """Populates the report entries with relative data.
-
-    :param entries: The report entries.
-    :return: None.
-    """
-    transactions: dict[int, Transaction] \
-        = {x.id: x for x in Transaction.query.filter(
-           Transaction.id.in_({x.entry.transaction_id for x in entries}))}
-    accounts: dict[int, Account] \
-        = {x.id: x for x in Account.query.filter(
-           Account.id.in_({x.entry.account_id for x in entries}))}
-    currencies: dict[int, Currency] \
-        = {x.code: x for x in Currency.query.filter(
-           Currency.code.in_({x.entry.currency_code for x in entries}))}
-    for entry in entries:
-        entry.transaction = transactions[entry.entry.transaction_id]
-        entry.account = accounts[entry.entry.account_id]
-        entry.currency = currencies[entry.entry.currency_code]
 
 
 class Search(BaseReport):
