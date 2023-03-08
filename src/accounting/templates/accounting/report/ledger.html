@@ -32,56 +32,13 @@ First written: 2023/3/5
 {% block content %}
 
 <div class="btn-group mb-2 d-none d-md-inline-flex">
-  {% if accounting_can_edit() %}
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-solid fa-plus"></i>
-        {{ A_("New") }}
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
-            {{ A_("Cash Expense") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
-            {{ A_("Cash Income") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
-            {{ A_("Transfer") }}
-          </a>
-        </li>
-      </ul>
-    </div>
-  {% endif %}
-  {% include "accounting/report/include/report-chooser.html" %}
-  {% include "accounting/report/include/currency-chooser.html" %}
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-clipboard"></i>
-      {{ report.account.title|title }}
-    </button>
-    <ul class="dropdown-menu">
-      {% for account in report.account_options %}
-        <li>
-          <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
-            {{ account.title|title }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
-    <i class="fa-solid fa-calendar-day"></i>
-    {{ report.period.desc|title }}
-  </button>
-  <a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
-    <i class="fa-solid fa-download"></i>
-    {{ A_("Download") }}
-  </a>
+  {% with use_add_new = true,
+          use_report_chooser = true,
+          use_currency_chooser = true,
+          use_account_chooser = true,
+          use_period_chooser = true %}
+    {% include "accounting/report/include/action-buttons.html" %}
+  {% endwith %}
 </div>
 
 {% with txn_types = report.txn_types %}
@@ -89,26 +46,12 @@ First written: 2023/3/5
 {% endwith %}
 
 <div class="btn-group btn-actions mb-3 d-md-none">
-  {% include "accounting/report/include/report-chooser.html" %}
-  {% include "accounting/report/include/currency-chooser.html" %}
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-clipboard"></i>
-    </button>
-    <ul class="dropdown-menu">
-      {% for account in report.account_options %}
-        <li>
-          <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
-            {{ account.title|title }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
-    <i class="fa-solid fa-calendar-day"></i>
-    {{ A_("Period") }}
-  </button>
+  {% with use_report_chooser = true,
+          use_currency_chooser = true,
+          use_account_chooser = true,
+          use_period_chooser = true %}
+    {% include "accounting/report/include/action-buttons.html" %}
+  {% endwith %}
 </div>
 
 {% with period = report.period, period_chooser = report.period_chooser %}

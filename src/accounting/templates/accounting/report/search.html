@@ -31,45 +31,13 @@ First written: 2023/3/8
 {% block content %}
 
 <div class="btn-group mb-2 d-none d-md-inline-flex">
-  {% if accounting_can_edit() %}
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-solid fa-plus"></i>
-        {{ A_("New") }}
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
-            {{ A_("Cash Expense") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
-            {{ A_("Cash Income") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
-            {{ A_("Transfer") }}
-          </a>
-        </li>
-      </ul>
-    </div>
-  {% endif %}
-  {% include "accounting/report/include/report-chooser.html" %}
-  <form class="btn btn-primary d-flex input-group accounting-search-desktop-form" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
-    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
-    <label for="accounting-search-desktop" class="accounting-search-label">
-      <button type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        {{ A_("Search") }}
-      </button>
-    </label>
-  </form>
-  <a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
-    <i class="fa-solid fa-download"></i>
-    {{ A_("Download") }}
-  </a>
+  {% with use_add_new = true,
+          use_report_chooser = true,
+          use_search = true,
+          search_platform = "desktop",
+          search_aria_label = A_("Search for Desktop") %}
+    {% include "accounting/report/include/action-buttons.html" %}
+  {% endwith %}
 </div>
 
 {% with txn_types = report.txn_types %}
@@ -77,16 +45,12 @@ First written: 2023/3/8
 {% endwith %}
 
 <div class="btn-group btn-actions mb-3 d-md-none">
-  {% include "accounting/report/include/report-chooser.html" %}
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-label="{{ A_("Search for Mobile") }}">
-    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
-    <label for="accounting-search-mobile" class="accounting-search-label">
-      <button type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        {{ A_("Search") }}
-      </button>
-    </label>
-  </form>
+  {% with use_report_chooser = true,
+          use_search = true,
+          search_platform = "mobile",
+          search_aria_label = A_("Search for Mobile") %}
+    {% include "accounting/report/include/action-buttons.html" %}
+  {% endwith %}
 </div>
 
 {% include "accounting/report/include/search-modal.html" %}
