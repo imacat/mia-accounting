@@ -137,48 +137,48 @@ def get_unchanged_update_form(txn_id: int, app: Flask, csrf_token: str) \
         assert txn is not None
         currencies: list[TransactionCurrency] = txn.currencies
 
-        form: dict[str, str] = {"csrf_token": csrf_token,
-                                "next": NEXT_URI,
-                                "date": txn.date,
-                                "note": "  \n \n\n  " if txn.note is None
-                                else f"\n    \n\n \n  \n{txn.note}  \n\n   "}
-        currency_indices_used: set[int] = set()
-        currency_no: int = 0
-        for currency in currencies:
-            currency_index: int = __get_new_index(currency_indices_used)
-            currency_no = currency_no + 3 + randbelow(3)
-            currency_prefix: str = f"currency-{currency_index}"
-            form[f"{currency_prefix}-no"] = str(currency_no)
-            form[f"{currency_prefix}-code"] = currency.code
-            entry_indices_used: set[int]
-            entry_no: int
-            prefix: str
+    form: dict[str, str] = {"csrf_token": csrf_token,
+                            "next": NEXT_URI,
+                            "date": txn.date,
+                            "note": "  \n \n\n  " if txn.note is None
+                            else f"\n    \n\n \n  \n{txn.note}  \n\n   "}
+    currency_indices_used: set[int] = set()
+    currency_no: int = 0
+    for currency in currencies:
+        currency_index: int = __get_new_index(currency_indices_used)
+        currency_no = currency_no + 3 + randbelow(3)
+        currency_prefix: str = f"currency-{currency_index}"
+        form[f"{currency_prefix}-no"] = str(currency_no)
+        form[f"{currency_prefix}-code"] = currency.code
+        entry_indices_used: set[int]
+        entry_no: int
+        prefix: str
 
-            entry_indices_used = set()
-            entry_no = 0
-            for entry in currency.debit:
-                entry_index: int = __get_new_index(entry_indices_used)
-                entry_no = entry_no + 3 + randbelow(3)
-                prefix = f"{currency_prefix}-debit-{entry_index}"
-                form[f"{prefix}-eid"] = str(entry.id)
-                form[f"{prefix}-no"] = str(entry_no)
-                form[f"{prefix}-account_code"] = entry.account.code
-                form[f"{prefix}-summary"] \
-                    = "  " if entry.summary is None else f" {entry.summary} "
-                form[f"{prefix}-amount"] = str(entry.amount)
+        entry_indices_used = set()
+        entry_no = 0
+        for entry in currency.debit:
+            entry_index: int = __get_new_index(entry_indices_used)
+            entry_no = entry_no + 3 + randbelow(3)
+            prefix = f"{currency_prefix}-debit-{entry_index}"
+            form[f"{prefix}-eid"] = str(entry.id)
+            form[f"{prefix}-no"] = str(entry_no)
+            form[f"{prefix}-account_code"] = entry.account.code
+            form[f"{prefix}-summary"] \
+                = "  " if entry.summary is None else f" {entry.summary} "
+            form[f"{prefix}-amount"] = str(entry.amount)
 
-            entry_indices_used = set()
-            entry_no = 0
-            for entry in currency.credit:
-                entry_index: int = __get_new_index(entry_indices_used)
-                entry_no = entry_no + 3 + randbelow(3)
-                prefix = f"{currency_prefix}-credit-{entry_index}"
-                form[f"{prefix}-eid"] = str(entry.id)
-                form[f"{prefix}-no"] = str(entry_no)
-                form[f"{prefix}-account_code"] = entry.account.code
-                form[f"{prefix}-summary"] \
-                    = "  " if entry.summary is None else f" {entry.summary} "
-                form[f"{prefix}-amount"] = str(entry.amount)
+        entry_indices_used = set()
+        entry_no = 0
+        for entry in currency.credit:
+            entry_index: int = __get_new_index(entry_indices_used)
+            entry_no = entry_no + 3 + randbelow(3)
+            prefix = f"{currency_prefix}-credit-{entry_index}"
+            form[f"{prefix}-eid"] = str(entry.id)
+            form[f"{prefix}-no"] = str(entry_no)
+            form[f"{prefix}-account_code"] = entry.account.code
+            form[f"{prefix}-summary"] \
+                = "  " if entry.summary is None else f" {entry.summary} "
+            form[f"{prefix}-amount"] = str(entry.amount)
 
     return form
 

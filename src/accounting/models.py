@@ -617,7 +617,7 @@ class JournalEntry(db.Model):
                                          onupdate="CASCADE"),
                            nullable=False)
     """The account ID."""
-    account = db.relationship(Account, back_populates="entries")
+    account = db.relationship(Account, back_populates="entries", lazy=False)
     """The account."""
     summary = db.Column(db.String, nullable=True)
     """The summary."""

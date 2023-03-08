@@ -22,6 +22,7 @@ from decimal import Decimal
 
 import sqlalchemy as sa
 from flask import render_template, Response
+from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
@@ -64,6 +65,7 @@ class ReportEntry:
         """The amount."""
         if entry is not None:
             self.entry = entry
+            self.account = entry.account
             self.summary = entry.summary
             self.debit = entry.amount if entry.is_debit else None
             self.credit = None if entry.is_debit else entry.amount
@@ -161,15 +163,11 @@ def populate_entries(entries: list[ReportEntry]) -> None:
     transactions: dict[int, Transaction] \
         = {x.id: x for x in Transaction.query.filter(
            Transaction.id.in_({x.entry.transaction_id for x in entries}))}
-    accounts: dict[int, Account] \
-        = {x.id: x for x in Account.query.filter(
-           Account.id.in_({x.entry.account_id for x in entries}))}
     currencies: dict[int, Currency] \
         = {x.code: x for x in Currency.query.filter(
            Currency.code.in_({x.entry.currency_code for x in entries}))}
     for entry in entries:
         entry.transaction = transactions[entry.entry.transaction_id]
-        entry.account = accounts[entry.entry.account_id]
         entry.currency = currencies[entry.entry.currency_code]
 
 
@@ -218,7 +216,8 @@ class Journal(BaseReport):
                 .query(JournalEntry).join(Transaction).filter(*conditions)
                 .order_by(Transaction.date,
                           JournalEntry.is_debit.desc(),
-                          JournalEntry.no).all()]
+                          JournalEntry.no)
+                .options(selectinload(JournalEntry.account)).all()]
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.

@@ -22,6 +22,7 @@ from decimal import Decimal
 
 import sqlalchemy as sa
 from flask import Response, render_template, request
+from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
 from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
@@ -67,7 +68,8 @@ class EntryCollector:
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return [ReportEntry(x) for x in JournalEntry.query.filter(*conditions)]
+        return [ReportEntry(x) for x in JournalEntry.query.filter(*conditions)
+                .options(selectinload(JournalEntry.account))]
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
