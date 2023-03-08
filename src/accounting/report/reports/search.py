@@ -30,7 +30,7 @@ from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download
-from .utils.page_params import PageParams
+from .utils.base_page_params import BasePageParams
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
@@ -112,12 +112,12 @@ class CSVRow(BaseCSVRow):
                 self.debit, self.credit, self.note]
 
 
-class SearchPageParams(PageParams):
-    """The HTML parameters of the search result."""
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
 
     def __init__(self, pagination: Pagination[Entry],
                  entries: list[Entry]):
-        """Constructs the HTML parameters of the search result.
+        """Constructs the HTML page parameters.
 
         :param entries: The search result entries.
         """
@@ -297,7 +297,7 @@ class Search(BaseReport):
         pagination: Pagination[Entry] = Pagination[Entry](self.__entries)
         page_entries: list[Entry] = pagination.list
         _populate_entries(page_entries)
-        params: SearchPageParams = SearchPageParams(pagination=pagination,
-                                                    entries=page_entries)
+        params: PageParams = PageParams(pagination=pagination,
+                                        entries=page_entries)
         return render_template("accounting/report/search.html",
                                report=params)

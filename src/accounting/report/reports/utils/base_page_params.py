@@ -28,8 +28,8 @@ from accounting.utils.txn_types import TransactionType
 from .report_chooser import ReportChooser
 
 
-class PageParams(ABC):
-    """The page parameters of a report."""
+class BasePageParams(ABC):
+    """The base HTML page parameters class."""
 
     @property
     @abstractmethod

@@ -30,7 +30,7 @@ from accounting.report.period import Period
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.page_params import PageParams
+from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import BalanceSheetPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
@@ -297,8 +297,8 @@ class CSVRow(BaseCSVRow):
                 self.liability_title, self.liability_amount]
 
 
-class BalanceSheetPageParams(PageParams):
-    """The HTML parameters of the balance sheet."""
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
 
     def __init__(self, currency: Currency,
                  period: Period,
@@ -306,7 +306,7 @@ class BalanceSheetPageParams(PageParams):
                  assets: BalanceSheetSection,
                  liabilities: BalanceSheetSection,
                  owner_s_equity: BalanceSheetSection):
-        """Constructs the HTML parameters of the balance sheet.
+        """Constructs the HTML page parameters.
 
         :param currency: The currency.
         :param period: The period.
@@ -485,12 +485,11 @@ class BalanceSheet(BaseReport):
 
         :return: The report as HTML.
         """
-        params: BalanceSheetPageParams = BalanceSheetPageParams(
-            currency=self.__currency,
-            period=self.__period,
-            has_data=self.__has_data,
-            assets=self.__assets,
-            liabilities=self.__liabilities,
-            owner_s_equity=self.__owner_s_equity)
+        params: PageParams = PageParams(currency=self.__currency,
+                                        period=self.__period,
+                                        has_data=self.__has_data,
+                                        assets=self.__assets,
+                                        liabilities=self.__liabilities,
+                                        owner_s_equity=self.__owner_s_equity)
         return render_template("accounting/report/balance-sheet.html",
                                report=params)

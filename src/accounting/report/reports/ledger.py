@@ -31,7 +31,7 @@ from accounting.utils.pagination import Pagination
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.page_params import PageParams
+from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import LedgerPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
@@ -223,8 +223,8 @@ class CSVRow(BaseCSVRow):
                 self.debit, self.credit, self.balance, self.note]
 
 
-class LedgerPageParams(PageParams):
-    """The HTML parameters of the ledger."""
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
 
     def __init__(self, currency: Currency,
                  account: Account,
@@ -234,7 +234,7 @@ class LedgerPageParams(PageParams):
                  brought_forward: Entry | None,
                  entries: list[Entry],
                  total: Entry | None):
-        """Constructs the HTML parameters of the ledger.
+        """Constructs the HTML page parameters.
 
         :param currency: The currency.
         :param account: The account.
@@ -426,14 +426,13 @@ class Ledger(BaseReport):
         if len(page_entries) > 0 and page_entries[-1].is_total:
             total = page_entries[-1]
             page_entries = page_entries[:-1]
-        params: LedgerPageParams = LedgerPageParams(
-            currency=self.__currency,
-            account=self.__account,
-            period=self.__period,
-            has_data=has_data,
-            pagination=pagination,
-            brought_forward=brought_forward,
-            entries=page_entries,
-            total=total)
+        params: PageParams = PageParams(currency=self.__currency,
+                                        account=self.__account,
+                                        period=self.__period,
+                                        has_data=has_data,
+                                        pagination=pagination,
+                                        brought_forward=brought_forward,
+                                        entries=page_entries,
+                                        total=total)
         return render_template("accounting/report/ledger.html",
                                report=params)

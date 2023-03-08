@@ -30,7 +30,7 @@ from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.page_params import PageParams
+from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import JournalPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
@@ -113,13 +113,13 @@ class CSVRow(BaseCSVRow):
                 self.debit, self.credit, self.note]
 
 
-class JournalPageParams(PageParams):
-    """The HTML parameters of the journal."""
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
 
     def __init__(self, period: Period,
                  pagination: Pagination[Entry],
                  entries: list[Entry]):
-        """Constructs the HTML parameters of the journal.
+        """Constructs the HTML page parameters.
 
         :param period: The period.
         :param entries: The journal entries.
@@ -235,9 +235,8 @@ class Journal(BaseReport):
         pagination: Pagination[Entry] = Pagination[Entry](self.__entries)
         page_entries: list[Entry] = pagination.list
         _populate_entries(page_entries)
-        params: JournalPageParams = JournalPageParams(
-            period=self.__period,
-            pagination=pagination,
-            entries=page_entries)
+        params: PageParams = PageParams(period=self.__period,
+                                        pagination=pagination,
+                                        entries=page_entries)
         return render_template("accounting/report/journal.html",
                                report=params)

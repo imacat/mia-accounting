@@ -30,7 +30,7 @@ from accounting.report.period import Period
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.page_params import PageParams
+from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import IncomeStatementPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
@@ -138,14 +138,14 @@ class CSVRow(BaseCSVRow):
         return [self.text, self.amount]
 
 
-class IncomeStatementPageParams(PageParams):
-    """The HTML parameters of the income statement."""
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
 
     def __init__(self, currency: Currency,
                  period: Period,
                  has_data: bool,
                  sections: list[IncomeStatementSection],):
-        """Constructs the HTML parameters of the income statement.
+        """Constructs the HTML page parameters.
 
         :param currency: The currency.
         :param period: The period.
@@ -340,10 +340,9 @@ class IncomeStatement(BaseReport):
 
         :return: The report as HTML.
         """
-        params: IncomeStatementPageParams = IncomeStatementPageParams(
-            currency=self.__currency,
-            period=self.__period,
-            has_data=self.__has_data,
-            sections=self.__sections)
+        params: PageParams = PageParams(currency=self.__currency,
+                                        period=self.__period,
+                                        has_data=self.__has_data,
+                                        sections=self.__sections)
         return render_template("accounting/report/income-statement.html",
                                report=params)

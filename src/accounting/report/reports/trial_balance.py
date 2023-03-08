@@ -29,7 +29,7 @@ from accounting.report.period import Period
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.page_params import PageParams
+from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import TrialBalancePeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
@@ -98,14 +98,14 @@ class CSVRow(BaseCSVRow):
         return [self.text, self.debit, self.credit]
 
 
-class TrialBalancePageParams(PageParams):
-    """The HTML parameters of the trial balance."""
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
 
     def __init__(self, currency: Currency,
                  period: Period,
                  accounts: list[TrialBalanceAccount],
                  total: TrialBalanceTotal):
-        """Constructs the HTML parameters of the trial balance.
+        """Constructs the HTML page parameters.
 
         :param currency: The currency.
         :param period: The period.
@@ -256,10 +256,9 @@ class TrialBalance(BaseReport):
 
         :return: The report as HTML.
         """
-        params: TrialBalancePageParams = TrialBalancePageParams(
-            currency=self.__currency,
-            period=self.__period,
-            accounts=self.__accounts,
-            total=self.__total)
+        params: PageParams = PageParams(currency=self.__currency,
+                                        period=self.__period,
+                                        accounts=self.__accounts,
+                                        total=self.__total)
         return render_template("accounting/report/trial-balance.html",
                                report=params)
