@@ -563,9 +563,6 @@ def _parse_period_spec(text: str) \
         may be None.
     :raise ValueError: When the date is invalid.
     """
-    if text == "this-month":
-        today: datetime.date = datetime.date.today()
-        return datetime.date(today.year, today.month, 1), _month_end(today)
     if text == "-":
         return None, None
     m = re.match(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
