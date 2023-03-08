@@ -35,6 +35,8 @@ from testlib_txn import Accounts, get_add_form, get_unchanged_update_form, \
 
 PREFIX: str = "/accounting/transactions"
 """The URL prefix for the transaction management."""
+RETURN_TO_URI: str = "/accounting/reports/journal"
+"""The URL to return to after the operation."""
 
 
 class CashIncomeTransactionTestCase(unittest.TestCase):
@@ -175,7 +177,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         response = self.client.post(f"{PREFIX}/{txn_id}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], PREFIX)
+        self.assertEqual(response.headers["Location"], RETURN_TO_URI)
 
     def test_add(self) -> None:
         """Tests to add the transactions.
@@ -736,7 +738,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         response = self.client.post(f"{PREFIX}/{txn_id}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], PREFIX)
+        self.assertEqual(response.headers["Location"], RETURN_TO_URI)
 
     def test_add(self) -> None:
         """Tests to add the transactions.
@@ -1304,7 +1306,7 @@ class TransferTransactionTestCase(unittest.TestCase):
         response = self.client.post(f"{PREFIX}/{txn_id}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], PREFIX)
+        self.assertEqual(response.headers["Location"], RETURN_TO_URI)
 
     def test_add(self) -> None:
         """Tests to add the transactions.
