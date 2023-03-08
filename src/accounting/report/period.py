@@ -63,6 +63,8 @@ class Period:
         """The period specification."""
         self.desc: str = ""
         """The text description."""
+        self.is_a_month: bool = False
+        """Whether the period is a whole month."""
         self.is_type_month: bool = False
         """Whether the period is for the month chooser."""
         self.is_a_year: bool = False
@@ -89,8 +91,9 @@ class Period:
         self.desc = self.__get_desc()
         if self.start is None or self.end is None:
             return
-        self.is_type_month \
-            = self.start.day == 1 and self.end == _month_end(self.start)
+        self.is_a_month = self.start.day == 1 \
+            and self.end == _month_end(self.start)
+        self.is_type_month = self.is_a_month
         self.is_a_year = self.start == datetime.date(self.start.year, 1, 1) \
             and self.end == datetime.date(self.start.year, 12, 31)
         self.is_a_day = self.start == self.end
