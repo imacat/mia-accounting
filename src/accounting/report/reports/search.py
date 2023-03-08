@@ -36,45 +36,13 @@ from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 
 
-class PageParams(BasePageParams):
-    """The HTML page parameters."""
-
-    def __init__(self, pagination: Pagination[ReportEntry],
-                 entries: list[ReportEntry]):
-        """Constructs the HTML page parameters.
-
-        :param entries: The search result entries.
-        """
-        self.pagination: Pagination[ReportEntry] = pagination
-        """The pagination."""
-        self.entries: list[ReportEntry] = entries
-        """The entries."""
-
-    @property
-    def has_data(self) -> bool:
-        """Returns whether there is any data on the page.
-
-        :return: True if there is any data, or False otherwise.
-        """
-        return len(self.entries) > 0
-
-    @property
-    def report_chooser(self) -> ReportChooser:
-        """Returns the report chooser.
-
-        :return: The report chooser.
-        """
-        return ReportChooser(ReportType.SEARCH)
-
-
-class Search(BaseReport):
-    """The search."""
+class EntryCollector:
+    """The report entry collector."""
 
     def __init__(self):
-        """Constructs a search."""
-        """The account."""
-        self.__entries: list[ReportEntry] = self.__query_entries()
-        """The journal entries."""
+        """Constructs the report entry collector."""
+        self.entries: list[ReportEntry] = self.__query_entries()
+        """The report entries."""
 
     def __query_entries(self) -> list[ReportEntry]:
         """Queries and returns the journal entries.
@@ -167,6 +135,47 @@ class Search(BaseReport):
         except ValueError:
             pass
         return sa.select(Transaction.id).filter(sa.or_(*conditions))
+
+
+class PageParams(BasePageParams):
+    """The HTML page parameters."""
+
+    def __init__(self, pagination: Pagination[ReportEntry],
+                 entries: list[ReportEntry]):
+        """Constructs the HTML page parameters.
+
+        :param entries: The search result entries.
+        """
+        self.pagination: Pagination[ReportEntry] = pagination
+        """The pagination."""
+        self.entries: list[ReportEntry] = entries
+        """The entries."""
+
+    @property
+    def has_data(self) -> bool:
+        """Returns whether there is any data on the page.
+
+        :return: True if there is any data, or False otherwise.
+        """
+        return len(self.entries) > 0
+
+    @property
+    def report_chooser(self) -> ReportChooser:
+        """Returns the report chooser.
+
+        :return: The report chooser.
+        """
+        return ReportChooser(ReportType.SEARCH)
+
+
+class Search(BaseReport):
+    """The search."""
+
+    def __init__(self):
+        """Constructs a search."""
+        """The account."""
+        self.__entries: list[ReportEntry] = EntryCollector().entries
+        """The journal entries."""
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
