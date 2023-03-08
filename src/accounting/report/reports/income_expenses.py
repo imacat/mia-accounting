@@ -71,10 +71,13 @@ class ReportEntry:
         """The note."""
         if entry is not None:
             self.entry = entry
+            self.transaction = entry.transaction
+            self.date = entry.transaction.date
             self.account = entry.account
             self.summary = entry.summary
             self.income = None if entry.is_debit else entry.amount
             self.expense = entry.amount if entry.is_debit else None
+            self.note = entry.transaction.note
 
 
 class EntryCollector:
@@ -159,7 +162,8 @@ class EntryCollector:
                 .order_by(Transaction.date,
                           JournalEntry.is_debit,
                           JournalEntry.no)
-                .options(selectinload(JournalEntry.account))]
+                .options(selectinload(JournalEntry.account),
+                         selectinload(JournalEntry.transaction))]
 
     @property
     def __account_condition(self) -> sa.BinaryExpression:
@@ -364,23 +368,6 @@ class PageParams(BasePageParams):
         return options
 
 
-def populate_entries(entries: list[ReportEntry]) -> None:
-    """Populates the report entries with relative data.
-
-    :param entries: The report entries.
-    :return: None.
-    """
-    transactions: dict[int, Transaction] \
-        = {x.id: x for x in Transaction.query.filter(
-           Transaction.id.in_({x.entry.transaction_id for x in entries
-                               if x.entry is not None}))}
-    for entry in entries:
-        if entry.entry is not None:
-            entry.transaction = transactions[entry.entry.transaction_id]
-            entry.date = entry.transaction.date
-            entry.note = entry.transaction.note
-
-
 class IncomeExpenses(BaseReport):
     """The income and expenses log."""
 
@@ -422,7 +409,6 @@ class IncomeExpenses(BaseReport):
 
         :return: The CSV rows.
         """
-        populate_entries(self.__entries)
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Account"),
                                      gettext("Summary"), gettext("Income"),
                                      gettext("Expense"), gettext("Balance"),
@@ -459,7 +445,6 @@ class IncomeExpenses(BaseReport):
             = Pagination[ReportEntry](all_entries)
         page_entries: list[ReportEntry] = pagination.list
         has_data: bool = len(page_entries) > 0
-        populate_entries(page_entries)
         brought_forward: ReportEntry | None = None
         if len(page_entries) > 0 and page_entries[0].is_brought_forward:
             brought_forward = page_entries[0]
