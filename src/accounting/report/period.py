@@ -554,6 +554,10 @@ class YearPeriod(Period):
         self.is_a_year = True
 
 
+DATE_SPEC_RE: str = r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?"
+"""The regular expression of a date specification."""
+
+
 def _parse_period_spec(text: str) \
         -> tuple[datetime.date | None, datetime.date | None]:
     """Parses the period specification.
@@ -565,17 +569,17 @@ def _parse_period_spec(text: str) \
     """
     if text == "-":
         return None, None
-    m = re.match(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
+    m = re.match(f"^{DATE_SPEC_RE}$", text)
     if m is not None:
         return __get_start(m[1], m[2], m[3]), \
                __get_end(m[1], m[2], m[3])
-    m = re.match(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?-$", text)
+    m = re.match(f"^{DATE_SPEC_RE}-$", text)
     if m is not None:
         return __get_start(m[1], m[2], m[3]), None
-    m = re.match(r"-(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
+    m = re.match(f"-{DATE_SPEC_RE}$", text)
     if m is not None:
         return None, __get_end(m[1], m[2], m[3])
-    m = re.match(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?-(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$", text)
+    m = re.match(f"^{DATE_SPEC_RE}-{DATE_SPEC_RE}$", text)
     if m is not None:
         return __get_start(m[1], m[2], m[3]), \
                __get_end(m[4], m[5], m[6])
