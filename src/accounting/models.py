@@ -141,11 +141,11 @@ class Account(db.Model):
     entries = db.relationship("JournalEntry", back_populates="account")
     """The journal entries."""
 
-    CASH_CODE = "1111-001"
+    CASH_CODE: str = "1111-001"
     """The code of the cash account,"""
-    ACCUMULATED_CHANGE_CODE = "3351-001"
+    ACCUMULATED_CHANGE_CODE: str = "3351-001"
     """The code of the accumulated-change account,"""
-    NET_CHANGE_CODE = "3353-001"
+    NET_CHANGE_CODE: str = "3353-001"
     """The code of the net-change account,"""
 
     def __str__(self) -> str:
