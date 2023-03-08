@@ -244,7 +244,7 @@ class Period:
         :param date: The date.
         :return: The formatted date.
         """
-        return F"{date.year}/{date.month}/{date.day}"
+        return f"{date.year}/{date.month}/{date.day}"
 
     @staticmethod
     def __format_month(month: datetime.date) -> str:
@@ -253,7 +253,7 @@ class Period:
         :param month: The month.
         :return: The formatted month.
         """
-        return F"{month.year}/{month.month}"
+        return f"{month.year}/{month.month}"
 
     def __get_year_desc(self) -> str:
         """Returns the description as a year range.
@@ -278,14 +278,14 @@ class Period:
         """
         if self.start.day != 1 or self.end != _month_end(self.end):
             raise ValueError
-        start: str = F"{self.start.year}/{self.start.month}"
+        start: str = f"{self.start.year}/{self.start.month}"
         if self.start.year == self.end.year \
                 and self.start.month == self.end.month:
             return gettext("in %(period)s", period=start)
         if self.start.year == self.end.year:
             end_month: str = str(self.end.month)
             return gettext("in %(start)s-%(end)s", start=start, end=end_month)
-        end: str = F"{self.end.year}/{self.end.month}"
+        end: str = f"{self.end.year}/{self.end.month}"
         return gettext("in %(start)s-%(end)s", start=start, end=end)
 
     def __get_day_desc(self) -> str:
@@ -294,7 +294,7 @@ class Period:
         :return: The description as a day range.
         :raise ValueError: The period is a month or year range.
         """
-        start: str = F"{self.start.year}/{self.start.month}/{self.start.day}"
+        start: str = f"{self.start.year}/{self.start.month}/{self.start.day}"
         if self.start == self.end:
             return gettext("in %(period)s", period=start)
         if self.start.year == self.end.year \
@@ -302,10 +302,10 @@ class Period:
             end_day: str = str(self.end.day)
             return gettext("in %(start)s-%(end)s", start=start, end=end_day)
         if self.start.year == self.end.year:
-            end_month_day: str = F"{self.end.month}/{self.end.day}"
+            end_month_day: str = f"{self.end.month}/{self.end.day}"
             return gettext("in %(start)s-%(end)s",
                            start=start, end=end_month_day)
-        end: str = F"{self.end.year}/{self.end.month}/{self.end.day}"
+        end: str = f"{self.end.year}/{self.end.month}/{self.end.day}"
         return gettext("in %(start)s-%(end)s", start=start, end=end)
 
     def is_year(self, year: int) -> bool:
