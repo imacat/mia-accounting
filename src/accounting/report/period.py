@@ -475,9 +475,6 @@ class YearPeriod(Period):
         self.spec = str(year)
         self.is_a_year = True
 
-    def _set_properties(self) -> None:
-        pass
-
 
 def _parse_period_spec(text: str) \
         -> tuple[datetime.date | None, datetime.date | None]:
