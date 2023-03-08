@@ -183,14 +183,19 @@ class Search(BaseReport):
             return []
         conditions: list[sa.BinaryExpression] = []
         for k in keywords:
-            conditions.append(sa.or_(
-                JournalEntry.summary.contains(k),
-                sa.cast(JournalEntry.amount, sa.String).contains(k),
-                JournalEntry.account_id.in_(self.__get_account_condition(k)),
-                JournalEntry.currency_code.in_(
-                    self.__get_currency_condition(k)),
-                JournalEntry.transaction_id.in_(
-                    self.__get_transaction_condition(k))))
+            sub_conditions: list[sa.BinaryExpression] \
+                = [JournalEntry.summary.contains(k),
+                   JournalEntry.account_id.in_(
+                       self.__get_account_condition(k)),
+                   JournalEntry.currency_code.in_(
+                       self.__get_currency_condition(k)),
+                   JournalEntry.transaction_id.in_(
+                       self.__get_transaction_condition(k))]
+            try:
+                sub_conditions.append(JournalEntry.amount == Decimal(k))
+            except ArithmeticError:
+                pass
+            conditions.append(sa.or_(*sub_conditions))
         return [Entry(x) for x in JournalEntry.query.filter(*conditions)]
 
     @staticmethod
