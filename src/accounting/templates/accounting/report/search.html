@@ -39,9 +39,7 @@ First written: 2023/3/8
   {% endwith %}
 </div>
 
-{% with txn_types = report.txn_types %}
-  {% include "accounting/report/include/add-txn-material-fab.html" %}
-{% endwith %}
+{% include "accounting/report/include/add-txn-material-fab.html" %}
 
 <div class="btn-group btn-actions mb-3 d-md-none">
   {% with use_report_chooser = true,
