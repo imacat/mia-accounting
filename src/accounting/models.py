@@ -141,11 +141,11 @@ class Account(db.Model):
     entries = db.relationship("JournalEntry", back_populates="account")
     """The journal entries."""
 
-    CASH = "1111-001"
+    CASH_CODE = "1111-001"
     """The code of the cash account,"""
-    ACCUMULATED_CHANGE = "3351-001"
+    ACCUMULATED_CHANGE_CODE = "3351-001"
     """The code of the accumulated-change account,"""
-    NET_CHANGE = "3353-001"
+    NET_CHANGE_CODE = "3353-001"
     """The code of the net-change account,"""
 
     def __str__(self) -> str:
@@ -265,7 +265,7 @@ class Account(db.Model):
 
         :return: The cash account
         """
-        return cls.find_by_code(cls.CASH)
+        return cls.find_by_code(cls.CASH_CODE)
 
     @classmethod
     def accumulated_change(cls) -> t.Self:
@@ -273,7 +273,7 @@ class Account(db.Model):
 
         :return: The accumulated-change account
         """
-        return cls.find_by_code(cls.ACCUMULATED_CHANGE)
+        return cls.find_by_code(cls.ACCUMULATED_CHANGE_CODE)
 
     @property
     def is_modified(self) -> bool:
@@ -550,7 +550,7 @@ class Transaction(db.Model):
         for currency in self.currencies:
             if len(currency.debit) > 1:
                 return False
-            if currency.debit[0].account.code != Account.CASH:
+            if currency.debit[0].account.code != Account.CASH_CODE:
                 return False
         return True
 
@@ -564,7 +564,7 @@ class Transaction(db.Model):
         for currency in self.currencies:
             if len(currency.credit) > 1:
                 return False
-            if currency.credit[0].account.code != Account.CASH:
+            if currency.credit[0].account.code != Account.CASH_CODE:
                 return False
         return True
 

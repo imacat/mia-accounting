@@ -180,7 +180,7 @@ class AccountCollector:
         url: str = url_for("accounting.report.income-statement",
                            currency=self.__currency,
                            period=self.__period.before)
-        self.__add_owner_s_equity(Account.ACCUMULATED_CHANGE, amount, url)
+        self.__add_owner_s_equity(Account.ACCUMULATED_CHANGE_CODE, amount, url)
 
     def __query_accumulated(self) -> Decimal | None:
         """Queries and returns the accumulated profit or loss.
@@ -209,7 +209,7 @@ class AccountCollector:
         amount: Decimal | None = self.__query_currency_period()
         url: str = url_for("accounting.report.income-statement",
                            currency=self.__currency, period=self.__period)
-        self.__add_owner_s_equity(Account.NET_CHANGE, amount, url)
+        self.__add_owner_s_equity(Account.NET_CHANGE_CODE, amount, url)
 
     def __query_currency_period(self) -> Decimal | None:
         """Queries and returns the net income or loss for current period.
