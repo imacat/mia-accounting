@@ -236,8 +236,7 @@ class Search(BaseReport):
         :param k: The keyword.
         :return: The condition to filter the transaction.
         """
-        conditions: list[sa.BinaryExpression] \
-            = [Transaction.note.contains(k)]
+        conditions: list[sa.BinaryExpression] = [Transaction.note.contains(k)]
         txn_date: datetime
         try:
             txn_date = datetime.strptime(k, "%Y")
