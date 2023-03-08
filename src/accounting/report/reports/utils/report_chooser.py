@@ -76,6 +76,8 @@ class ReportChooser:
         for report in self.__reports:
             if report.is_active:
                 self.current_report = report.title
+        if self.is_search:
+            self.current_report = gettext("Search")
 
     @property
     def __journal(self) -> OptionLink:
