@@ -171,28 +171,30 @@ class MonthTab extends TabPlane {
     constructor(chooser) {
         super(chooser);
         const monthChooser = document.getElementById(this.prefix + "-chooser");
-        let start = monthChooser.dataset.start;
-        this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
-            restrictions: {
-                minDate: start,
-            },
-            display: {
-                inline: true,
-                components: {
-                    date: false,
-                    clock: false,
+        if (monthChooser !== null) {
+            let start = monthChooser.dataset.start;
+            this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
+                restrictions: {
+                    minDate: start,
                 },
-            },
-            defaultDate: monthChooser.dataset.default,
-        });
-        monthChooser.addEventListener(tempusDominus.Namespace.events.change, (e) => {
-            const date = e.detail.date;
-            const year = date.year;
-            const month = date.month + 1;
-            const period = month < 10? year + "-0" + month: year + "-" + month;
-            window.location = chooser.modal.dataset.urlTemplate
-                .replaceAll("PERIOD", period);
-        });
+                display: {
+                    inline: true,
+                    components: {
+                        date: false,
+                        clock: false,
+                    },
+                },
+                defaultDate: monthChooser.dataset.default,
+            });
+            monthChooser.addEventListener(tempusDominus.Namespace.events.change, (e) => {
+                const date = e.detail.date;
+                const year = date.year;
+                const month = date.month + 1;
+                const period = month < 10? year + "-0" + month: year + "-" + month;
+                window.location = chooser.modal.dataset.urlTemplate
+                    .replaceAll("PERIOD", period);
+            });
+        }
     }
 
     /**
@@ -250,12 +252,14 @@ class DayTab extends TabPlane {
         super(chooser);
         this.#date = document.getElementById(this.prefix + "-date");
         this.#dateError = document.getElementById(this.prefix + "-date-error");
-        this.#date.onchange = () => {
-            if (this.#validateDate()) {
-                window.location = chooser.modal.dataset.urlTemplate
-                    .replaceAll("PERIOD", this.#date.value);
-            }
-        };
+        if (this.#date !== null) {
+            this.#date.onchange = () => {
+                if (this.#validateDate()) {
+                    window.location = chooser.modal.dataset.urlTemplate
+                        .replaceAll("PERIOD", this.#date.value);
+                }
+            };
+        }
     }
 
     /**
@@ -338,25 +342,27 @@ class CustomTab extends TabPlane {
         this.#end = document.getElementById(this.prefix + "-end");
         this.#endError = document.getElementById(this.prefix + "-end-error");
         this.#conform = document.getElementById(this.prefix + "-confirm");
-        this.#start.onchange = () => {
-            if (this.#validateStart()) {
-                this.#end.min = this.#start.value;
-            }
-        };
-        this.#end.onchange = () => {
-            if (this.#validateEnd()) {
-                this.#start.max = this.#end.value;
-            }
-        };
-        this.#conform.onclick = () => {
-            let isValid = true;
-            isValid = this.#validateStart() && isValid;
-            isValid = this.#validateEnd() && isValid;
-            if (isValid) {
-                window.location = chooser.modal.dataset.urlTemplate
-                    .replaceAll("PERIOD", this.#start.value + "-" + this.#end.value);
-            }
-        };
+        if (this.#start !== null) {
+            this.#start.onchange = () => {
+                if (this.#validateStart()) {
+                    this.#end.min = this.#start.value;
+                }
+            };
+            this.#end.onchange = () => {
+                if (this.#validateEnd()) {
+                    this.#start.max = this.#end.value;
+                }
+            };
+            this.#conform.onclick = () => {
+                let isValid = true;
+                isValid = this.#validateStart() && isValid;
+                isValid = this.#validateEnd() && isValid;
+                if (isValid) {
+                    window.location = chooser.modal.dataset.urlTemplate
+                        .replaceAll("PERIOD", this.#start.value + "-" + this.#end.value);
+                }
+            };
+        }
     }
 
     /**
