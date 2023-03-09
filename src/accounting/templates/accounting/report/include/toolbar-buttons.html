@@ -111,9 +111,9 @@ First written: 2023/3/8
   <span class="d-none d-md-inline">{{ A_("Download") }}</span>
 </a>
 {% if use_search %}
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-labelledby="accounting-search-label">
-    <input id="accounting-search" class="form-control form-control-sm" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
-    <label id="accounting-search-label" for="accounting-search" class="input-group-text">
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-labelledby="accounting-toolbar-search-label">
+    <input id="accounting-toolbar-search" class="form-control form-control-sm" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
+    <label id="accounting-toolbar-search-label" for="accounting-toolbar-search" class="input-group-text">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
         <span class="d-none d-md-inline">{{ A_("Search") }}</span>
