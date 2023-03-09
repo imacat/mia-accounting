@@ -21,11 +21,11 @@ from flask import Blueprint, request, Response
 
 from accounting.models import Currency, Account
 from accounting.utils.permission import has_permission, can_view
-from .income_expense_account import IncomeExpensesAccount
-from .period import Period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
 from .template_filters import format_amount
+from .utils.income_expense_account import IncomeExpensesAccount
+from .utils.period import Period
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""

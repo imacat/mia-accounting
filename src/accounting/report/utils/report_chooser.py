@@ -28,10 +28,10 @@ from flask_babel import LazyString
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account
-from accounting.report.income_expense_account import IncomeExpensesAccount
-from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
+from .income_expense_account import IncomeExpensesAccount
 from .option_link import OptionLink
+from .period import Period
 from .report_type import ReportType
 from .urls import journal_url, ledger_url, income_expenses_url, \
     trial_balance_url, income_statement_url, balance_sheet_url
