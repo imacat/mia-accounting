@@ -79,7 +79,7 @@ class PeriodChooser:
         self.available_years: list[int] = []
         """The available years."""
 
-        if self.has_data is not None:
+        if self.has_data:
             today: date = date.today()
             self.has_last_month = start < date(today.year, today.month, 1)
             self.has_last_year = start.year < today.year
