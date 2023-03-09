@@ -21,12 +21,12 @@ This file is largely taken from the NanoParma ERP project, first written in
 
 """
 import calendar
-import re
 import typing as t
 from datetime import date, timedelta
 
 from accounting.locale import gettext
 from .description import PeriodDescription
+from .parser import parse_spec
 from .specification import PeriodSpecification
 
 
@@ -123,7 +123,7 @@ class Period:
         }
         if spec in named_periods:
             return named_periods[spec]()
-        start, end = _parse_period_spec(spec)
+        start, end = parse_spec(spec)
         if start is not None and end is not None and start > end:
             raise ValueError
         return cls(start, end)
@@ -300,72 +300,6 @@ class YearPeriod(Period):
         start: date = date(year, 1, 1)
         end: date = date(year, 12, 31)
         super().__init__(start, end)
-
-
-DATE_SPEC_RE: str = r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?"
-"""The regular expression of a date specification."""
-
-
-def _parse_period_spec(text: str) -> tuple[date | None, date | None]:
-    """Parses the period specification.
-
-    :param text: The period specification.
-    :return: The start and end day of the period.  The start and end day
-        may be None.
-    :raise ValueError: When the date is invalid.
-    """
-    if text == "-":
-        return None, None
-    m = re.match(f"^{DATE_SPEC_RE}$", text)
-    if m is not None:
-        return __get_start(m[1], m[2], m[3]), \
-               __get_end(m[1], m[2], m[3])
-    m = re.match(f"^{DATE_SPEC_RE}-$", text)
-    if m is not None:
-        return __get_start(m[1], m[2], m[3]), None
-    m = re.match(f"-{DATE_SPEC_RE}$", text)
-    if m is not None:
-        return None, __get_end(m[1], m[2], m[3])
-    m = re.match(f"^{DATE_SPEC_RE}-{DATE_SPEC_RE}$", text)
-    if m is not None:
-        return __get_start(m[1], m[2], m[3]), \
-               __get_end(m[4], m[5], m[6])
-    raise ValueError
-
-
-def __get_start(year: str, month: str | None, day: str | None) -> date:
-    """Returns the start of the period from the date representation.
-
-    :param year: The year.
-    :param month: The month, if any.
-    :param day: The day, if any.
-    :return: The start of the period.
-    :raise ValueError: When the date is invalid.
-    """
-    if day is not None:
-        return date(int(year), int(month), int(day))
-    if month is not None:
-        return date(int(year), int(month), 1)
-    return date(int(year), 1, 1)
-
-
-def __get_end(year: str, month: str | None, day: str | None) -> date:
-    """Returns the end of the period from the date representation.
-
-    :param year: The year.
-    :param month: The month, if any.
-    :param day: The day, if any.
-    :return: The end of the period.
-    :raise ValueError: When the date is invalid.
-    """
-    if day is not None:
-        return date(int(year), int(month), int(day))
-    if month is not None:
-        year_n: int = int(year)
-        month_n: int = int(month)
-        day_n: int = calendar.monthrange(year_n, month_n)[1]
-        return date(year_n, month_n, day_n)
-    return date(int(year), 12, 31)
 
 
 def _month_end(day: date) -> date:
