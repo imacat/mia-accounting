@@ -23,7 +23,6 @@ This file is largely taken from the NanoParma ERP project, first written in
 import re
 import typing as t
 
-from flask import url_for
 from flask_babel import LazyString
 
 from accounting import db
@@ -33,7 +32,8 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
 from .get_url import get_journal_url, get_ledger_url, \
-    get_income_expenses_url, get_trial_balance_url, get_income_statement_url
+    get_income_expenses_url, get_trial_balance_url, get_income_statement_url, \
+    get_balance_sheet_url
 from .option_link import OptionLink
 from .report_type import ReportType
 
@@ -151,12 +151,9 @@ class ReportChooser:
 
         :return: The balance sheet.
         """
-        url: str = url_for("accounting.report.balance-sheet-default",
-                           currency=self.__currency) \
-            if self.__period.is_default \
-            else url_for("accounting.report.balance-sheet",
-                         currency=self.__currency, period=self.__period)
-        return OptionLink(gettext("Balance Sheet"), url,
+        return OptionLink(gettext("Balance Sheet"),
+                          get_balance_sheet_url(self.__currency,
+                                                self.__period),
                           self.__active_report == ReportType.BALANCE_SHEET,
                           fa_icon="fa-solid fa-scale-balanced")
 

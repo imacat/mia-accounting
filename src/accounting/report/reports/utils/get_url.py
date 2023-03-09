@@ -96,3 +96,17 @@ def get_income_statement_url(currency: Currency, period: Period) -> str:
                        currency=currency)
     return url_for("accounting.report.income-statement",
                    currency=currency, period=period)
+
+
+def get_balance_sheet_url(currency: Currency, period: Period) -> str:
+    """Returns the URL of a balance sheet.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The URL of the balance sheet.
+    """
+    if period.is_default:
+        return url_for("accounting.report.balance-sheet-default",
+                       currency=currency)
+    return url_for("accounting.report.balance-sheet",
+                   currency=currency, period=period)

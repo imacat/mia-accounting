@@ -23,15 +23,14 @@ This file is largely taken from the NanoParma ERP project, first written in
 from abc import ABC, abstractmethod
 from datetime import date
 
-from flask import url_for
-
 from accounting.models import Currency, Account, Transaction
 from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
 from .get_url import get_journal_url, get_ledger_url, \
-    get_income_expenses_url, get_trial_balance_url, get_income_statement_url
+    get_income_expenses_url, get_trial_balance_url, get_income_statement_url, \
+    get_balance_sheet_url
 
 
 class PeriodChooser(ABC):
@@ -193,8 +192,4 @@ class BalanceSheetPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        if period.is_default:
-            return url_for("accounting.report.balance-sheet-default",
-                           currency=self.currency)
-        return url_for("accounting.report.balance-sheet",
-                       currency=self.currency, period=period)
+        return get_balance_sheet_url(self.currency, period)
