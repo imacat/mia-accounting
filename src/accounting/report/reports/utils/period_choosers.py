@@ -24,9 +24,9 @@ import typing as t
 from datetime import date
 
 from accounting.models import Transaction
-from accounting.report.period import YearPeriod, Period, ThisMonth, \
-    LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, AllTime, \
-    TemplatePeriod
+from accounting.report.period import Period, ThisMonth, LastMonth, \
+    SinceLastMonth, ThisYear, LastYear, Today, Yesterday, AllTime, \
+    TemplatePeriod, YearPeriod
 
 
 class PeriodChooser:
