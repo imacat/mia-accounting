@@ -20,42 +20,45 @@ This file is largely taken from the NanoParma ERP project, first written in
 2021/9/16 by imacat (imacat@nanoparma.com).
 
 """
-from abc import ABC, abstractmethod
+import typing as t
 from datetime import date
 
-from accounting.models import Currency, Account, Transaction
-from accounting.report.income_expense_account import IncomeExpensesAccount
+from accounting.models import Transaction
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
-from .urls import journal_url, ledger_url, income_expenses_url, \
-    trial_balance_url, income_statement_url, balance_sheet_url
 
 
-class PeriodChooser(ABC):
+class PeriodChooser:
     """The period chooser."""
 
-    def __init__(self):
-        """Constructs a period chooser."""
+    def __init__(self, get_url: t.Callable[[Period], str]):
+        """Constructs a period chooser.
+
+        :param get_url: The callback to return the URL of the current report in
+            a period.
+        """
+        self.__get_url: t.Callable[[Period], str] = get_url
+        """The callback to return the URL of the current report in a period."""
 
         # Shortcut periods
-        self.this_month_url: str = self._url_for(ThisMonth())
+        self.this_month_url: str = get_url(ThisMonth())
         """The URL for this month."""
-        self.last_month_url: str = self._url_for(LastMonth())
+        self.last_month_url: str = get_url(LastMonth())
         """The URL for last month."""
-        self.since_last_month_url: str = self._url_for(SinceLastMonth())
+        self.since_last_month_url: str = get_url(SinceLastMonth())
         """The URL since last mint."""
-        self.this_year_url: str = self._url_for(ThisYear())
+        self.this_year_url: str = get_url(ThisYear())
         """The URL for this year."""
-        self.last_year_url: str = self._url_for(LastYear())
+        self.last_year_url: str = get_url(LastYear())
         """The URL for last year."""
-        self.today_url: str = self._url_for(Today())
+        self.today_url: str = get_url(Today())
         """The URL for today."""
-        self.yesterday_url: str = self._url_for(Yesterday())
+        self.yesterday_url: str = get_url(Yesterday())
         """The URL for yesterday."""
-        self.all_url: str = self._url_for(Period(None, None))
+        self.all_url: str = get_url(Period(None, None))
         """The URL for all period."""
-        self.url_template: str = self._url_for(TemplatePeriod())
+        self.url_template: str = get_url(TemplatePeriod())
         """The URL template."""
 
         first: Transaction | None \
@@ -85,95 +88,10 @@ class PeriodChooser(ABC):
                 self.available_years \
                     = reversed(range(start.year, today.year - 1))
 
-    @abstractmethod
-    def _url_for(self, period: Period) -> str:
-        """Returns the URL for a period.
-
-        :param period: The period.
-        :return: The URL for the period.
-        """
-        pass
-
     def year_url(self, year: int) -> str:
         """Returns the period URL of a year.
 
         :param year: The year
         :return: The period URL of the year.
         """
-        return self._url_for(YearPeriod(year))
-
-
-class JournalPeriodChooser(PeriodChooser):
-    """The journal period chooser."""
-
-    def _url_for(self, period: Period) -> str:
-        return journal_url(period)
-
-
-class LedgerPeriodChooser(PeriodChooser):
-    """The ledger period chooser."""
-
-    def __init__(self, currency: Currency, account: Account):
-        """Constructs the ledger period chooser."""
-        self.currency: Currency = currency
-        """The currency."""
-        self.account: Account = account
-        """The account."""
-        super().__init__()
-
-    def _url_for(self, period: Period) -> str:
-        return ledger_url(self.currency, self.account, period)
-
-
-class IncomeExpensesPeriodChooser(PeriodChooser):
-    """The income and expenses log period chooser."""
-
-    def __init__(self, currency: Currency, account: IncomeExpensesAccount):
-        """Constructs the income and expenses log period chooser."""
-        self.currency: Currency = currency
-        """The currency."""
-        self.account: IncomeExpensesAccount = account
-        """The account."""
-        super().__init__()
-
-    def _url_for(self, period: Period) -> str:
-        return income_expenses_url(self.currency, self.account, period)
-
-
-class TrialBalancePeriodChooser(PeriodChooser):
-    """The trial balance period chooser."""
-
-    def __init__(self, currency: Currency):
-        """Constructs the trial balance period chooser."""
-        self.currency: Currency = currency
-        """The currency."""
-        super().__init__()
-
-    def _url_for(self, period: Period) -> str:
-        return trial_balance_url(self.currency, period)
-
-
-class IncomeStatementPeriodChooser(PeriodChooser):
-    """The income statement period chooser."""
-
-    def __init__(self, currency: Currency):
-        """Constructs the income statement period chooser."""
-        self.currency: Currency = currency
-        """The currency."""
-        super().__init__()
-
-    def _url_for(self, period: Period) -> str:
-        return income_statement_url(self.currency, period)
-
-
-class BalanceSheetPeriodChooser(PeriodChooser):
-    """The balance sheet period chooser."""
-
-    def __init__(self, currency: Currency):
-        """Constructs the balance sheet period chooser."""
-        self.currency: Currency = currency
-        """The currency."""
-        super().__init__()
-
-    def _url_for(self, period: Period) -> str:
-        return balance_sheet_url(self.currency, period)
+        return self.__get_url(YearPeriod(year))

@@ -31,7 +31,7 @@ from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.period_choosers import IncomeStatementPeriodChooser
+from .utils.period_choosers import PeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 from .utils.urls import ledger_url, income_statement_url
@@ -160,8 +160,8 @@ class PageParams(BasePageParams):
         """True if there is any data, or False otherwise."""
         self.sections: list[Section] = sections
         """The sections in the income statement."""
-        self.period_chooser: IncomeStatementPeriodChooser \
-            = IncomeStatementPeriodChooser(currency)
+        self.period_chooser: PeriodChooser = PeriodChooser(
+            lambda x: income_statement_url(currency, x))
         """The period chooser."""
 
     @property

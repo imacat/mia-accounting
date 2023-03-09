@@ -34,7 +34,7 @@ from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.period_choosers import IncomeExpensesPeriodChooser
+from .utils.period_choosers import PeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 from .utils.urls import income_expenses_url
@@ -289,8 +289,8 @@ class PageParams(BasePageParams):
         """The report entries."""
         self.total: ReportEntry | None = total
         """The total entry."""
-        self.period_chooser: IncomeExpensesPeriodChooser \
-            = IncomeExpensesPeriodChooser(currency, account)
+        self.period_chooser: PeriodChooser = PeriodChooser(
+            lambda x: income_expenses_url(currency, account, x))
         """The period chooser."""
 
     @property

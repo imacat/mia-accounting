@@ -31,9 +31,10 @@ from accounting.utils.pagination import Pagination
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.period_choosers import JournalPeriodChooser
+from .utils.period_choosers import PeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
+from .utils.urls import journal_url
 
 
 class ReportEntry:
@@ -122,8 +123,8 @@ class PageParams(BasePageParams):
         """The pagination."""
         self.entries: list[JournalEntry] = entries
         """The entries."""
-        self.period_chooser: JournalPeriodChooser \
-            = JournalPeriodChooser()
+        self.period_chooser: PeriodChooser = PeriodChooser(
+            lambda x: journal_url(x))
         """The period chooser."""
 
     @property

@@ -30,7 +30,7 @@ from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.period_choosers import TrialBalancePeriodChooser
+from .utils.period_choosers import PeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 from .utils.urls import ledger_url, trial_balance_url
@@ -121,8 +121,8 @@ class PageParams(BasePageParams):
         """The accounts in the trial balance."""
         self.total: Total = total
         """The total of the trial balance."""
-        self.period_chooser: TrialBalancePeriodChooser \
-            = TrialBalancePeriodChooser(currency)
+        self.period_chooser: PeriodChooser = PeriodChooser(
+            lambda x: trial_balance_url(currency, x))
         """The period chooser."""
 
     @property

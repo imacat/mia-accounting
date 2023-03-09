@@ -31,7 +31,7 @@ from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
 from .utils.option_link import OptionLink
-from .utils.period_choosers import BalanceSheetPeriodChooser
+from .utils.period_choosers import PeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
 from .utils.urls import ledger_url, balance_sheet_url, income_statement_url
@@ -317,8 +317,8 @@ class PageParams(BasePageParams):
         """The liabilities."""
         self.owner_s_equity: Section = owner_s_equity
         """The owner's equity."""
-        self.period_chooser: BalanceSheetPeriodChooser \
-            = BalanceSheetPeriodChooser(currency)
+        self.period_chooser: PeriodChooser = PeriodChooser(
+            lambda x: balance_sheet_url(currency, x))
         """The period chooser."""
 
     @property
