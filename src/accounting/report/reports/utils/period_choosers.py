@@ -25,7 +25,7 @@ from datetime import date
 
 from accounting.models import Transaction
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
-    LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
+    LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, AllTime, \
     TemplatePeriod
 
 
@@ -56,7 +56,7 @@ class PeriodChooser:
         """The URL for today."""
         self.yesterday_url: str = get_url(Yesterday())
         """The URL for yesterday."""
-        self.all_url: str = get_url(Period(None, None))
+        self.all_url: str = get_url(AllTime())
         """The URL for all period."""
         self.url_template: str = get_url(TemplatePeriod())
         """The URL template."""

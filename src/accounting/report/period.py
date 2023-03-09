@@ -116,6 +116,7 @@ class Period:
             "last-year": lambda: LastYear(),
             "today": lambda: Today(),
             "yesterday": lambda: Yesterday(),
+            "all-time": lambda: AllTime(),
         }
         if spec in named_periods:
             return named_periods[spec]()
@@ -529,6 +530,18 @@ class Yesterday(Period):
         self.desc = gettext("Yesterday")
         self.is_a_day = True
         self.is_yesterday = True
+
+
+class AllTime(Period):
+    """The period of all time."""
+    def __init__(self):
+        super().__init__(None, None)
+        self.is_this_year = True
+
+    def _set_properties(self) -> None:
+        self.spec = "all-time"
+        self.desc = gettext("All")
+        self.is_all = True
 
 
 class TemplatePeriod(Period):
