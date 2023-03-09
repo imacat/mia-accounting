@@ -35,11 +35,8 @@ from .urls import journal_url, ledger_url, income_expenses_url, \
 class PeriodChooser(ABC):
     """The period chooser."""
 
-    def __init__(self, start: date | None):
-        """Constructs a period chooser.
-
-        :param start: The start of the period.
-        """
+    def __init__(self):
+        """Constructs a period chooser."""
 
         # Shortcut periods
         self.this_month_url: str = self._url_for(ThisMonth())
@@ -60,6 +57,10 @@ class PeriodChooser(ABC):
         """The URL for all period."""
         self.url_template: str = self._url_for(TemplatePeriod())
         """The URL template."""
+
+        first: Transaction | None \
+            = Transaction.query.order_by(Transaction.date).first()
+        start: date | None = None if first is None else first.date
 
         # Attributes
         self.data_start: date | None = start
@@ -105,12 +106,6 @@ class PeriodChooser(ABC):
 class JournalPeriodChooser(PeriodChooser):
     """The journal period chooser."""
 
-    def __init__(self):
-        """Constructs the journal period chooser."""
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
-        super().__init__(None if first is None else first.date)
-
     def _url_for(self, period: Period) -> str:
         return journal_url(period)
 
@@ -124,9 +119,7 @@ class LedgerPeriodChooser(PeriodChooser):
         """The currency."""
         self.account: Account = account
         """The account."""
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
-        super().__init__(None if first is None else first.date)
+        super().__init__()
 
     def _url_for(self, period: Period) -> str:
         return ledger_url(self.currency, self.account, period)
@@ -141,9 +134,7 @@ class IncomeExpensesPeriodChooser(PeriodChooser):
         """The currency."""
         self.account: IncomeExpensesAccount = account
         """The account."""
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
-        super().__init__(None if first is None else first.date)
+        super().__init__()
 
     def _url_for(self, period: Period) -> str:
         return income_expenses_url(self.currency, self.account, period)
@@ -156,9 +147,7 @@ class TrialBalancePeriodChooser(PeriodChooser):
         """Constructs the trial balance period chooser."""
         self.currency: Currency = currency
         """The currency."""
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
-        super().__init__(None if first is None else first.date)
+        super().__init__()
 
     def _url_for(self, period: Period) -> str:
         return trial_balance_url(self.currency, period)
@@ -171,9 +160,7 @@ class IncomeStatementPeriodChooser(PeriodChooser):
         """Constructs the income statement period chooser."""
         self.currency: Currency = currency
         """The currency."""
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
-        super().__init__(None if first is None else first.date)
+        super().__init__()
 
     def _url_for(self, period: Period) -> str:
         return income_statement_url(self.currency, period)
@@ -186,9 +173,7 @@ class BalanceSheetPeriodChooser(PeriodChooser):
         """Constructs the balance sheet period chooser."""
         self.currency: Currency = currency
         """The currency."""
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
-        super().__init__(None if first is None else first.date)
+        super().__init__()
 
     def _url_for(self, period: Period) -> str:
         return balance_sheet_url(self.currency, period)
