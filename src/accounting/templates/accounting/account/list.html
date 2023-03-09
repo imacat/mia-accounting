@@ -25,31 +25,19 @@ First written: 2023/1/30
 
 {% block content %}
 
-<div class="btn-group mb-2 d-none d-md-inline-flex">
+<div class="mb-2 accounting-toolbar">
   {% if accounting_can_edit() %}
-    <a class="btn btn-primary text-nowrap" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
+    <a class="btn btn-primary text-nowrap d-none d-md-block" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
       <i class="fa-solid fa-plus"></i>
       {{ A_("New") }}
     </a>
   {% endif %}
-  <form class="btn btn-primary d-flex input-group accounting-search-desktop-form" action="{{ url_for("accounting.account.list") }}" method="get" role="search" aria-label="{{ A_("Search for Desktop") }}">
-    <input id="accounting-search-desktop" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
-    <label for="accounting-search-desktop" class="accounting-search-label">
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search" aria-labelledby="accounting-search-label">
+    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
+    <label id="accounting-search-label" for="accounting-search" class="input-group-text accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
-        {{ A_("Search") }}
-      </button>
-    </label>
-  </form>
-</div>
-
-<div class="btn-group mb-2 d-md-none">
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.account.list") }}" method="get" role="search" aria-label="{{ A_("Search for Mobile") }}">
-    <input id="accounting-search-mobile" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
-    <label for="accounting-search-mobile" class="accounting-search-label">
-      <button type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        {{ A_("Search") }}
+        <span class="d-none d-md-inline">{{ A_("Search") }}</span>
       </button>
     </label>
   </form>
