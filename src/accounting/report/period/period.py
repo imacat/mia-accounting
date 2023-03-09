@@ -20,11 +20,11 @@ This file is largely taken from the NanoParma ERP project, first written in
 2021/9/16 by imacat (imacat@nanoparma.com).
 
 """
-import calendar
 import typing as t
 from datetime import date, timedelta
 
 from .description import get_desc
+from .month_end import month_end
 from .specification import get_spec
 
 
@@ -127,13 +127,3 @@ class Period:
         if self.start is None:
             return None
         return Period(None, self.start - timedelta(days=1))
-
-
-def month_end(day: date) -> date:
-    """Returns the end day of month for a date.
-
-    :param day: The date.
-    :return: The end day of the month of that day.
-    """
-    last_day: int = calendar.monthrange(day.year, day.month)[1]
-    return date(day.year, day.month, last_day)

@@ -20,7 +20,8 @@
 from datetime import date, timedelta
 
 from accounting.locale import gettext
-from .period import Period, month_end
+from .month_end import month_end
+from .period import Period
 
 
 class ThisMonth(Period):
