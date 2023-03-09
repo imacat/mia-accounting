@@ -33,11 +33,11 @@ from accounting.utils.pagination import Pagination
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.urls import income_expenses_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import IncomeExpensesPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
+from .utils.urls import income_expenses_url
 
 
 class ReportEntry:
