@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The utility to export the report as CSV for download.
+"""The utilities to export the report as CSV for download.
 
 """
 import csv
