@@ -31,7 +31,7 @@ from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
 from .get_url import get_ledger_url, get_income_expenses_url, \
-    get_income_statement_url
+    get_trial_balance_url, get_income_statement_url
 
 
 class PeriodChooser(ABC):
@@ -165,11 +165,7 @@ class TrialBalancePeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        if period.is_default:
-            return url_for("accounting.report.trial-balance-default",
-                           currency=self.currency)
-        return url_for("accounting.report.trial-balance",
-                       currency=self.currency, period=period)
+        return get_trial_balance_url(self.currency, period)
 
 
 class IncomeStatementPeriodChooser(PeriodChooser):

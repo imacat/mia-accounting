@@ -58,6 +58,20 @@ def get_income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
                    period=period)
 
 
+def get_trial_balance_url(currency: Currency, period: Period) -> str:
+    """Returns the URL of a trial balance.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The URL of the trial balance.
+    """
+    if period.is_default:
+        return url_for("accounting.report.trial-balance-default",
+                       currency=currency)
+    return url_for("accounting.report.trial-balance",
+                   currency=currency, period=period)
+
+
 def get_income_statement_url(currency: Currency, period: Period) -> str:
     """Returns the URL of an income statement.
 
