@@ -31,11 +31,10 @@ from accounting.models import Currency, Account
 from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
-from .get_url import get_journal_url, get_ledger_url, \
-    get_income_expenses_url, get_trial_balance_url, get_income_statement_url, \
-    get_balance_sheet_url
 from .option_link import OptionLink
 from .report_type import ReportType
+from .urls import journal_url, ledger_url, income_expenses_url, \
+    trial_balance_url, income_statement_url, balance_sheet_url
 
 
 class ReportChooser:
@@ -88,7 +87,7 @@ class ReportChooser:
 
         :return: The journal.
         """
-        return OptionLink(gettext("Journal"), get_journal_url(self.__period),
+        return OptionLink(gettext("Journal"), journal_url(self.__period),
                           self.__active_report == ReportType.JOURNAL,
                           fa_icon="fa-solid fa-book")
 
@@ -99,8 +98,8 @@ class ReportChooser:
         :return: The ledger.
         """
         return OptionLink(gettext("Ledger"),
-                          get_ledger_url(self.__currency, self.__account,
-                                         self.__period),
+                          ledger_url(self.__currency, self.__account,
+                                     self.__period),
                           self.__active_report == ReportType.LEDGER,
                           fa_icon="fa-solid fa-clipboard")
 
@@ -114,10 +113,9 @@ class ReportChooser:
         if not re.match(r"[12][12]", account.base_code):
             account: Account = Account.cash()
         return OptionLink(gettext("Income and Expenses Log"),
-                          get_income_expenses_url(
-                              self.__currency,
-                              IncomeExpensesAccount(account),
-                              self.__period),
+                          income_expenses_url(self.__currency,
+                                              IncomeExpensesAccount(account),
+                                              self.__period),
                           self.__active_report == ReportType.INCOME_EXPENSES,
                           fa_icon="fa-solid fa-money-bill-wave")
 
@@ -128,8 +126,7 @@ class ReportChooser:
         :return: The trial balance.
         """
         return OptionLink(gettext("Trial Balance"),
-                          get_trial_balance_url(self.__currency,
-                                                self.__period),
+                          trial_balance_url(self.__currency, self.__period),
                           self.__active_report == ReportType.TRIAL_BALANCE,
                           fa_icon="fa-solid fa-scale-unbalanced")
 
@@ -140,8 +137,7 @@ class ReportChooser:
         :return: The income statement.
         """
         return OptionLink(gettext("Income Statement"),
-                          get_income_statement_url(self.__currency,
-                                                   self.__period),
+                          income_statement_url(self.__currency, self.__period),
                           self.__active_report == ReportType.INCOME_STATEMENT,
                           fa_icon="fa-solid fa-file-invoice-dollar")
 
@@ -152,8 +148,7 @@ class ReportChooser:
         :return: The balance sheet.
         """
         return OptionLink(gettext("Balance Sheet"),
-                          get_balance_sheet_url(self.__currency,
-                                                self.__period),
+                          balance_sheet_url(self.__currency, self.__period),
                           self.__active_report == ReportType.BALANCE_SHEET,
                           fa_icon="fa-solid fa-scale-balanced")
 

@@ -29,7 +29,7 @@ from accounting.report.period import Period
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.get_url import get_ledger_url, get_trial_balance_url
+from .utils.urls import ledger_url, trial_balance_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import TrialBalancePeriodChooser
 from .utils.report_chooser import ReportChooser
@@ -150,7 +150,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: get_trial_balance_url(x, self.period), self.currency)
+            lambda x: trial_balance_url(x, self.period), self.currency)
 
 
 class TrialBalance(BaseReport):
@@ -197,9 +197,9 @@ class TrialBalance(BaseReport):
                .filter(Account.id.in_([x.id for x in balances])).all()}
         self.__accounts = [ReportAccount(account=accounts[x.id],
                                          amount=x.balance,
-                                         url=get_ledger_url(self.__currency,
-                                                            accounts[x.id],
-                                                            self.__period))
+                                         url=ledger_url(self.__currency,
+                                                        accounts[x.id],
+                                                        self.__period))
                            for x in balances]
         self.__total = Total(
             sum([x.debit for x in self.__accounts if x.debit is not None]),

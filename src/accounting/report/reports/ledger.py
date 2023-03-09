@@ -32,7 +32,7 @@ from accounting.utils.pagination import Pagination
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.get_url import get_ledger_url
+from .utils.urls import ledger_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import LedgerPeriodChooser
 from .utils.report_chooser import ReportChooser
@@ -292,8 +292,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: get_ledger_url(x, self.account, self.period),
-            self.currency)
+            lambda x: ledger_url(x, self.account, self.period), self.currency)
 
     @property
     def account_options(self) -> list[OptionLink]:
@@ -304,8 +303,7 @@ class PageParams(BasePageParams):
         in_use: sa.Select = sa.Select(JournalEntry.account_id)\
             .filter(JournalEntry.currency_code == self.currency.code)\
             .group_by(JournalEntry.account_id)
-        return [OptionLink(str(x), get_ledger_url(self.currency, x,
-                                                  self.period),
+        return [OptionLink(str(x), ledger_url(self.currency, x, self.period),
                            x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
                 .order_by(Account.base_code, Account.no).all()]

@@ -30,12 +30,11 @@ from accounting.report.period import Period
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.get_url import get_ledger_url, get_balance_sheet_url, \
-    get_income_statement_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import BalanceSheetPeriodChooser
 from .utils.report_chooser import ReportChooser
 from .utils.report_type import ReportType
+from .utils.urls import ledger_url, balance_sheet_url, income_statement_url
 
 
 class ReportAccount:
@@ -149,9 +148,9 @@ class AccountCollector:
         self.accounts: list[ReportAccount] \
             = [ReportAccount(account=account_by_id[x.id],
                              amount=x.balance,
-                             url=get_ledger_url(self.__currency,
-                                                account_by_id[x.id],
-                                                self.__period))
+                             url=ledger_url(self.__currency,
+                                            account_by_id[x.id],
+                                            self.__period))
                for x in account_balances]
         self.__add_accumulated()
         self.__add_current_period()
@@ -169,7 +168,7 @@ class AccountCollector:
         self.__add_owner_s_equity(
             Account.ACCUMULATED_CHANGE_CODE,
             self.__query_accumulated(),
-            get_income_statement_url(self.__currency, self.__period.before))
+            income_statement_url(self.__currency, self.__period.before))
 
     def __query_accumulated(self) -> Decimal | None:
         """Queries and returns the accumulated profit or loss.
@@ -191,7 +190,7 @@ class AccountCollector:
         self.__add_owner_s_equity(
             Account.NET_CHANGE_CODE,
             self.__query_currency_period(),
-            get_income_statement_url(self.__currency, self.__period))
+            income_statement_url(self.__currency, self.__period))
 
     def __query_currency_period(self) -> Decimal | None:
         """Queries and returns the net income or loss for current period.
@@ -348,7 +347,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: get_balance_sheet_url(x, self.period), self.currency)
+            lambda x: balance_sheet_url(x, self.period), self.currency)
 
 
 class BalanceSheet(BaseReport):

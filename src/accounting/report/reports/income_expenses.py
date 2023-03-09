@@ -33,7 +33,7 @@ from accounting.utils.pagination import Pagination
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.get_url import get_income_expenses_url
+from .utils.urls import income_expenses_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import IncomeExpensesPeriodChooser
 from .utils.report_chooser import ReportChooser
@@ -324,7 +324,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: get_income_expenses_url(x, self.account, self.period),
+            lambda x: income_expenses_url(x, self.account, self.period),
             self.currency)
 
     @property
@@ -337,8 +337,8 @@ class PageParams(BasePageParams):
             = IncomeExpensesAccount.current_assets_and_liabilities()
         options: list[OptionLink] \
             = [OptionLink(str(current_al),
-                          get_income_expenses_url(self.currency, current_al,
-                                                  self.period),
+                          income_expenses_url(self.currency, current_al,
+                                              self.period),
                           self.account.id == 0)]
         in_use: sa.Select = sa.Select(JournalEntry.account_id)\
             .join(Account)\
@@ -349,7 +349,7 @@ class PageParams(BasePageParams):
                            Account.base_code.startswith("22")))\
             .group_by(JournalEntry.account_id)
         options.extend([OptionLink(str(x),
-                                   get_income_expenses_url(
+                                   income_expenses_url(
                                        self.currency,
                                        IncomeExpensesAccount(x),
                                        self.period),

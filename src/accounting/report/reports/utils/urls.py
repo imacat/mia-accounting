@@ -24,7 +24,7 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 
 
-def get_journal_url(period: Period) \
+def journal_url(period: Period) \
         -> str:
     """Returns the URL of a journal.
 
@@ -36,7 +36,7 @@ def get_journal_url(period: Period) \
     return url_for("accounting.report.journal", period=period)
 
 
-def get_ledger_url(currency: Currency, account: Account, period: Period) \
+def ledger_url(currency: Currency, account: Account, period: Period) \
         -> str:
     """Returns the URL of a ledger.
 
@@ -53,8 +53,8 @@ def get_ledger_url(currency: Currency, account: Account, period: Period) \
                    period=period)
 
 
-def get_income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
-                            period: Period) -> str:
+def income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
+                        period: Period) -> str:
     """Returns the URL of an income and expenses log.
 
     :param currency: The currency.
@@ -70,7 +70,7 @@ def get_income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
                    period=period)
 
 
-def get_trial_balance_url(currency: Currency, period: Period) -> str:
+def trial_balance_url(currency: Currency, period: Period) -> str:
     """Returns the URL of a trial balance.
 
     :param currency: The currency.
@@ -84,7 +84,7 @@ def get_trial_balance_url(currency: Currency, period: Period) -> str:
                    currency=currency, period=period)
 
 
-def get_income_statement_url(currency: Currency, period: Period) -> str:
+def income_statement_url(currency: Currency, period: Period) -> str:
     """Returns the URL of an income statement.
 
     :param currency: The currency.
@@ -98,7 +98,7 @@ def get_income_statement_url(currency: Currency, period: Period) -> str:
                    currency=currency, period=period)
 
 
-def get_balance_sheet_url(currency: Currency, period: Period) -> str:
+def balance_sheet_url(currency: Currency, period: Period) -> str:
     """Returns the URL of a balance sheet.
 
     :param currency: The currency.

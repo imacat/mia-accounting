@@ -28,9 +28,8 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
-from .get_url import get_journal_url, get_ledger_url, \
-    get_income_expenses_url, get_trial_balance_url, get_income_statement_url, \
-    get_balance_sheet_url
+from .urls import journal_url, ledger_url, income_expenses_url, \
+    trial_balance_url, income_statement_url, balance_sheet_url
 
 
 class PeriodChooser(ABC):
@@ -113,7 +112,7 @@ class JournalPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        return get_journal_url(period)
+        return journal_url(period)
 
 
 class LedgerPeriodChooser(PeriodChooser):
@@ -130,7 +129,7 @@ class LedgerPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        return get_ledger_url(self.currency, self.account, period)
+        return ledger_url(self.currency, self.account, period)
 
 
 class IncomeExpensesPeriodChooser(PeriodChooser):
@@ -147,7 +146,7 @@ class IncomeExpensesPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        return get_income_expenses_url(self.currency, self.account, period)
+        return income_expenses_url(self.currency, self.account, period)
 
 
 class TrialBalancePeriodChooser(PeriodChooser):
@@ -162,7 +161,7 @@ class TrialBalancePeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        return get_trial_balance_url(self.currency, period)
+        return trial_balance_url(self.currency, period)
 
 
 class IncomeStatementPeriodChooser(PeriodChooser):
@@ -177,7 +176,7 @@ class IncomeStatementPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        return get_income_statement_url(self.currency, period)
+        return income_statement_url(self.currency, period)
 
 
 class BalanceSheetPeriodChooser(PeriodChooser):
@@ -192,4 +191,4 @@ class BalanceSheetPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        return get_balance_sheet_url(self.currency, period)
+        return balance_sheet_url(self.currency, period)
