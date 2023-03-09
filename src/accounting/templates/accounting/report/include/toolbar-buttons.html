@@ -19,60 +19,56 @@ toolbar-buttons.html: The toolbar buttons on the report
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/8
 #}
-{% if use_add_new %}
-  {% if accounting_can_edit() %}
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-primary dropdown-toggle accounting-toolbar-button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-solid fa-plus"></i>
-        <span class="d-none d-md-inline">{{ A_("New") }}</span>
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
-            {{ A_("Cash Expense") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
-            {{ A_("Cash Income") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
-            {{ A_("Transfer") }}
-          </a>
-        </li>
-      </ul>
-    </div>
-  {% endif %}
-{% endif %}
-{% if use_report_chooser %}
-  <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle accounting-toolbar-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-book"></i>
-      <span class="d-none d-md-inline">{{ report.report_chooser.current_report }}</span>
+{% if accounting_can_edit() %}
+  <div class="btn-group d-none d-md-flex" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-plus"></i>
+      <span class="d-none d-md-inline">{{ A_("New") }}</span>
     </button>
-    <ul class="dropdown-menu" aria-label="{{ A_("Report") }}">
-      {% for report in report.report_chooser %}
-        <li>
-          <a class="dropdown-item {% if report.is_active %} active {% endif %}" href="{{ report.url }}">
-            <i class="{{ report.fa_icon }}"></i>
-            {{ report.title }}
-          </a>
-        </li>
-      {% endfor %}
+    <ul class="dropdown-menu">
       <li>
-        <span class="dropdown-item {% if report.report_chooser.is_search %} active {% endif %} accounting-clickable" data-bs-toggle="modal" data-bs-target="#accounting-search-modal">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          {{ A_("Search") }}
-        </span>
+        <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_EXPENSE)|accounting_append_next }}">
+          {{ A_("Cash Expense") }}
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.CASH_INCOME)|accounting_append_next }}">
+          {{ A_("Cash Income") }}
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for("accounting.transaction.create", txn_type=report.txn_types.TRANSFER)|accounting_append_next }}">
+          {{ A_("Transfer") }}
+        </a>
       </li>
     </ul>
   </div>
 {% endif %}
+<div class="btn-group" role="group">
+  <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="fa-solid fa-book"></i>
+    <span class="d-none d-md-inline">{{ report.report_chooser.current_report }}</span>
+  </button>
+  <ul class="dropdown-menu" aria-label="{{ A_("Report") }}">
+    {% for report in report.report_chooser %}
+      <li>
+        <a class="dropdown-item {% if report.is_active %} active {% endif %}" href="{{ report.url }}">
+          <i class="{{ report.fa_icon }}"></i>
+          {{ report.title }}
+        </a>
+      </li>
+    {% endfor %}
+    <li>
+      <span class="dropdown-item {% if report.report_chooser.is_search %} active {% endif %} accounting-clickable" data-bs-toggle="modal" data-bs-target="#accounting-search-modal">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        {{ A_("Search") }}
+      </span>
+    </li>
+  </ul>
+</div>
 {% if use_currency_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle accounting-toolbar-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-money-bill-wave"></i>
       <span class="d-none d-md-inline">{{ report.currency.name|title }}</span>
     </button>
@@ -89,7 +85,7 @@ First written: 2023/3/8
 {% endif %}
 {% if use_account_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle accounting-toolbar-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-clipboard"></i>
       <span class="d-none d-md-inline">{{ report.account.title|title }}</span>
     </button>
@@ -105,19 +101,19 @@ First written: 2023/3/8
   </div>
 {% endif %}
 {% if use_period_chooser %}
-  <button class="btn btn-primary accounting-toolbar-button" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
+  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
     <i class="fa-solid fa-calendar-day"></i>
     <span class="d-none d-md-inline">{{ report.period.desc|title }}</span>
   </button>
 {% endif %}
-<a class="btn btn-primary accounting-toolbar-button" role="button" href="{{ report.csv_uri }}">
+<a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
   <i class="fa-solid fa-download"></i>
   <span class="d-none d-md-inline">{{ A_("Download") }}</span>
 </a>
 {% if use_search %}
-  <form class="btn btn-primary d-flex input-group accounting-search-{{ search_platform }}-form" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-label="{{ search_aria_label }}">
-    <input id="accounting-search-{{ search_platform }}" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
-    <label for="accounting-search-{{ search_platform }}" class="accounting-search-label">
+  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-labelledby="accounting-search-label">
+    <input id="accounting-search" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
+    <label id="accounting-search-label" for="accounting-search" class="input-group-text accounting-search-label">
       <button type="submit">
         <i class="fa-solid fa-magnifying-glass"></i>
         <span class="d-none d-md-inline">{{ A_("Search") }}</span>

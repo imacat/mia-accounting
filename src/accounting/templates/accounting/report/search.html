@@ -29,26 +29,13 @@ First written: 2023/3/8
 
 {% block content %}
 
-<div class="btn-group mb-2 d-none d-md-inline-flex">
-  {% with use_add_new = true,
-          use_report_chooser = true,
-          use_search = true,
-          search_platform = "desktop",
-          search_aria_label = A_("Search for Desktop") %}
+<div class="mb-3 accounting-toolbar">
+  {% with use_search = true %}
     {% include "accounting/report/include/toolbar-buttons.html" %}
   {% endwith %}
 </div>
 
 {% include "accounting/report/include/add-txn-material-fab.html" %}
-
-<div class="mb-3 d-md-none accounting-mobile-toolbar">
-  {% with use_report_chooser = true,
-          use_search = true,
-          search_platform = "mobile",
-          search_aria_label = A_("Search for Mobile") %}
-    {% include "accounting/report/include/toolbar-buttons.html" %}
-  {% endwith %}
-</div>
 
 {% include "accounting/report/include/search-modal.html" %}
 

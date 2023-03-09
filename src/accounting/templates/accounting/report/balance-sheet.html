@@ -30,24 +30,14 @@ First written: 2023/3/7
 
 {% block content %}
 
-<div class="btn-group mb-2 d-none d-md-inline-flex">
-  {% with use_add_new = true,
-          use_report_chooser = true,
-          use_currency_chooser = true,
+<div class="mb-3 accounting-toolbar">
+  {% with use_currency_chooser = true,
           use_period_chooser = true %}
     {% include "accounting/report/include/toolbar-buttons.html" %}
   {% endwith %}
 </div>
 
 {% include "accounting/report/include/add-txn-material-fab.html" %}
-
-<div class="mb-3 d-md-none accounting-mobile-toolbar">
-  {% with use_report_chooser = true,
-          use_currency_chooser = true,
-          use_period_chooser = true %}
-    {% include "accounting/report/include/toolbar-buttons.html" %}
-  {% endwith %}
-</div>
 
 {% include "accounting/report/include/period-chooser.html" %}
 
