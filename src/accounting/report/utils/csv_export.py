@@ -25,7 +25,7 @@ from io import StringIO
 
 from flask import Response
 
-from .period import Period
+from accounting.report.period import Period
 
 
 class BaseCSVRow(ABC):

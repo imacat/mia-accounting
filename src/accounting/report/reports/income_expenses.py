@@ -27,6 +27,7 @@ from sqlalchemy.orm import selectinload
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
@@ -34,8 +35,6 @@ from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
 from accounting.report.utils.income_expense_account import \
     IncomeExpensesAccount
 from accounting.report.utils.option_link import OptionLink
-from accounting.report.utils.period import Period
-from accounting.report.utils.period_chooser import PeriodChooser
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.urls import income_expenses_url

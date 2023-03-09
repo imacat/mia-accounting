@@ -20,8 +20,8 @@
 from flask import url_for
 
 from accounting.models import Currency, Account
+from accounting.report.period import Period
 from .income_expense_account import IncomeExpensesAccount
-from .period import Period
 
 
 def journal_url(period: Period) \
