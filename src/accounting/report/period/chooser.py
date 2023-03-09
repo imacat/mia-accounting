@@ -24,7 +24,8 @@ import typing as t
 from datetime import date
 
 from accounting.models import Transaction
-from .period import Period, ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
+from .period import Period
+from .periods import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
     LastYear, Today, Yesterday, AllTime, TemplatePeriod, YearPeriod
 
 

@@ -24,7 +24,6 @@ import calendar
 import typing as t
 from datetime import date, timedelta
 
-from accounting.locale import gettext
 from .description import get_desc
 from .specification import get_spec
 
@@ -94,7 +93,7 @@ class Period:
         if self.start is None or self.end is None:
             return
         self.is_a_month = self.start.day == 1 \
-            and self.end == _month_end(self.start)
+            and self.end == month_end(self.start)
         self.is_type_month = self.is_a_month
         self.is_a_year = self.start == date(self.start.year, 1, 1) \
             and self.end == date(self.start.year, 12, 31)
@@ -130,151 +129,7 @@ class Period:
         return Period(None, self.start - timedelta(days=1))
 
 
-class ThisMonth(Period):
-    """The period of this month."""
-    def __init__(self):
-        today: date = date.today()
-        this_month_start: date = date(today.year, today.month, 1)
-        super().__init__(this_month_start, _month_end(today))
-        self.is_default = True
-        self.is_this_month = True
-
-    def _set_properties(self) -> None:
-        self.spec = "this-month"
-        self.desc = gettext("This month")
-        self.is_a_month = True
-        self.is_type_month = True
-
-
-class LastMonth(Period):
-    """The period of this month."""
-    def __init__(self):
-        today: date = date.today()
-        year: int = today.year
-        month: int = today.month - 1
-        if month < 1:
-            year = year - 1
-            month = 12
-        start: date = date(year, month, 1)
-        super().__init__(start, _month_end(start))
-        self.is_last_month = True
-
-    def _set_properties(self) -> None:
-        self.spec = "last-month"
-        self.desc = gettext("Last month")
-        self.is_a_month = True
-        self.is_type_month = True
-
-
-class SinceLastMonth(Period):
-    """The period of this month."""
-    def __init__(self):
-        today: date = date.today()
-        year: int = today.year
-        month: int = today.month - 1
-        if month < 1:
-            year = year - 1
-            month = 12
-        start: date = date(year, month, 1)
-        super().__init__(start, None)
-        self.is_since_last_month = True
-
-    def _set_properties(self) -> None:
-        self.spec = "since-last-month"
-        self.desc = gettext("Since last month")
-        self.is_type_month = True
-
-
-class ThisYear(Period):
-    """The period of this year."""
-    def __init__(self):
-        year: int = date.today().year
-        start: date = date(year, 1, 1)
-        end: date = date(year, 12, 31)
-        super().__init__(start, end)
-        self.is_this_year = True
-
-    def _set_properties(self) -> None:
-        self.spec = "this-year"
-        self.desc = gettext("This year")
-        self.is_a_year = True
-
-
-class LastYear(Period):
-    """The period of last year."""
-    def __init__(self):
-        year: int = date.today().year
-        start: date = date(year - 1, 1, 1)
-        end: date = date(year - 1, 12, 31)
-        super().__init__(start, end)
-        self.is_last_year = True
-
-    def _set_properties(self) -> None:
-        self.spec = "last-year"
-        self.desc = gettext("Last year")
-        self.is_a_year = True
-
-
-class Today(Period):
-    """The period of today."""
-    def __init__(self):
-        today: date = date.today()
-        super().__init__(today, today)
-        self.is_today = True
-
-    def _set_properties(self) -> None:
-        self.spec = "today"
-        self.desc = gettext("Today")
-        self.is_a_day = True
-
-
-class Yesterday(Period):
-    """The period of yesterday."""
-    def __init__(self):
-        yesterday: date = date.today() - timedelta(days=1)
-        super().__init__(yesterday, yesterday)
-        self.is_yesterday = True
-
-    def _set_properties(self) -> None:
-        self.spec = "yesterday"
-        self.desc = gettext("Yesterday")
-        self.is_a_day = True
-
-
-class AllTime(Period):
-    """The period of all time."""
-    def __init__(self):
-        super().__init__(None, None)
-        self.is_all = True
-
-    def _set_properties(self) -> None:
-        self.spec = "all-time"
-        self.desc = gettext("All")
-
-
-class TemplatePeriod(Period):
-    """The period template."""
-    def __init__(self):
-        super().__init__(None, None)
-
-    def _set_properties(self) -> None:
-        self.spec = "PERIOD"
-
-
-class YearPeriod(Period):
-    """A year period."""
-
-    def __init__(self, year: int):
-        """Constructs a year period.
-
-        :param year: The year.
-        """
-        start: date = date(year, 1, 1)
-        end: date = date(year, 12, 31)
-        super().__init__(start, end)
-
-
-def _month_end(day: date) -> date:
+def month_end(day: date) -> date:
     """Returns the end day of month for a date.
 
     :param day: The date.
