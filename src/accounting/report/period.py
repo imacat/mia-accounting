@@ -83,7 +83,8 @@ class Period:
         * self.is_a_year
         * self.is_a_day
 
-        Override this method to set the properties in the subclasses.
+        Override this method to set the properties in the subclasses, to skip
+        the calculation.
 
         :return: None.
         """
