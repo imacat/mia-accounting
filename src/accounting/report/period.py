@@ -509,13 +509,12 @@ class Today(Period):
     def __init__(self):
         today: datetime.date = datetime.date.today()
         super().__init__(today, today)
-        self.is_this_year = True
+        self.is_today = True
 
     def _set_properties(self) -> None:
         self.spec = "today"
         self.desc = gettext("Today")
         self.is_a_day = True
-        self.is_today = True
 
 
 class Yesterday(Period):
@@ -524,25 +523,23 @@ class Yesterday(Period):
         yesterday: datetime.date \
             = datetime.date.today() - datetime.timedelta(days=1)
         super().__init__(yesterday, yesterday)
-        self.is_this_year = True
+        self.is_yesterday = True
 
     def _set_properties(self) -> None:
         self.spec = "yesterday"
         self.desc = gettext("Yesterday")
         self.is_a_day = True
-        self.is_yesterday = True
 
 
 class AllTime(Period):
     """The period of all time."""
     def __init__(self):
         super().__init__(None, None)
-        self.is_this_year = True
+        self.is_all = True
 
     def _set_properties(self) -> None:
         self.spec = "all-time"
         self.desc = gettext("All")
-        self.is_all = True
 
 
 class TemplatePeriod(Period):
