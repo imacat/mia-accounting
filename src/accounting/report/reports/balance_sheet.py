@@ -192,14 +192,7 @@ class AccountCollector:
         conditions: list[sa.BinaryExpression] \
             = [JournalEntry.currency_code == self.__currency.code,
                Transaction.date < self.__period.start]
-        conditions.extend([sa.not_(Account.base_code.startswith(x))
-                           for x in {"1", "2"}])
-        balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
-        select_balance: sa.Select = sa.select(balance_func)\
-            .join(Transaction).join(Account).filter(*conditions)
-        return db.session.scalar(select_balance)
+        return self.__query_balance(conditions)
 
     def __add_current_period(self) -> None:
         """Adds the accumulated profit or loss to the balances.
@@ -222,11 +215,21 @@ class AccountCollector:
             conditions.append(Transaction.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Transaction.date <= self.__period.end)
+        return self.__query_balance(conditions)
+
+    @staticmethod
+    def __query_balance(conditions: list[sa.BinaryExpression])\
+            -> Decimal:
+        """Queries the balance.
+
+        :param conditions: The SQL conditions for the balance.
+        :return: The balance.
+        """
         conditions.extend([sa.not_(Account.base_code.startswith(x))
                            for x in {"1", "2"}])
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
+            else_=-JournalEntry.amount))
         select_balance: sa.Select = sa.select(balance_func)\
             .join(Transaction).join(Account).filter(*conditions)
         return db.session.scalar(select_balance)
