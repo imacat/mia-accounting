@@ -32,7 +32,7 @@ from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
     period_spec
 from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.period import Period
-from accounting.report.utils.period_choosers import PeriodChooser
+from accounting.report.utils.period_chooser import PeriodChooser
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.urls import ledger_url, income_statement_url
