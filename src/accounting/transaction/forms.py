@@ -127,9 +127,13 @@ class AccountOption:
         :param account: The account.
         """
         self.__account: Account = account
+        """The account."""
         self.id: str = account.id
+        """The account ID."""
         self.code: str = account.code
+        """The account code."""
         self.is_in_use: bool = False
+        """True if this account is in use, or False otherwise."""
 
     def __str__(self) -> str:
         """Returns the string representation of the account option.
