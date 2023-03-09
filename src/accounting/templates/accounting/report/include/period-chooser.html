@@ -67,7 +67,7 @@ First written: 2023/3/4
             {% endif %}
           </div>
           {% if report.period_chooser.has_data %}
-            <div id="accounting-period-chooser-month-chooser" class="mt-3" data-start="{{ report.period_chooser.data_start }}" data-default="{{ report.period.start }}"></div>
+            <div id="accounting-period-chooser-month-chooser" class="mt-3" data-start="{{ report.period_chooser.data_start }}" data-default="{{ report.period.start|accounting_default(report.period_chooser.data_start) }}"></div>
           {% endif %}
         </div>
 
