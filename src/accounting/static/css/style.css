@@ -24,18 +24,6 @@
 .accounting-clickable {
     cursor: pointer;
 }
-.accounting-search-desktop-form {
-    max-width: 16rem;
-}
-.btn-group .btn .accounting-search-input {
-    min-height: calc(1em + .5rem + 2px);
-}
-.btn-group .btn .accounting-search-label button {
-    border: none;
-    background-color: transparent;
-    color: inherit;
-    padding-right: 0;
-}
 .form-floating > textarea.form-control {
     height: 6rem;
 }
