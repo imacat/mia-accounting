@@ -19,6 +19,8 @@
 """
 import typing as t
 
+from flask import current_app
+
 from accounting.locale import gettext
 from accounting.models import Account
 
@@ -62,3 +64,23 @@ class IncomeExpensesAccount:
         account.title = gettext("current assets and liabilities")
         account.str = account.title
         return account
+
+
+def default_io_account_code() -> str:
+    """Returns the default account code for the income and expenses log.
+
+    :return: The default account code for the income and expenses log.
+    """
+    with current_app.app_context():
+        return current_app.config.get("DEFAULT_IO_ACCOUNT", Account.CASH_CODE)
+
+
+def default_io_account() -> IncomeExpensesAccount:
+    """Returns the default account for the income and expenses log.
+
+    :return: The default account for the income and expenses log.
+    """
+    code: str = default_io_account_code()
+    if code == IncomeExpensesAccount.CURRENT_AL_CODE:
+        return IncomeExpensesAccount.current_assets_and_liabilities()
+    return IncomeExpensesAccount(Account.find_by_code(code))

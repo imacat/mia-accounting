@@ -35,7 +35,7 @@ from testlib_txn import Accounts, get_add_form, get_unchanged_update_form, \
 
 PREFIX: str = "/accounting/transactions"
 """The URL prefix for the transaction management."""
-RETURN_TO_URI: str = "/accounting/reports/journal"
+RETURN_TO_URI: str = "/accounting/reports"
 """The URL to return to after the operation."""
 
 
