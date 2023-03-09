@@ -20,10 +20,10 @@ accounting.base\_account.converters module
    :undoc-members:
    :show-inheritance:
 
-accounting.base\_account.query module
--------------------------------------
+accounting.base\_account.queries module
+---------------------------------------
 
-.. automodule:: accounting.base_account.query
+.. automodule:: accounting.base_account.queries
    :members:
    :undoc-members:
    :show-inheritance:

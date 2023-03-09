@@ -10,6 +10,7 @@ Subpackages
    accounting.account
    accounting.base_account
    accounting.currency
+   accounting.report
    accounting.transaction
    accounting.utils
 
@@ -28,6 +29,22 @@ accounting.models module
 ------------------------
 
 .. automodule:: accounting.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.template\_filters module
+-----------------------------------
+
+.. automodule:: accounting.template_filters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.template\_globals module
+-----------------------------------
+
+.. automodule:: accounting.template_globals
    :members:
    :undoc-members:
    :show-inheritance:

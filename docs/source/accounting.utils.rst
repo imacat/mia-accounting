@@ -60,6 +60,14 @@ accounting.utils.strip\_text module
    :undoc-members:
    :show-inheritance:
 
+accounting.utils.txn\_types module
+----------------------------------
+
+.. automodule:: accounting.utils.txn_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.utils.user module
 ----------------------------
 

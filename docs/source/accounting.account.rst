@@ -28,10 +28,10 @@ accounting.account.forms module
    :undoc-members:
    :show-inheritance:
 
-accounting.account.query module
--------------------------------
+accounting.account.queries module
+---------------------------------
 
-.. automodule:: accounting.account.query
+.. automodule:: accounting.account.queries
    :members:
    :undoc-members:
    :show-inheritance:

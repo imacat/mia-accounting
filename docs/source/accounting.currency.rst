@@ -28,10 +28,10 @@ accounting.currency.forms module
    :undoc-members:
    :show-inheritance:
 
-accounting.currency.query module
---------------------------------
+accounting.currency.queries module
+----------------------------------
 
-.. automodule:: accounting.currency.query
+.. automodule:: accounting.currency.queries
    :members:
    :undoc-members:
    :show-inheritance:

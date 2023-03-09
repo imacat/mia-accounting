@@ -12,14 +12,6 @@ accounting.transaction.converters module
    :undoc-members:
    :show-inheritance:
 
-accounting.transaction.dispatcher module
-----------------------------------------
-
-.. automodule:: accounting.transaction.dispatcher
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 accounting.transaction.forms module
 -----------------------------------
 
@@ -28,26 +20,26 @@ accounting.transaction.forms module
    :undoc-members:
    :show-inheritance:
 
-accounting.transaction.query module
------------------------------------
+accounting.transaction.operators module
+---------------------------------------
 
-.. automodule:: accounting.transaction.query
+.. automodule:: accounting.transaction.operators
    :members:
    :undoc-members:
    :show-inheritance:
 
-accounting.transaction.summary\_helper module
+accounting.transaction.summary\_editor module
 ---------------------------------------------
 
-.. automodule:: accounting.transaction.summary_helper
+.. automodule:: accounting.transaction.summary_editor
    :members:
    :undoc-members:
    :show-inheritance:
 
-accounting.transaction.template module
---------------------------------------
+accounting.transaction.template\_filters module
+-----------------------------------------------
 
-.. automodule:: accounting.transaction.template
+.. automodule:: accounting.transaction.template_filters
    :members:
    :undoc-members:
    :show-inheritance:
