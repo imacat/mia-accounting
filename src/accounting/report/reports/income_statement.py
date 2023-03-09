@@ -159,6 +159,7 @@ class PageParams(BasePageParams):
         self.__has_data: bool = has_data
         """True if there is any data, or False otherwise."""
         self.sections: list[Section] = sections
+        """The sections in the income statement."""
         self.period_chooser: IncomeStatementPeriodChooser \
             = IncomeStatementPeriodChooser(currency)
         """The period chooser."""
