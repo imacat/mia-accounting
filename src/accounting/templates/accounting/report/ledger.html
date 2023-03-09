@@ -79,7 +79,7 @@ First written: 2023/3/5
         {% endwith %}
       {% endif %}
       {% for entry in report.entries %}
-        <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
+        <a class="accounting-report-table-row" href="{{ entry.url|accounting_append_next }}">
           {% include "accounting/report/include/ledger-row-desktop.html" %}
         </a>
       {% endfor %}
@@ -107,7 +107,7 @@ First written: 2023/3/5
     {% endwith %}
   {% endif %}
   {% for entry in report.entries %}
-    <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
+    <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ entry.url|accounting_append_next }}">
       {% include "accounting/report/include/ledger-row-mobile.html" %}
     </a>
   {% endfor %}

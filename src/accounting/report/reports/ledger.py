@@ -46,8 +46,6 @@ class ReportEntry:
 
         :param entry: The journal entry.
         """
-        self.transaction: Transaction | None = None
-        """The transaction."""
         self.is_brought_forward: bool = False
         """Whether this is the brought-forward entry."""
         self.is_total: bool = False
@@ -64,13 +62,16 @@ class ReportEntry:
         """The balance."""
         self.note: str | None = None
         """The note."""
+        self.url: str | None = None
+        """The URL to the journal entry."""
         if entry is not None:
-            self.transaction = entry.transaction
             self.date = entry.transaction.date
             self.summary = entry.summary
             self.debit = entry.amount if entry.is_debit else None
             self.credit = None if entry.is_debit else entry.amount
             self.note = entry.transaction.note
+            self.url = url_for("accounting.transaction.detail",
+                               txn=entry.transaction)
 
 
 class EntryCollector:
