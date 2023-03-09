@@ -110,6 +110,8 @@ class EntryCollector:
         """
         if self.__period.start is None:
             return None
+        if self.__account.base_code[0] not in {"1", "2", "3"}:
+            return None
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount))
