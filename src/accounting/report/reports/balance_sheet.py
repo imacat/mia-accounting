@@ -27,14 +27,16 @@ from accounting.locale import gettext
 from accounting.models import Currency, BaseAccount, Account, Transaction, \
     JournalEntry
 from accounting.report.period import Period
-from .utils.base_page_params import BasePageParams
-from .utils.base_report import BaseReport
-from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.option_link import OptionLink
-from .utils.period_choosers import PeriodChooser
-from .utils.report_chooser import ReportChooser
-from .utils.report_type import ReportType
-from .utils.urls import ledger_url, balance_sheet_url, income_statement_url
+from accounting.report.utils.base_page_params import BasePageParams
+from accounting.report.utils.base_report import BaseReport
+from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
+    period_spec
+from accounting.report.utils.option_link import OptionLink
+from accounting.report.utils.period_choosers import PeriodChooser
+from accounting.report.utils.report_chooser import ReportChooser
+from accounting.report.utils.report_type import ReportType
+from accounting.report.utils.urls import ledger_url, balance_sheet_url, \
+    income_statement_url
 
 
 class ReportAccount:

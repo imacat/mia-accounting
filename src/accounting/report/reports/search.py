@@ -27,14 +27,14 @@ from sqlalchemy.orm import selectinload
 from accounting.locale import gettext
 from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
     Transaction, JournalEntry
+from accounting.report.utils.base_page_params import BasePageParams
+from accounting.report.utils.base_report import BaseReport
+from accounting.report.utils.csv_export import csv_download
+from accounting.report.utils.report_chooser import ReportChooser
+from accounting.report.utils.report_type import ReportType
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
 from .journal import get_csv_rows
-from .utils.base_page_params import BasePageParams
-from .utils.base_report import BaseReport
-from .utils.csv_export import csv_download
-from .utils.report_chooser import ReportChooser
-from .utils.report_type import ReportType
 
 
 class EntryCollector:
