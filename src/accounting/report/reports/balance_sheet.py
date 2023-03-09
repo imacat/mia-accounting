@@ -30,7 +30,7 @@ from accounting.report.period import Period
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.get_url import get_ledger_url
+from .utils.get_url import get_ledger_url, get_income_statement_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import BalanceSheetPeriodChooser
 from .utils.report_chooser import ReportChooser
@@ -165,11 +165,10 @@ class AccountCollector:
 
         :return: None.
         """
-        amount: Decimal | None = self.__query_accumulated()
-        url: str = url_for("accounting.report.income-statement",
-                           currency=self.__currency,
-                           period=self.__period.before)
-        self.__add_owner_s_equity(Account.ACCUMULATED_CHANGE_CODE, amount, url)
+        self.__add_owner_s_equity(
+            Account.ACCUMULATED_CHANGE_CODE,
+            self.__query_accumulated(),
+            get_income_statement_url(self.__currency, self.__period.before))
 
     def __query_accumulated(self) -> Decimal | None:
         """Queries and returns the accumulated profit or loss.
@@ -188,10 +187,10 @@ class AccountCollector:
 
         :return: None.
         """
-        amount: Decimal | None = self.__query_currency_period()
-        url: str = url_for("accounting.report.income-statement",
-                           currency=self.__currency, period=self.__period)
-        self.__add_owner_s_equity(Account.NET_CHANGE_CODE, amount, url)
+        self.__add_owner_s_equity(
+            Account.NET_CHANGE_CODE,
+            self.__query_currency_period(),
+            get_income_statement_url(self.__currency, self.__period))
 
     def __query_currency_period(self) -> Decimal | None:
         """Queries and returns the net income or loss for current period.

@@ -30,7 +30,8 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
-from .get_url import get_ledger_url, get_income_expenses_url
+from .get_url import get_ledger_url, get_income_expenses_url, \
+    get_income_statement_url
 
 
 class PeriodChooser(ABC):
@@ -183,11 +184,7 @@ class IncomeStatementPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        if period.is_default:
-            return url_for("accounting.report.income-statement-default",
-                           currency=self.currency)
-        return url_for("accounting.report.income-statement",
-                       currency=self.currency, period=period)
+        return get_income_statement_url(self.currency, period)
 
 
 class BalanceSheetPeriodChooser(PeriodChooser):

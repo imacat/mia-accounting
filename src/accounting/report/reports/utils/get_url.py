@@ -56,3 +56,17 @@ def get_income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
     return url_for("accounting.report.income-expenses",
                    currency=currency, account=account,
                    period=period)
+
+
+def get_income_statement_url(currency: Currency, period: Period) -> str:
+    """Returns the URL of an income statement.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The URL of the income statement.
+    """
+    if period.is_default:
+        return url_for("accounting.report.income-statement-default",
+                       currency=currency)
+    return url_for("accounting.report.income-statement",
+                   currency=currency, period=period)

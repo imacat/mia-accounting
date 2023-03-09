@@ -20,7 +20,7 @@
 from decimal import Decimal
 
 import sqlalchemy as sa
-from flask import url_for, render_template, Response
+from flask import render_template, Response
 
 from accounting import db
 from accounting.locale import gettext
@@ -30,7 +30,7 @@ from accounting.report.period import Period
 from .utils.base_page_params import BasePageParams
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
-from .utils.get_url import get_ledger_url
+from .utils.get_url import get_ledger_url, get_income_statement_url
 from .utils.option_link import OptionLink
 from .utils.period_choosers import IncomeStatementPeriodChooser
 from .utils.report_chooser import ReportChooser
@@ -187,14 +187,9 @@ class PageParams(BasePageParams):
 
         :return: The currency options.
         """
-        def get_url(currency: Currency):
-            if self.period.is_default:
-                return url_for("accounting.report.income-statement-default",
-                               currency=currency)
-            return url_for("accounting.report.income-statement",
-                           currency=currency, period=self.period)
-
-        return self._get_currency_options(get_url, self.currency)
+        return self._get_currency_options(
+            lambda x: get_income_statement_url(x, self.period),
+            self.currency)
 
 
 class IncomeStatement(BaseReport):
