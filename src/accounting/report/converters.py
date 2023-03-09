@@ -23,7 +23,7 @@ from flask import abort
 from werkzeug.routing import BaseConverter
 
 from accounting.models import Account
-from accounting.report.period import Period
+from .period import Period, get_period
 from .utils.income_expense_account import IncomeExpensesAccount
 
 
@@ -38,7 +38,7 @@ class PeriodConverter(BaseConverter):
         :return: The corresponding period.
         """
         try:
-            return Period.get_instance(value)
+            return get_period(value)
         except ValueError:
             abort(404)
 

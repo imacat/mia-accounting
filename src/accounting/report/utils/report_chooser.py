@@ -28,7 +28,7 @@ from flask_babel import LazyString
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account
-from accounting.report.period import Period
+from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
 from .income_expense_account import IncomeExpensesAccount
 from .option_link import OptionLink
@@ -53,8 +53,7 @@ class ReportChooser:
         """
         self.__active_report: ReportType = active_report
         """The currently active report."""
-        self.__period: Period = Period.get_instance() if period is None \
-            else period
+        self.__period: Period = get_period() if period is None else period
         """The period."""
         self.__currency: Currency = db.session.get(
             Currency, default_currency_code()) \

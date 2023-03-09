@@ -20,7 +20,7 @@
 from flask import Blueprint, request, Response
 
 from accounting.models import Currency, Account
-from accounting.report.period import Period
+from accounting.report.period import Period, get_period
 from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
@@ -39,7 +39,7 @@ def get_default_journal_list() -> str | Response:
 
     :return: The journal in the default period.
     """
-    return __get_journal_list(Period.get_instance())
+    return __get_journal_list(get_period())
 
 
 @bp.get("journal/<period:period>", endpoint="journal")
@@ -76,7 +76,7 @@ def get_default_ledger_list(currency: Currency, account: Account) \
     :param account: The account.
     :return: The ledger in the default period.
     """
-    return __get_ledger_list(currency, account, Period.get_instance())
+    return __get_ledger_list(currency, account, get_period())
 
 
 @bp.get("ledger/<currency:currency>/<account:account>/<period:period>",
@@ -121,7 +121,7 @@ def get_default_income_expenses_list(currency: Currency,
     :param account: The account.
     :return: The income and expenses log in the default period.
     """
-    return __get_income_expenses_list(currency, account, Period.get_instance())
+    return __get_income_expenses_list(currency, account, get_period())
 
 
 @bp.get(
@@ -166,7 +166,7 @@ def get_default_trial_balance_list(currency: Currency) -> str | Response:
     :param currency: The currency.
     :return: The trial balance in the default period.
     """
-    return __get_trial_balance_list(currency, Period.get_instance())
+    return __get_trial_balance_list(currency, get_period())
 
 
 @bp.get("trial-balance/<currency:currency>/<period:period>",
@@ -206,7 +206,7 @@ def get_default_income_statement_list(currency: Currency) -> str | Response:
     :param currency: The currency.
     :return: The income statement in the default period.
     """
-    return __get_income_statement_list(currency, Period.get_instance())
+    return __get_income_statement_list(currency, get_period())
 
 
 @bp.get("income-statement/<currency:currency>/<period:period>",
@@ -246,7 +246,7 @@ def get_default_balance_sheet_list(currency: Currency) -> str | Response:
     :param currency: The currency.
     :return: The balance sheet in the default period.
     """
-    return __get_balance_sheet_list(currency, Period.get_instance())
+    return __get_balance_sheet_list(currency, get_period())
 
 
 @bp.get("balance-sheet/<currency:currency>/<period:period>",

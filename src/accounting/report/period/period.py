@@ -26,7 +26,6 @@ from datetime import date, timedelta
 
 from accounting.locale import gettext
 from .description import get_desc
-from .parser import parse_spec
 from .specification import get_spec
 
 
@@ -100,33 +99,6 @@ class Period:
         self.is_a_year = self.start == date(self.start.year, 1, 1) \
             and self.end == date(self.start.year, 12, 31)
         self.is_a_day = self.start == self.end
-
-    @classmethod
-    def get_instance(cls, spec: str | None = None) -> t.Self:
-        """Returns a period instance.
-
-        :param spec: The period specification, or omit for the default.
-        :return: The period instance.
-        :raise ValueError: When the period is invalid.
-        """
-        if spec is None:
-            return ThisMonth()
-        named_periods: dict[str, t.Type[t.Callable[[], Period]]] = {
-            "this-month": lambda: ThisMonth(),
-            "last-month": lambda: LastMonth(),
-            "since-last-month": lambda: SinceLastMonth(),
-            "this-year": lambda: ThisYear(),
-            "last-year": lambda: LastYear(),
-            "today": lambda: Today(),
-            "yesterday": lambda: Yesterday(),
-            "all-time": lambda: AllTime(),
-        }
-        if spec in named_periods:
-            return named_periods[spec]()
-        start, end = parse_spec(spec)
-        if start is not None and end is not None and start > end:
-            raise ValueError
-        return cls(start, end)
 
     def is_year(self, year: int) -> bool:
         """Returns whether the period is the specific year period.

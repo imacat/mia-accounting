@@ -18,4 +18,5 @@
 
 """
 from .chooser import PeriodChooser
+from .parser import get_period
 from .period import Period

@@ -20,12 +20,43 @@
 import calendar
 import re
 from datetime import date
+import typing as t
+
+from .period import Period, ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
+    LastYear, Today, Yesterday, AllTime
 
 DATE_SPEC_RE: str = r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?"
 """The regular expression of a date specification."""
 
 
-def parse_spec(text: str) -> tuple[date | None, date | None]:
+def get_period(spec: str | None = None) -> Period:
+    """Returns a period instance.
+
+    :param spec: The period specification, or omit for the default.
+    :return: The period instance.
+    :raise ValueError: When the period specification is invalid.
+    """
+    if spec is None:
+        return ThisMonth()
+    named_periods: dict[str, t.Type[t.Callable[[], Period]]] = {
+        "this-month": lambda: ThisMonth(),
+        "last-month": lambda: LastMonth(),
+        "since-last-month": lambda: SinceLastMonth(),
+        "this-year": lambda: ThisYear(),
+        "last-year": lambda: LastYear(),
+        "today": lambda: Today(),
+        "yesterday": lambda: Yesterday(),
+        "all-time": lambda: AllTime(),
+    }
+    if spec in named_periods:
+        return named_periods[spec]()
+    start, end = __parse_spec(spec)
+    if start is not None and end is not None and start > end:
+        raise ValueError
+    return Period(start, end)
+
+
+def __parse_spec(text: str) -> tuple[date | None, date | None]:
     """Parses the period specification.
 
     :param text: The period specification.
