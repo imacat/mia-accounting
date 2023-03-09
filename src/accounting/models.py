@@ -113,8 +113,8 @@ class Account(db.Model):
     """The account number under the base account."""
     title_l10n = db.Column("title", db.String, nullable=False)
     """The title."""
-    is_pay_off_needed = db.Column(db.Boolean, nullable=False, default=False)
-    """Whether the entries of this account need pay-off."""
+    is_offset_needed = db.Column(db.Boolean, nullable=False, default=False)
+    """Whether the entries of this account need offset."""
     created_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
     """The time of creation."""
@@ -597,15 +597,15 @@ class JournalEntry(db.Model):
     """True for a debit entry, or False for a credit entry."""
     no = db.Column(db.Integer, nullable=False)
     """The entry number under the transaction and debit or credit."""
-    pay_off_target_id = db.Column(db.Integer,
-                                  db.ForeignKey(id, onupdate="CASCADE"),
-                                  nullable=True)
-    """The ID of the pay-off target entry."""
-    pay_off_target = db.relationship("JournalEntry", back_populates="pay_off",
-                                     remote_side=id, passive_deletes=True)
-    """The pay-off target entry."""
-    pay_off = db.relationship("JournalEntry", back_populates="pay_off_target")
-    """The pay-off entries."""
+    original_id = db.Column(db.Integer,
+                            db.ForeignKey(id, onupdate="CASCADE"),
+                            nullable=True)
+    """The ID of the original entry when offsetting."""
+    original = db.relationship("JournalEntry", back_populates="offset",
+                               remote_side=id, passive_deletes=True)
+    """The original entry when offsetting."""
+    offset = db.relationship("JournalEntry", back_populates="original")
+    """The offset entries."""
     currency_code = db.Column(db.String,
                               db.ForeignKey(Currency.code, onupdate="CASCADE"),
                               nullable=False)

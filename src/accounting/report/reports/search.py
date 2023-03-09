@@ -91,8 +91,8 @@ class EntryCollector:
                Account.title_l10n.contains(k),
                code.contains(k),
                Account.id.in_(select_l10n)]
-        if k in gettext("Pay-off needed"):
-            conditions.append(Account.is_pay_off_needed)
+        if k in gettext("Need offset"):
+            conditions.append(Account.is_offset_needed)
         return sa.select(Account.id).filter(sa.or_(*conditions))
 
     @staticmethod
