@@ -165,10 +165,9 @@ class AccountCollector:
 
         :return: None.
         """
-        self.__add_owner_s_equity(
-            Account.ACCUMULATED_CHANGE_CODE,
-            self.__query_accumulated(),
-            income_statement_url(self.__currency, self.__period.before))
+        self.__add_owner_s_equity(Account.ACCUMULATED_CHANGE_CODE,
+                                  self.__query_accumulated(),
+                                  self.__period)
 
     def __query_accumulated(self) -> Decimal | None:
         """Queries and returns the accumulated profit or loss.
@@ -187,10 +186,9 @@ class AccountCollector:
 
         :return: None.
         """
-        self.__add_owner_s_equity(
-            Account.NET_CHANGE_CODE,
-            self.__query_currency_period(),
-            income_statement_url(self.__currency, self.__period))
+        self.__add_owner_s_equity(Account.NET_CHANGE_CODE,
+                                  self.__query_currency_period(),
+                                  self.__period)
 
     def __query_currency_period(self) -> Decimal | None:
         """Queries and returns the net income or loss for current period.
@@ -223,25 +221,26 @@ class AccountCollector:
         return db.session.scalar(select_balance)
 
     def __add_owner_s_equity(self, code: str, amount: Decimal | None,
-                             url: str) -> None:
+                             period: Period) -> None:
         """Adds an owner's equity balance.
 
         :param code: The code of the account to add.
         :param amount: The amount.
+        :param period: The period.
         :return: None.
         """
+        if amount is None:
+            return
+        url: str = income_statement_url(self.__currency, period)
         # There is an existing balance.
         account_balance_by_code: dict[str, ReportAccount] \
             = {x.account.code: x for x in self.accounts}
         if code in account_balance_by_code:
             balance: ReportAccount = account_balance_by_code[code]
-            if amount is not None:
-                balance.amount = balance.amount + amount
-                balance.url = url
+            balance.amount = balance.amount + amount
+            balance.url = url
             return
         # Add a new balance
-        if amount is None:
-            return
         account_by_code: dict[str, Account] \
             = {x.code: x for x in self.__all_accounts}
         self.accounts.append(ReportAccount(account=account_by_code[code],
