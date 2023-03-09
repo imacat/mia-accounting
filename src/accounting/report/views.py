@@ -42,7 +42,7 @@ def get_default_report() -> str | Response:
 
     :return: The income and expenses log in the default period.
     """
-    return __get_income_expenses_list(
+    return __get_income_expenses(
         db.session.get(Currency, default_currency_code()),
         default_io_account(),
         get_period())
@@ -50,26 +50,26 @@ def get_default_report() -> str | Response:
 
 @bp.get("journal", endpoint="journal-default")
 @has_permission(can_view)
-def get_default_journal_list() -> str | Response:
+def get_default_journal() -> str | Response:
     """Returns the journal in the default period.
 
     :return: The journal in the default period.
     """
-    return __get_journal_list(get_period())
+    return __get_journal(get_period())
 
 
 @bp.get("journal/<period:period>", endpoint="journal")
 @has_permission(can_view)
-def get_journal_list(period: Period) -> str | Response:
+def get_journal(period: Period) -> str | Response:
     """Returns the journal.
 
     :param period: The period.
     :return: The journal in the period.
     """
-    return __get_journal_list(period)
+    return __get_journal(period)
 
 
-def __get_journal_list(period: Period) -> str | Response:
+def __get_journal(period: Period) -> str | Response:
     """Returns the journal.
 
     :param period: The period.
@@ -84,21 +84,20 @@ def __get_journal_list(period: Period) -> str | Response:
 @bp.get("ledger/<currency:currency>/<account:account>",
         endpoint="ledger-default")
 @has_permission(can_view)
-def get_default_ledger_list(currency: Currency, account: Account) \
-        -> str | Response:
+def get_default_ledger(currency: Currency, account: Account) -> str | Response:
     """Returns the ledger in the default period.
 
     :param currency: The currency.
     :param account: The account.
     :return: The ledger in the default period.
     """
-    return __get_ledger_list(currency, account, get_period())
+    return __get_ledger(currency, account, get_period())
 
 
 @bp.get("ledger/<currency:currency>/<account:account>/<period:period>",
         endpoint="ledger")
 @has_permission(can_view)
-def get_ledger_list(currency: Currency, account: Account, period: Period) \
+def get_ledger(currency: Currency, account: Account, period: Period) \
         -> str | Response:
     """Returns the ledger.
 
@@ -107,10 +106,10 @@ def get_ledger_list(currency: Currency, account: Account, period: Period) \
     :param period: The period.
     :return: The ledger in the period.
     """
-    return __get_ledger_list(currency, account, period)
+    return __get_ledger(currency, account, period)
 
 
-def __get_ledger_list(currency: Currency, account: Account, period: Period) \
+def __get_ledger(currency: Currency, account: Account, period: Period) \
         -> str | Response:
     """Returns the ledger.
 
@@ -128,8 +127,8 @@ def __get_ledger_list(currency: Currency, account: Account, period: Period) \
 @bp.get("income-expenses/<currency:currency>/<ioAccount:account>",
         endpoint="income-expenses-default")
 @has_permission(can_view)
-def get_default_income_expenses_list(currency: Currency,
-                                     account: IncomeExpensesAccount) \
+def get_default_income_expenses(currency: Currency,
+                                account: IncomeExpensesAccount) \
         -> str | Response:
     """Returns the income and expenses log in the default period.
 
@@ -137,16 +136,15 @@ def get_default_income_expenses_list(currency: Currency,
     :param account: The account.
     :return: The income and expenses log in the default period.
     """
-    return __get_income_expenses_list(currency, account, get_period())
+    return __get_income_expenses(currency, account, get_period())
 
 
 @bp.get(
     "income-expenses/<currency:currency>/<ioAccount:account>/<period:period>",
     endpoint="income-expenses")
 @has_permission(can_view)
-def get_income_expenses_list(currency: Currency,
-                             account: IncomeExpensesAccount,
-                             period: Period) -> str | Response:
+def get_income_expenses(currency: Currency, account: IncomeExpensesAccount,
+                        period: Period) -> str | Response:
     """Returns the income and expenses log.
 
     :param currency: The currency.
@@ -154,12 +152,11 @@ def get_income_expenses_list(currency: Currency,
     :param period: The period.
     :return: The income and expenses log in the period.
     """
-    return __get_income_expenses_list(currency, account, period)
+    return __get_income_expenses(currency, account, period)
 
 
-def __get_income_expenses_list(currency: Currency,
-                               account: IncomeExpensesAccount,
-                               period: Period) -> str | Response:
+def __get_income_expenses(currency: Currency, account: IncomeExpensesAccount,
+                          period: Period) -> str | Response:
     """Returns the income and expenses log.
 
     :param currency: The currency.
@@ -176,31 +173,29 @@ def __get_income_expenses_list(currency: Currency,
 @bp.get("trial-balance/<currency:currency>",
         endpoint="trial-balance-default")
 @has_permission(can_view)
-def get_default_trial_balance_list(currency: Currency) -> str | Response:
+def get_default_trial_balance(currency: Currency) -> str | Response:
     """Returns the trial balance in the default period.
 
     :param currency: The currency.
     :return: The trial balance in the default period.
     """
-    return __get_trial_balance_list(currency, get_period())
+    return __get_trial_balance(currency, get_period())
 
 
 @bp.get("trial-balance/<currency:currency>/<period:period>",
         endpoint="trial-balance")
 @has_permission(can_view)
-def get_trial_balance_list(currency: Currency, period: Period) \
-        -> str | Response:
+def get_trial_balance(currency: Currency, period: Period) -> str | Response:
     """Returns the trial balance.
 
     :param currency: The currency.
     :param period: The period.
     :return: The trial balance in the period.
     """
-    return __get_trial_balance_list(currency, period)
+    return __get_trial_balance(currency, period)
 
 
-def __get_trial_balance_list(currency: Currency, period: Period) \
-        -> str | Response:
+def __get_trial_balance(currency: Currency, period: Period) -> str | Response:
     """Returns the trial balance.
 
     :param currency: The currency.
@@ -216,30 +211,29 @@ def __get_trial_balance_list(currency: Currency, period: Period) \
 @bp.get("income-statement/<currency:currency>",
         endpoint="income-statement-default")
 @has_permission(can_view)
-def get_default_income_statement_list(currency: Currency) -> str | Response:
+def get_default_income_statement(currency: Currency) -> str | Response:
     """Returns the income statement in the default period.
 
     :param currency: The currency.
     :return: The income statement in the default period.
     """
-    return __get_income_statement_list(currency, get_period())
+    return __get_income_statement(currency, get_period())
 
 
 @bp.get("income-statement/<currency:currency>/<period:period>",
         endpoint="income-statement")
 @has_permission(can_view)
-def get_income_statement_list(currency: Currency, period: Period) \
-        -> str | Response:
+def get_income_statement(currency: Currency, period: Period) -> str | Response:
     """Returns the income statement.
 
     :param currency: The currency.
     :param period: The period.
     :return: The income statement in the period.
     """
-    return __get_income_statement_list(currency, period)
+    return __get_income_statement(currency, period)
 
 
-def __get_income_statement_list(currency: Currency, period: Period) \
+def __get_income_statement(currency: Currency, period: Period) \
         -> str | Response:
     """Returns the income statement.
 
@@ -256,19 +250,19 @@ def __get_income_statement_list(currency: Currency, period: Period) \
 @bp.get("balance-sheet/<currency:currency>",
         endpoint="balance-sheet-default")
 @has_permission(can_view)
-def get_default_balance_sheet_list(currency: Currency) -> str | Response:
+def get_default_balance_sheet(currency: Currency) -> str | Response:
     """Returns the balance sheet in the default period.
 
     :param currency: The currency.
     :return: The balance sheet in the default period.
     """
-    return __get_balance_sheet_list(currency, get_period())
+    return __get_balance_sheet(currency, get_period())
 
 
 @bp.get("balance-sheet/<currency:currency>/<period:period>",
         endpoint="balance-sheet")
 @has_permission(can_view)
-def get_balance_sheet_list(currency: Currency, period: Period) \
+def get_balance_sheet(currency: Currency, period: Period) \
         -> str | Response:
     """Returns the balance sheet.
 
@@ -276,10 +270,10 @@ def get_balance_sheet_list(currency: Currency, period: Period) \
     :param period: The period.
     :return: The balance sheet in the period.
     """
-    return __get_balance_sheet_list(currency, period)
+    return __get_balance_sheet(currency, period)
 
 
-def __get_balance_sheet_list(currency: Currency, period: Period) \
+def __get_balance_sheet(currency: Currency, period: Period) \
         -> str | Response:
     """Returns the balance sheet.
 
