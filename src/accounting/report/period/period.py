@@ -21,9 +21,9 @@ This file is largely taken from the NanoParma ERP project, first written in
 
 """
 import calendar
-import datetime
 import re
 import typing as t
+from datetime import date, timedelta
 
 from accounting.locale import gettext
 from .description import PeriodDescription
@@ -33,15 +33,15 @@ from .specification import PeriodSpecification
 class Period:
     """A date period."""
 
-    def __init__(self, start: datetime.date | None, end: datetime.date | None):
+    def __init__(self, start: date | None, end: date | None):
         """Constructs a new date period.
 
         :param start: The start date, or None from the very beginning.
         :param end: The end date, or None till no end.
         """
-        self.start: datetime.date | None = start
+        self.start: date | None = start
         """The start of the period."""
-        self.end: datetime.date | None = end
+        self.end: date | None = end
         """The end of the period."""
         self.is_default: bool = False
         """Whether the is the default period."""
@@ -97,8 +97,8 @@ class Period:
         self.is_a_month = self.start.day == 1 \
             and self.end == _month_end(self.start)
         self.is_type_month = self.is_a_month
-        self.is_a_year = self.start == datetime.date(self.start.year, 1, 1) \
-            and self.end == datetime.date(self.start.year, 12, 31)
+        self.is_a_year = self.start == date(self.start.year, 1, 1) \
+            and self.end == date(self.start.year, 12, 31)
         self.is_a_day = self.start == self.end
 
     @classmethod
@@ -123,8 +123,6 @@ class Period:
         }
         if spec in named_periods:
             return named_periods[spec]()
-        start: datetime.date
-        end: datetime.date
         start, end = _parse_period_spec(spec)
         if start is not None and end is not None and start > end:
             raise ValueError
@@ -157,15 +155,14 @@ class Period:
         """
         if self.start is None:
             return None
-        return Period(None, self.start - datetime.timedelta(days=1))
+        return Period(None, self.start - timedelta(days=1))
 
 
 class ThisMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: datetime.date = datetime.date.today()
-        this_month_start: datetime.date \
-            = datetime.date(today.year, today.month, 1)
+        today: date = date.today()
+        this_month_start: date = date(today.year, today.month, 1)
         super().__init__(this_month_start, _month_end(today))
         self.is_default = True
         self.is_this_month = True
@@ -180,13 +177,13 @@ class ThisMonth(Period):
 class LastMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: datetime.date = datetime.date.today()
+        today: date = date.today()
         year: int = today.year
         month: int = today.month - 1
         if month < 1:
             year = year - 1
             month = 12
-        start: datetime.date = datetime.date(year, month, 1)
+        start: date = date(year, month, 1)
         super().__init__(start, _month_end(start))
         self.is_last_month = True
 
@@ -200,13 +197,13 @@ class LastMonth(Period):
 class SinceLastMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: datetime.date = datetime.date.today()
+        today: date = date.today()
         year: int = today.year
         month: int = today.month - 1
         if month < 1:
             year = year - 1
             month = 12
-        start: datetime.date = datetime.date(year, month, 1)
+        start: date = date(year, month, 1)
         super().__init__(start, None)
         self.is_since_last_month = True
 
@@ -219,9 +216,9 @@ class SinceLastMonth(Period):
 class ThisYear(Period):
     """The period of this year."""
     def __init__(self):
-        year: int = datetime.date.today().year
-        start: datetime.date = datetime.date(year, 1, 1)
-        end: datetime.date = datetime.date(year, 12, 31)
+        year: int = date.today().year
+        start: date = date(year, 1, 1)
+        end: date = date(year, 12, 31)
         super().__init__(start, end)
         self.is_this_year = True
 
@@ -234,9 +231,9 @@ class ThisYear(Period):
 class LastYear(Period):
     """The period of last year."""
     def __init__(self):
-        year: int = datetime.date.today().year
-        start: datetime.date = datetime.date(year - 1, 1, 1)
-        end: datetime.date = datetime.date(year - 1, 12, 31)
+        year: int = date.today().year
+        start: date = date(year - 1, 1, 1)
+        end: date = date(year - 1, 12, 31)
         super().__init__(start, end)
         self.is_last_year = True
 
@@ -249,7 +246,7 @@ class LastYear(Period):
 class Today(Period):
     """The period of today."""
     def __init__(self):
-        today: datetime.date = datetime.date.today()
+        today: date = date.today()
         super().__init__(today, today)
         self.is_today = True
 
@@ -262,8 +259,7 @@ class Today(Period):
 class Yesterday(Period):
     """The period of yesterday."""
     def __init__(self):
-        yesterday: datetime.date \
-            = datetime.date.today() - datetime.timedelta(days=1)
+        yesterday: date = date.today() - timedelta(days=1)
         super().__init__(yesterday, yesterday)
         self.is_yesterday = True
 
@@ -301,8 +297,8 @@ class YearPeriod(Period):
 
         :param year: The year.
         """
-        start: datetime.date = datetime.date(year, 1, 1)
-        end: datetime.date = datetime.date(year, 12, 31)
+        start: date = date(year, 1, 1)
+        end: date = date(year, 12, 31)
         super().__init__(start, end)
 
 
@@ -310,8 +306,7 @@ DATE_SPEC_RE: str = r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?"
 """The regular expression of a date specification."""
 
 
-def _parse_period_spec(text: str) \
-        -> tuple[datetime.date | None, datetime.date | None]:
+def _parse_period_spec(text: str) -> tuple[date | None, date | None]:
     """Parses the period specification.
 
     :param text: The period specification.
@@ -338,8 +333,7 @@ def _parse_period_spec(text: str) \
     raise ValueError
 
 
-def __get_start(year: str, month: str | None, day: str | None)\
-        -> datetime.date:
+def __get_start(year: str, month: str | None, day: str | None) -> date:
     """Returns the start of the period from the date representation.
 
     :param year: The year.
@@ -349,14 +343,13 @@ def __get_start(year: str, month: str | None, day: str | None)\
     :raise ValueError: When the date is invalid.
     """
     if day is not None:
-        return datetime.date(int(year), int(month), int(day))
+        return date(int(year), int(month), int(day))
     if month is not None:
-        return datetime.date(int(year), int(month), 1)
-    return datetime.date(int(year), 1, 1)
+        return date(int(year), int(month), 1)
+    return date(int(year), 1, 1)
 
 
-def __get_end(year: str, month: str | None, day: str | None)\
-        -> datetime.date:
+def __get_end(year: str, month: str | None, day: str | None) -> date:
     """Returns the end of the period from the date representation.
 
     :param year: The year.
@@ -366,20 +359,20 @@ def __get_end(year: str, month: str | None, day: str | None)\
     :raise ValueError: When the date is invalid.
     """
     if day is not None:
-        return datetime.date(int(year), int(month), int(day))
+        return date(int(year), int(month), int(day))
     if month is not None:
         year_n: int = int(year)
         month_n: int = int(month)
         day_n: int = calendar.monthrange(year_n, month_n)[1]
-        return datetime.date(year_n, month_n, day_n)
-    return datetime.date(int(year), 12, 31)
+        return date(year_n, month_n, day_n)
+    return date(int(year), 12, 31)
 
 
-def _month_end(date: datetime.date) -> datetime.date:
+def _month_end(day: date) -> date:
     """Returns the end day of month for a date.
 
-    :param date: The date.
+    :param day: The date.
     :return: The end day of the month of that day.
     """
-    day: int = calendar.monthrange(date.year, date.month)[1]
-    return datetime.date(date.year, date.month, day)
+    last_day: int = calendar.monthrange(day.year, day.month)[1]
+    return date(day.year, day.month, last_day)
