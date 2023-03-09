@@ -45,6 +45,32 @@
     background-color: #D3D3D4;
 }
 
+/** The toolbar for the mobile devices */
+.accounting-mobile-toolbar {
+    display: flex;
+}
+.accounting-mobile-toolbar .accounting-toolbar-button {
+    height: 3.2rem;
+    width: 3.2rem;
+    border-radius: 50%;
+    margin-left: 1rem;
+}
+.accounting-mobile-toolbar > a.accounting-toolbar-button {
+    padding-top: 0.7rem;
+}
+.accounting-search-mobile-form {
+    width: 12rem;
+    margin-left: 1rem;
+    height: 2.8rem;
+    align-items: center;
+    margin-top: 0.3rem;
+}
+.accounting-search-mobile-form button {
+    background-color: transparent;
+    border: 0;
+    color: inherit;
+}
+
 /** The card layout */
 .accounting-card {
     padding: 2em 1.5em;

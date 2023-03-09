@@ -22,7 +22,7 @@ First written: 2023/3/8
 {% if use_add_new %}
   {% if accounting_can_edit() %}
     <div class="btn-group" role="group">
-      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <button type="button" class="btn btn-primary dropdown-toggle accounting-toolbar-button" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fa-solid fa-plus"></i>
         <span class="d-none d-md-inline">{{ A_("New") }}</span>
       </button>
@@ -48,7 +48,7 @@ First written: 2023/3/8
 {% endif %}
 {% if use_report_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle accounting-toolbar-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-book"></i>
       <span class="d-none d-md-inline">{{ report.report_chooser.current_report }}</span>
     </button>
@@ -72,7 +72,7 @@ First written: 2023/3/8
 {% endif %}
 {% if use_currency_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle accounting-toolbar-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-money-bill-wave"></i>
       <span class="d-none d-md-inline">{{ report.currency.name|title }}</span>
     </button>
@@ -89,7 +89,7 @@ First written: 2023/3/8
 {% endif %}
 {% if use_account_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle accounting-toolbar-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-clipboard"></i>
       <span class="d-none d-md-inline">{{ report.account.title|title }}</span>
     </button>
@@ -105,11 +105,15 @@ First written: 2023/3/8
   </div>
 {% endif %}
 {% if use_period_chooser %}
-  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
+  <button class="btn btn-primary accounting-toolbar-button" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
     <i class="fa-solid fa-calendar-day"></i>
     <span class="d-none d-md-inline">{{ report.period.desc|title }}</span>
   </button>
 {% endif %}
+<a class="btn btn-primary accounting-toolbar-button" role="button" href="{{ report.csv_uri }}">
+  <i class="fa-solid fa-download"></i>
+  <span class="d-none d-md-inline">{{ A_("Download") }}</span>
+</a>
 {% if use_search %}
   <form class="btn btn-primary d-flex input-group accounting-search-{{ search_platform }}-form" action="{{ url_for("accounting.report.search") }}" method="get" role="search" aria-label="{{ search_aria_label }}">
     <input id="accounting-search-{{ search_platform }}" class="form-control form-control-sm accounting-search-input" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
@@ -121,7 +125,3 @@ First written: 2023/3/8
     </label>
   </form>
 {% endif %}
-<a class="btn btn-primary" role="button" href="{{ report.csv_uri }}">
-  <i class="fa-solid fa-download"></i>
-  <span class="d-none d-md-inline">{{ A_("Download") }}</span>
-</a>
