@@ -30,7 +30,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, Account
 from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
-from .income_expense_account import IncomeExpensesAccount
+from .ie_account import IncomeExpensesAccount
 from .option_link import OptionLink
 from .report_type import ReportType
 from .urls import journal_url, ledger_url, income_expenses_url, \

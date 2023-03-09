@@ -24,7 +24,7 @@ from werkzeug.routing import BaseConverter
 
 from accounting.models import Account
 from .period import Period, get_period
-from .utils.income_expense_account import IncomeExpensesAccount
+from .utils.ie_account import IncomeExpensesAccount
 
 
 class PeriodConverter(BaseConverter):

@@ -27,8 +27,7 @@ from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
 from .template_filters import format_amount
-from .utils.income_expense_account import IncomeExpensesAccount, \
-    default_io_account
+from .utils.ie_account import IncomeExpensesAccount, default_io_account
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
