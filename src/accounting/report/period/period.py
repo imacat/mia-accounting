@@ -27,7 +27,7 @@ from datetime import date, timedelta
 from accounting.locale import gettext
 from .description import get_desc
 from .parser import parse_spec
-from .specification import PeriodSpecification
+from .specification import get_spec
 
 
 class Period:
@@ -90,7 +90,7 @@ class Period:
 
         :return: None.
         """
-        self.spec = PeriodSpecification(self.start, self.end).spec
+        self.spec = get_spec(self.start, self.end)
         self.desc = get_desc(self.start, self.end)
         if self.start is None or self.end is None:
             return

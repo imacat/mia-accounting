@@ -20,99 +20,101 @@
 from datetime import date, timedelta
 
 
-class PeriodSpecification:
-    """The period specification composer."""
+def get_spec(start: date | None, end: date | None) -> str:
+    """Returns the period specification.
 
-    def __init__(self, start: date | None, end: date | None):
-        """Constructs the period specification composer.
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The period specification.
+    """
+    if start is None and end is None:
+        return "-"
+    if end is None:
+        return __get_since_spec(start)
+    if start is None:
+        return __get_until_spec(end)
+    try:
+        return __get_year_spec(start, end)
+    except ValueError:
+        pass
+    try:
+        return __get_month_spec(start, end)
+    except ValueError:
+        pass
+    return __get_day_spec(start, end)
 
-        :param start: The start of the period.
-        :param end: The end of the period.
-        """
-        self.__start: date | None = start
-        self.__end: date | None = end
-        self.spec: str = self.__get_spec()
 
-    def __get_spec(self) -> str:
-        """Returns the period specification.
+def __get_since_spec(start: date) -> str:
+    """Returns the period specification without the end day.
 
-        :return: The period specification.
-        """
-        if self.__start is None and self.__end is None:
-            return "-"
-        if self.__end is None:
-            return self.__get_since_spec()
-        if self.__start is None:
-            return self.__get_until_spec()
-        try:
-            return self.__get_year_spec()
-        except ValueError:
-            pass
-        try:
-            return self.__get_month_spec()
-        except ValueError:
-            pass
-        return self.__get_day_spec()
+    :param start: The start of the period.
+    :return: The period specification without the end day
+    """
+    if start.month == 1 and start.day == 1:
+        return start.strftime("%Y-")
+    if start.day == 1:
+        return start.strftime("%Y-%m-")
+    return start.strftime("%Y-%m-%d-")
 
-    def __get_since_spec(self) -> str:
-        """Returns the period specification without the end day.
 
-        :return: The period specification without the end day
-        """
-        if self.__start.month == 1 and self.__start.day == 1:
-            return self.__start.strftime("%Y-")
-        if self.__start.day == 1:
-            return self.__start.strftime("%Y-%m-")
-        return self.__start.strftime("%Y-%m-%d-")
+def __get_until_spec(end: date) -> str:
+    """Returns the period specification without the start day.
 
-    def __get_until_spec(self) -> str:
-        """Returns the period specification without the start day.
+    :param end: The end of the period.
+    :return: The period specification without the start day
+    """
+    if end.month == 12 and end.day == 31:
+        return end.strftime("-%Y")
+    if (end + timedelta(days=1)).day == 1:
+        return end.strftime("-%Y-%m")
+    return end.strftime("-%Y-%m-%d")
 
-        :return: The period specification without the start day
-        """
-        if self.__end.month == 12 and self.__end.day == 31:
-            return self.__end.strftime("-%Y")
-        if (self.__end + timedelta(days=1)).day == 1:
-            return self.__end.strftime("-%Y-%m")
-        return self.__end.strftime("-%Y-%m-%d")
 
-    def __get_year_spec(self) -> str:
-        """Returns the period specification as a year range.
+def __get_year_spec(start: date, end: date) -> str:
+    """Returns the period specification as a year range.
 
-        :return: The period specification as a year range.
-        :raise ValueError: The period is not a year range.
-        """
-        if self.__start.month != 1 or self.__start.day != 1 \
-                or self.__end.month != 12 or self.__end.day != 31:
-            raise ValueError
-        if self.__start.year == self.__end.year:
-            return "%04d" % self.__start.year
-        return "%04d-%04d" % (self.__start.year, self.__end.year)
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The period specification as a year range.
+    :raise ValueError: The period is not a year range.
+    """
+    if start.month != 1 or start.day != 1 \
+            or end.month != 12 or end.day != 31:
+        raise ValueError
+    start_spec: str = start.strftime("%Y")
+    if start.year == end.year:
+        return start_spec
+    end_spec: str = end.strftime("%Y")
+    return f"{start_spec}-{end_spec}"
 
-    def __get_month_spec(self) -> str:
-        """Returns the period specification as a month range.
 
-        :return: The period specification as a month range.
-        :raise ValueError: The period is not a month range.
-        """
-        if self.__start.day != 1 or (self.__end + timedelta(days=1)).day != 1:
-            raise ValueError
-        if self.__start.year == self.__end.year \
-                and self.__start.month == self.__end.month:
-            return "%04d-%02d" % (self.__start.year, self.__start.month)
-        return "%04d-%02d-%04d-%02d" % (
-            self.__start.year, self.__start.month,
-            self.__end.year, self.__end.month)
+def __get_month_spec(start: date, end: date) -> str:
+    """Returns the period specification as a month range.
 
-    def __get_day_spec(self) -> str:
-        """Returns the period specification as a day range.
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The period specification as a month range.
+    :raise ValueError: The period is not a month range.
+    """
+    if start.day != 1 or (end + timedelta(days=1)).day != 1:
+        raise ValueError
+    start_spec: str = start.strftime("%Y-%m")
+    if start.year == end.year and start.month == end.month:
+        return start_spec
+    end_spec: str = end.strftime("%Y-%m")
+    return f"{start_spec}-{end_spec}"
 
-        :return: The period specification as a day range.
-        :raise ValueError: The period is a month or year range.
-        """
-        if self.__start == self.__end:
-            return "%04d-%02d-%02d" % (
-                self.__start.year, self.__start.month, self.__start.day)
-        return "%04d-%02d-%02d-%04d-%02d-%02d" % (
-            self.__start.year, self.__start.month, self.__start.day,
-            self.__end.year, self.__end.month, self.__end.day)
+
+def __get_day_spec(start: date, end: date) -> str:
+    """Returns the period specification as a day range.
+
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The period specification as a day range.
+    :raise ValueError: The period is a month or year range.
+    """
+    start_spec: str = start.strftime("%Y-%m-%d")
+    if start == end:
+        return start_spec
+    end_spec: str = end.strftime("%Y-%m-%d")
+    return f"{start_spec}-{end_spec}"
