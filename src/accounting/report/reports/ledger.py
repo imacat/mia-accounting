@@ -46,8 +46,6 @@ class ReportEntry:
 
         :param entry: The journal entry.
         """
-        self.entry: JournalEntry | None = None
-        """The journal entry."""
         self.transaction: Transaction | None = None
         """The transaction."""
         self.is_brought_forward: bool = False
@@ -56,8 +54,6 @@ class ReportEntry:
         """Whether this is the total entry."""
         self.date: date | None = None
         """The date."""
-        self.account: Account | None = None
-        """The account."""
         self.summary: str | None = None
         """The summary."""
         self.debit: Decimal | None = None
@@ -69,7 +65,6 @@ class ReportEntry:
         self.note: str | None = None
         """The note."""
         if entry is not None:
-            self.entry = entry
             self.transaction = entry.transaction
             self.date = entry.transaction.date
             self.summary = entry.summary
