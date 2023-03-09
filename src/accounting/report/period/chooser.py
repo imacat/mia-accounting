@@ -25,7 +25,7 @@ from datetime import date
 
 from accounting.models import Transaction
 from .period import Period
-from .periods import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
+from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
     LastYear, Today, Yesterday, AllTime, TemplatePeriod, YearPeriod
 
 

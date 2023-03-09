@@ -23,7 +23,7 @@ import typing as t
 from datetime import date
 
 from .period import Period
-from .periods import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
+from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
     LastYear, Today, Yesterday, AllTime
 
 DATE_SPEC_RE: str = r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?"
