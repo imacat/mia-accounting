@@ -30,6 +30,7 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import YearPeriod, Period, ThisMonth, \
     LastMonth, SinceLastMonth, ThisYear, LastYear, Today, Yesterday, \
     TemplatePeriod
+from .get_url import get_ledger_url
 
 
 class PeriodChooser(ABC):
@@ -131,12 +132,7 @@ class LedgerPeriodChooser(PeriodChooser):
         super().__init__(None if first is None else first.date)
 
     def _url_for(self, period: Period) -> str:
-        if period.is_default:
-            return url_for("accounting.report.ledger-default",
-                           currency=self.currency, account=self.account)
-        return url_for("accounting.report.ledger",
-                       currency=self.currency, account=self.account,
-                       period=period)
+        return get_ledger_url(self.currency, self.account, period)
 
 
 class IncomeExpensesPeriodChooser(PeriodChooser):

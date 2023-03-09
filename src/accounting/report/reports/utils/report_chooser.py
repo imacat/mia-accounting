@@ -31,6 +31,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, Account
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
+from .get_url import get_ledger_url
 from .option_link import OptionLink
 from .report_type import ReportType
 
@@ -98,13 +99,9 @@ class ReportChooser:
 
         :return: The ledger.
         """
-        url: str = url_for("accounting.report.ledger-default",
-                           currency=self.__currency, account=self.__account) \
-            if self.__period.is_default \
-            else url_for("accounting.report.ledger",
-                         currency=self.__currency, account=self.__account,
-                         period=self.__period)
-        return OptionLink(gettext("Ledger"), url,
+        return OptionLink(gettext("Ledger"),
+                          get_ledger_url(self.__currency, self.__account,
+                                         self.__period),
                           self.__active_report == ReportType.LEDGER,
                           fa_icon="fa-solid fa-clipboard")
 

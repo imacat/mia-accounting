@@ -31,6 +31,7 @@ from accounting.report.period import Period
 from accounting.utils.pagination import Pagination
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
+from .utils.get_url import get_ledger_url
 from .utils.option_link import OptionLink
 from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import LedgerPeriodChooser
@@ -290,15 +291,9 @@ class PageParams(BasePageParams):
 
         :return: The currency options.
         """
-        def get_url(currency: Currency):
-            if self.period.is_default:
-                return url_for("accounting.report.ledger-default",
-                               currency=currency, account=self.account)
-            return url_for("accounting.report.ledger",
-                           currency=currency, account=self.account,
-                           period=self.period)
-
-        return self._get_currency_options(get_url, self.currency)
+        return self._get_currency_options(
+            lambda x: get_ledger_url(x, self.account, self.period),
+            self.currency)
 
     @property
     def account_options(self) -> list[OptionLink]:
@@ -306,18 +301,12 @@ class PageParams(BasePageParams):
 
         :return: The account options.
         """
-        def get_url(account: Account):
-            if self.period.is_default:
-                return url_for("accounting.report.ledger-default",
-                               currency=self.currency, account=account)
-            return url_for("accounting.report.ledger",
-                           currency=self.currency, account=account,
-                           period=self.period)
-
         in_use: sa.Select = sa.Select(JournalEntry.account_id)\
             .filter(JournalEntry.currency_code == self.currency.code)\
             .group_by(JournalEntry.account_id)
-        return [OptionLink(str(x), get_url(x), x.id == self.account.id)
+        return [OptionLink(str(x), get_ledger_url(self.currency, x,
+                                                  self.period),
+                           x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
                 .order_by(Account.base_code, Account.no).all()]
 

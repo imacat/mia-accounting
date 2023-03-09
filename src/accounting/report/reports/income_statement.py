@@ -29,6 +29,7 @@ from accounting.models import Currency, BaseAccount, Account, Transaction, \
 from accounting.report.period import Period
 from .utils.base_report import BaseReport
 from .utils.csv_export import BaseCSVRow, csv_download, period_spec
+from .utils.get_url import get_ledger_url
 from .utils.option_link import OptionLink
 from .utils.base_page_params import BasePageParams
 from .utils.period_choosers import IncomeStatementPeriodChooser
@@ -278,23 +279,11 @@ class IncomeStatement(BaseReport):
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query
                .filter(Account.id.in_([x.id for x in balances])).all()}
-
-        def get_url(account: Account) -> str:
-            """Returns the ledger URL of an account.
-
-            :param account: The account.
-            :return: The ledger URL of the account.
-            """
-            if self.__period.is_default:
-                return url_for("accounting.report.ledger-default",
-                               currency=self.__currency, account=account)
-            return url_for("accounting.report.ledger",
-                           currency=self.__currency, account=account,
-                           period=self.__period)
-
         return [ReportAccount(account=accounts[x.id],
                               amount=x.balance,
-                              url=get_url(accounts[x.id]))
+                              url=get_ledger_url(self.__currency,
+                                                 accounts[x.id],
+                                                 self.__period))
                 for x in balances]
 
     def csv(self) -> Response:
