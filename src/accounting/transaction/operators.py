@@ -304,15 +304,17 @@ TXN_TYPE_TO_OP: dict[TransactionType, TransactionOperator] \
 """The map from the transaction types to their operators."""
 
 
-def get_txn_op(txn: Transaction) -> TransactionOperator:
+def get_txn_op(txn: Transaction, is_check_as: bool = False) \
+        -> TransactionOperator:
     """Returns the transaction operator that may be specified in the "as" query
     parameter.  If it is not specified, check the transaction type from the
-     transaction.
+    transaction.
 
     :param txn: The transaction.
+    :param is_check_as: True to check the "as" parameter, or False otherwise.
     :return: None.
     """
-    if "as" in request.args:
+    if is_check_as and "as" in request.args:
         type_dict: dict[str, TransactionType] \
             = {x.value: x for x in TransactionType}
         if request.args["as"] not in type_dict:

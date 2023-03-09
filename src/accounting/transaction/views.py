@@ -111,7 +111,7 @@ def show_transaction_edit_form(txn: Transaction) -> str:
     :param txn: The transaction.
     :return: The form to edit the transaction.
     """
-    txn_op: TransactionOperator = get_txn_op(txn)
+    txn_op: TransactionOperator = get_txn_op(txn, is_check_as=True)
     form: txn_op.form
     if "form" in session:
         form = txn_op.form(ImmutableMultiDict(parse_qsl(session["form"])))
@@ -131,7 +131,7 @@ def update_transaction(txn: Transaction) -> redirect:
     :return: The redirection to the transaction detail on success, or the
         transaction edit form on error.
     """
-    txn_op: TransactionOperator = get_txn_op(txn)
+    txn_op: TransactionOperator = get_txn_op(txn, is_check_as=True)
     form: txn_op.form = txn_op.form(request.form)
     if not form.validate():
         flash_form_errors(form)
