@@ -22,156 +22,158 @@ from datetime import date, timedelta
 from accounting.locale import gettext
 
 
-class PeriodDescription:
-    """The period description composer."""
+def get_desc(start: date | None, end: date | None) -> str:
+    """Returns the period description.
 
-    def __init__(self, start: date | None, end: date | None):
-        """Constructs the period description composer.
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The period description.
+    """
+    if start is None and end is None:
+        return gettext("for all time")
+    if start is None:
+        return __get_until_desc(end)
+    if end is None:
+        return __get_since_desc(start)
+    try:
+        return __get_year_desc(start, end)
+    except ValueError:
+        pass
+    try:
+        return __get_month_desc(start, end)
+    except ValueError:
+        pass
+    return __get_day_desc(start, end)
 
-        :param start: The start of the period.
-        :param end: The end of the period.
+
+def __get_since_desc(start: date) -> str:
+    """Returns the description without the end day.
+
+    :param start: The start of the period.
+    :return: The description without the end day.
+    """
+
+    def get_start_desc() -> str:
+        """Returns the description of the start day.
+
+        :return: The description of the start day.
         """
-        self.__start: date | None = start
-        self.__end: date | None = end
-        self.desc: str = self.__get_desc()
+        if start.month == 1 and start.day == 1:
+            return str(start.year)
+        if start.day == 1:
+            return __format_month(start)
+        return __format_day(start)
 
-    def __get_desc(self) -> str:
-        """Returns the period description.
+    return gettext("since %(start)s", start=get_start_desc())
 
-        :return: The period description.
+
+def __get_until_desc(end: date) -> str:
+    """Returns the description without the start day.
+
+    :param end: The end of the period.
+    :return: The description without the start day.
+    """
+
+    def get_end_desc() -> str:
+        """Returns the description of the end day.
+
+        :return: The description of the end day.
         """
-        if self.__start is None and self.__end is None:
-            return gettext("for all time")
-        if self.__start is None:
-            return self.__get_until_desc()
-        if self.__end is None:
-            return self.__get_since_desc()
-        try:
-            return self.__get_year_desc()
-        except ValueError:
-            pass
-        try:
-            return self.__get_month_desc()
-        except ValueError:
-            pass
-        return self.__get_day_desc()
+        if end.month == 12 and end.day == 31:
+            return str(end.year)
+        if (end + timedelta(days=1)).day == 1:
+            return __format_month(end)
+        return __format_day(end)
 
-    def __get_since_desc(self) -> str:
-        """Returns the description without the end day.
+    return gettext("until %(end)s", end=get_end_desc())
 
-        :return: The description without the end day.
-        """
-        def get_start_desc() -> str:
-            """Returns the description of the start day.
 
-            :return: The description of the start day.
-            """
-            if self.__start.month == 1 and self.__start.day == 1:
-                return str(self.__start.year)
-            if self.__start.day == 1:
-                return self.__format_month(self.__start)
-            return self.__format_day(self.__start)
+def __get_year_desc(start: date, end: date) -> str:
+    """Returns the description as a year range.
 
-        return gettext("since %(start)s", start=get_start_desc())
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The description as a year range.
+    :raise ValueError: The period is not a year range.
+    """
+    if start.month != 1 or start.day != 1 \
+            or end.month != 12 or end.day != 31:
+        raise ValueError
+    start_text: str = str(start.year)
+    if start.year == end.year:
+        return __get_in_desc(start_text)
+    return __get_from_to_desc(start_text, str(end.year))
 
-    def __get_until_desc(self) -> str:
-        """Returns the description without the start day.
 
-        :return: The description without the start day.
-        """
-        def get_end_desc() -> str:
-            """Returns the description of the end day.
+def __get_month_desc(start: date, end: date) -> str:
+    """Returns the description as a month range.
 
-            :return: The description of the end day.
-            """
-            if self.__end.month == 12 and self.__end.day == 31:
-                return str(self.__end.year)
-            if (self.__end + timedelta(days=1)).day == 1:
-                return self.__format_month(self.__end)
-            return self.__format_day(self.__end)
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The description as a month range.
+    :raise ValueError: The period is not a month range.
+    """
+    if start.day != 1 or (end + timedelta(days=1)).day != 1:
+        raise ValueError
+    start_text: str = __format_month(start)
+    if start.year == end.year and start.month == end.month:
+        return __get_in_desc(start_text)
+    if start.year == end.year:
+        return __get_from_to_desc(start_text, str(end.month))
+    return __get_from_to_desc(start_text, __format_month(end))
 
-        return gettext("until %(end)s", end=get_end_desc())
 
-    def __get_year_desc(self) -> str:
-        """Returns the description as a year range.
+def __get_day_desc(start: date, end: date) -> str:
+    """Returns the description as a day range.
 
-        :return: The description as a year range.
-        :raise ValueError: The period is not a year range.
-        """
-        if self.__start.month != 1 or self.__start.day != 1 \
-                or self.__end.month != 12 or self.__end.day != 31:
-            raise ValueError
-        start: str = str(self.__start.year)
-        if self.__start.year == self.__end.year:
-            return self.__get_in_desc(start)
-        return self.__get_from_to_desc(start, str(self.__end.year))
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The description as a day range.
+    :raise ValueError: The period is a month or year range.
+    """
+    start_text: str = __format_day(start)
+    if start == end:
+        return __get_in_desc(start_text)
+    if start.year == end.year and start.month == end.month:
+        return __get_from_to_desc(start_text, str(end.day))
+    if start.year == end.year:
+        end_month_day: str = f"{end.month}/{end.day}"
+        return __get_from_to_desc(start_text, end_month_day)
+    return __get_from_to_desc(start_text, __format_day(end))
 
-    def __get_month_desc(self) -> str:
-        """Returns the description as a month range.
 
-        :return: The description as a month range.
-        :raise ValueError: The period is not a month range.
-        """
-        if self.__start.day != 1 or (self.__end + timedelta(days=1)).day != 1:
-            raise ValueError
-        start: str = self.__format_month(self.__start)
-        if self.__start.year == self.__end.year \
-                and self.__start.month == self.__end.month:
-            return self.__get_in_desc(start)
-        if self.__start.year == self.__end.year:
-            return self.__get_from_to_desc(start, str(self.__end.month))
-        return self.__get_from_to_desc(start, self.__format_month(self.__end))
+def __format_month(month: date) -> str:
+    """Formats a month.
 
-    def __get_day_desc(self) -> str:
-        """Returns the description as a day range.
+    :param month: The month.
+    :return: The formatted month.
+    """
+    return f"{month.year}/{month.month}"
 
-        :return: The description as a day range.
-        :raise ValueError: The period is a month or year range.
-        """
-        start: str = self.__format_day(self.__start)
-        if self.__start == self.__end:
-            return self.__get_in_desc(start)
-        if self.__start.year == self.__end.year \
-                and self.__start.month == self.__end.month:
-            return self.__get_from_to_desc(start, str(self.__end.day))
-        if self.__start.year == self.__end.year:
-            end_month_day: str = f"{self.__end.month}/{self.__end.day}"
-            return self.__get_from_to_desc(start, end_month_day)
-        return self.__get_from_to_desc(start, self.__format_day(self.__end))
 
-    @staticmethod
-    def __format_month(month: date) -> str:
-        """Formats a month.
+def __format_day(day: date) -> str:
+    """Formats a day.
 
-        :param month: The month.
-        :return: The formatted month.
-        """
-        return f"{month.year}/{month.month}"
+    :param day: The day.
+    :return: The formatted day.
+    """
+    return f"{day.year}/{day.month}/{day.day}"
 
-    @staticmethod
-    def __format_day(day: date) -> str:
-        """Formats a day.
 
-        :param day: The day.
-        :return: The formatted day.
-        """
-        return f"{day.year}/{day.month}/{day.day}"
+def __get_in_desc(period: str) -> str:
+    """Returns the description of a whole year, month, or day.
 
-    @staticmethod
-    def __get_in_desc(period: str) -> str:
-        """Returns the description of a whole year, month, or day.
+    :param period: The time period.
+    :return: The description of a whole year, month, or day.
+    """
+    return gettext("in %(period)s", period=period)
 
-        :param period: The time period.
-        :return: The description of a whole year, month, or day.
-        """
-        return gettext("in %(period)s", period=period)
 
-    @staticmethod
-    def __get_from_to_desc(start: str, end: str) -> str:
-        """Returns the description of a separated start and end.
+def __get_from_to_desc(start: str, end: str) -> str:
+    """Returns the description of a separated start and end.
 
-        :param start: The start.
-        :param end: The end.
-        :return: The description of the separated start and end.
-        """
-        return gettext("in %(start)s-%(end)s", start=start, end=end)
+    :param start: The start.
+    :param end: The end.
+    :return: The description of the separated start and end.
+    """
+    return gettext("in %(start)s-%(end)s", start=start, end=end)

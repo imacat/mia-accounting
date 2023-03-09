@@ -25,7 +25,7 @@ import typing as t
 from datetime import date, timedelta
 
 from accounting.locale import gettext
-from .description import PeriodDescription
+from .description import get_desc
 from .parser import parse_spec
 from .specification import PeriodSpecification
 
@@ -91,7 +91,7 @@ class Period:
         :return: None.
         """
         self.spec = PeriodSpecification(self.start, self.end).spec
-        self.desc = PeriodDescription(self.start, self.end).desc
+        self.desc = get_desc(self.start, self.end)
         if self.start is None or self.end is None:
             return
         self.is_a_month = self.start.day == 1 \
