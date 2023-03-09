@@ -24,6 +24,18 @@ from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 
 
+def get_journal_url(period: Period) \
+        -> str:
+    """Returns the URL of a journal.
+
+    :param period: The period.
+    :return: The URL of the journal.
+    """
+    if period.is_default:
+        return url_for("accounting.report.journal-default")
+    return url_for("accounting.report.journal", period=period)
+
+
 def get_ledger_url(currency: Currency, account: Account, period: Period) \
         -> str:
     """Returns the URL of a ledger.

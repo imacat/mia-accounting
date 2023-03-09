@@ -32,8 +32,8 @@ from accounting.models import Currency, Account
 from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
-from .get_url import get_ledger_url, get_income_expenses_url, \
-    get_trial_balance_url, get_income_statement_url
+from .get_url import get_journal_url, get_ledger_url, \
+    get_income_expenses_url, get_trial_balance_url, get_income_statement_url
 from .option_link import OptionLink
 from .report_type import ReportType
 
@@ -88,10 +88,7 @@ class ReportChooser:
 
         :return: The journal.
         """
-        url: str = url_for("accounting.report.journal-default") \
-            if self.__period.is_default \
-            else url_for("accounting.report.journal", period=self.__period)
-        return OptionLink(gettext("Journal"), url,
+        return OptionLink(gettext("Journal"), get_journal_url(self.__period),
                           self.__active_report == ReportType.JOURNAL,
                           fa_icon="fa-solid fa-book")
 
