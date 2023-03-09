@@ -126,12 +126,14 @@ class AccountOption:
 
         :param account: The account.
         """
-        self.__account: Account = account
-        """The account."""
         self.id: str = account.id
         """The account ID."""
         self.code: str = account.code
         """The account code."""
+        self.query_values: list[str] = account.query_values
+        """The values to be queried."""
+        self.__str: str = str(account)
+        """The string representation of the account option."""
         self.is_in_use: bool = False
         """True if this account is in use, or False otherwise."""
 
@@ -140,15 +142,7 @@ class AccountOption:
 
         :return: The string representation of the account option.
         """
-        return str(self.__account)
-
-    @property
-    def query_values(self) -> list[str]:
-        """Returns the values to be queried.
-
-        :return: The values to be queried.
-        """
-        return self.__account.query_values
+        return self.__str
 
 
 class JournalEntryForm(FlaskForm):
