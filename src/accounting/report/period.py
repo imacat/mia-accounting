@@ -553,6 +553,7 @@ class TemplatePeriod(Period):
 
 class YearPeriod(Period):
     """A year period."""
+
     def __init__(self, year: int):
         """Constructs a year period.
 
@@ -561,8 +562,6 @@ class YearPeriod(Period):
         start: datetime.date = datetime.date(year, 1, 1)
         end: datetime.date = datetime.date(year, 12, 31)
         super().__init__(start, end)
-        self.spec = str(year)
-        self.is_a_year = True
 
 
 DATE_SPEC_RE: str = r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?"
