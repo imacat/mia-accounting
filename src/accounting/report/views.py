@@ -298,4 +298,3 @@ def search() -> str | Response:
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
-
