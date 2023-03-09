@@ -29,9 +29,10 @@ from flask_babel import LazyString
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, Account
+from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
-from .get_url import get_ledger_url
+from .get_url import get_ledger_url, get_income_expenses_url
 from .option_link import OptionLink
 from .report_type import ReportType
 
@@ -114,13 +115,11 @@ class ReportChooser:
         account: Account = self.__account
         if not re.match(r"[12][12]", account.base_code):
             account: Account = Account.cash()
-        url: str = url_for("accounting.report.income-expenses-default",
-                           currency=self.__currency, account=account) \
-            if self.__period.is_default \
-            else url_for("accounting.report.income-expenses",
-                         currency=self.__currency, account=account,
-                         period=self.__period)
-        return OptionLink(gettext("Income and Expenses Log"), url,
+        return OptionLink(gettext("Income and Expenses Log"),
+                          get_income_expenses_url(
+                              self.__currency,
+                              IncomeExpensesAccount(account),
+                              self.__period),
                           self.__active_report == ReportType.INCOME_EXPENSES,
                           fa_icon="fa-solid fa-money-bill-wave")
 

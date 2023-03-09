@@ -20,6 +20,7 @@
 from flask import url_for
 
 from accounting.models import Currency, Account
+from accounting.report.income_expense_account import IncomeExpensesAccount
 from accounting.report.period import Period
 
 
@@ -36,5 +37,22 @@ def get_ledger_url(currency: Currency, account: Account, period: Period) \
         return url_for("accounting.report.ledger-default",
                        currency=currency, account=account)
     return url_for("accounting.report.ledger",
+                   currency=currency, account=account,
+                   period=period)
+
+
+def get_income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
+                            period: Period) -> str:
+    """Returns the URL of an income and expenses log.
+
+    :param currency: The currency.
+    :param account: The account.
+    :param period: The period.
+    :return: The URL of the income and expenses log.
+    """
+    if period.is_default:
+        return url_for("accounting.report.income-expenses-default",
+                       currency=currency, account=account)
+    return url_for("accounting.report.income-expenses",
                    currency=currency, account=account,
                    period=period)
