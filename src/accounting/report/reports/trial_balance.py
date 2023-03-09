@@ -191,11 +191,10 @@ class TrialBalance(BaseReport):
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount)).label("balance")
-        select_balances: sa.Select \
-            = sa.select(Account.id, balance_func)\
+        select_balances: sa.Select = sa.select(Account.id, balance_func)\
             .join(Transaction).join(Account)\
             .filter(*conditions)\
-            .group_by(JournalEntry.account_id)\
+            .group_by(Account.id)\
             .order_by(Account.base_code, Account.no)
         balances: list[sa.Row] = db.session.execute(select_balances).all()
         accounts: dict[int, Account] \
