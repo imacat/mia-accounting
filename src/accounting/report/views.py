@@ -27,7 +27,7 @@ from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
 from .template_filters import format_amount
-from .utils.ie_account import IncomeExpensesAccount, default_io_account
+from .utils.ie_account import IncomeExpensesAccount, default_ie_account
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""
@@ -43,7 +43,7 @@ def get_default_report() -> str | Response:
     """
     return __get_income_expenses(
         db.session.get(Currency, default_currency_code()),
-        default_io_account(),
+        default_ie_account(),
         get_period())
 
 

@@ -66,21 +66,21 @@ class IncomeExpensesAccount:
         return account
 
 
-def default_io_account_code() -> str:
+def default_ie_account_code() -> str:
     """Returns the default account code for the income and expenses log.
 
     :return: The default account code for the income and expenses log.
     """
     with current_app.app_context():
-        return current_app.config.get("DEFAULT_IO_ACCOUNT", Account.CASH_CODE)
+        return current_app.config.get("DEFAULT_IE_ACCOUNT", Account.CASH_CODE)
 
 
-def default_io_account() -> IncomeExpensesAccount:
+def default_ie_account() -> IncomeExpensesAccount:
     """Returns the default account for the income and expenses log.
 
     :return: The default account for the income and expenses log.
     """
-    code: str = default_io_account_code()
+    code: str = default_ie_account_code()
     if code == IncomeExpensesAccount.CURRENT_AL_CODE:
         return IncomeExpensesAccount.current_assets_and_liabilities()
     return IncomeExpensesAccount(Account.find_by_code(code))
