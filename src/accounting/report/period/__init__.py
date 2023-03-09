@@ -17,5 +17,5 @@
 """The period utility.
 
 """
+from .chooser import PeriodChooser
 from .period import Period
-from .period_chooser import PeriodChooser
