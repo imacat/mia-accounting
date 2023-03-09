@@ -235,9 +235,9 @@ class AccountCollector:
             = {x.account.code: x for x in self.accounts}
         if code in account_balance_by_code:
             balance: ReportAccount = account_balance_by_code[code]
-            balance.url = url
             if amount is not None:
                 balance.amount = balance.amount + amount
+                balance.url = url
             return
         # Add a new balance
         if amount is None:
