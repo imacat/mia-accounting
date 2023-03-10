@@ -46,6 +46,42 @@ class AccountSelector {
     #prefix;
 
     /**
+     * The button to clear the account
+     * @type {HTMLButtonElement}
+     */
+    #clearButton
+
+    /**
+     * The query input
+     * @type {HTMLInputElement}
+     */
+    #query;
+
+    /**
+     * The error message when the query has no result
+     * @type {HTMLParagraphElement}
+     */
+    #queryNoResult;
+
+    /**
+     * The option list
+     * @type {HTMLUListElement}
+     */
+    #optionList;
+
+    /**
+     * The options
+     * @type {HTMLLIElement[]}
+     */
+    #options;
+
+    /**
+     * The more item to show all accounts
+     * @type {HTMLLIElement}
+     */
+    #more;
+
+    /**
      * Constructs an account selector.
      *
      * @param modal {HTMLDivElement} the account selector modal
@@ -53,41 +89,34 @@ class AccountSelector {
     constructor(modal) {
         this.#entryType = modal.dataset.entryType;
         this.#prefix = "accounting-account-selector-" + modal.dataset.entryType;
-        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-        const formAccount = document.getElementById("accounting-entry-form-account");
-        const more = document.getElementById(this.#prefix + "-more");
-        const btnClear = document.getElementById(this.#prefix + "-btn-clear");
-        const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
-        more.onclick = () => {
-            more.classList.add("d-none");
+        this.#query = document.getElementById(this.#prefix + "-query");
+        this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
+        this.#optionList = document.getElementById(this.#prefix + "-option-list");
+        // noinspection JSValidateTypes
+        this.#options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
+        this.#more = document.getElementById(this.#prefix + "-more");
+        this.#clearButton = document.getElementById(this.#prefix + "-btn-clear");
+        this.#more.onclick = () => {
+            this.#more.classList.add("d-none");
             this.#filterAccountOptions();
         };
-        this.#initializeAccountQuery();
-        btnClear.onclick = () => {
-            formAccountControl.classList.remove("accounting-not-empty");
-            formAccount.innerText = "";
-            formAccount.dataset.code = "";
-            formAccount.dataset.text = "";
+        this.#clearButton.onclick = () => {
+            AccountSelector.#formAccountControl.classList.remove("accounting-not-empty");
+            AccountSelector.#formAccount.innerText = "";
+            AccountSelector.#formAccount.dataset.code = "";
+            AccountSelector.#formAccount.dataset.text = "";
             validateJournalEntryAccount();
         };
-        for (const option of options) {
+        for (const option of this.#options) {
             option.onclick = () => {
-                formAccountControl.classList.add("accounting-not-empty");
-                formAccount.innerText = option.dataset.content;
-                formAccount.dataset.code = option.dataset.code;
-                formAccount.dataset.text = option.dataset.content;
+                AccountSelector.#formAccountControl.classList.add("accounting-not-empty");
+                AccountSelector.#formAccount.innerText = option.dataset.content;
+                AccountSelector.#formAccount.dataset.code = option.dataset.code;
+                AccountSelector.#formAccount.dataset.text = option.dataset.content;
                 validateJournalEntryAccount();
             };
         }
-    }
-
-    /**
-     * Initializes the query on the account options.
-     *
-     */
-    #initializeAccountQuery() {
-        const query = document.getElementById(this.#prefix + "-query");
-        query.addEventListener("input", () => {
+        this.#query.addEventListener("input", () => {
             this.#filterAccountOptions();
         });
     }
@@ -97,18 +126,13 @@ class AccountSelector {
      *
      */
     #filterAccountOptions() {
-        const query = document.getElementById(this.#prefix + "-query");
-        const optionList = document.getElementById(this.#prefix + "-option-list");
-        if (optionList === null) {
+        if (this.#optionList === null) {
             console.log(this.#prefix + "-option-list");
         }
-        const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
-        const more = document.getElementById(this.#prefix + "-more");
-        const queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
         const codesInUse = this.#getAccountCodeUsedInForm();
         let shouldAnyShow = false;
-        for (const option of options) {
-            const shouldShow = this.#shouldAccountOptionShow(option, more, codesInUse, query);
+        for (const option of this.#options) {
+            const shouldShow = this.#shouldAccountOptionShow(option, this.#more, codesInUse, this.#query);
             if (shouldShow) {
                 option.classList.remove("d-none");
                 shouldAnyShow = true;
@@ -116,12 +140,12 @@ class AccountSelector {
                 option.classList.add("d-none");
             }
         }
-        if (!shouldAnyShow && more.classList.contains("d-none")) {
-            optionList.classList.add("d-none");
-            queryNoResult.classList.remove("d-none");
+        if (!shouldAnyShow && this.#more.classList.contains("d-none")) {
+            this.#optionList.classList.add("d-none");
+            this.#queryNoResult.classList.remove("d-none");
         } else {
-            optionList.classList.remove("d-none");
-            queryNoResult.classList.add("d-none");
+            this.#optionList.classList.remove("d-none");
+            this.#queryNoResult.classList.add("d-none");
         }
     }
 
@@ -132,8 +156,7 @@ class AccountSelector {
      */
     #getAccountCodeUsedInForm() {
         const accountCodes = Array.from(document.getElementsByClassName("accounting-" + this.#prefix + "-account-code"));
-        const formAccount = document.getElementById("accounting-entry-form-account");
-        const inUse = [formAccount.dataset.code];
+        const inUse = [AccountSelector.#formAccount.dataset.code];
         for (const accountCode of accountCodes) {
             inUse.push(accountCode.value);
         }
@@ -172,33 +195,28 @@ class AccountSelector {
     }
 
     /**
-     * Initializes the account selector when it is shown.
+     * The callback when the account selector is shown.
      *
      */
-    initShow() {
-        const formAccount = document.getElementById("accounting-entry-form-account");
-        const query = document.getElementById(this.#prefix + "-query")
-        const more = document.getElementById(this.#prefix + "-more");
-        const options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
-        const btnClear = document.getElementById(this.#prefix + "-btn-clear");
-        query.value = "";
-        more.classList.remove("d-none");
+    #onOpen() {
+        this.#query.value = "";
+        this.#more.classList.remove("d-none");
         this.#filterAccountOptions();
-        for (const option of options) {
-            if (option.dataset.code === formAccount.dataset.code) {
+        for (const option of this.#options) {
+            if (option.dataset.code === AccountSelector.#formAccount.dataset.code) {
                 option.classList.add("active");
             } else {
                 option.classList.remove("active");
             }
         }
-        if (formAccount.dataset.code === "") {
-            btnClear.classList.add("btn-secondary");
-            btnClear.classList.remove("btn-danger");
-            btnClear.disabled = true;
+        if (AccountSelector.#formAccount.dataset.code === "") {
+            this.#clearButton.classList.add("btn-secondary");
+            this.#clearButton.classList.remove("btn-danger");
+            this.#clearButton.disabled = true;
         } else {
-            btnClear.classList.add("btn-danger");
-            btnClear.classList.remove("btn-secondary");
-            btnClear.disabled = false;
+            this.#clearButton.classList.add("btn-danger");
+            this.#clearButton.classList.remove("btn-secondary");
+            this.#clearButton.disabled = false;
         }
     }
 
@@ -209,10 +227,31 @@ class AccountSelector {
     static #selectors = {}
 
     /**
+     * The journal entry form.
+     * @type {HTMLFormElement}
+     */
+    static #entryForm;
+
+    /**
+     * The control of the account on the journal entry form
+     * @type {HTMLDivElement}
+     */
+    static #formAccountControl;
+
+    /**
+     * The account on the journal entry form
+     * @type {HTMLDivElement}
+     */
+    static #formAccount;
+
+    /**
      * Initializes the account selectors.
      *
      */
     static initialize() {
+        this.#entryForm = document.getElementById("accounting-entry-form");
+        this.#formAccountControl = document.getElementById("accounting-entry-form-account-control");
+        this.#formAccount = document.getElementById("accounting-entry-form-account");
         const modals = Array.from(document.getElementsByClassName("accounting-account-selector-modal"));
         for (const modal of modals) {
             const selector = new AccountSelector(modal);
@@ -226,9 +265,7 @@ class AccountSelector {
      *
      */
     static #initializeTransactionForm() {
-        const entryForm = document.getElementById("accounting-entry-form");
-        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-        formAccountControl.onclick = () => this.#selectors[entryForm.dataset.entryType].initShow();
+        this.#formAccountControl.onclick = () => this.#selectors[this.#entryForm.dataset.entryType].#onOpen();
     }
 
     /**
@@ -236,8 +273,6 @@ class AccountSelector {
      *x
      */
     static initializeJournalEntryForm() {
-        const entryForm = document.getElementById("accounting-entry-form");
-        const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-        formAccountControl.dataset.bsTarget = "#accounting-account-selector-" + entryForm.dataset.entryType + "-modal";
+        this.#formAccountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#entryForm.dataset.entryType + "-modal";
     }
 }
