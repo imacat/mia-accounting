@@ -48,7 +48,7 @@ class AccountSelector {
     /**
      * Constructs an account selector.
      *
-     * @param modal {HTMLFormElement} the account selector modal
+     * @param modal {HTMLDivElement} the account selector modal
      */
     constructor(modal) {
         this.#entryType = modal.dataset.entryType;
