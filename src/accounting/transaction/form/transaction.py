@@ -14,38 +14,35 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The forms for the transaction management.
+"""The transaction forms for the transaction management.
 
 """
 from __future__ import annotations
 
-import re
 import typing as t
 from abc import ABC, abstractmethod
-from datetime import date
-from decimal import Decimal
 
 import sqlalchemy as sa
-from flask import request
 from flask_babel import LazyString
 from flask_wtf import FlaskForm
-from wtforms import DateField, StringField, FieldList, FormField, \
-    IntegerField, TextAreaField, DecimalField, BooleanField
+from wtforms import DateField, FieldList, FormField, \
+    TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Transaction, Account, JournalEntry, \
-    TransactionCurrency, Currency
+    TransactionCurrency
 from accounting.transaction.summary_editor import SummaryEditor
 from accounting.utils.random_id import new_id
-from accounting.utils.strip_text import strip_text, strip_multiline_text
+from accounting.utils.strip_text import strip_multiline_text
 from accounting.utils.user import get_current_user_pk
+from .account_option import AccountOption
+from .currency import CurrencyForm, IncomeCurrencyForm, ExpenseCurrencyForm, \
+    TransferCurrencyForm
+from .journal_entry import JournalEntryForm, DebitEntryForm, CreditEntryForm
+from .reorder import sort_transactions_in
 
-MISSING_CURRENCY: LazyString = lazy_gettext("Please select the currency.")
-"""The error message when the currency code is empty."""
-MISSING_ACCOUNT: LazyString = lazy_gettext("Please select the account.")
-"""The error message when the account code is empty."""
 DATE_REQUIRED: DataRequired = DataRequired(
     lazy_gettext("Please fill in the date."))
 """The validator to check if the date is empty."""
@@ -59,223 +56,6 @@ class NeedSomeCurrencies:
         if len(field) == 0:
             raise ValidationError(lazy_gettext(
                 "Please add some currencies."))
-
-
-class CurrencyExists:
-    """The validator to check if the account exists."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if db.session.get(Currency, field.data) is None:
-            raise ValidationError(lazy_gettext(
-                "The currency does not exist."))
-
-
-class NeedSomeJournalEntries:
-    """The validator to check if there is any journal entry sub-form."""
-
-    def __call__(self, form: TransferCurrencyForm, field: FieldList) \
-            -> None:
-        if len(field) == 0:
-            raise ValidationError(lazy_gettext(
-                "Please add some journal entries."))
-
-
-class AccountExists:
-    """The validator to check if the account exists."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if Account.find_by_code(field.data) is None:
-            raise ValidationError(lazy_gettext(
-                "The account does not exist."))
-
-
-class PositiveAmount:
-    """The validator to check if the amount is positive."""
-
-    def __call__(self, form: FlaskForm, field: DecimalField) -> None:
-        if field.data is None:
-            return
-        if field.data <= 0:
-            raise ValidationError(lazy_gettext(
-                "Please fill in a positive amount."))
-
-
-class IsDebitAccount:
-    """The validator to check if the account is for debit journal entries."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[1235689]|7[5678])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for debit entries."))
-
-
-class AccountOption:
-    """An account option."""
-
-    def __init__(self, account: Account):
-        """Constructs an account option.
-
-        :param account: The account.
-        """
-        self.id: str = account.id
-        """The account ID."""
-        self.code: str = account.code
-        """The account code."""
-        self.query_values: list[str] = account.query_values
-        """The values to be queried."""
-        self.__str: str = str(account)
-        """The string representation of the account option."""
-        self.is_in_use: bool = False
-        """True if this account is in use, or False otherwise."""
-
-    def __str__(self) -> str:
-        """Returns the string representation of the account option.
-
-        :return: The string representation of the account option.
-        """
-        return self.__str
-
-
-class JournalEntryForm(FlaskForm):
-    """The base form to create or edit a journal entry."""
-    eid = IntegerField()
-    """The existing journal entry ID."""
-    no = IntegerField()
-    """The order in the currency."""
-    account_code = StringField()
-    """The account code."""
-    amount = DecimalField()
-    """The amount."""
-
-    @property
-    def account_text(self) -> str:
-        """Returns the text representation of the account.
-
-        :return: The text representation of the account.
-        """
-        if self.account_code.data is None:
-            return ""
-        account: Account | None = Account.find_by_code(self.account_code.data)
-        if account is None:
-            return ""
-        return str(account)
-
-    @property
-    def all_errors(self) -> list[str | LazyString]:
-        """Returns all the errors of the form.
-
-        :return: All the errors of the form.
-        """
-        all_errors: list[str | LazyString] = []
-        for key in self.errors:
-            if key != "csrf_token":
-                all_errors.extend(self.errors[key])
-        return all_errors
-
-
-class DebitEntryForm(JournalEntryForm):
-    """The form to create or edit a debit journal entry."""
-    eid = IntegerField()
-    """The existing journal entry ID."""
-    no = IntegerField()
-    """The order in the currency."""
-    account_code = StringField(
-        filters=[strip_text],
-        validators=[DataRequired(MISSING_ACCOUNT),
-                    AccountExists(),
-                    IsDebitAccount()])
-    """The account code."""
-    summary = StringField(filters=[strip_text])
-    """The summary."""
-    amount = DecimalField(validators=[PositiveAmount()])
-    """The amount."""
-
-    def populate_obj(self, obj: JournalEntry) -> None:
-        """Populates the form data into a journal entry object.
-
-        :param obj: The journal entry object.
-        :return: None.
-        """
-        is_new: bool = obj.id is None
-        if is_new:
-            obj.id = new_id(JournalEntry)
-        obj.account_id = Account.find_by_code(self.account_code.data).id
-        obj.summary = self.summary.data
-        obj.is_debit = True
-        obj.amount = self.amount.data
-        if is_new:
-            current_user_pk: int = get_current_user_pk()
-            obj.created_by_id = current_user_pk
-            obj.updated_by_id = current_user_pk
-
-
-class IsCreditAccount:
-    """The validator to check if the account is for credit journal entries."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[123489]|7[1234])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for credit entries."))
-
-
-class CreditEntryForm(JournalEntryForm):
-    """The form to create or edit a credit journal entry."""
-    eid = IntegerField()
-    """The existing journal entry ID."""
-    no = IntegerField()
-    """The order in the currency."""
-    account_code = StringField(
-        filters=[strip_text],
-        validators=[DataRequired(MISSING_ACCOUNT),
-                    AccountExists(),
-                    IsCreditAccount()])
-    """The account code."""
-    summary = StringField(filters=[strip_text])
-    """The summary."""
-    amount = DecimalField(validators=[PositiveAmount()])
-    """The amount."""
-
-    def populate_obj(self, obj: JournalEntry) -> None:
-        """Populates the form data into a journal entry object.
-
-        :param obj: The journal entry object.
-        :return: None.
-        """
-        is_new: bool = obj.id is None
-        if is_new:
-            obj.id = new_id(JournalEntry)
-        obj.account_id = Account.find_by_code(self.account_code.data).id
-        obj.summary = self.summary.data
-        obj.is_debit = False
-        obj.amount = self.amount.data
-        if is_new:
-            current_user_pk: int = get_current_user_pk()
-            obj.created_by_id = current_user_pk
-            obj.updated_by_id = current_user_pk
-
-
-class CurrencyForm(FlaskForm):
-    """The form to create or edit a currency in a transaction."""
-    no = IntegerField()
-    """The order in the transaction."""
-    code = StringField()
-    """The currency code."""
-    whole_form = BooleanField()
-    """The pseudo field for the whole form validators."""
 
 
 class TransactionForm(FlaskForm):
@@ -538,41 +318,6 @@ class JournalEntryCollector(t.Generic[T], ABC):
                                   ord_by_form.get(x)))
 
 
-class IncomeCurrencyForm(CurrencyForm):
-    """The form to create or edit a currency in a cash income transaction."""
-    no = IntegerField()
-    """The order in the transaction."""
-    code = StringField(
-        filters=[strip_text],
-        validators=[DataRequired(MISSING_CURRENCY),
-                    CurrencyExists()])
-    """The currency code."""
-    credit = FieldList(FormField(CreditEntryForm),
-                       validators=[NeedSomeJournalEntries()])
-    """The credit entries."""
-    whole_form = BooleanField()
-    """The pseudo field for the whole form validators."""
-
-    @property
-    def credit_total(self) -> Decimal:
-        """Returns the total amount of the credit journal entries.
-
-        :return: The total amount of the credit journal entries.
-        """
-        return sum([x.amount.data for x in self.credit
-                    if x.amount.data is not None])
-
-    @property
-    def credit_errors(self) -> list[str | LazyString]:
-        """Returns the credit journal entry errors, without the errors in their
-        sub-forms.
-
-        :return:
-        """
-        return [x for x in self.credit.errors
-                if isinstance(x, str) or isinstance(x, LazyString)]
-
-
 class IncomeTransactionForm(TransactionForm):
     """The form to create or edit a cash income transaction."""
     date = DateField(validators=[DATE_REQUIRED])
@@ -609,41 +354,6 @@ class IncomeTransactionForm(TransactionForm):
                         self._credit_no = self._credit_no + 1
 
         self.collector = Collector
-
-
-class ExpenseCurrencyForm(CurrencyForm):
-    """The form to create or edit a currency in a cash expense transaction."""
-    no = IntegerField()
-    """The order in the transaction."""
-    code = StringField(
-        filters=[strip_text],
-        validators=[DataRequired(MISSING_CURRENCY),
-                    CurrencyExists()])
-    """The currency code."""
-    debit = FieldList(FormField(DebitEntryForm),
-                      validators=[NeedSomeJournalEntries()])
-    """The debit entries."""
-    whole_form = BooleanField()
-    """The pseudo field for the whole form validators."""
-
-    @property
-    def debit_total(self) -> Decimal:
-        """Returns the total amount of the debit journal entries.
-
-        :return: The total amount of the debit journal entries.
-        """
-        return sum([x.amount.data for x in self.debit
-                    if x.amount.data is not None])
-
-    @property
-    def debit_errors(self) -> list[str | LazyString]:
-        """Returns the debit journal entry errors, without the errors in their
-        sub-forms.
-
-        :return:
-        """
-        return [x for x in self.debit.errors
-                if isinstance(x, str) or isinstance(x, LazyString)]
 
 
 class ExpenseTransactionForm(TransactionForm):
@@ -683,76 +393,6 @@ class ExpenseTransactionForm(TransactionForm):
                     self._credit_no = self._credit_no + 1
 
         self.collector = Collector
-
-
-class TransferCurrencyForm(CurrencyForm):
-    """The form to create or edit a currency in a transfer transaction."""
-
-    class IsBalanced:
-        """The validator to check that the total amount of the debit and credit
-        entries are equal."""
-        def __call__(self, form: TransferCurrencyForm, field: BooleanField)\
-                -> None:
-            if len(form.debit) == 0 or len(form.credit) == 0:
-                return
-            if form.debit_total != form.credit_total:
-                raise ValidationError(lazy_gettext(
-                    "The totals of the debit and credit amounts do not"
-                    " match."))
-
-    no = IntegerField()
-    """The order in the transaction."""
-    code = StringField(
-        filters=[strip_text],
-        validators=[DataRequired(MISSING_CURRENCY),
-                    CurrencyExists()])
-    """The currency code."""
-    debit = FieldList(FormField(DebitEntryForm),
-                      validators=[NeedSomeJournalEntries()])
-    """The debit entries."""
-    credit = FieldList(FormField(CreditEntryForm),
-                       validators=[NeedSomeJournalEntries()])
-    """The credit entries."""
-    whole_form = BooleanField(validators=[IsBalanced()])
-    """The pseudo field for the whole form validators."""
-
-    @property
-    def debit_total(self) -> Decimal:
-        """Returns the total amount of the debit journal entries.
-
-        :return: The total amount of the debit journal entries.
-        """
-        return sum([x.amount.data for x in self.debit
-                    if x.amount.data is not None])
-
-    @property
-    def credit_total(self) -> Decimal:
-        """Returns the total amount of the credit journal entries.
-
-        :return: The total amount of the credit journal entries.
-        """
-        return sum([x.amount.data for x in self.credit
-                    if x.amount.data is not None])
-
-    @property
-    def debit_errors(self) -> list[str | LazyString]:
-        """Returns the debit journal entry errors, without the errors in their
-        sub-forms.
-
-        :return:
-        """
-        return [x for x in self.debit.errors
-                if isinstance(x, str) or isinstance(x, LazyString)]
-
-    @property
-    def credit_errors(self) -> list[str | LazyString]:
-        """Returns the credit journal entry errors, without the errors in their
-        sub-forms.
-
-        :return:
-        """
-        return [x for x in self.credit.errors
-                if isinstance(x, str) or isinstance(x, LazyString)]
 
 
 class TransferTransactionForm(TransactionForm):
@@ -795,67 +435,3 @@ class TransferTransactionForm(TransactionForm):
                         self._credit_no = self._credit_no + 1
 
         self.collector = Collector
-
-
-def sort_transactions_in(txn_date: date, exclude: int) -> None:
-    """Sorts the transactions under a date after changing the date or deleting
-    a transaction.
-
-    :param txn_date: The date of the transaction.
-    :param exclude: The transaction ID to exclude.
-    :return: None.
-    """
-    transactions: list[Transaction] = Transaction.query\
-        .filter(Transaction.date == txn_date,
-                Transaction.id != exclude)\
-        .order_by(Transaction.no).all()
-    for i in range(len(transactions)):
-        if transactions[i].no != i + 1:
-            transactions[i].no = i + 1
-
-
-class TransactionReorderForm:
-    """The form to reorder the transactions."""
-
-    def __init__(self, txn_date: date):
-        """Constructs the form to reorder the transactions in a day.
-
-        :param txn_date: The date.
-        """
-        self.date: date = txn_date
-        self.is_modified: bool = False
-
-    def save_order(self) -> None:
-        """Saves the order of the account.
-
-        :return:
-        """
-        transactions: list[Transaction] = Transaction.query\
-            .filter(Transaction.date == self.date).all()
-
-        # Collects the specified order.
-        orders: dict[Transaction, int] = {}
-        for txn in transactions:
-            if f"{txn.id}-no" in request.form:
-                try:
-                    orders[txn] = int(request.form[f"{txn.id}-no"])
-                except ValueError:
-                    pass
-
-        # Missing and invalid orders are appended to the end.
-        missing: list[Transaction] \
-            = [x for x in transactions if x not in orders]
-        if len(missing) > 0:
-            next_no: int = 1 if len(orders) == 0 else max(orders.values()) + 1
-            for txn in missing:
-                orders[txn] = next_no
-
-        # Sort by the specified order first, and their original order.
-        transactions.sort(key=lambda x: (orders[x], x.no))
-
-        # Update the orders.
-        with db.session.no_autoflush:
-            for i in range(len(transactions)):
-                if transactions[i].no != i + 1:
-                    transactions[i].no = i + 1
-                    self.is_modified = True
