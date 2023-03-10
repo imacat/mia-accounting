@@ -597,14 +597,14 @@ class JournalEntry(db.Model):
     """True for a debit entry, or False for a credit entry."""
     no = db.Column(db.Integer, nullable=False)
     """The entry number under the transaction and debit or credit."""
-    original_id = db.Column(db.Integer,
-                            db.ForeignKey(id, onupdate="CASCADE"),
-                            nullable=True)
-    """The ID of the original entry when offsetting."""
-    original = db.relationship("JournalEntry", back_populates="offset",
-                               remote_side=id, passive_deletes=True)
-    """The original entry when offsetting."""
-    offset = db.relationship("JournalEntry", back_populates="original")
+    offset_original_id = db.Column(db.Integer,
+                                   db.ForeignKey(id, onupdate="CASCADE"),
+                                   nullable=True)
+    """The ID of the original entry to offset."""
+    offset_original = db.relationship("JournalEntry", back_populates="offsets",
+                                      remote_side=id, passive_deletes=True)
+    """The original entry to offset."""
+    offsets = db.relationship("JournalEntry", back_populates="offset_original")
     """The offset entries."""
     currency_code = db.Column(db.String,
                               db.ForeignKey(Currency.code, onupdate="CASCADE"),
