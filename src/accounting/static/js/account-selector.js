@@ -230,6 +230,7 @@ class AccountSelector {
         const formAccountControl = document.getElementById("accounting-entry-form-account-control");
         formAccountControl.onclick = () => this.#selectors[entryForm.dataset.entryType].initShow();
     }
+
     /**
      * Initializes the account selector for the journal entry form.
      *x
