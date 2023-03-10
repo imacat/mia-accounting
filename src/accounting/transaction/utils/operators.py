@@ -26,7 +26,7 @@ from flask_wtf import FlaskForm
 from accounting.models import Transaction
 from accounting.template_globals import default_currency_code
 from accounting.utils.txn_types import TransactionType
-from .form import TransactionForm, IncomeTransactionForm, \
+from accounting.transaction.form import TransactionForm, IncomeTransactionForm, \
     ExpenseTransactionForm, TransferTransactionForm
 
 

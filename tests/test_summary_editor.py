@@ -66,7 +66,7 @@ class SummeryEditorTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.transaction.summary_editor import SummaryEditor
+        from accounting.transaction.utils.summary_editor import SummaryEditor
         for form in get_form_data(self.csrf_token):
             add_txn(self.client, form)
         with self.app.app_context():

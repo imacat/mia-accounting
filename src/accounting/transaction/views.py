@@ -34,9 +34,9 @@ from accounting.utils.permission import has_permission, can_view, can_edit
 from accounting.utils.txn_types import TransactionType
 from accounting.utils.user import get_current_user_pk
 from .form import sort_transactions_in, TransactionReorderForm
-from .operators import TransactionOperator, TXN_TYPE_TO_OP, get_txn_op
 from .template_filters import with_type, to_transfer, format_amount_input, \
     text2html
+from .utils.operators import TransactionOperator, TXN_TYPE_TO_OP, get_txn_op
 
 bp: Blueprint = Blueprint("transaction", __name__)
 """The view blueprint for the transaction management."""

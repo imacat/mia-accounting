@@ -33,11 +33,11 @@ from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Transaction, Account, JournalEntry, \
     TransactionCurrency
-from accounting.transaction.summary_editor import SummaryEditor
+from accounting.transaction.utils.account_option import AccountOption
+from accounting.transaction.utils.summary_editor import SummaryEditor
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_multiline_text
 from accounting.utils.user import get_current_user_pk
-from .account_option import AccountOption
 from .currency import CurrencyForm, IncomeCurrencyForm, ExpenseCurrencyForm, \
     TransferCurrencyForm
 from .journal_entry import JournalEntryForm, DebitEntryForm, CreditEntryForm
