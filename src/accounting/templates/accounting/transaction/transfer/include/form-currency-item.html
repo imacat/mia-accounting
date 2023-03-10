@@ -88,10 +88,10 @@ First written: 2023/2/25
           <ul id="accounting-currency-{{ currency_index }}-credit-list" class="list-group accounting-entry-list">
             {% for entry_form in credit_forms %}
               {% with currency_index = currency_index,
-                      entry_id = entry_form.eid.data,
                       entry_type = "credit",
                       entry_index = loop.index,
                       only_one_entry_form = debit_forms|length == 1,
+                      entry_id = entry_form.eid.data,
                       account_code_data = entry_form.account_code.data|accounting_default,
                       account_code_error = entry_form.account_code.errors,
                       account_text = entry_form.account_text,
