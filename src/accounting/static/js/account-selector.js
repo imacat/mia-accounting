@@ -53,14 +53,6 @@ class AccountSelector {
     constructor(modal) {
         this.#entryType = modal.dataset.entryType;
         this.#prefix = "accounting-account-selector-" + modal.dataset.entryType;
-        this.#init();
-    }
-
-    /**
-     * Initializes the account selector.
-     *
-     */
-    #init() {
         const formAccountControl = document.getElementById("accounting-entry-form-account-control");
         const formAccount = document.getElementById("accounting-entry-form-account");
         const more = document.getElementById(this.#prefix + "-more");
