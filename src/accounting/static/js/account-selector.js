@@ -126,9 +126,6 @@ class AccountSelector {
      *
      */
     #filterAccountOptions() {
-        if (this.#optionList === null) {
-            console.log(this.#prefix + "-option-list");
-        }
         const codesInUse = this.#getAccountCodeUsedInForm();
         let shouldAnyShow = false;
         for (const option of this.#options) {
