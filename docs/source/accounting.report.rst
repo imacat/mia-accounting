@@ -7,7 +7,9 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   accounting.report.period
    accounting.report.reports
+   accounting.report.utils
 
 Submodules
 ----------
@@ -16,22 +18,6 @@ accounting.report.converters module
 -----------------------------------
 
 .. automodule:: accounting.report.converters
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.report.income\_expense\_account module
--------------------------------------------------
-
-.. automodule:: accounting.report.income_expense_account
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.report.period module
--------------------------------
-
-.. automodule:: accounting.report.period
    :members:
    :undoc-members:
    :show-inheritance:

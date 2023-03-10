@@ -1,14 +1,6 @@
 accounting.report.reports package
 =================================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   accounting.report.reports.utils
-
 Submodules
 ----------
 
