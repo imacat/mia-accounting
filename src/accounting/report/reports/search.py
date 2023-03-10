@@ -68,7 +68,10 @@ class EntryCollector:
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return JournalEntry.query.filter(*conditions)\
+        return JournalEntry.query.join(Transaction).filter(*conditions)\
+            .order_by(Transaction.date,
+                      JournalEntry.is_debit,
+                      JournalEntry.no)\
             .options(selectinload(JournalEntry.account),
                      selectinload(JournalEntry.currency),
                      selectinload(JournalEntry.transaction)).all()
