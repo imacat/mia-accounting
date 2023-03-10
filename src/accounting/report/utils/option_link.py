@@ -27,10 +27,15 @@ class OptionLink:
         """Constructs an option link.
 
         :param title: The title.
-        :param url: The URI.
+        :param url: The URL.
         :param is_active: True if active, or False otherwise
+        :param fa_icon: The font-awesome icon, if any.
         """
         self.title: str = title
+        """The title."""
         self.url: str = url
+        """The URL."""
         self.is_active: bool = is_active
+        """True if active, or False otherwise."""
         self.fa_icon: str | None = fa_icon
+        """The font-awesome icon, if any."""
