@@ -98,7 +98,7 @@ class AccountSelector {
         this.#clearButton = document.getElementById(this.#prefix + "-btn-clear");
         this.#more.onclick = () => {
             this.#more.classList.add("d-none");
-            this.#filterAccountOptions();
+            this.#filterOptions();
         };
         this.#clearButton.onclick = () => {
             AccountSelector.#formAccountControl.classList.remove("accounting-not-empty");
@@ -117,19 +117,19 @@ class AccountSelector {
             };
         }
         this.#query.addEventListener("input", () => {
-            this.#filterAccountOptions();
+            this.#filterOptions();
         });
     }
 
     /**
-     * Filters the account options.
+     * Filters the options.
      *
      */
-    #filterAccountOptions() {
-        const codesInUse = this.#getAccountCodeUsedInForm();
+    #filterOptions() {
+        const codesInUse = this.#getCodesUsedInForm();
         let shouldAnyShow = false;
         for (const option of this.#options) {
-            const shouldShow = this.#shouldAccountOptionShow(option, this.#more, codesInUse, this.#query);
+            const shouldShow = this.#shouldOptionShow(option, this.#more, codesInUse, this.#query);
             if (shouldShow) {
                 option.classList.remove("d-none");
                 shouldAnyShow = true;
@@ -151,7 +151,7 @@ class AccountSelector {
      *
      * @return {string[]} the account codes that are used in the form
      */
-    #getAccountCodeUsedInForm() {
+    #getCodesUsedInForm() {
         const accountCodes = Array.from(document.getElementsByClassName("accounting-" + this.#prefix + "-account-code"));
         const inUse = [AccountSelector.#formAccount.dataset.code];
         for (const accountCode of accountCodes) {
@@ -161,15 +161,15 @@ class AccountSelector {
     }
 
     /**
-     * Returns whether an account option should show.
+     * Returns whether an option should show.
      *
-     * @param option {HTMLLIElement} the account option
-     * @param more {HTMLLIElement} the more account element
+     * @param option {HTMLLIElement} the option
+     * @param more {HTMLLIElement} the more element
      * @param inUse {string[]} the account codes that are used in the form
      * @param query {HTMLInputElement} the query element, if any
-     * @return {boolean} true if the account option should show, or false otherwise
+     * @return {boolean} true if the option should show, or false otherwise
      */
-    #shouldAccountOptionShow(option, more, inUse, query) {
+    #shouldOptionShow(option, more, inUse, query) {
         const isQueryMatched = () => {
             if (query.value === "") {
                 return true;
@@ -198,7 +198,7 @@ class AccountSelector {
     #onOpen() {
         this.#query.value = "";
         this.#more.classList.remove("d-none");
-        this.#filterAccountOptions();
+        this.#filterOptions();
         for (const option of this.#options) {
             if (option.dataset.code === AccountSelector.#formAccount.dataset.code) {
                 option.classList.add("active");
