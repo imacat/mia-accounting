@@ -80,8 +80,6 @@ class TransactionForm(FlaskForm):
         """The journal entry collector.  The default is the base abstract
         collector only to provide the correct type.  The subclass forms should
         provide their own collectors."""
-        self.__in_use_account_id: set[int] | None = None
-        """The ID of the accounts that are in use."""
 
     def populate_obj(self, obj: Transaction) -> None:
         """Populates the form data into a transaction object.
