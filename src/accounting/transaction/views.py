@@ -163,7 +163,7 @@ def delete_transaction(txn: Transaction) -> redirect:
     sort_transactions_in(txn.date, txn.id)
     db.session.commit()
     flash(lazy_gettext("The transaction is deleted successfully."), "success")
-    return redirect(or_next(url_for("accounting.report.default")))
+    return redirect(or_next(__get_default_page_uri()))
 
 
 @bp.get("/dates/<date:txn_date>", endpoint="order")
@@ -194,10 +194,10 @@ def sort_transactions(txn_date: date) -> redirect:
     form.save_order()
     if not form.is_modified:
         flash(lazy_gettext("The order was not modified."), "success")
-        return redirect(or_next(url_for("accounting.report.default")))
+        return redirect(or_next(__get_default_page_uri()))
     db.session.commit()
     flash(lazy_gettext("The order is updated successfully."), "success")
-    return redirect(or_next(url_for("accounting.report.default")))
+    return redirect(or_next(__get_default_page_uri()))
 
 
 def __get_detail_uri(txn: Transaction) -> str:
@@ -207,3 +207,11 @@ def __get_detail_uri(txn: Transaction) -> str:
     :return: The detail URI of the transaction.
     """
     return url_for("accounting.transaction.detail", txn=txn)
+
+
+def __get_default_page_uri() -> str:
+    """Returns the URI for the default page.
+
+    :return: The URI for the default page.
+    """
+    return url_for("accounting.report.default")
