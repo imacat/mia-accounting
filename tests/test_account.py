@@ -372,6 +372,15 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
+        # A nominal account that needs offset
+        response = self.client.post(store_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "6172",
+                                          "title": stock.title,
+                                          "is_offset_needed": "yes"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
         # Success, with spaces to be stripped
         response = self.client.post(store_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -467,6 +476,15 @@ class AccountTestCase(unittest.TestCase):
                                     data={"csrf_token": self.csrf_token,
                                           "base_code": stock.base_code,
                                           "title": " "})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # A nominal account that needs offset
+        response = self.client.post(update_uri,
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": "6172",
+                                          "title": stock.title,
+                                          "is_offset_needed": "yes"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 

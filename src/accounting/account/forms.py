@@ -53,6 +53,21 @@ class BaseAccountAvailable:
                 "The base account is not available."))
 
 
+class NoOffsetNominalAccount:
+    """The validator to check nominal account is not to be offset."""
+
+    def __call__(self, form: FlaskForm, field: BooleanField) -> None:
+        if not field.data:
+            return
+        if not isinstance(form, AccountForm):
+            return
+        if form.base_code.data is None:
+            return
+        if form.base_code.data[0] not in {"1", "2"}:
+            raise ValidationError(lazy_gettext(
+                "A nominal account does not need offset."))
+
+
 class AccountForm(FlaskForm):
     """The form to create or edit an account."""
     base_code = StringField(
@@ -66,7 +81,8 @@ class AccountForm(FlaskForm):
         filters=[strip_text],
         validators=[DataRequired(lazy_gettext("Please fill in the title"))])
     """The title."""
-    is_offset_needed = BooleanField()
+    is_offset_needed = BooleanField(
+        validators=[NoOffsetNominalAccount()])
     """Whether the the entries of this account need offset."""
 
     def populate_obj(self, obj: Account) -> None:
@@ -87,7 +103,10 @@ class AccountForm(FlaskForm):
             obj.base_code = self.base_code.data
             obj.no = count + 1
         obj.title = self.title.data
-        obj.is_offset_needed = self.is_offset_needed.data
+        if self.base_code.data[0] in {"1", "2"}:
+            obj.is_offset_needed = self.is_offset_needed.data
+        else:
+            obj.is_offset_needed = False
         if is_new:
             current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk

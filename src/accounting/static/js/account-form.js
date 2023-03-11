@@ -43,6 +43,8 @@ function initializeBaseAccountSelector() {
     const base = document.getElementById("accounting-base");
     const baseCode = document.getElementById("accounting-base-code");
     const baseContent = document.getElementById("accounting-base-content");
+    const isOffsetNeededControl = document.getElementById("accounting-is-offset-needed-control");
+    const isOffsetNeeded = document.getElementById("accounting-is-offset-needed");
     const options = Array.from(document.getElementsByClassName("accounting-base-option"));
     const btnClear = document.getElementById("accounting-btn-clear-base");
     selector.addEventListener("show.bs.modal", () => {
@@ -64,6 +66,14 @@ function initializeBaseAccountSelector() {
         option.onclick = () => {
             baseCode.value = option.dataset.code;
             baseContent.innerText = option.dataset.content;
+            if (["1", "2"].includes(option.dataset.content.substring(0, 1))) {
+                isOffsetNeededControl.classList.remove("d-none");
+                isOffsetNeeded.disabled = false;
+            } else {
+                isOffsetNeededControl.classList.add("d-none");
+                isOffsetNeeded.disabled = true;
+                isOffsetNeeded.checked = false;
+            }
             btnClear.classList.add("btn-danger");
             btnClear.classList.remove("btn-secondary")
             btnClear.disabled = false;
