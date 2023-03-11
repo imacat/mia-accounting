@@ -59,6 +59,19 @@ class NeedSomeJournalEntries:
                 "Please add some journal entries."))
 
 
+class IsBalanced:
+    """The validator to check that the total amount of the debit and credit
+    entries are equal."""
+
+    def __call__(self, form: TransferCurrencyForm, field: BooleanField)\
+            -> None:
+        if len(form.debit) == 0 or len(form.credit) == 0:
+            return
+        if form.debit_total != form.credit_total:
+            raise ValidationError(lazy_gettext(
+                "The totals of the debit and credit amounts do not match."))
+
+
 class CurrencyForm(FlaskForm):
     """The form to create or edit a currency in a transaction."""
     no = IntegerField()
@@ -141,19 +154,6 @@ class ExpenseCurrencyForm(CurrencyForm):
 
 class TransferCurrencyForm(CurrencyForm):
     """The form to create or edit a currency in a transfer transaction."""
-
-    class IsBalanced:
-        """The validator to check that the total amount of the debit and credit
-        entries are equal."""
-        def __call__(self, form: TransferCurrencyForm, field: BooleanField)\
-                -> None:
-            if len(form.debit) == 0 or len(form.credit) == 0:
-                return
-            if form.debit_total != form.credit_total:
-                raise ValidationError(lazy_gettext(
-                    "The totals of the debit and credit amounts do not"
-                    " match."))
-
     no = IntegerField()
     """The order in the transaction."""
     code = StringField(
