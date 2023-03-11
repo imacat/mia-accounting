@@ -73,6 +73,20 @@ class IsDebitAccount:
             "This account is not for debit entries."))
 
 
+class IsCreditAccount:
+    """The validator to check if the account is for credit journal entries."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data is None:
+            return
+        if re.match(r"^(?:[123489]|7[1234])", field.data) \
+                and not field.data.startswith("3351-") \
+                and not field.data.startswith("3353-"):
+            return
+        raise ValidationError(lazy_gettext(
+            "This account is not for credit entries."))
+
+
 class JournalEntryForm(FlaskForm):
     """The base form to create or edit a journal entry."""
     eid = IntegerField()
@@ -144,20 +158,6 @@ class DebitEntryForm(JournalEntryForm):
             current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk
             obj.updated_by_id = current_user_pk
-
-
-class IsCreditAccount:
-    """The validator to check if the account is for credit journal entries."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[123489]|7[1234])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for credit entries."))
 
 
 class CreditEntryForm(JournalEntryForm):
