@@ -52,8 +52,7 @@ class CurrencyExists:
 class NeedSomeJournalEntries:
     """The validator to check if there is any journal entry sub-form."""
 
-    def __call__(self, form: TransferCurrencyForm, field: FieldList) \
-            -> None:
+    def __call__(self, form: FlaskForm, field: FieldList) -> None:
         if len(field) == 0:
             raise ValidationError(lazy_gettext(
                 "Please add some journal entries."))
