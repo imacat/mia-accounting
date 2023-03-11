@@ -18,7 +18,6 @@
 
 """
 import os
-import re
 from secrets import randbelow
 
 import click
@@ -93,12 +92,34 @@ def init_accounts_command(username: str) -> None:
     data: list[AccountData] = []
     for base in bases_to_add:
         l10n: dict[str, str] = {x.locale: x.title for x in base.l10n}
-        is_offset_needed: bool = True if re.match("^[12]1[34]", base.code) \
-            else False
+        is_offset_needed: bool = __is_offset_needed(base.code)
         data.append((get_new_id(), base.code, 1, base.title_l10n,
                      l10n["zh_Hant"], l10n["zh_Hans"], is_offset_needed))
     __add_accounting_accounts(data, creator_pk)
     click.echo(F"{len(data)} added.  Accounting accounts initialized.")
+
+
+def __is_offset_needed(base_code: str) -> bool:
+    """Checks that whether entries in the account need offset.
+
+    :param base_code: The code of the base account.
+    :return: True if entries in the account need offset, or False otherwise.
+    """
+    # Assets
+    if base_code[0] == "1":
+        if base_code[:3] in {"113", "114", "118", "184"}:
+            return True
+        if base_code in {"1411", "1421", "1431", "1441", "1511", "1521",
+                         "1581", "1611", "1851", ""}:
+            return True
+        return False
+    # Liabilities
+    if base_code[0] == "2":
+        if base_code in {"2111", "2114", "2284", "2293"}:
+            return False
+        return True
+    # Only assets and liabilities need offset
+    return False
 
 
 def __add_accounting_accounts(data: list[AccountData], creator_pk: int)\
