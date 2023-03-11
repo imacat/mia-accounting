@@ -79,13 +79,13 @@ class SummeryEditorTestCase(unittest.TestCase):
         self.assertEqual(editor.debit.general.tags[0].accounts[0].code,
                          Accounts.MEAL)
         self.assertEqual(editor.debit.general.tags[0].accounts[1].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
         self.assertEqual(editor.debit.general.tags[1].name, "Dinner")
         self.assertEqual(len(editor.debit.general.tags[1].accounts), 2)
         self.assertEqual(editor.debit.general.tags[1].accounts[0].code,
                          Accounts.MEAL)
         self.assertEqual(editor.debit.general.tags[1].accounts[1].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
 
         # Debit-Travel
         self.assertEqual(len(editor.debit.travel.tags), 3)
@@ -118,7 +118,7 @@ class SummeryEditorTestCase(unittest.TestCase):
         self.assertEqual(editor.credit.general.tags[0].name, "Lunch")
         self.assertEqual(len(editor.credit.general.tags[0].accounts), 3)
         self.assertEqual(editor.credit.general.tags[0].accounts[0].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
         self.assertEqual(editor.credit.general.tags[0].accounts[1].code,
                          Accounts.BANK)
         self.assertEqual(editor.credit.general.tags[0].accounts[2].code,
@@ -128,20 +128,20 @@ class SummeryEditorTestCase(unittest.TestCase):
         self.assertEqual(editor.credit.general.tags[1].accounts[0].code,
                          Accounts.BANK)
         self.assertEqual(editor.credit.general.tags[1].accounts[1].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
 
         # Credit-Travel
         self.assertEqual(len(editor.credit.travel.tags), 2)
         self.assertEqual(editor.credit.travel.tags[0].name, "Bike")
         self.assertEqual(len(editor.credit.travel.tags[0].accounts), 2)
         self.assertEqual(editor.credit.travel.tags[0].accounts[0].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
         self.assertEqual(editor.credit.travel.tags[0].accounts[1].code,
                          Accounts.PREPAID)
         self.assertEqual(editor.credit.travel.tags[1].name, "Taxi")
         self.assertEqual(len(editor.credit.travel.tags[1].accounts), 2)
         self.assertEqual(editor.credit.travel.tags[1].accounts[0].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
         self.assertEqual(editor.credit.travel.tags[1].accounts[1].code,
                          Accounts.CASH)
 
@@ -152,7 +152,7 @@ class SummeryEditorTestCase(unittest.TestCase):
         self.assertEqual(editor.credit.bus.tags[0].accounts[0].code,
                          Accounts.PREPAID)
         self.assertEqual(editor.credit.bus.tags[0].accounts[1].code,
-                         Accounts.PAYABLE)
+                         Accounts.PETTY_CASH)
         self.assertEqual(editor.credit.bus.tags[1].name, "Bus")
         self.assertEqual(len(editor.credit.bus.tags[1].accounts), 1)
         self.assertEqual(editor.credit.bus.tags[1].accounts[0].code,
@@ -186,7 +186,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-debit-1-account_code": Accounts.MEAL,
              "currency-0-debit-1-summary": " Lunch—Fries ",
              "currency-0-debit-1-amount": "2.15",
-             "currency-0-credit-1-account_code": Accounts.PAYABLE,
+             "currency-0-credit-1-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-1-summary": " Lunch—Fries ",
              "currency-0-credit-1-amount": "2.15",
              "currency-0-debit-2-account_code": Accounts.MEAL,
@@ -208,7 +208,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-debit-1-account_code": Accounts.MEAL,
              "currency-0-debit-1-summary": " Dinner—Steak  ",
              "currency-0-debit-1-amount": "8.28",
-             "currency-0-credit-1-account_code": Accounts.PAYABLE,
+             "currency-0-credit-1-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-1-summary": " Dinner—Steak ",
              "currency-0-credit-1-amount": "8.28"},
             {"csrf_token": csrf_token,
@@ -218,13 +218,13 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-debit-0-account_code": Accounts.MEAL,
              "currency-0-debit-0-summary": " Lunch—Pizza  ",
              "currency-0-debit-0-amount": "5.49",
-             "currency-0-credit-0-account_code": Accounts.PAYABLE,
+             "currency-0-credit-0-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-0-summary": " Lunch—Pizza ",
              "currency-0-credit-0-amount": "5.49",
              "currency-0-debit-1-account_code": Accounts.MEAL,
              "currency-0-debit-1-summary": " Lunch—Noodles ",
              "currency-0-debit-1-amount": "7.47",
-             "currency-0-credit-1-account_code": Accounts.PAYABLE,
+             "currency-0-credit-1-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-1-summary": " Lunch—Noodles ",
              "currency-0-credit-1-amount": "7.47"},
             {"csrf_token": csrf_token,
@@ -259,7 +259,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-debit-3-account_code": Accounts.TRAVEL,
              "currency-0-debit-3-summary": " Train—Red—Mall→Museum ",
              "currency-0-debit-3-amount": "4.4",
-             "currency-0-credit-3-account_code": Accounts.PAYABLE,
+             "currency-0-credit-3-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-3-summary": " Train—Red—Mall→Museum ",
              "currency-0-credit-3-amount": "4.4"},
             {"csrf_token": csrf_token,
@@ -275,31 +275,31 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-debit-1-account_code": Accounts.TRAVEL,
              "currency-0-debit-1-summary": " Taxi—Office→Restaurant ",
              "currency-0-debit-1-amount": "12",
-             "currency-0-credit-1-account_code": Accounts.PAYABLE,
+             "currency-0-credit-1-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-1-summary": " Taxi—Office→Restaurant ",
              "currency-0-credit-1-amount": "12",
              "currency-0-debit-2-account_code": Accounts.TRAVEL,
              "currency-0-debit-2-summary": " Taxi—Restaurant→City Hall ",
              "currency-0-debit-2-amount": "8",
-             "currency-0-credit-2-account_code": Accounts.PAYABLE,
+             "currency-0-credit-2-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-2-summary": " Taxi—Restaurant→City Hall ",
              "currency-0-credit-2-amount": "8",
              "currency-0-debit-3-account_code": Accounts.TRAVEL,
              "currency-0-debit-3-summary": " Bike—City Hall→Office ",
              "currency-0-debit-3-amount": "3.5",
-             "currency-0-credit-3-account_code": Accounts.PAYABLE,
+             "currency-0-credit-3-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-3-summary": " Bike—City Hall→Office ",
              "currency-0-credit-3-amount": "3.5",
              "currency-0-debit-4-account_code": Accounts.TRAVEL,
              "currency-0-debit-4-summary": " Bike—Restaurant→Office ",
              "currency-0-debit-4-amount": "4",
-             "currency-0-credit-4-account_code": Accounts.PAYABLE,
+             "currency-0-credit-4-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-4-summary": " Bike—Restaurant→Office ",
              "currency-0-credit-4-amount": "4",
              "currency-0-debit-5-account_code": Accounts.TRAVEL,
              "currency-0-debit-5-summary": " Bike—Office→Theatre ",
              "currency-0-debit-5-amount": "1.5",
-             "currency-0-credit-5-account_code": Accounts.PAYABLE,
+             "currency-0-credit-5-account_code": Accounts.PETTY_CASH,
              "currency-0-credit-5-summary": " Bike—Office→Theatre ",
              "currency-0-credit-5-amount": "1.5",
              "currency-0-debit-6-account_code": Accounts.TRAVEL,
@@ -312,13 +312,13 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "next": NEXT_URI,
              "date": txn_date,
              "currency-0-code": "USD",
-             "currency-0-debit-0-account_code": Accounts.PAYABLE,
+             "currency-0-debit-0-account_code": Accounts.PETTY_CASH,
              "currency-0-debit-0-summary": " Dinner—Steak  ",
              "currency-0-debit-0-amount": "8.28",
              "currency-0-credit-0-account_code": Accounts.BANK,
              "currency-0-credit-0-summary": " Dinner—Steak ",
              "currency-0-credit-0-amount": "8.28",
-             "currency-0-debit-1-account_code": Accounts.PAYABLE,
+             "currency-0-debit-1-account_code": Accounts.PETTY_CASH,
              "currency-0-debit-1-summary": " Lunch—Pizza ",
              "currency-0-debit-1-amount": "5.49",
              "currency-0-credit-1-account_code": Accounts.BANK,

@@ -38,6 +38,7 @@ EMPTY_NOTE: str = " \n\n  "
 class Accounts:
     """The shortcuts to the common accounts."""
     CASH: str = "1111-001"
+    PETTY_CASH: str = "1112-001"
     BANK: str = "1113-001"
     PREPAID: str = "1258-001"
     PAYABLE: str = "2141-001"
