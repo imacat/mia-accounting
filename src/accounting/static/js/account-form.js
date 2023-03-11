@@ -47,7 +47,7 @@ function initializeBaseAccountSelector() {
     const isOffsetNeeded = document.getElementById("accounting-is-offset-needed");
     const options = Array.from(document.getElementsByClassName("accounting-base-option"));
     const btnClear = document.getElementById("accounting-btn-clear-base");
-    selector.addEventListener("show.bs.modal", () => {
+    base.onclick = () => {
         base.classList.add("accounting-not-empty");
         for (const option of options) {
             option.classList.remove("active");
@@ -56,7 +56,7 @@ function initializeBaseAccountSelector() {
         if (selected !== null) {
             selected.classList.add("active");
         }
-    });
+    };
     selector.addEventListener("hidden.bs.modal", () => {
         if (baseCode.value === "") {
             base.classList.remove("accounting-not-empty");
