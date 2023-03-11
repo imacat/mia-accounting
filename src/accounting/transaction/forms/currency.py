@@ -17,8 +17,6 @@
 """The currency sub-forms for the transaction management.
 
 """
-from __future__ import annotations
-
 from decimal import Decimal
 
 from flask_babel import LazyString
@@ -62,8 +60,9 @@ class IsBalanced:
     """The validator to check that the total amount of the debit and credit
     entries are equal."""
 
-    def __call__(self, form: TransferCurrencyForm, field: BooleanField)\
-            -> None:
+    def __call__(self, form: FlaskForm, field: BooleanField) -> None:
+        if not isinstance(form, TransferCurrencyForm):
+            return
         if len(form.debit) == 0 or len(form.credit) == 0:
             return
         if form.debit_total != form.credit_total:
