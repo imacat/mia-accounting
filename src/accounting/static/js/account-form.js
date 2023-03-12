@@ -24,171 +24,335 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", () => {
-    initializeBaseAccountSelector();
-    document.getElementById("accounting-base-code")
-        .onchange = validateBase;
-    document.getElementById("accounting-title")
-        .onchange = validateTitle;
-    document.getElementById("accounting-form")
-        .onsubmit = validateForm;
+    AccountForm.initialize();
 });
 
 /**
- * Initializes the base account selector.
+ * The account form.
  *
  * @private
  */
-function initializeBaseAccountSelector() {
-    const selector = document.getElementById("accounting-base-selector-modal");
-    const base = document.getElementById("accounting-base");
-    const baseCode = document.getElementById("accounting-base-code");
-    const baseContent = document.getElementById("accounting-base-content");
-    const isOffsetNeededControl = document.getElementById("accounting-is-offset-needed-control");
-    const isOffsetNeeded = document.getElementById("accounting-is-offset-needed");
-    const options = Array.from(document.getElementsByClassName("accounting-base-option"));
-    const btnClear = document.getElementById("accounting-btn-clear-base");
-    base.onclick = () => {
-        base.classList.add("accounting-not-empty");
-        for (const option of options) {
-            option.classList.remove("active");
-        }
-        const selected = document.getElementById("accounting-base-option-" + baseCode.value);
-        if (selected !== null) {
-            selected.classList.add("active");
-        }
-    };
-    selector.addEventListener("hidden.bs.modal", () => {
-        if (baseCode.value === "") {
-            base.classList.remove("accounting-not-empty");
-        }
-    });
-    for (const option of options) {
-        option.onclick = () => {
-            baseCode.value = option.dataset.code;
-            baseContent.innerText = option.dataset.content;
-            if (["1", "2"].includes(option.dataset.content.substring(0, 1))) {
-                isOffsetNeededControl.classList.remove("d-none");
-                isOffsetNeeded.disabled = false;
-            } else {
-                isOffsetNeededControl.classList.add("d-none");
-                isOffsetNeeded.disabled = true;
-                isOffsetNeeded.checked = false;
-            }
-            btnClear.classList.add("btn-danger");
-            btnClear.classList.remove("btn-secondary")
-            btnClear.disabled = false;
-            validateBase();
-            bootstrap.Modal.getInstance(selector).hide();
+class AccountForm {
+
+    /**
+     * The base account selector
+     * @type {BaseAccountSelector}
+     */
+    #baseAccountSelector;
+
+    /**
+     * The form element
+     * @type {HTMLFormElement}
+     */
+    #formElement;
+
+    /**
+     * The control of the base account
+     * @type {HTMLDivElement}
+     */
+    #baseControl;
+
+    /**
+     * The input of the base account
+     * @type {HTMLInputElement}
+     */
+    #baseCode;
+
+    /**
+     * The base account
+     * @type {HTMLDivElement}
+     */
+    #base;
+
+    /**
+     * The error message for the base account
+     * @type {HTMLDivElement}
+     */
+    #baseError;
+
+    /**
+     * The title
+     * @type {HTMLInputElement}
+     */
+    #title;
+
+    /**
+     * The error message of the title
+     * @type {HTMLDivElement}
+     */
+    #titleError;
+
+    /**
+     * The control of the is-offset-needed option
+     * @type {HTMLDivElement}
+     */
+    #isOffsetNeededControl;
+
+    /**
+     * The is-offset-needed option
+     * @type {HTMLInputElement}
+     */
+    #isOffsetNeeded;
+
+    /**
+     * Constructs the account form.
+     *
+     */
+    constructor() {
+        this.#baseAccountSelector = new BaseAccountSelector(this);
+        this.#formElement = document.getElementById("accounting-form");
+        this.#baseControl = document.getElementById("accounting-base-control");
+        this.#baseCode = document.getElementById("accounting-base-code");
+        this.#base = document.getElementById("accounting-base");
+        this.#baseError = document.getElementById("accounting-base-error");
+        this.#title = document.getElementById("accounting-title");
+        this.#titleError = document.getElementById("accounting-title-error");
+        this.#isOffsetNeededControl = document.getElementById("accounting-is-offset-needed-control");
+        this.#isOffsetNeeded = document.getElementById("accounting-is-offset-needed");
+        this.#formElement.onsubmit = () => {
+            return this.#validateForm();
+        };
+        this.#baseControl.onclick = () => {
+            this.#baseControl.classList.add("accounting-not-empty");
+            this.#baseAccountSelector.onOpen(this.#baseCode.value);
         };
     }
-    btnClear.onclick = () => {
-        baseCode.value = "";
-        baseContent.innerText = "";
-        btnClear.classList.add("btn-secondary")
-        btnClear.classList.remove("btn-danger");
-        btnClear.disabled = true;
-        validateBase();
-        bootstrap.Modal.getInstance(selector).hide();
+
+    /**
+     * The callback when the base account selector is closed.
+     *
+     */
+    onBaseAccountSelectorClosed() {
+        if (this.#baseCode.value === "") {
+            this.#baseControl.classList.remove("accounting-not-empty");
+        }
     }
-    initializeBaseAccountQuery();
+
+    /**
+     * Sets the base account.
+     *
+     * @param code {string} the base account code
+     * @param text {string} the text for the base account
+     */
+    setBaseAccount(code, text) {
+        this.#baseCode.value = code;
+        this.#base.innerText = text;
+        if (["1", "2"].includes(code.substring(0, 1))) {
+            this.#isOffsetNeededControl.classList.remove("d-none");
+            this.#isOffsetNeeded.disabled = false;
+        } else {
+            this.#isOffsetNeededControl.classList.add("d-none");
+            this.#isOffsetNeeded.disabled = true;
+            this.#isOffsetNeeded.checked = false;
+        }
+        this.#validateBase();
+    }
+
+    /**
+     * Clears the base account.
+     *
+     */
+    clearBaseAccount() {
+        this.#baseCode.value = "";
+        this.#base.innerText = "";
+        this.#validateBase();
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateForm() {
+        let isValid = true;
+        isValid = this.#validateBase() && isValid;
+        isValid = this.#validateTitle() && isValid;
+        return isValid;
+    }
+
+    /**
+     * Validates the base account.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateBase() {
+        if (this.#baseCode.value === "") {
+            this.#baseControl.classList.add("is-invalid");
+            this.#baseError.innerText = A_("Please select the base account.");
+            return false;
+        }
+        this.#baseControl.classList.remove("is-invalid");
+        this.#baseError.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the title.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateTitle() {
+        this.#title.value = this.#title.value.trim();
+        if (this.#title.value === "") {
+            this.#title.classList.add("is-invalid");
+            this.#titleError.innerText = A_("Please fill in the title.");
+            return false;
+        }
+        this.#title.classList.remove("is-invalid");
+        this.#titleError.innerText = "";
+        return true;
+    }
+
+    /**
+     * The account form
+     * @type {AccountForm} the form
+     */
+    static #form;
+
+    static initialize() {
+        this.#form = new AccountForm();
+    }
 }
 
 /**
- * Initializes the query on the base account options.
+ * The base account selector.
  *
  * @private
  */
-function initializeBaseAccountQuery() {
-    const query = document.getElementById("accounting-base-selector-query");
-    const optionList = document.getElementById("accounting-base-option-list");
-    const options = Array.from(document.getElementsByClassName("accounting-base-option"));
-    const queryNoResult = document.getElementById("accounting-base-option-no-result");
-    query.addEventListener("input", () => {
-        if (query.value === "") {
-            for (const option of options) {
-                option.classList.remove("d-none");
-            }
-            optionList.classList.remove("d-none");
-            queryNoResult.classList.add("d-none");
-            return
+class BaseAccountSelector {
+
+    /**
+     * The account form
+     * @type {AccountForm}
+     */
+    #form;
+
+    /**
+     * The selector modal
+     * @type {HTMLDivElement}
+     */
+    #modal;
+
+    /**
+     * The query input
+     * @type {HTMLInputElement}
+     */
+    #query;
+
+    /**
+     * The error message when the query has no result
+     * @type {HTMLParagraphElement}
+     */
+    #queryNoResult;
+
+    /**
+     * The option list
+     * @type {HTMLUListElement}
+     */
+    #optionList;
+
+    /**
+     * The options
+     * @type {HTMLLIElement[]}
+     */
+    #options;
+
+    /**
+     * The button to clear the base account value
+     * @type {HTMLButtonElement}
+     */
+    #clearButton;
+
+    /**
+     * Constructs the base account selector.
+     *
+     * @param form {AccountForm} the form
+     */
+    constructor(form) {
+        this.#form = form;
+        this.#modal = document.getElementById("accounting-base-selector-modal");
+        this.#query = document.getElementById("accounting-base-selector-query");
+        this.#optionList = document.getElementById("accounting-base-selector-option-list");
+        // noinspection JSValidateTypes
+        this.#options = Array.from(document.getElementsByClassName("accounting-base-selector-option"));
+        this.#clearButton = document.getElementById("accounting-base-selector-clear");
+        this.#queryNoResult = document.getElementById("accounting-base-selector-option-no-result");
+        this.#modal.addEventListener("hidden.bs.modal", () => {
+            this.#form.onBaseAccountSelectorClosed();
+        });
+        for (const option of this.#options) {
+            option.onclick = () => {
+                this.#form.setBaseAccount(option.dataset.code, option.dataset.content);
+            };
         }
-        let hasAnyMatched = false;
-        for (const option of options) {
-            const queryValues = JSON.parse(option.dataset.queryValues);
-            let isMatched = false;
-            for (const queryValue of queryValues) {
-                if (queryValue.includes(query.value)) {
-                    isMatched = true;
-                    break;
+        this.#clearButton.onclick = () => {
+            this.#form.clearBaseAccount();
+        };
+        this.#initializeBaseAccountQuery();
+    }
+
+    /**
+     * Initializes the query.
+     *
+     */
+    #initializeBaseAccountQuery() {
+        this.#query.addEventListener("input", () => {
+            if (this.#query.value === "") {
+                for (const option of this.#options) {
+                    option.classList.remove("d-none");
+                }
+                this.#optionList.classList.remove("d-none");
+                this.#queryNoResult.classList.add("d-none");
+                return
+            }
+            let hasAnyMatched = false;
+            for (const option of this.#options) {
+                const queryValues = JSON.parse(option.dataset.queryValues);
+                let isMatched = false;
+                for (const queryValue of queryValues) {
+                    if (queryValue.includes(this.#query.value)) {
+                        isMatched = true;
+                        break;
+                    }
+                }
+                if (isMatched) {
+                    option.classList.remove("d-none");
+                    hasAnyMatched = true;
+                } else {
+                    option.classList.add("d-none");
                 }
             }
-            if (isMatched) {
-                option.classList.remove("d-none");
-                hasAnyMatched = true;
+            if (!hasAnyMatched) {
+                this.#optionList.classList.add("d-none");
+                this.#queryNoResult.classList.remove("d-none");
             } else {
-                option.classList.add("d-none");
+                this.#optionList.classList.remove("d-none");
+                this.#queryNoResult.classList.add("d-none");
+            }
+        });
+    }
+
+    /**
+     * The callback when the base account selector is shown.
+     *
+     * @param baseCode {string} the active base code
+     */
+    onOpen(baseCode) {
+        for (const option of this.#options) {
+            if (option.dataset.code === baseCode) {
+                option.classList.add("active");
+            } else {
+                option.classList.remove("active");
             }
         }
-        if (!hasAnyMatched) {
-            optionList.classList.add("d-none");
-            queryNoResult.classList.remove("d-none");
+        if (baseCode === "") {
+            this.#clearButton.classList.add("btn-secondary")
+            this.#clearButton.classList.remove("btn-danger");
+            this.#clearButton.disabled = true;
         } else {
-            optionList.classList.remove("d-none");
-            queryNoResult.classList.add("d-none");
+            this.#clearButton.classList.add("btn-danger");
+            this.#clearButton.classList.remove("btn-secondary")
+            this.#clearButton.disabled = false;
         }
-    });
-}
-
-/**
- * Validates the form.
- *
- * @returns {boolean} true if valid, or false otherwise
- * @private
- */
-function validateForm() {
-    let isValid = true;
-    isValid = validateBase() && isValid;
-    isValid = validateTitle() && isValid;
-    return isValid;
-}
-
-/**
- * Validates the base account.
- *
- * @returns {boolean} true if valid, or false otherwise
- * @private
- */
-function validateBase() {
-    const field = document.getElementById("accounting-base-code");
-    const error = document.getElementById("accounting-base-code-error");
-    const displayField = document.getElementById("accounting-base");
-    field.value = field.value.trim();
-    if (field.value === "") {
-        displayField.classList.add("is-invalid");
-        error.innerText = A_("Please select the base account.");
-        return false;
     }
-    displayField.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates the title.
- *
- * @returns {boolean} true if valid, or false otherwise
- * @private
- */
-function validateTitle() {
-    const field = document.getElementById("accounting-title");
-    const error = document.getElementById("accounting-title-error");
-    field.value = field.value.trim();
-    if (field.value === "") {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please fill in the title.");
-        return false;
-    }
-    field.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
 }

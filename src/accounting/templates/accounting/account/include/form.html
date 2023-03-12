@@ -41,9 +41,9 @@ First written: 2023/2/1
   {% endif %}
   <div class="form-floating mb-3">
     <input id="accounting-base-code" type="hidden" name="base_code" value="{{ form.base_code.data|accounting_default }}">
-    <div id="accounting-base" class="form-control accounting-clickable accounting-material-text-field {% if form.base_code.data %} accounting-not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-base-selector-modal">
+    <div id="accounting-base-control" class="form-control accounting-clickable accounting-material-text-field {% if form.base_code.data %} accounting-not-empty {% endif %} {% if form.base_code.errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-base-selector-modal">
       <label class="form-label" for="accounting-base">{{ A_("Base account") }}</label>
-      <div id="accounting-base-content">
+      <div id="accounting-base">
         {% if form.base_code.data %}
           {% if form.base_code.errors %}
             {{ A_("(Unknown)") }}
@@ -53,7 +53,7 @@ First written: 2023/2/1
         {% endif %}
       </div>
     </div>
-    <div id="accounting-base-code-error" class="invalid-feedback">{% if form.base_code.errors %}{{ form.base_code.errors[0] }}{% endif %}</div>
+    <div id="accounting-base-error" class="invalid-feedback">{% if form.base_code.errors %}{{ form.base_code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">
@@ -99,21 +99,21 @@ First written: 2023/2/1
           </label>
         </div>
 
-        <ul id="accounting-base-option-list" class="list-group accounting-selector-list">
+        <ul id="accounting-base-selector-option-list" class="list-group accounting-selector-list">
           {% for base in form.base_options %}
-          <li id="accounting-base-option-{{ base.code }}" class="list-group-item accounting-base-option accounting-clickable" data-code="{{ base.code }}" data-content="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}">
-            {{ base }}
-          </li>
+            <li class="list-group-item accounting-clickable accounting-base-selector-option" data-code="{{ base.code }}" data-content="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}" data-bs-dismiss="modal">
+              {{ base }}
+            </li>
           {% endfor %}
         </ul>
-        <p id="accounting-base-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
+        <p id="accounting-base-selector-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>
         {% if form.base_code.data %}
-          <button id="accounting-btn-clear-base" type="button" class="btn btn-danger">{{ A_("Clear") }}</button>
+          <button id="accounting-base-selector-clear" type="button" class="btn btn-danger" data-bs-dismiss="modal">{{ A_("Clear") }}</button>
         {% else %}
-          <button id="accounting-btn-clear-base" type="button" class="btn btn-secondary" disabled="disabled">{{ A_("Clear") }}</button>
+          <button id="accounting-base-selector-clear" type="button" class="btn btn-secondary" disabled="disabled" data-bs-dismiss="modal">{{ A_("Clear") }}</button>
         {% endif %}
       </div>
     </div>
