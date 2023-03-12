@@ -24,152 +24,151 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("accounting-code")
-        .onchange = validateCode;
-    document.getElementById("accounting-name")
-        .onchange = validateName;
-    document.getElementById("accounting-form")
-        .onsubmit = validateForm;
+    CurrencyForm.initialize();
 });
 
 /**
- * The asynchronous validation result
- * @type {object}
- * @private
- */
-let isAsyncValid = {};
-
-/**
- * Validates the form.
- *
- * @returns {boolean} true if valid, or false otherwise
- * @private
- */
-function validateForm() {
-    isAsyncValid = {
-        "code": false,
-        "_sync": false,
-    };
-    let isValid = true;
-    isValid = validateCode() && isValid;
-    isValid = validateName() && isValid;
-    isAsyncValid["_sync"] = isValid;
-    submitFormIfAllAsyncValid();
-    return false;
-}
-
-/**
- * Submits the form if the whole form passed the asynchronous
- * validations.
+ * The currency form.
  *
  * @private
  */
-function submitFormIfAllAsyncValid() {
-    let isValid = true;
-    for (const key of Object.keys(isAsyncValid)) {
-        isValid = isAsyncValid[key] && isValid;
-    }
-    if (isValid) {
-        document.getElementById("accounting-form").submit()
-    }
-}
+class CurrencyForm {
 
-/**
- * Validates the code.
- *
- * @param changeEvent {Event} the change event, if invoked from onchange
- * @returns {boolean} true if valid, or false otherwise
- * @private
- */
-function validateCode(changeEvent = null) {
-    const key = "code";
-    const isSubmission = changeEvent === null;
-    let hasAsyncValidation = false;
-    const field = document.getElementById("accounting-code");
-    const error = document.getElementById("accounting-code-error");
-    field.value = field.value.trim();
-    if (field.value === "") {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please fill in the code.");
-        return false;
-    }
-    const blocklist = JSON.parse(field.dataset.blocklist);
-    if (blocklist.includes(field.value)) {
-        field.classList.add("is-invalid");
-        error.innerText = A_("This code is not available.");
-        return false;
-    }
-    if (!field.value.match(/^[A-Z]{3}$/)) {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Code can only be composed of 3 upper-cased letters.");
-        return false;
-    }
-    const original = field.dataset.original;
-    if (original === "" || field.value !== original) {
-        hasAsyncValidation = true;
-        validateAsyncCodeIsDuplicated(isSubmission, key);
-    }
-    if (!hasAsyncValidation) {
-        isAsyncValid[key] = true;
-        field.classList.remove("is-invalid");
-        error.innerText = "";
-    }
-    return true;
-}
+    /**
+     * The form.
+     * @type {HTMLFormElement}
+     */
+    #formElement;
 
-/**
- * Validates asynchronously whether the code is duplicated.
- * The boolean validation result is stored in isAsyncValid[key].
- *
- * @param isSubmission {boolean} whether this is invoked from a form submission
- * @param key {string} the key to store the result in isAsyncValid
- * @private
- */
-function validateAsyncCodeIsDuplicated(isSubmission, key) {
-    const field = document.getElementById("accounting-code");
-    const error = document.getElementById("accounting-code-error");
-    const url = field.dataset.existsUrl;
-    const onLoad = function () {
-        if (this.status === 200) {
-            const result = JSON.parse(this.responseText);
-            if (result["exists"]) {
-                field.classList.add("is-invalid");
-                error.innerText = A_("Code conflicts with another currency.");
-                if (isSubmission) {
-                    isAsyncValid[key] = false;
+    /**
+     * The code
+     * @type {HTMLInputElement}
+     */
+    #code;
+
+    /**
+     * The error message of the code
+     * @type {HTMLDivElement}
+     */
+    #codeError;
+
+    /**
+     * The name
+     * @type {HTMLInputElement}
+     */
+    #name;
+
+    /**
+     * The error message of the name
+     * @type {HTMLDivElement}
+     */
+    #nameError;
+
+    /**
+     * Constructs the currency form.
+     *
+     */
+    constructor() {
+        this.#formElement = document.getElementById("accounting-form");
+        this.#code = document.getElementById("accounting-code");
+        this.#codeError = document.getElementById("accounting-code-error");
+        this.#name = document.getElementById("accounting-name");
+        this.#nameError = document.getElementById("accounting-name-error");
+        this.#code.onchange = () => {
+            this.#validateCode().then();
+        };
+        this.#name.onchange = () => {
+            this.#validateName();
+        };
+        this.#formElement.onsubmit = () => {
+            this.#validateForm().then((isValid) => {
+                if (isValid) {
+                    this.#formElement.submit();
                 }
-                return;
-            }
-            field.classList.remove("is-invalid");
-            error.innerText = "";
-            if (isSubmission) {
-                isAsyncValid[key] = true;
-                submitFormIfAllAsyncValid();
+            });
+            return false;
+        };
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {Promise<boolean>} true if valid, or false otherwise
+     */
+    async #validateForm() {
+        let isValid = true;
+        isValid = await this.#validateCode() && isValid;
+        isValid = this.#validateName() && isValid;
+        return isValid;
+    }
+
+    /**
+     * Validates the code.
+     *
+     * @param changeEvent {Event} the change event, if invoked from onchange
+     * @returns {Promise<boolean>} true if valid, or false otherwise
+     */
+    async #validateCode(changeEvent = null) {
+        this.#code.value = this.#code.value.trim();
+        if (this.#code.value === "") {
+            this.#code.classList.add("is-invalid");
+            this.#codeError.innerText = A_("Please fill in the code.");
+            return false;
+        }
+        const blocklist = JSON.parse(this.#code.dataset.blocklist);
+        if (blocklist.includes(this.#code.value)) {
+            this.#code.classList.add("is-invalid");
+            this.#codeError.innerText = A_("This code is not available.");
+            return false;
+        }
+        if (!this.#code.value.match(/^[A-Z]{3}$/)) {
+            this.#code.classList.add("is-invalid");
+            this.#codeError.innerText = A_("Code can only be composed of 3 upper-cased letters.");
+            return false;
+        }
+        const original = this.#code.dataset.original;
+        if (original === "" || this.#code.value !== original) {
+            const response = await fetch(this.#code.dataset.existsUrl + "?q=" + encodeURIComponent(this.#code.value));
+            const data = await response.json();
+            if (data["exists"]) {
+                this.#code.classList.add("is-invalid");
+                this.#codeError.innerText = A_("Code conflicts with another currency.");
+                return false;
             }
         }
-    };
-    const request = new XMLHttpRequest();
-    request.onload = onLoad;
-    request.open("GET", url + "?q=" + encodeURIComponent(field.value));
-    request.send();
-}
-
-/**
- * Validates the name.
- *
- * @returns {boolean} true if valid, or false otherwise
- * @private
- */
-function validateName() {
-    const field = document.getElementById("accounting-name");
-    const error = document.getElementById("accounting-name-error");
-    field.value = field.value.trim();
-    if (field.value === "") {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please fill in the name.");
-        return false;
+        this.#code.classList.remove("is-invalid");
+        this.#codeError.innerText = "";
+        return true;
     }
-    field.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
+
+    /**
+     * Validates the name.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateName() {
+        this.#name.value = this.#name.value.trim();
+        if (this.#name.value === "") {
+            this.#name.classList.add("is-invalid");
+            this.#nameError.innerText = A_("Please fill in the name.");
+            return false;
+        }
+        this.#name.classList.remove("is-invalid");
+        this.#nameError.innerText = "";
+        return true;
+    }
+
+    /**
+     * The form
+     * @type {CurrencyForm}
+     */
+    static #form;
+
+    /**
+     * Initializes the currency form.
+     *
+     */
+    static initialize() {
+        this.#form = new CurrencyForm();
+    }
 }
