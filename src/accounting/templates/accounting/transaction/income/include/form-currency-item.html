@@ -24,7 +24,7 @@ First written: 2023/2/25
   <div id="accounting-currency-{{ currency_index }}-control" class="form-control accounting-currency-control {% if currency_errors %} is-invalid {% endif %}">
     <div class="d-flex justify-content-between mt-2 mb-3">
       <div class="form-floating accounting-currency-content">
-        <select id="accounting-currency-{{ currency_index }}-code" class="form-select" name="currency-{{ currency_index }}-code">
+        <select id="accounting-currency-{{ currency_index }}-code" class="form-select {% if currency_code_errors %} is-invalid {% endif %}" name="currency-{{ currency_index }}-code">
           {% for currency in accounting_currency_options() %}
             <option value="{{ currency.code }}" {% if currency.code == currency_code_data %} selected="selected" {% endif %}>{{ currency }}</option>
           {% endfor %}
