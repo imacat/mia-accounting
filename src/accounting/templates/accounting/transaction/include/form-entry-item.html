@@ -29,7 +29,7 @@ First written: 2023/2/25
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary" value="{{ summary_data }}">
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" value="{{ amount_data }}">
   <div class="accounting-entry-content">
-    <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-control" class="form-control clickable d-flex justify-content-between accounting-entry-control {% if entry_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal">
+    <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-control" class="form-control clickable d-flex justify-content-between accounting-entry-control {% if entry_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">
       <div>
         <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account-text" class="small">{{ account_text }}</div>
         <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary-text">{{ summary_data }}</div>

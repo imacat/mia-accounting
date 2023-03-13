@@ -27,7 +27,7 @@ First written: 2023/2/28
           <h1 class="modal-title fs-5" id="accounting-summary-editor-{{ summary_editor.type }}-modal-label">
             <label for="accounting-summary-editor-{{ summary_editor.type }}-summary">{{ A_("Summary") }}</label>
           </h1>
-          <button class="btn-close" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal" aria-label="{{ A_("Close") }}"></button>
+          <button class="btn-close" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal" aria-label="{{ A_("Close") }}"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -181,7 +181,7 @@ First written: 2023/2/28
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal">{{ A_("Cancel") }}</button>
+          <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">{{ A_("Cancel") }}</button>
           <button id="accounting-summary-editor-{{ summary_editor.type }}-btn-save" type="submit" class="btn btn-primary">{{ A_("Save") }}</button>
         </div>
       </div>

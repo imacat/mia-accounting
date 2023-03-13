@@ -146,11 +146,11 @@ class SummaryEditor {
         this.#accountButtons = Array.from(document.getElementsByClassName(this.prefix + "-account"));
 
         // Things from the entry form
-        this.#entryFormModal = document.getElementById("accounting-entry-form-modal");
-        this.#formAccountControl = document.getElementById("accounting-entry-form-account-control");
-        this.#formAccount = document.getElementById("accounting-entry-form-account");
-        this.#formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
-        this.#formSummary = document.getElementById("accounting-entry-form-summary");
+        this.#entryFormModal = document.getElementById("accounting-entry-editor-modal");
+        this.#formAccountControl = document.getElementById("accounting-entry-editor-account-control");
+        this.#formAccount = document.getElementById("accounting-entry-editor-account");
+        this.#formSummaryControl = document.getElementById("accounting-entry-editor-summary-control");
+        this.#formSummary = document.getElementById("accounting-entry-editor-summary");
 
         for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, AnnotationTab]) {
             const tab = new cls(this);
@@ -249,7 +249,7 @@ class SummaryEditor {
             this.#formAccount.dataset.code = this.#selectedAccount.dataset.code;
             this.#formAccount.dataset.text = this.#selectedAccount.dataset.text;
             this.#formAccount.innerText = this.#selectedAccount.dataset.text;
-            JournalEntryForm.validateAccount();
+            JournalEntryEditor.validateAccount();
         }
         this.#formSummary.dataset.value = this.summary.value;
         this.#formSummary.innerText = this.summary.value;
@@ -291,8 +291,8 @@ class SummaryEditor {
      */
     static initialize() {
         const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
-        const entryForm = document.getElementById("accounting-entry-form");
-        const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
+        const entryForm = document.getElementById("accounting-entry-editor");
+        const formSummaryControl = document.getElementById("accounting-entry-editor-summary-control");
         for (const form of forms) {
             const editor = new SummaryEditor(form);
             this.#editors[editor.#entryType] = editor;

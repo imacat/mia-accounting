@@ -105,7 +105,7 @@ class AccountSelector {
             AccountSelector.#formAccount.innerText = "";
             AccountSelector.#formAccount.dataset.code = "";
             AccountSelector.#formAccount.dataset.text = "";
-            JournalEntryForm.validateAccount();
+            JournalEntryEditor.validateAccount();
         };
         for (const option of this.#options) {
             option.onclick = () => {
@@ -113,7 +113,7 @@ class AccountSelector {
                 AccountSelector.#formAccount.innerText = option.dataset.content;
                 AccountSelector.#formAccount.dataset.code = option.dataset.code;
                 AccountSelector.#formAccount.dataset.text = option.dataset.content;
-                JournalEntryForm.validateAccount();
+                JournalEntryEditor.validateAccount();
             };
         }
         this.#query.addEventListener("input", () => {
@@ -246,9 +246,9 @@ class AccountSelector {
      *
      */
     static initialize() {
-        this.#entryForm = document.getElementById("accounting-entry-form");
-        this.#formAccountControl = document.getElementById("accounting-entry-form-account-control");
-        this.#formAccount = document.getElementById("accounting-entry-form-account");
+        this.#entryForm = document.getElementById("accounting-entry-editor");
+        this.#formAccountControl = document.getElementById("accounting-entry-editor-account-control");
+        this.#formAccount = document.getElementById("accounting-entry-editor-account");
         const modals = Array.from(document.getElementsByClassName("accounting-account-selector-modal"));
         for (const modal of modals) {
             const selector = new AccountSelector(modal);
