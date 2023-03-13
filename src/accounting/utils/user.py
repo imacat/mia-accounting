@@ -35,9 +35,9 @@ class AbstractUserUtils(t.Generic[T], ABC):
     @property
     @abstractmethod
     def cls(self) -> t.Type[T]:
-        """Returns the user class.
+        """Returns the class of the user data model.
 
-        :return: The user class.
+        :return: The class of the user data model.
         """
 
     @property
@@ -66,9 +66,9 @@ class AbstractUserUtils(t.Generic[T], ABC):
 
     @abstractmethod
     def get_pk(self, user: T) -> int:
-        """Returns the primary key of the user.
+        """Returns the primary key of the user, as an integer.
 
-        :return: The primary key of the user.
+        :return: The primary key of the user, as an integer.
         """
 
 
