@@ -144,8 +144,6 @@ class JournalEntryEditor {
                     this.#entry = this.#side.addJournalEntry();
                 }
                 this.#entry.save(this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
-                this.#side.updateTotal();
-                this.#side.currency.validateBalance();
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;

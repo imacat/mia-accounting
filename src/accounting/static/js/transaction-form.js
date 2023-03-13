@@ -599,6 +599,7 @@ class DebitCreditSideSubForm {
             }
         }
         this.#total.innerText = formatDecimal(this.getTotal());
+        this.currency.validateBalance();
     }
 
 
@@ -830,6 +831,7 @@ class JournalEntrySubForm {
         this.amount.value = amount;
         this.#amountText.innerText = formatDecimal(new Decimal(amount));
         this.validate();
+        this.side.updateTotal();
     }
 }
 
