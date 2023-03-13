@@ -481,7 +481,6 @@ class DebitCreditSideSubForm {
         this.#addEntryButton.onclick = () => {
             JournalEntryEditor.addNew(this);
             AccountSelector.initializeJournalEntryForm();
-            SummaryEditor.initializeNewJournalEntry(entryType);
         };
         this.#resetDeleteJournalEntryButtons();
         this.#initializeDragAndDropReordering();

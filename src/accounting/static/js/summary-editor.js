@@ -299,15 +299,6 @@ class SummaryEditor {
         }
         formSummaryControl.onclick = () => this.#editors[entryForm.dataset.entryType].#onOpen()
     }
-
-    /**
-     * Initializes the summary editor for a new journal entry.
-     *
-     * @param entryType {string} the entry type, either "debit" or "credit"
-     */
-    static initializeNewJournalEntry(entryType) {
-        this.#editors[entryType].#onOpen();
-    }
 }
 
 /**
