@@ -58,24 +58,6 @@ class JournalEntryEditor {
     #prefix = "accounting-entry-editor"
 
     /**
-     * The control of the account
-     * @type {HTMLDivElement}
-     */
-    #accountControl;
-
-    /**
-     * The account
-     * @type {HTMLDivElement}
-     */
-    #account;
-
-    /**
-     * The error message of the account
-     * @type {HTMLDivElement}
-     */
-    #accountError;
-
-    /**
      * The control of the summary
      * @type {HTMLDivElement}
      */
@@ -92,6 +74,24 @@ class JournalEntryEditor {
      * @type {HTMLDivElement}
      */
     #summaryError;
+
+    /**
+     * The control of the account
+     * @type {HTMLDivElement}
+     */
+    #accountControl;
+
+    /**
+     * The account
+     * @type {HTMLDivElement}
+     */
+    #account;
+
+    /**
+     * The error message of the account
+     * @type {HTMLDivElement}
+     */
+    #accountError;
 
     /**
      * The amount
@@ -124,20 +124,20 @@ class JournalEntryEditor {
     constructor() {
         this.#element = document.getElementById(this.#prefix);
         this.#modal = document.getElementById(this.#prefix + "-modal");
-        this.#accountControl = document.getElementById(this.#prefix + "-account-control");
-        this.#account = document.getElementById(this.#prefix + "-account");
-        this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#summaryControl = document.getElementById(this.#prefix + "-summary-control");
         this.#summary = document.getElementById(this.#prefix + "-summary");
         this.#summaryError = document.getElementById(this.#prefix + "-summary-error");
+        this.#accountControl = document.getElementById(this.#prefix + "-account-control");
+        this.#account = document.getElementById(this.#prefix + "-account");
+        this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error")
-        this.#accountControl.onclick = () => {
-            AccountSelector.start(this, this.entryType);
-        }
         this.#summaryControl.onclick = () => {
             SummaryEditor.start(this, this.#summary.dataset.value);
         };
+        this.#accountControl.onclick = () => {
+            AccountSelector.start(this, this.entryType);
+        }
         this.#element.onsubmit = () => {
             if (this.#validate()) {
                 if (this.#entry === null) {
@@ -150,6 +150,38 @@ class JournalEntryEditor {
             }
             return false;
         };
+    }
+
+    /**
+     * Saves the summary from the summary editor.
+     *
+     * @param summary {string} the summary
+     */
+    saveSummary(summary) {
+        if (summary === "") {
+            this.#summaryControl.classList.remove("accounting-not-empty");
+        } else {
+            this.#summaryControl.classList.add("accounting-not-empty");
+        }
+        this.#summary.dataset.value = summary;
+        this.#summary.innerText = summary;
+        bootstrap.Modal.getOrCreateInstance(this.#modal).show();
+    }
+
+    /**
+     * Saves the summary with the suggested account from the summary editor.
+     *
+     * @param summary {string} the summary
+     * @param accountCode {string} the account code
+     * @param accountText {string} the account text
+     */
+    saveSummaryWithAccount(summary, accountCode, accountText) {
+        this.#accountControl.classList.add("accounting-not-empty");
+        this.#account.dataset.code = accountCode;
+        this.#account.dataset.text = accountText;
+        this.#account.innerText = accountText;
+        this.#validateAccount();
+        this.saveSummary(summary)
     }
 
     /**
@@ -188,48 +220,28 @@ class JournalEntryEditor {
     }
 
     /**
-     * Saves the summary from the summary editor.
-     *
-     * @param summary {string} the summary
-     */
-    saveSummary(summary) {
-        if (summary === "") {
-            this.#summaryControl.classList.remove("accounting-not-empty");
-        } else {
-            this.#summaryControl.classList.add("accounting-not-empty");
-        }
-        this.#summary.dataset.value = summary;
-        this.#summary.innerText = summary;
-        bootstrap.Modal.getOrCreateInstance(this.#modal).show();
-    }
-
-    /**
-     * Saves the summary with the suggested account from the summary editor.
-     *
-     * @param summary {string} the summary
-     * @param accountCode {string} the account code
-     * @param accountText {string} the account text
-     */
-    saveSummaryWithAccount(summary, accountCode, accountText) {
-        this.#accountControl.classList.add("accounting-not-empty");
-        this.#account.dataset.code = accountCode;
-        this.#account.dataset.text = accountText;
-        this.#account.innerText = accountText;
-        this.#validateAccount();
-        this.saveSummary(summary)
-    }
-
-    /**
      * Validates the form.
      *
      * @returns {boolean} true if valid, or false otherwise
      */
     #validate() {
         let isValid = true;
-        isValid = this.#validateAccount() && isValid;
         isValid = this.#validateSummary() && isValid;
+        isValid = this.#validateAccount() && isValid;
         isValid = this.#validateAmount() && isValid
         return isValid;
+    }
+
+    /**
+     * Validates the summary.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     * @private
+     */
+    #validateSummary() {
+        this.#summary.classList.remove("is-invalid");
+        this.#summaryError.innerText = "";
+        return true;
     }
 
     /**
@@ -245,18 +257,6 @@ class JournalEntryEditor {
         }
         this.#accountControl.classList.remove("is-invalid");
         this.#accountError.innerText = "";
-        return true;
-    }
-
-    /**
-     * Validates the summary.
-     *
-     * @return {boolean} true if valid, or false otherwise
-     * @private
-     */
-    #validateSummary() {
-        this.#summary.classList.remove("is-invalid");
-        this.#summaryError.innerText = "";
         return true;
     }
 
@@ -289,6 +289,12 @@ class JournalEntryEditor {
         this.#side = side;
         this.entryType = this.#side.entryType;
         this.#element.dataset.entryType = side.entryType;
+        this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + side.entryType + "-modal";
+        this.#summaryControl.classList.remove("accounting-not-empty");
+        this.#summaryControl.classList.remove("is-invalid");
+        this.#summary.dataset.value = "";
+        this.#summary.innerText = ""
+        this.#summaryError.innerText = ""
         this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + side.entryType + "-modal";
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
@@ -296,12 +302,6 @@ class JournalEntryEditor {
         this.#account.dataset.code = "";
         this.#account.dataset.text = "";
         this.#accountError.innerText = "";
-        this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + side.entryType + "-modal";
-        this.#summaryControl.classList.remove("accounting-not-empty");
-        this.#summaryControl.classList.remove("is-invalid");
-        this.#summary.dataset.value = "";
-        this.#summary.innerText = ""
-        this.#summaryError.innerText = ""
         this.#amount.value = "";
         this.#amount.classList.remove("is-invalid");
         this.#amountError.innerText = "";
@@ -311,16 +311,24 @@ class JournalEntryEditor {
      * Edits a journal entry.
      *
      * @param entry {JournalEntrySubForm} the journal entry sub-form
+     * @param summary {string} the summary
      * @param accountCode {string} the account code
      * @param accountText {string} the account text
-     * @param summary {string} the summary
      * @param amount {string} the amount
      */
-    #onEdit(entry, accountCode, accountText, summary, amount) {
+    #onEdit(entry, summary, accountCode, accountText, amount) {
         this.#entry = entry;
         this.#side = entry.side;
         this.entryType = this.#side.entryType;
         this.#element.dataset.entryType = entry.entryType;
+        this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + entry.entryType + "-modal";
+        if (summary === "") {
+            this.#summaryControl.classList.remove("accounting-not-empty");
+        } else {
+            this.#summaryControl.classList.add("accounting-not-empty");
+        }
+        this.#summary.dataset.value = summary;
+        this.#summary.innerText = summary;
         this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + entry.entryType + "-modal";
         if (accountCode === "") {
             this.#accountControl.classList.remove("accounting-not-empty");
@@ -330,14 +338,6 @@ class JournalEntryEditor {
         this.#account.innerText = accountText;
         this.#account.dataset.code = accountCode;
         this.#account.dataset.text = accountText;
-        this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + entry.entryType + "-modal";
-        if (summary === "") {
-            this.#summaryControl.classList.remove("accounting-not-empty");
-        } else {
-            this.#summaryControl.classList.add("accounting-not-empty");
-        }
-        this.#summary.dataset.value = summary;
-        this.#summary.innerText = summary;
         this.#amount.value = amount;
     }
 
@@ -368,12 +368,12 @@ class JournalEntryEditor {
      * Edits a journal entry.
      *
      * @param entry {JournalEntrySubForm} the journal entry sub-form
+     * @param summary {string} the summary
      * @param accountCode {string} the account code
      * @param accountText {string} the account text
-     * @param summary {string} the summary
      * @param amount {string} the amount
      */
-    static edit(entry, accountCode, accountText, summary, amount) {
-        this.#editor.#onEdit(entry, accountCode, accountText, summary, amount);
+    static edit(entry, summary, accountCode, accountText, amount) {
+        this.#editor.#onEdit(entry, summary, accountCode, accountText, amount);
     }
 }

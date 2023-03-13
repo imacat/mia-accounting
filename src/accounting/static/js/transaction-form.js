@@ -723,7 +723,7 @@ class JournalEntrySubForm {
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
         this.#control.onclick = () => {
-            JournalEntryEditor.edit(this, this.#accountCode.value, this.#accountCode.dataset.text, this.#summary.value, this.amount.value);
+            JournalEntryEditor.edit(this, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.amount.value);
         };
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
