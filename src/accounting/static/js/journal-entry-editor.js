@@ -376,12 +376,4 @@ class JournalEntryEditor {
     static edit(entry, accountCode, accountText, summary, amount) {
         this.#editor.#onEdit(entry, accountCode, accountText, summary, amount);
     }
-
-    /**
-     * Validates the account when the account is updated from the account selector.
-     *
-     */
-    static validateAccount() {
-        this.#editor.#validateAccount();
-    }
 }
