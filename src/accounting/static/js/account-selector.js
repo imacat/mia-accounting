@@ -82,6 +82,12 @@ class AccountSelector {
     #more;
 
     /**
+     * The journal entry editor
+     * @type {JournalEntryEditor}
+     */
+    #entryEditor;
+
+    /**
      * Constructs an account selector.
      *
      * @param modal {HTMLDivElement} the account selector modal
@@ -101,19 +107,11 @@ class AccountSelector {
             this.#filterOptions();
         };
         this.#clearButton.onclick = () => {
-            AccountSelector.#formAccountControl.classList.remove("accounting-not-empty");
-            AccountSelector.#formAccount.innerText = "";
-            AccountSelector.#formAccount.dataset.code = "";
-            AccountSelector.#formAccount.dataset.text = "";
-            JournalEntryEditor.validateAccount();
+            this.#entryEditor.clearAccount();
         };
         for (const option of this.#options) {
             option.onclick = () => {
-                AccountSelector.#formAccountControl.classList.add("accounting-not-empty");
-                AccountSelector.#formAccount.innerText = option.dataset.content;
-                AccountSelector.#formAccount.dataset.code = option.dataset.code;
-                AccountSelector.#formAccount.dataset.text = option.dataset.content;
-                JournalEntryEditor.validateAccount();
+                this.#entryEditor.saveAccount(option.dataset.code, option.dataset.content);
             };
         }
         this.#query.addEventListener("input", () => {
@@ -153,7 +151,10 @@ class AccountSelector {
      */
     #getCodesUsedInForm() {
         const accountCodes = Array.from(document.getElementsByClassName("accounting-" + this.#prefix + "-account-code"));
-        const inUse = [AccountSelector.#formAccount.dataset.code];
+        const inUse = [];
+        if (this.#entryEditor.getAccountCode() !== null) {
+            inUse.push(this.#entryEditor.getAccountCode());
+        }
         for (const accountCode of accountCodes) {
             inUse.push(accountCode.value);
         }
@@ -194,19 +195,21 @@ class AccountSelector {
     /**
      * The callback when the account selector is shown.
      *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
      */
-    #onOpen() {
+    #onOpen(entryEditor) {
+        this.#entryEditor = entryEditor;
         this.#query.value = "";
         this.#more.classList.remove("d-none");
         this.#filterOptions();
         for (const option of this.#options) {
-            if (option.dataset.code === AccountSelector.#formAccount.dataset.code) {
+            if (option.dataset.code === entryEditor.getAccountCode()) {
                 option.classList.add("active");
             } else {
                 option.classList.remove("active");
             }
         }
-        if (AccountSelector.#formAccount.dataset.code === "") {
+        if (entryEditor.getAccountCode() === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
@@ -224,52 +227,24 @@ class AccountSelector {
     static #selectors = {}
 
     /**
-     * The journal entry form.
-     * @type {HTMLFormElement}
-     */
-    static #entryForm;
-
-    /**
-     * The control of the account on the journal entry form
-     * @type {HTMLDivElement}
-     */
-    static #formAccountControl;
-
-    /**
-     * The account on the journal entry form
-     * @type {HTMLDivElement}
-     */
-    static #formAccount;
-
-    /**
      * Initializes the account selectors.
      *
      */
     static initialize() {
-        this.#entryForm = document.getElementById("accounting-entry-editor");
-        this.#formAccountControl = document.getElementById("accounting-entry-editor-account-control");
-        this.#formAccount = document.getElementById("accounting-entry-editor-account");
         const modals = Array.from(document.getElementsByClassName("accounting-account-selector-modal"));
         for (const modal of modals) {
             const selector = new AccountSelector(modal);
             this.#selectors[selector.#entryType] = selector;
         }
-        this.#initializeTransactionForm();
     }
 
     /**
-     * Initializes the transaction form.
+     * Starts the account selector.
      *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @param entryType {string} the entry type, either "debit" or "credit"
      */
-    static #initializeTransactionForm() {
-        this.#formAccountControl.onclick = () => this.#selectors[this.#entryForm.dataset.entryType].#onOpen();
-    }
-
-    /**
-     * Initializes the account selector for the journal entry form.
-     *x
-     */
-    static initializeJournalEntryForm() {
-        this.#formAccountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#entryForm.dataset.entryType + "-modal";
+    static start(entryEditor, entryType) {
+        this.#selectors[entryType].#onOpen(entryEditor);
     }
 }
