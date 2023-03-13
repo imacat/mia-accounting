@@ -94,34 +94,10 @@ class SummaryEditor {
     #selectedAccount = null;
 
     /**
-     * The modal of the journal entry form
-     * @type {HTMLDivElement}
+     * The journal entry editor
+     * @type {JournalEntryEditor}
      */
-    #entryFormModal;
-
-    /**
-     * The control of the account on the journal entry form
-     * @type {HTMLDivElement}
-     */
-    #formAccountControl;
-
-    /**
-     * The account on the journal entry form
-     * @type {HTMLDivElement}
-     */
-    #formAccount;
-
-    /**
-     * The control of the summary on the journal entry form
-     * @type {HTMLDivElement}
-     */
-    #formSummaryControl;
-
-    /**
-     * The summary on the journal entry form
-     * @type {HTMLDivElement}
-     */
-    #formSummary;
+    #entryEditor;
 
     /**
      * The tab planes
@@ -144,13 +120,6 @@ class SummaryEditor {
         this.note = document.getElementById(this.prefix + "-annotation-note");
         // noinspection JSValidateTypes
         this.#accountButtons = Array.from(document.getElementsByClassName(this.prefix + "-account"));
-
-        // Things from the entry form
-        this.#entryFormModal = document.getElementById("accounting-entry-editor-modal");
-        this.#formAccountControl = document.getElementById("accounting-entry-editor-account-control");
-        this.#formAccount = document.getElementById("accounting-entry-editor-account");
-        this.#formSummaryControl = document.getElementById("accounting-entry-editor-summary-control");
-        this.#formSummary = document.getElementById("accounting-entry-editor-summary");
 
         for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, AnnotationTab]) {
             const tab = new cls(this);
@@ -239,31 +208,24 @@ class SummaryEditor {
      *
      */
     #submit() {
-        if (this.summary.value === "") {
-            this.#formSummaryControl.classList.remove("accounting-not-empty");
-        } else {
-            this.#formSummaryControl.classList.add("accounting-not-empty");
-        }
-        if (this.#selectedAccount !== null) {
-            this.#formAccountControl.classList.add("accounting-not-empty");
-            this.#formAccount.dataset.code = this.#selectedAccount.dataset.code;
-            this.#formAccount.dataset.text = this.#selectedAccount.dataset.text;
-            this.#formAccount.innerText = this.#selectedAccount.dataset.text;
-            JournalEntryEditor.validateAccount();
-        }
-        this.#formSummary.dataset.value = this.summary.value;
-        this.#formSummary.innerText = this.summary.value;
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
-        bootstrap.Modal.getOrCreateInstance(this.#entryFormModal).show();
+        if (this.#selectedAccount !== null) {
+            this.#entryEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text);
+        } else {
+            this.#entryEditor.saveSummary(this.summary.value);
+        }
     }
 
     /**
      * The callback when the summary editor is shown.
      *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @param summary {string} the summary
      */
-    #onOpen() {
+    #onOpen(entryEditor, summary) {
+        this.#entryEditor = entryEditor;
         this.#reset();
-        this.summary.value = this.#formSummary.dataset.value;
+        this.summary.value = summary;
         this.#onSummaryChange();
     }
 
@@ -291,13 +253,20 @@ class SummaryEditor {
      */
     static initialize() {
         const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
-        const entryForm = document.getElementById("accounting-entry-editor");
-        const formSummaryControl = document.getElementById("accounting-entry-editor-summary-control");
         for (const form of forms) {
             const editor = new SummaryEditor(form);
             this.#editors[editor.#entryType] = editor;
         }
-        formSummaryControl.onclick = () => this.#editors[entryForm.dataset.entryType].#onOpen()
+    }
+
+    /**
+     * The callback when the summary editor is shown.
+     *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @param summary {string} the summary
+     */
+    static start(entryEditor, summary) {
+        this.#editors[entryEditor.entryType].#onOpen(entryEditor, summary);
     }
 }
 
