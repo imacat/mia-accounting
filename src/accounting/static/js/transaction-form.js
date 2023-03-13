@@ -184,7 +184,7 @@ class TransactionForm {
      * @param entryType {string} the entry type, either "debit" or "credit"
      * @return {string[]} the account codes used in the form
      */
-    #getAccountCodesUsed(entryType) {
+    getAccountCodesUsed(entryType) {
         let inUse = [];
         for (const currency of this.#currencies) {
             inUse = inUse.concat(currency.getAccountCodesUsed(entryType));
@@ -279,16 +279,6 @@ class TransactionForm {
      */
     static initialize() {
         this.#form = new TransactionForm()
-    }
-
-    /**
-     * Returns the account codes used in the form.
-     *
-     * @param entryType {string} the entry type, either "debit" or "credit"
-     * @return {string[]} the account codes used in the form
-     */
-    static getAccountCodesUsed(entryType) {
-        return this.#form.#getAccountCodesUsed(entryType);
     }
 }
 

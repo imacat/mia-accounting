@@ -151,6 +151,15 @@ class JournalEntryEditor {
     }
 
     /**
+     * Returns the transaction form.
+     *
+     * @return {TransactionForm} the transaction form
+     */
+    getTransactionForm() {
+        return this.#side.currency.form;
+    }
+
+    /**
      * Saves the summary from the summary editor.
      *
      * @param summary {string} the summary

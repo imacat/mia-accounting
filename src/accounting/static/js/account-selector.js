@@ -150,7 +150,7 @@ class AccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getCodesUsedInForm() {
-        const inUse = TransactionForm.getAccountCodesUsed(this.#entryType);
+        const inUse = this.#entryEditor.getTransactionForm().getAccountCodesUsed(this.#entryType);
         if (this.#entryEditor.getAccountCode() !== null) {
             inUse.push(this.#entryEditor.getAccountCode());
         }
