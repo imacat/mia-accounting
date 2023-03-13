@@ -179,6 +179,20 @@ class TransactionForm {
     }
 
     /**
+     * Returns the account codes used in the form.
+     *
+     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @return {string[]} the account codes used in the form
+     */
+    #getAccountCodesUsed(entryType) {
+        let inUse = [];
+        for (const currency of this.#currencies) {
+            inUse = inUse.concat(currency.getAccountCodesUsed(entryType));
+        }
+        return inUse;
+    }
+
+    /**
      * Validates the form.
      *
      * @returns {boolean} true if valid, or false otherwise
@@ -265,6 +279,16 @@ class TransactionForm {
      */
     static initialize() {
         this.#form = new TransactionForm()
+    }
+
+    /**
+     * Returns the account codes used in the form.
+     *
+     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @return {string[]} the account codes used in the form
+     */
+    static getAccountCodesUsed(entryType) {
+        return this.#form.#getAccountCodesUsed(entryType);
     }
 }
 
@@ -357,6 +381,21 @@ class CurrencySubForm {
             this.element.parentElement.removeChild(this.element);
             this.form.deleteCurrency(this);
         };
+    }
+
+    /**
+     * Returns the account codes used in the form.
+     *
+     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @return {string[]} the account codes used in the form
+     */
+    getAccountCodesUsed(entryType) {
+        if (entryType === "debit") {
+            return this.#debit.getAccountCodesUsed();
+        } else if (entryType === "credit") {
+            return this.#credit.getAccountCodesUsed();
+        }
+        return []
     }
 
     /**
@@ -578,6 +617,15 @@ class DebitCreditSideSubForm {
     }
 
     /**
+     * Returns the account codes used in the form.
+     *
+     * @return {string[]} the account codes used in the form
+     */
+    getAccountCodesUsed() {
+        return this.#entries.filter((entry) => entry.getAccountCode() !== null).map((entry) => entry.getAccountCode());
+    }
+
+    /**
      * Validates the form.
      *
      * @returns {boolean} true if valid, or false otherwise
@@ -733,6 +781,15 @@ class JournalEntrySubForm {
             this.element.parentElement.removeChild(this.element);
             this.side.deleteJournalEntry(this);
         };
+    }
+
+    /**
+     * Returns the account code.
+     *
+     * @return {string|null} the account code
+     */
+    getAccountCode() {
+        return this.#accountCode.value === ""? null: this.#accountCode.value;
     }
 
     /**
