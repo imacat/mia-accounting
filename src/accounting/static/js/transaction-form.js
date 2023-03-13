@@ -462,7 +462,7 @@ class DebitCreditSideSubForm {
      *
      * @param currency {CurrencySubForm} the currency sub-form
      * @param element {HTMLDivElement} the element
-     * @param entryType {string} the entry type, either "debit"
+     * @param entryType {string} the entry type, either "debit" or "credit"
      */
     constructor(currency, element, entryType) {
         this.currency = currency;
