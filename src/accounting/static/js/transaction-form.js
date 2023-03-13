@@ -848,7 +848,7 @@ class JournalEntryEditor {
     #entry;
 
     /**
-     * The debit or credit entry side sub-form, when adding a new entry
+     * The debit or credit entry side sub-form
      * @type {DebitCreditSideSubForm}
      */
     #side;
