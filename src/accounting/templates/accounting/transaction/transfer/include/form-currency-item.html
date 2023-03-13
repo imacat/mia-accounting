@@ -19,7 +19,7 @@ currency-sub-form.html: The currency sub-form in the transfer transaction form
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
-<div id="accounting-currency-{{ currency_index }}" class="mb-3 accounting-currency" data-index="{{ currency_index }}" data-prefix="accounting-currency-{{ currency_index }}">
+<div id="accounting-currency-{{ currency_index }}" class="mb-3 accounting-currency" data-index="{{ currency_index }}">
   <input id="accounting-currency-{{ currency_index }}-no" type="hidden" name="currency-{{ currency_index }}-no" value="{{ currency_index }}">
   <div id="accounting-currency-{{ currency_index }}-control" class="form-control accounting-currency-control {% if currency_errors %} is-invalid {% endif %}">
     <div class="d-flex justify-content-between mt-2 mb-3">
