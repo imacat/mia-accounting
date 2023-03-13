@@ -801,6 +801,12 @@ class JournalEntryEditor {
     entryType;
 
     /**
+     * The prefix of the HTML ID and class
+     * @type {string}
+     */
+    #prefix = "accounting-entry-editor"
+
+    /**
      * The control of the account
      * @type {HTMLDivElement}
      */
@@ -865,16 +871,16 @@ class JournalEntryEditor {
      *
      */
     constructor() {
-        this.#element = document.getElementById("accounting-entry-editor");
-        this.#modal = document.getElementById("accounting-entry-editor-modal");
-        this.#accountControl = document.getElementById("accounting-entry-editor-account-control");
-        this.#account = document.getElementById("accounting-entry-editor-account");
-        this.#accountError = document.getElementById("accounting-entry-editor-account-error")
-        this.#summaryControl = document.getElementById("accounting-entry-editor-summary-control");
-        this.#summary = document.getElementById("accounting-entry-editor-summary");
-        this.#summaryError = document.getElementById("accounting-entry-editor-summary-error");
-        this.#amount = document.getElementById("accounting-entry-editor-amount");
-        this.#amountError = document.getElementById("accounting-entry-editor-amount-error");
+        this.#element = document.getElementById(this.#prefix);
+        this.#modal = document.getElementById(this.#prefix + "-modal");
+        this.#accountControl = document.getElementById(this.#prefix + "-account-control");
+        this.#account = document.getElementById(this.#prefix + "-account");
+        this.#accountError = document.getElementById(this.#prefix + "-account-error")
+        this.#summaryControl = document.getElementById(this.#prefix + "-summary-control");
+        this.#summary = document.getElementById(this.#prefix + "-summary");
+        this.#summaryError = document.getElementById(this.#prefix + "-summary-error");
+        this.#amount = document.getElementById(this.#prefix + "-amount");
+        this.#amountError = document.getElementById(this.#prefix + "-amount-error");
         this.#summaryControl.onclick = () => {
             SummaryEditor.start(this, this.#summary.dataset.value);
         };
