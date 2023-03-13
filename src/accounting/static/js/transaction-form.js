@@ -502,6 +502,7 @@ class DebitCreditSideSubForm {
         this.#entries.push(entry);
         this.#resetDeleteJournalEntryButtons();
         this.#initializeDragAndDropReordering();
+        this.validate();
         return entry;
     }
 
