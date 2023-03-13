@@ -58,25 +58,25 @@ class SummaryEditor {
     #entryType;
 
     /**
-     * The current tab.
+     * The current tab
      * @type {TabPlane}
      */
     currentTab;
 
     /**
-     * The summary input.
+     * The summary input
      * @type {HTMLInputElement}
      */
     summary;
 
     /**
-     * The number input.
+     * The number input
      * @type {HTMLInputElement}
      */
     number;
 
     /**
-     * The note.
+     * The note
      * @type {HTMLInputElement}
      */
     note;
