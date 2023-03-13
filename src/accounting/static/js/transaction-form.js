@@ -259,6 +259,10 @@ class TransactionForm {
      */
     static #form;
 
+    /**
+     * Initializes the transaction form.
+     *
+     */
     static initialize() {
         this.#form = new TransactionForm()
     }
