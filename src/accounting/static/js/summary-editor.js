@@ -508,7 +508,7 @@ class TagTabPlane extends TabPlane {
         errorContainer.innerText = "";
         return true;
     }
-    
+
     /**
      * Resets the tab plane input.
      *
