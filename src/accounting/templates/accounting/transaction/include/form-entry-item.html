@@ -27,7 +27,7 @@ First written: 2023/2/25
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-no" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-no" value="{{ entry_index }}">
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account-code" class="accounting-{{ entry_type }}-account-code" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-account_code" value="{{ account_code_data }}" data-text="{{ account_text }}">
   <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-summary" value="{{ summary_data }}">
-  <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" class="accounting-currency-{{ currency_index }}-{{ entry_type }}-amount" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" value="{{ amount_data }}">
+  <input id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-amount" value="{{ amount_data }}">
   <div class="accounting-entry-content">
     <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-control" class="form-control clickable d-flex justify-content-between accounting-entry-control {% if entry_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-entry-form-modal">
       <div>
@@ -40,7 +40,7 @@ First written: 2023/2/25
   </div>
 
   <div>
-    <button id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-btn-delete" class="btn btn-danger rounded-circle accounting-btn-delete-entry accounting-currency-{{ currency_index }}-{{ entry_type }}-btn-delete-entry {% if only_one_entry_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}" data-same-class="accounting-currency-{{ currency_index }}-{{ entry_type }}-btn-delete-entry">
+    <button id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-delete" class="btn btn-danger rounded-circle {% if only_one_entry_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}" data-same-class="accounting-currency-{{ currency_index }}-{{ entry_type }}-btn-delete-entry">
       <i class="fas fa-minus"></i>
     </button>
   </div>

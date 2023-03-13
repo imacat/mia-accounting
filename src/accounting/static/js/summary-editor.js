@@ -249,6 +249,7 @@ class SummaryEditor {
             this.#formAccount.dataset.code = this.#selectedAccount.dataset.code;
             this.#formAccount.dataset.text = this.#selectedAccount.dataset.text;
             this.#formAccount.innerText = this.#selectedAccount.dataset.text;
+            JournalEntryForm.validateAccount();
         }
         this.#formSummary.dataset.value = this.summary.value;
         this.#formSummary.innerText = this.summary.value;

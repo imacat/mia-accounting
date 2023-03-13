@@ -105,7 +105,7 @@ class AccountSelector {
             AccountSelector.#formAccount.innerText = "";
             AccountSelector.#formAccount.dataset.code = "";
             AccountSelector.#formAccount.dataset.text = "";
-            validateJournalEntryAccount();
+            JournalEntryForm.validateAccount();
         };
         for (const option of this.#options) {
             option.onclick = () => {
@@ -113,7 +113,7 @@ class AccountSelector {
                 AccountSelector.#formAccount.innerText = option.dataset.content;
                 AccountSelector.#formAccount.dataset.code = option.dataset.code;
                 AccountSelector.#formAccount.dataset.text = option.dataset.content;
-                validateJournalEntryAccount();
+                JournalEntryForm.validateAccount();
             };
         }
         this.#query.addEventListener("input", () => {

@@ -24,10 +24,1027 @@
 
 // Initializes the page JavaScript.
 document.addEventListener("DOMContentLoaded", () => {
-    initializeCurrencyForms();
-    initializeJournalEntries();
-    initializeFormValidation();
+    TransactionForm.initialize();
+    JournalEntryForm.initialize();
 });
+
+/**
+ * The transaction form
+ *
+ */
+class TransactionForm {
+
+    /**
+     * The form element
+     * @type {HTMLFormElement}
+     */
+    #element;
+
+    /**
+     * The template to add a new journal entry
+     * @type {string}
+     */
+    entryTemplate;
+
+    /**
+     * The date
+     * @type {HTMLInputElement}
+     */
+    #date;
+
+    /**
+     * The error message of the date
+     * @type {HTMLDivElement}
+     */
+    #dateError;
+
+    /**
+     * The control of the currencies
+     * @type {HTMLDivElement}
+     */
+    #currencyControl;
+
+    /**
+     * The error message of the currencies
+     * @type {HTMLDivElement}
+     */
+    #currencyError;
+
+    /**
+     * The currency list
+     * @type {HTMLDivElement}
+     */
+    #currencyList;
+
+    /**
+     * The currency sub-forms
+     * @type {CurrencySubForm[]}
+     */
+    #currencies;
+
+    /**
+     * The button to add a new currency
+     * @type {HTMLButtonElement}
+     */
+    #addCurrencyButton;
+
+    /**
+     * The note
+     * @type {HTMLTextAreaElement}
+     */
+    #note;
+
+    /**
+     * The error message of the note
+     * @type {HTMLDivElement}
+     */
+    #noteError;
+
+    /**
+     * Constructs the transaction form.
+     *
+     */
+    constructor() {
+        this.#element = document.getElementById("accounting-form");
+        this.entryTemplate = this.#element.dataset.entryTemplate;
+        this.#date = document.getElementById("accounting-date");
+        this.#dateError = document.getElementById("accounting-date-error");
+        this.#currencyControl = document.getElementById("accounting-currencies");
+        this.#currencyError = document.getElementById("accounting-currencies-error");
+        this.#currencyList = document.getElementById("accounting-currency-list");
+        this.#currencies = Array.from(document.getElementsByClassName("accounting-currency"))
+            .map((element) => new CurrencySubForm(this, element));
+        this.#addCurrencyButton = document.getElementById("accounting-add-currency");
+        this.#note = document.getElementById("accounting-note");
+        this.#noteError = document.getElementById("accounting-note-error");
+
+        this.#addCurrencyButton.onclick = () => {
+            const newIndex = 1 + (this.#currencies.length === 0? 0: Math.max(...this.#currencies.map((currency) => currency.index)));
+            const html = this.#element.dataset.currencyTemplate
+                .replaceAll("CURRENCY_INDEX", escapeHtml(String(newIndex)));
+            this.#currencyList.insertAdjacentHTML("beforeend", html);
+            const element = document.getElementById("accounting-currency-" + String(newIndex));
+            this.#currencies.push(new CurrencySubForm(this, element));
+            this.#resetDeleteCurrencyButtons();
+            this.#initializeDragAndDropReordering();
+        };
+        this.#resetDeleteCurrencyButtons();
+        this.#initializeDragAndDropReordering();
+        this.#date.onchange = () => {
+            this.#validateDate();
+        };
+        this.#note.onchange = () => {
+            this.#validateNote();
+        }
+        this.#element.onsubmit = () => {
+            return this.#validate();
+        };
+    }
+
+    /**
+     * Deletes a currency sub-form.
+     *
+     * @param currency {CurrencySubForm} the currency sub-form to delete
+     */
+    deleteCurrency(currency) {
+        const index = this.#currencies.indexOf(currency);
+        this.#currencies.splice(index, 1);
+        this.#resetDeleteCurrencyButtons();
+    }
+
+    /**
+     * Resets the buttons to delete the currency sub-forms
+     *
+     */
+    #resetDeleteCurrencyButtons() {
+        if (this.#currencies.length === 1) {
+            this.#currencies[0].deleteButton.classList.add("d-none");
+        } else {
+            for (const currency of this.#currencies) {
+                currency.deleteButton.classList.remove("d-none");
+            }
+        }
+    }
+
+    /**
+     * Initializes the drag and drop reordering on the currency sub-forms.
+     *
+     */
+    #initializeDragAndDropReordering() {
+        initializeDragAndDropReordering(this.#currencyList, () => {
+            const currencyId = Array.from(this.#currencyList.children).map((currency) => currency.id);
+            this.#currencies.sort((a, b) => currencyId.indexOf(a.element.id) - currencyId.indexOf(b.element.id));
+            for (let i = 0; i < this.#currencies.length; i++) {
+                this.#currencies[i].no.value = String(i + 1);
+            }
+        });
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validate() {
+        let isValid = true;
+        isValid = this.#validateDate() && isValid;
+        isValid = this.#validateCurrencies() && isValid;
+        isValid = this.#validateNote() && isValid;
+        return isValid;
+    }
+
+    /**
+     * Validates the date.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateDate() {
+        this.#date.value = this.#date.value.trim();
+        this.#date.classList.remove("is-invalid");
+        if (this.#date.value === "") {
+            this.#date.classList.add("is-invalid");
+            this.#dateError.innerText = A_("Please fill in the date.");
+            return false;
+        }
+        this.#date.classList.remove("is-invalid");
+        this.#dateError.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the currencies.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateCurrencies() {
+        let isValid = true;
+        isValid = this.#validateCurrenciesReal() && isValid;
+        for (const currency of this.#currencies) {
+            isValid = currency.validate() && isValid;
+        }
+        return isValid;
+    }
+
+    /**
+     * Validates the currency sub-forms, the validator itself.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateCurrenciesReal() {
+        if (this.#currencies.length === 0) {
+            this.#currencyControl.classList.add("is-invalid");
+            this.#currencyError.innerText = A_("Please add some currencies.");
+            return false;
+        }
+        this.#currencyControl.classList.remove("is-invalid");
+        this.#currencyError.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the note.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateNote() {
+        this.#note.value = this.#note.value
+             .replace(/^\s*\n/, "")
+             .trimEnd();
+        this.#note.classList.remove("is-invalid");
+        this.#noteError.innerText = "";
+        return true;
+    }
+
+    /**
+     * The transaction form
+     * @type {TransactionForm}
+     */
+    static #form;
+
+    static initialize() {
+        this.#form = new TransactionForm()
+    }
+}
+
+/**
+ * The currency sub-form.
+ *
+ */
+class CurrencySubForm {
+
+    /**
+     * The element
+     * @type {HTMLDivElement}
+     */
+    element;
+
+    /**
+     * The transaction form
+     * @type {TransactionForm}
+     */
+    form;
+
+    /**
+     * The currency index
+     * @type {number}
+     */
+    index;
+
+    /**
+     * The prefix of the HTML ID and class
+     * @type {string}
+     */
+    #prefix;
+
+    /**
+     * The control
+     * @type {HTMLDivElement}
+     */
+    #control;
+
+    /**
+     * The error message
+     * @type {HTMLDivElement}
+     */
+    #error;
+
+    /**
+     * The number
+     * @type {HTMLInputElement}
+     */
+    no;
+
+    /**
+     * The button to delete the currency
+     * @type {HTMLButtonElement}
+     */
+    deleteButton;
+
+    /**
+     * The debit side
+     * @type {DebitCreditSideSubForm|null}
+     */
+    #debit;
+
+    /**
+     * The credit side
+     * @type {DebitCreditSideSubForm|null}
+     */
+    #credit;
+
+    /**
+     * Constructs a currency sub-form
+     *
+     * @param form {TransactionForm} the transaction form
+     * @param element {HTMLDivElement} the currency sub-form element
+     */
+    constructor(form, element) {
+        this.element = element;
+        this.form = form;
+        this.index = parseInt(this.element.dataset.index);
+        this.#prefix = "accounting-currency-" + String(this.index);
+        this.#control = document.getElementById(this.#prefix + "-control");
+        this.#error = document.getElementById(this.#prefix + "-error");
+        this.no = document.getElementById(this.#prefix + "-no");
+        this.deleteButton = document.getElementById(this.#prefix + "-delete");
+        const debitElement = document.getElementById(this.#prefix + "-debit");
+        this.#debit = debitElement === null? null: new DebitCreditSideSubForm(this, debitElement, "debit");
+        const creditElement = document.getElementById(this.#prefix + "-credit");
+        this.#credit = creditElement == null? null: new DebitCreditSideSubForm(this, creditElement, "credit");
+        this.deleteButton.onclick = () => {
+            this.element.parentElement.removeChild(this.element);
+            this.form.deleteCurrency(this);
+        };
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    validate() {
+        let isValid = true;
+        if (this.#debit !== null) {
+            isValid = this.#debit.validate() && isValid;
+        }
+        if (this.#credit !== null) {
+            isValid = this.#credit.validate() && isValid;
+        }
+        isValid = this.validateBalance() && isValid;
+        return isValid;
+    }
+
+    /**
+     * Validates the valance.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    validateBalance() {
+        if (this.#debit !== null && this.#credit !== null) {
+            if (!this.#debit.getTotal().equals(this.#credit.getTotal())) {
+                this.#control.classList.add("is-invalid");
+                this.#error.innerText = A_("The totals of the debit and credit amounts do not match.");
+                return false;
+            }
+        }
+        this.#control.classList.remove("is-invalid");
+        this.#error.innerText = "";
+        return true;
+    }
+}
+
+/**
+ * The debit or credit side sub-form
+ *
+ */
+class DebitCreditSideSubForm {
+
+    /**
+     * The currency sub-form
+     * @type {CurrencySubForm}
+     */
+    currency;
+
+    /**
+     * The element
+     * @type {HTMLDivElement}
+     */
+    #element;
+
+    /**
+     * The currencyIndex
+     * @type {number}
+     */
+    #currencyIndex;
+
+    /**
+     * The entry type, either "debit" or "credit"
+     * @type {string}
+     */
+    entryType;
+
+    /**
+     * The prefix of the HTML ID and class
+     * @type {string}
+     */
+    #prefix;
+
+    /**
+     * The error message
+     * @type {HTMLDivElement}
+     */
+    #error;
+
+    /**
+     * The journal entry list
+     * @type {HTMLUListElement}
+     */
+    #entryList;
+
+    /**
+     * The journal entry sub-forms
+     * @type {JournalEntrySubForm[]}
+     */
+    #entries;
+
+    /**
+     * The total
+     * @type {HTMLSpanElement}
+     */
+    #total;
+
+    /**
+     * The button to add a new entry
+     * @type {HTMLButtonElement}
+     */
+    #addEntryButton;
+
+    /**
+     * Constructs a debit or credit side sub-form
+     *
+     * @param currency {CurrencySubForm} the currency sub-form
+     * @param element {HTMLDivElement} the element
+     * @param entryType {string} the entry type, either "debit"
+     */
+    constructor(currency, element, entryType) {
+        this.currency = currency;
+        this.#element = element;
+        this.#currencyIndex = currency.index;
+        this.entryType = entryType;
+        this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + entryType;
+        this.#error = document.getElementById(this.#prefix + "-error");
+        this.#entryList = document.getElementById(this.#prefix + "-list");
+        // noinspection JSValidateTypes
+        this.#entries = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new JournalEntrySubForm(this, element));
+        this.#total = document.getElementById(this.#prefix + "-total");
+        this.#addEntryButton = document.getElementById(this.#prefix + "-add-entry");
+        this.#addEntryButton.onclick = () => {
+            JournalEntryForm.addNew(this);
+            AccountSelector.initializeJournalEntryForm();
+            SummaryEditor.initializeNewJournalEntry(entryType);
+        };
+        this.#resetDeleteJournalEntryButtons();
+        this.#initializeDragAndDropReordering();
+    }
+
+    /**
+     * Adds a new journal entry sub-form
+     *
+     * @returns {JournalEntrySubForm} the newly-added journal entry sub-form
+     */
+    addJournalEntry() {
+        const newIndex = 1 + (this.#entries.length === 0? 0: Math.max(...this.#entries.map((entry) => entry.entryIndex)));
+        const html = this.currency.form.entryTemplate
+            .replaceAll("CURRENCY_INDEX", escapeHtml(String(this.#currencyIndex)))
+            .replaceAll("ENTRY_TYPE", escapeHtml(this.entryType))
+            .replaceAll("ENTRY_INDEX", escapeHtml(String(newIndex)));
+        this.#entryList.insertAdjacentHTML("beforeend", html);
+        const entry = new JournalEntrySubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
+        this.#entries.push(entry);
+        this.#resetDeleteJournalEntryButtons();
+        this.#initializeDragAndDropReordering();
+        return entry;
+    }
+
+    /**
+     * Deletes a journal entry sub-form
+     *
+     * @param entry {JournalEntrySubForm}
+     */
+    deleteJournalEntry(entry) {
+        const index = this.#entries.indexOf(entry);
+        this.#entries.splice(index, 1);
+        this.updateTotal();
+        this.#resetDeleteJournalEntryButtons();
+    }
+
+    /**
+     * Resets the buttons to delete the journal entry sub-forms
+     *
+     */
+    #resetDeleteJournalEntryButtons() {
+        if (this.#entries.length === 1) {
+            this.#entries[0].deleteButton.classList.add("d-none");
+        } else {
+            for (const entry of this.#entries) {
+                entry.deleteButton.classList.remove("d-none");
+            }
+        }
+    }
+
+    /**
+     * Returns the total amount.
+     *
+     * @return {Decimal} the total amount
+     */
+    getTotal() {
+        let total = new Decimal("0");
+        for (const entry of this.#entries) {
+            if (entry.amount.value !== "") {
+                total = total.plus(new Decimal(entry.amount.value));
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Updates the total
+     *
+     */
+    updateTotal() {
+        let total = new Decimal("0");
+        for (const entry of this.#entries) {
+            if (entry.amount.value !== "") {
+                total = total.plus(new Decimal(entry.amount.value));
+            }
+        }
+        this.#total.innerText = formatDecimal(this.getTotal());
+    }
+
+
+    /**
+     * Initializes the drag and drop reordering on the currency sub-forms.
+     *
+     */
+    #initializeDragAndDropReordering() {
+        initializeDragAndDropReordering(this.#entryList, () => {
+            const entryId = Array.from(this.#entryList.children).map((entry) => entry.id);
+            this.#entries.sort((a, b) => entryId.indexOf(a.element.id) - entryId.indexOf(b.element.id));
+            for (let i = 0; i < this.#entries.length; i++) {
+                this.#entries[i].no.value = String(i + 1);
+            }
+        });
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    validate() {
+        let isValid = true;
+        isValid = this.#validateReal() && isValid;
+        for (const entry of this.#entries) {
+            isValid = entry.validate() && isValid;
+        }
+        return isValid;
+    }
+
+    /**
+     * Validates the form, the validator itself.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validateReal() {
+        if (this.#entries.length === 0) {
+            this.#element.classList.add("is-invalid");
+            this.#error.innerText = A_("Please add some journal entries.");
+            return false;
+        }
+        this.#element.classList.remove("is-invalid");
+        this.#error.innerText = "";
+        return true;
+    }
+}
+
+/**
+ * The journal entry sub-form.
+ *
+ */
+class JournalEntrySubForm {
+
+    /**
+     * The debit or credit entry side sub-form
+     * @type {DebitCreditSideSubForm}
+     */
+    side;
+
+    /**
+     * The element
+     * @type {HTMLLIElement}
+     */
+    element;
+
+    /**
+     * The entry type, either "debit" or "credit"
+     * @type {string}
+     */
+    entryType;
+
+    /**
+     * The entry index
+     * @type {number}
+     */
+    entryIndex;
+
+    /**
+     * The prefix of the HTML ID and class
+     * @type {string}
+     */
+    #prefix;
+
+    /**
+     * The control
+     * @type {HTMLDivElement}
+     */
+    #control;
+
+    /**
+     * The error message
+     * @type {HTMLDivElement}
+     */
+    #error;
+
+    /**
+     * The number
+     * @type {HTMLInputElement}
+     */
+    no;
+
+    /**
+     * The account code
+     * @type {HTMLInputElement}
+     */
+    #accountCode;
+
+    /**
+     * The text display of the account
+     * @type {HTMLDivElement}
+     */
+    #accountText;
+
+    /**
+     * The summary
+     * @type {HTMLInputElement}
+     */
+    #summary;
+
+    /**
+     * The text display of the summary
+     * @type {HTMLDivElement}
+     */
+    #summaryText;
+
+    /**
+     * The amount
+     * @type {HTMLInputElement}
+     */
+    amount;
+
+    /**
+     * The text display of the amount
+     * @type {HTMLSpanElement}
+     */
+    #amountText;
+
+    /**
+     * The button to delete journal entry
+     * @type {HTMLButtonElement}
+     */
+    deleteButton;
+
+    /**
+     * Constructs the journal entry sub-form.
+     *
+     * @param side {DebitCreditSideSubForm} the debit or credit entry side sub-form
+     * @param element {HTMLLIElement} the element
+     */
+    constructor(side, element) {
+        this.side = side;
+        this.element = element;
+        this.entryType = element.dataset.entryType;
+        this.entryIndex = parseInt(element.dataset.entryIndex);
+        this.#prefix = element.dataset.prefix;
+        this.#control = document.getElementById(this.#prefix + "-control");
+        this.#error = document.getElementById(this.#prefix + "-error");
+        this.no = document.getElementById(this.#prefix + "-no");
+        this.#accountCode = document.getElementById(this.#prefix + "-account-code");
+        this.#accountText = document.getElementById(this.#prefix + "-account-text");
+        this.#summary = document.getElementById(this.#prefix + "-summary");
+        this.#summaryText = document.getElementById(this.#prefix + "-summary-text");
+        this.amount = document.getElementById(this.#prefix + "-amount");
+        this.#amountText = document.getElementById(this.#prefix + "-amount-text");
+        this.deleteButton = document.getElementById(this.#prefix + "-delete");
+        this.#control.onclick = () => {
+            JournalEntryForm.edit(this, this.#accountCode.value, this.#accountCode.dataset.text, this.#summary.value, this.amount.value);
+            AccountSelector.initializeJournalEntryForm();
+        };
+        this.deleteButton.onclick = () => {
+            this.element.parentElement.removeChild(this.element);
+            this.side.deleteJournalEntry(this);
+        };
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    validate() {
+        if (this.#accountCode.value === "") {
+            this.#control.classList.add("is-invalid");
+            this.#error.innerText = A_("Please select the account.");
+            return false;
+        }
+        if (this.amount.value === "") {
+            this.#control.classList.add("is-invalid");
+            this.#error.innerText = A_("Please fill in the amount.");
+            return false;
+        }
+        this.#control.classList.remove("is-invalid");
+        this.#error.innerText = "";
+        return true;
+    }
+
+    /**
+     * Stores the data into the journal entry sub-form.
+     *
+     * @param accountCode {string} the account code
+     * @param accountText {string} the account text
+     * @param summary {string} the summary
+     * @param amount {string} the amount
+     */
+    save(accountCode, accountText, summary, amount) {
+        this.#accountCode.value = accountCode;
+        this.#accountCode.dataset.text = accountText;
+        this.#accountText.innerText = accountText;
+        this.#summary.value = summary;
+        this.#summaryText.innerText = summary;
+        this.amount.value = amount;
+        this.#amountText.innerText = formatDecimal(new Decimal(amount));
+        this.validate();
+    }
+}
+
+/**
+ * The journal entry form.
+ *
+ */
+class JournalEntryForm {
+
+    /**
+     * The journal entry form
+     * @type {HTMLFormElement}
+     */
+    #element;
+
+    /**
+     * The bootstrap modal
+     * @type {HTMLDivElement}
+     */
+    #modal;
+
+    /**
+     * The control of the account
+     * @type {HTMLDivElement}
+     */
+    #accountControl;
+
+    /**
+     * The account
+     * @type {HTMLDivElement}
+     */
+    #account;
+
+    /**
+     * The error message of the account
+     * @type {HTMLDivElement}
+     */
+    #accountError;
+
+    /**
+     * The control of the summary
+     * @type {HTMLDivElement}
+     */
+    #summaryControl;
+
+    /**
+     * The summary
+     * @type {HTMLDivElement}
+     */
+    #summary;
+
+    /**
+     * The error message of the summary
+     * @type {HTMLDivElement}
+     */
+    #summaryError;
+
+    /**
+     * The amount
+     * @type {HTMLInputElement}
+     */
+    #amount;
+
+    /**
+     * The error message of the amount
+     * @type {HTMLDivElement}
+     */
+    #amountError;
+
+    /**
+     * The journal entry to edit
+     * @type {JournalEntrySubForm|null}
+     */
+    #entry;
+
+    /**
+     * The debit or credit entry side sub-form, when adding a new entry
+     * @type {DebitCreditSideSubForm}
+     */
+    #side;
+
+    /**
+     * Constructs a new journal entry form.
+     *
+     */
+    constructor() {
+        this.#element = document.getElementById("accounting-entry-form");
+        this.#modal = document.getElementById("accounting-entry-form-modal");
+        this.#accountControl = document.getElementById("accounting-entry-form-account-control");
+        this.#account = document.getElementById("accounting-entry-form-account");
+        this.#accountError = document.getElementById("accounting-entry-form-account-error")
+        this.#summaryControl = document.getElementById("accounting-entry-form-summary-control");
+        this.#summary = document.getElementById("accounting-entry-form-summary");
+        this.#summaryError = document.getElementById("accounting-entry-form-summary-error");
+        this.#amount = document.getElementById("accounting-entry-form-amount");
+        this.#amountError = document.getElementById("accounting-entry-form-amount-error");
+        this.#element.onsubmit = () => {
+            if (this.#validate()) {
+                if (this.#entry === null) {
+                    this.#entry = this.#side.addJournalEntry();
+                }
+                this.#entry.save(this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
+                this.#side.updateTotal();
+                this.#side.currency.validateBalance();
+                bootstrap.Modal.getInstance(this.#modal).hide();
+            }
+            return false;
+        };
+    }
+
+    /**
+     * Validates the form.
+     *
+     * @returns {boolean} true if valid, or false otherwise
+     */
+    #validate() {
+        let isValid = true;
+        isValid = this.#validateAccount() && isValid;
+        isValid = this.#validateSummary() && isValid;
+        isValid = this.#validateAmount() && isValid
+        return isValid;
+    }
+
+    /**
+     * Validates the account.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     */
+    #validateAccount() {
+        if (this.#account.dataset.code === "") {
+            this.#accountControl.classList.add("is-invalid");
+            this.#accountError.innerText = A_("Please select the account.");
+            return false;
+        }
+        this.#accountControl.classList.remove("is-invalid");
+        this.#accountError.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the summary.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     * @private
+     */
+    #validateSummary() {
+        this.#summary.classList.remove("is-invalid");
+        this.#summaryError.innerText = "";
+        return true;
+    }
+
+    /**
+     * Validates the amount.
+     *
+     * @return {boolean} true if valid, or false otherwise
+     * @private
+     */
+    #validateAmount() {
+        this.#amount.value = this.#amount.value.trim();
+        this.#amount.classList.remove("is-invalid");
+        if (this.#amount.value === "") {
+            this.#amount.classList.add("is-invalid");
+            this.#amountError.innerText = A_("Please fill in the amount.");
+            return false;
+        }
+        this.#amount.classList.remove("is-invalid");
+        this.#amount.innerText = "";
+        return true;
+    }
+
+    /**
+     * Adds a new journal entry.
+     *
+     * @param side {DebitCreditSideSubForm} the debit or credit side sub-form
+     */
+    #onAddNew(side) {
+        this.#entry = null;
+        this.#side = side;
+        this.#element.dataset.entryType = side.entryType;
+        this.#accountControl.classList.remove("accounting-not-empty");
+        this.#accountControl.classList.remove("is-invalid");
+        this.#account.innerText = "";
+        this.#account.dataset.code = "";
+        this.#account.dataset.text = "";
+        this.#accountError.innerText = "";
+        this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + side.entryType + "-modal";
+        this.#summaryControl.classList.remove("accounting-not-empty");
+        this.#summaryControl.classList.remove("is-invalid");
+        this.#summary.dataset.value = "";
+        this.#summary.innerText = ""
+        this.#summaryError.innerText = ""
+        this.#amount.value = "";
+        this.#amount.classList.remove("is-invalid");
+        this.#amountError.innerText = "";
+    }
+
+    /**
+     * Edits a journal entry.
+     *
+     * @param entry {JournalEntrySubForm} the journal entry sub-form
+     * @param accountCode {string} the account code
+     * @param accountText {string} the account text
+     * @param summary {string} the summary
+     * @param amount {string} the amount
+     */
+    #onEdit(entry, accountCode, accountText, summary, amount) {
+        this.#entry = entry;
+        this.#side = entry.side;
+        this.#element.dataset.entryType = entry.entryType;
+        if (accountCode === "") {
+            this.#accountControl.classList.remove("accounting-not-empty");
+        } else {
+            this.#accountControl.classList.add("accounting-not-empty");
+        }
+        this.#account.innerText = accountText;
+        this.#account.dataset.code = accountCode;
+        this.#account.dataset.text = accountText;
+        this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + entry.entryType + "-modal";
+        if (summary === "") {
+            this.#summaryControl.classList.remove("accounting-not-empty");
+        } else {
+            this.#summaryControl.classList.add("accounting-not-empty");
+        }
+        this.#summary.dataset.value = summary;
+        this.#summary.innerText = summary;
+        this.#amount.value = amount;
+    }
+
+    /**
+     * The journal entry form
+     * @type {JournalEntryForm}
+     */
+    static #form;
+
+    /**
+     * Initializes the journal entry form.
+     *
+     */
+    static initialize() {
+        this.#form = new JournalEntryForm();
+    }
+
+    /**
+     * Adds a new journal entry.
+     *
+     * @param side {DebitCreditSideSubForm} the debit or credit side sub-form
+     */
+    static addNew(side) {
+        this.#form.#onAddNew(side);
+    }
+
+    /**
+     * Edits a journal entry.
+     *
+     * @param entry {JournalEntrySubForm} the journal entry sub-form
+     * @param accountCode {string} the account code
+     * @param accountText {string} the account text
+     * @param summary {string} the summary
+     * @param amount {string} the amount
+     */
+    static edit(entry, accountCode, accountText, summary, amount) {
+        this.#form.#onEdit(entry, accountCode, accountText, summary, amount);
+    }
+
+    /**
+     * Validates the account when the account is updated from the account selector.
+     *
+     */
+    static validateAccount() {
+        this.#form.#validateAccount();
+    }
+}
 
 /**
  * Escapes the HTML special characters and returns.
@@ -57,624 +1074,4 @@ function formatDecimal(number) {
     const frac = number.modulo(1);
     const whole = Number(number.minus(frac)).toLocaleString();
     return whole + String(frac).substring(1);
-}
-
-/**
- * Initializes the currency forms.
- *
- * @private
- */
-function initializeCurrencyForms() {
-    const form = document.getElementById("accounting-form");
-    const btnNew = document.getElementById("accounting-btn-new-currency");
-    const currencyList = document.getElementById("accounting-currency-list");
-    const deleteButtons = Array.from(document.getElementsByClassName("accounting-btn-delete-currency"));
-    const onReorder = () => {
-        const currencies = Array.from(currencyList.children);
-        for (let i = 0; i < currencies.length; i++) {
-            const no = document.getElementById(currencies[i].dataset.prefix + "-no");
-            no.value = String(i + 1);
-        }
-    };
-    btnNew.onclick = () => {
-        const currencies = Array.from(document.getElementsByClassName("accounting-currency"));
-        let maxIndex = 0;
-        for (const currency of currencies) {
-            const index = parseInt(currency.dataset.index);
-            if (maxIndex < index) {
-                maxIndex = index;
-            }
-        }
-        const newIndex = String(maxIndex + 1);
-        const html = form.dataset.currencyTemplate
-            .replaceAll("CURRENCY_INDEX", escapeHtml(newIndex));
-        currencyList.insertAdjacentHTML("beforeend", html);
-        const newEntryButtons = Array.from(document.getElementsByClassName("accounting-currency-" + newIndex + "-btn-new-entry"));
-        const btnDelete = document.getElementById("accounting-btn-delete-currency-" + newIndex);
-        newEntryButtons.forEach(initializeNewEntryButton);
-        initializeBtnDeleteCurrency(btnDelete);
-        resetDeleteCurrencyButtons();
-        initializeDragAndDropReordering(currencyList, onReorder);
-    };
-    deleteButtons.forEach(initializeBtnDeleteCurrency);
-    initializeDragAndDropReordering(currencyList, onReorder);
-}
-
-/**
- * Initializes the button to delete a currency.
- *
- * @param button {HTMLButtonElement} the button to delete a currency.
- * @private
- */
-function initializeBtnDeleteCurrency(button) {
-    const target = document.getElementById(button.dataset.target);
-    button.onclick = () => {
-        target.parentElement.removeChild(target);
-        resetDeleteCurrencyButtons();
-    };
-}
-
-/**
- * Resets the status of the delete currency buttons.
- *
- * @private
- */
-function resetDeleteCurrencyButtons() {
-    const buttons = Array.from(document.getElementsByClassName("accounting-btn-delete-currency"));
-    if (buttons.length > 1) {
-        for (const button of buttons) {
-            button.classList.remove("d-none");
-        }
-    } else {
-        buttons[0].classList.add("d-none");
-    }
-}
-
-/**
- * Initializes the journal entry forms.
- *
- * @private
- */
-function initializeJournalEntries() {
-    const newButtons = Array.from(document.getElementsByClassName("accounting-btn-new-entry"));
-    const entryLists = Array.from(document.getElementsByClassName("accounting-entry-list"));
-    const entries = Array.from(document.getElementsByClassName("accounting-entry"))
-    const deleteButtons = Array.from(document.getElementsByClassName("accounting-btn-delete-entry"));
-    newButtons.forEach(initializeNewEntryButton);
-    entryLists.forEach(initializeJournalEntryListReorder);
-    entries.forEach(initializeJournalEntry);
-    deleteButtons.forEach(initializeDeleteJournalEntryButton);
-    initializeJournalEntryFormModal();
-}
-
-/**
- * Initializes the button to add a new journal entry.
- *
- * @param button {HTMLButtonElement} the button to add a new journal entry
- */
-function initializeNewEntryButton(button) {
-    const entryForm = document.getElementById("accounting-entry-form");
-    const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-    const formAccount = document.getElementById("accounting-entry-form-account");
-    const formAccountError = document.getElementById("accounting-entry-form-account-error")
-    const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
-    const formSummary = document.getElementById("accounting-entry-form-summary");
-    const formSummaryError = document.getElementById("accounting-entry-form-summary-error");
-    const formAmount = document.getElementById("accounting-entry-form-amount");
-    const formAmountError = document.getElementById("accounting-entry-form-amount-error");
-    button.onclick = () => {
-        entryForm.dataset.currencyIndex = button.dataset.currencyIndex;
-        entryForm.dataset.entryType = button.dataset.entryType;
-        entryForm.dataset.entryIndex = button.dataset.entryIndex;
-        formAccountControl.classList.remove("accounting-not-empty");
-        formAccountControl.classList.remove("is-invalid");
-        formAccount.innerText = "";
-        formAccount.dataset.code = "";
-        formAccount.dataset.text = "";
-        formAccountError.innerText = "";
-        formSummaryControl.dataset.bsTarget = "#accounting-summary-editor-" + button.dataset.entryType + "-modal";
-        formSummaryControl.classList.remove("accounting-not-empty");
-        formSummaryControl.classList.remove("is-invalid");
-        formSummary.dataset.value = "";
-        formSummary.innerText = ""
-        formSummaryError.innerText = ""
-        formAmount.value = "";
-        formAmount.classList.remove("is-invalid");
-        formAmountError.innerText = "";
-        AccountSelector.initializeJournalEntryForm();
-        SummaryEditor.initializeNewJournalEntry(button.dataset.entryType);
-    };
-}
-
-/**
- * Initializes the reordering of a journal entry list.
- *
- * @param entryList {HTMLUListElement} the journal entry list.
- */
-function initializeJournalEntryListReorder(entryList) {
-    initializeDragAndDropReordering(entryList, () => {
-        const entries = Array.from(entryList.children);
-        for (let i = 0; i < entries.length; i++) {
-            const no = document.getElementById(entries[i].dataset.prefix + "-no");
-            no.value = String(i + 1);
-        }
-    });
-}
-
-/**
- * Initializes the journal entry.
- *
- * @param entry {HTMLLIElement} the journal entry.
- */
-function initializeJournalEntry(entry) {
-    const entryForm = document.getElementById("accounting-entry-form");
-    const accountCode = document.getElementById(entry.dataset.prefix + "-account-code");
-    const summary = document.getElementById(entry.dataset.prefix + "-summary");
-    const amount = document.getElementById(entry.dataset.prefix + "-amount");
-    const control = document.getElementById(entry.dataset.prefix + "-control");
-    const formAccountControl = document.getElementById("accounting-entry-form-account-control");
-    const formAccount = document.getElementById("accounting-entry-form-account");
-    const formSummaryControl = document.getElementById("accounting-entry-form-summary-control");
-    const formSummary = document.getElementById("accounting-entry-form-summary");
-    const formAmount = document.getElementById("accounting-entry-form-amount");
-    control.onclick = () => {
-        entryForm.dataset.currencyIndex = entry.dataset.currencyIndex;
-        entryForm.dataset.entryType = entry.dataset.entryType;
-        entryForm.dataset.entryIndex = entry.dataset.entryIndex;
-        if (accountCode.value === "") {
-            formAccountControl.classList.remove("accounting-not-empty");
-        } else {
-            formAccountControl.classList.add("accounting-not-empty");
-        }
-        formAccount.innerText = accountCode.dataset.text;
-        formAccount.dataset.code = accountCode.value;
-        formAccount.dataset.text = accountCode.dataset.text;
-        formSummaryControl.dataset.bsTarget = "#accounting-summary-editor-" + entry.dataset.entryType + "-modal";
-        if (summary.value === "") {
-            formSummaryControl.classList.remove("accounting-not-empty");
-        } else {
-            formSummaryControl.classList.add("accounting-not-empty");
-        }
-        formSummary.dataset.value = summary.value;
-        formSummary.innerText = summary.value;
-        formAmount.value = amount.value;
-        AccountSelector.initializeJournalEntryForm();
-        validateJournalEntryForm();
-    };
-}
-
-/**
- * Initializes the journal entry form modal.
- *
- * @private
- */
-function initializeJournalEntryFormModal() {
-    const entryForm = document.getElementById("accounting-entry-form");
-    const formAmount = document.getElementById("accounting-entry-form-amount");
-    const modal = document.getElementById("accounting-entry-form-modal");
-    formAmount.onchange = validateJournalEntryAmount;
-    entryForm.onsubmit = () => {
-        if (validateJournalEntryForm()) {
-            saveJournalEntryForm();
-            bootstrap.Modal.getInstance(modal).hide();
-        }
-        return false;
-    }
-}
-
-/**
- * Validates the journal entry form modal.
- *
- * @return {boolean} true if the form is valid, or false otherwise.
- * @private
- */
-function validateJournalEntryForm() {
-    let isValid = true;
-    isValid = validateJournalEntryAccount() && isValid;
-    isValid = validateJournalEntrySummary() && isValid;
-    isValid = validateJournalEntryAmount() && isValid
-    return isValid;
-}
-
-/**
- * Validates the account in the journal entry form modal.
- *
- * @return {boolean} true if valid, or false otherwise
- */
-function validateJournalEntryAccount() {
-    const field = document.getElementById("accounting-entry-form-account");
-    const error = document.getElementById("accounting-entry-form-account-error");
-    const control = document.getElementById("accounting-entry-form-account-control");
-    if (field.dataset.code === "") {
-        control.classList.add("is-invalid");
-        error.innerText = A_("Please select the account.");
-        return false;
-    }
-    control.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates the summary in the journal entry form modal.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateJournalEntrySummary() {
-    const control = document.getElementById("accounting-entry-form-summary-control");
-    const error = document.getElementById("accounting-entry-form-summary-error");
-    control.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates the amount in the journal entry form modal.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateJournalEntryAmount() {
-    const field = document.getElementById("accounting-entry-form-amount");
-    const error = document.getElementById("accounting-entry-form-amount-error");
-    field.value = field.value.trim();
-    field.classList.remove("is-invalid");
-    if (field.value === "") {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please fill in the amount.");
-        return false;
-    }
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Saves the journal entry form modal to the form.
- *
- * @private
- */
-function saveJournalEntryForm() {
-    const form = document.getElementById("accounting-form");
-    const entryForm = document.getElementById("accounting-entry-form");
-    const formAccount = document.getElementById("accounting-entry-form-account");
-    const formSummary = document.getElementById("accounting-entry-form-summary");
-    const formAmount = document.getElementById("accounting-entry-form-amount");
-    const currencyIndex = entryForm.dataset.currencyIndex;
-    const entryType = entryForm.dataset.entryType;
-    let entryIndex;
-    if (entryForm.dataset.entryIndex === "new") {
-        const entries = Array.from(document.getElementsByClassName("accounting-currency-" + currencyIndex + "-" + entryType));
-        const entryList = document.getElementById("accounting-currency-" + currencyIndex + "-" + entryType + "-list")
-        let maxIndex = 0;
-        for (const entry of entries) {
-            const index = parseInt(entry.dataset.entryIndex);
-            if (maxIndex < index) {
-                maxIndex = index;
-            }
-        }
-        entryIndex = String(maxIndex + 1);
-        const html = form.dataset.entryTemplate
-            .replaceAll("CURRENCY_INDEX", escapeHtml(currencyIndex))
-            .replaceAll("ENTRY_TYPE", escapeHtml(entryType))
-            .replaceAll("ENTRY_INDEX", escapeHtml(entryIndex));
-        entryList.insertAdjacentHTML("beforeend", html);
-        initializeJournalEntryListReorder(entryList);
-    } else {
-        entryIndex = entryForm.dataset.entryIndex;
-    }
-    const currency = document.getElementById("accounting-currency-" + currencyIndex);
-    const entry = document.getElementById("accounting-currency-" + currencyIndex + "-" + entryType + "-" + entryIndex);
-    const accountCode = document.getElementById(entry.dataset.prefix + "-account-code");
-    const accountText = document.getElementById(entry.dataset.prefix + "-account-text");
-    const summary = document.getElementById(entry.dataset.prefix + "-summary");
-    const summaryText = document.getElementById(entry.dataset.prefix + "-summary-text");
-    const amount = document.getElementById(entry.dataset.prefix + "-amount");
-    const amountText = document.getElementById(entry.dataset.prefix + "-amount-text");
-    accountCode.value = formAccount.dataset.code;
-    accountCode.dataset.text = formAccount.dataset.text;
-    accountText.innerText = formAccount.dataset.text;
-    summary.value = formSummary.dataset.value;
-    summaryText.innerText = formSummary.dataset.value;
-    amount.value = formAmount.value;
-    amountText.innerText = formatDecimal(new Decimal(formAmount.value));
-    if (entryForm.dataset.entryIndex === "new") {
-        const btnDelete = document.getElementById(entry.dataset.prefix + "-btn-delete");
-        initializeJournalEntry(entry);
-        initializeDeleteJournalEntryButton(btnDelete);
-        resetDeleteJournalEntryButtons(btnDelete.dataset.sameClass);
-    }
-    updateBalance(currencyIndex, entryType);
-    validateJournalEntriesReal(currencyIndex, entryType);
-    validateBalance(currency);
-}
-
-/**
- * Initializes the button to delete a journal entry.
- *
- * @param button {HTMLButtonElement} the button to delete a journal entry
- */
-function initializeDeleteJournalEntryButton(button) {
-    const target = document.getElementById(button.dataset.target);
-    const currencyIndex = target.dataset.currencyIndex;
-    const entryType = target.dataset.entryType;
-    const currency = document.getElementById("accounting-currency-" + currencyIndex);
-    button.onclick = () => {
-        target.parentElement.removeChild(target);
-        resetDeleteJournalEntryButtons(button.dataset.sameClass);
-        updateBalance(currencyIndex, entryType);
-        validateJournalEntriesReal(currencyIndex, entryType);
-        validateBalance(currency);
-    };
-}
-
-/**
- * Resets the status of the delete journal entry buttons.
- *
- * @param sameClass {string} the class of the buttons
- * @private
- */
-function resetDeleteJournalEntryButtons(sameClass) {
-    const buttons = Array.from(document.getElementsByClassName(sameClass));
-    if (buttons.length > 1) {
-        for (const button of buttons) {
-            button.classList.remove("d-none");
-        }
-    } else {
-        buttons[0].classList.add("d-none");
-    }
-}
-
-/**
- * Updates the balance.
- *
- * @param currencyIndex {string} the currency index.
- * @param entryType {string} the journal entry type, either "debit" or "credit"
- * @private
- */
-function updateBalance(currencyIndex, entryType) {
-    const prefix = "accounting-currency-" + currencyIndex + "-" + entryType;
-    const amounts = Array.from(document.getElementsByClassName(prefix + "-amount"));
-    const totalText = document.getElementById(prefix + "-total");
-    let total = new Decimal("0");
-    for (const amount of amounts) {
-        if (amount.value !== "") {
-            total = total.plus(new Decimal(amount.value));
-        }
-    }
-    totalText.innerText = formatDecimal(total);
-}
-
-/**
- * Initializes the form validation.
- *
- * @private
- */
-function initializeFormValidation() {
-    const date = document.getElementById("accounting-date");
-    const note = document.getElementById("accounting-note");
-    const form = document.getElementById("accounting-form");
-    date.onchange = validateDate;
-    note.onchange = validateNote;
-    form.onsubmit = validateForm;
-}
-
-/**
- * Validates the form.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateForm() {
-    let isValid = true;
-    isValid = validateDate() && isValid;
-    isValid = validateCurrencies() && isValid;
-    isValid = validateNote() && isValid;
-    return isValid;
-}
-
-/**
- * Validates the date.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateDate() {
-    const field = document.getElementById("accounting-date");
-    const error = document.getElementById("accounting-date-error");
-    field.value = field.value.trim();
-    field.classList.remove("is-invalid");
-    if (field.value === "") {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please fill in the date.");
-        return false;
-    }
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates the currency sub-forms.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateCurrencies() {
-    const currencies = Array.from(document.getElementsByClassName("accounting-currency"));
-    let isValid = true;
-    isValid = validateCurrenciesReal() && isValid;
-    for (const currency of currencies) {
-        isValid = validateCurrency(currency) && isValid;
-    }
-    return isValid;
-}
-
-/**
- * Validates the currency sub-forms, the validator itself.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateCurrenciesReal() {
-    const field = document.getElementById("accounting-currencies");
-    const error = document.getElementById("accounting-currencies-error");
-    const currencies = Array.from(document.getElementsByClassName("accounting-currency"));
-    if (currencies.length === 0) {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please add some currencies.");
-        return false;
-    }
-    field.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates a currency sub-form.
- *
- * @param currency {HTMLDivElement} the currency sub-form
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateCurrency(currency) {
-    const prefix = "accounting-currency-" + currency.dataset.index;
-    const debit = document.getElementById(prefix + "-debit");
-    const credit = document.getElementById(prefix + "-credit");
-    let isValid = true;
-    if (debit !== null) {
-        isValid = validateJournalEntries(currency, "debit") && isValid;
-    }
-    if (credit !== null) {
-        isValid = validateJournalEntries(currency, "credit") && isValid;
-    }
-    if (debit !== null && credit !== null) {
-        isValid = validateBalance(currency) && isValid;
-    }
-    return isValid;
-}
-
-/**
- * Validates the journal entries in a currency sub-form.
- *
- * @param currency {HTMLDivElement} the currency
- * @param entryType {string} the journal entry type, either "debit" or "credit"
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateJournalEntries(currency, entryType) {
-    const currencyIndex = currency.dataset.index;
-    const entries = Array.from(document.getElementsByClassName("accounting-currency-" + currencyIndex + "-" + entryType));
-    let isValid = true;
-    isValid = validateJournalEntriesReal(currencyIndex, entryType) && isValid;
-    for (const entry of entries) {
-        isValid = validateJournalEntry(entry) && isValid;
-    }
-    return isValid;
-}
-
-/**
- * Validates the journal entries, the validator itself.
- *
- * @param currencyIndex {string} the currency index
- * @param entryType {string} the journal entry type, either "debit" or "credit"
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateJournalEntriesReal(currencyIndex, entryType) {
-    const prefix = "accounting-currency-" + currencyIndex + "-" + entryType;
-    const field = document.getElementById(prefix);
-    const error = document.getElementById(prefix + "-error");
-    const entries = Array.from(document.getElementsByClassName(prefix));
-    if (entries.length === 0) {
-        field.classList.add("is-invalid");
-        error.innerText = A_("Please add some journal entries.");
-        return false;
-    }
-    field.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates a journal entry sub-form in a currency sub-form.
- *
- * @param entry {HTMLLIElement} the journal entry
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateJournalEntry(entry) {
-    const control = document.getElementById(entry.dataset.prefix + "-control");
-    const error = document.getElementById(entry.dataset.prefix + "-error");
-    const accountCode = document.getElementById(entry.dataset.prefix + "-account-code");
-    const amount = document.getElementById(entry.dataset.prefix + "-amount");
-    if (accountCode.value === "") {
-        control.classList.add("is-invalid");
-        error.innerText = A_("Please select the account.");
-        return false;
-    }
-    if (amount.value === "") {
-        control.classList.add("is-invalid");
-        error.innerText = A_("Please fill in the amount.");
-        return false;
-    }
-    control.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-/**
- * Validates the balance of a currency sub-form.
- *
- * @param currency {HTMLDivElement} the currency sub-form
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateBalance(currency) {
-    const prefix = "accounting-currency-" + currency.dataset.index;
-    const control = document.getElementById(prefix + "-control");
-    const error = document.getElementById(prefix + "-error");
-    const debit = document.getElementById(prefix + "-debit");
-    const debitAmounts = Array.from(document.getElementsByClassName(prefix + "-debit-amount"));
-    const credit = document.getElementById(prefix + "-credit");
-    const creditAmounts = Array.from(document.getElementsByClassName(prefix + "-credit-amount"));
-    if (debit !== null && credit !== null) {
-        let debitTotal = new Decimal("0");
-        for (const amount of debitAmounts) {
-            if (amount.value !== "") {
-                debitTotal = debitTotal.plus(new Decimal(amount.value));
-            }
-        }
-        let creditTotal = new Decimal("0");
-        for (const amount of creditAmounts) {
-            if (amount.value !== "") {
-                creditTotal = creditTotal.plus(new Decimal(amount.value));
-            }
-        }
-        if (!debitTotal.equals(creditTotal)) {
-            control.classList.add("is-invalid");
-            error.innerText = A_("The totals of the debit and credit amounts do not match.");
-            return false;
-        }
-    }
-    control.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
-}
-
-
-/**
- * Validates the note.
- *
- * @return {boolean} true if valid, or false otherwise
- * @private
- */
-function validateNote() {
-    const field = document.getElementById("accounting-note");
-    const error = document.getElementById("accounting-note-error");
-    field.value = field.value
-         .replace(/^\s*\n/, "")
-         .trimEnd();
-    field.classList.remove("is-invalid");
-    error.innerText = "";
-    return true;
 }

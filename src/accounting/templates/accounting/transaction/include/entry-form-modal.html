@@ -19,7 +19,7 @@ entry-form-modal.html: The modal of the journal entry sub-form
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
-<form id="accounting-entry-form" data-currency-index="" data-entry-type="" data-entry-index="">
+<form id="accounting-entry-form" data-entry-type="">
   <div id="accounting-entry-form-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-entry-form-modal-label" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -52,7 +52,7 @@ First written: 2023/2/25
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>
-          <button id="accounting-entry-form-btn-save" type="submit" class="btn btn-primary">{{ A_("Save") }}</button>
+          <button type="submit" class="btn btn-primary">{{ A_("Save") }}</button>
         </div>
       </div>
     </div>
