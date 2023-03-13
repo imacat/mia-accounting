@@ -20,7 +20,7 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
 {# <ul> For SonarQube not to complain about incorrect HTML #}
-<li id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}" class="list-group-item list-group-item-action d-flex justify-content-between accounting-entry accounting-currency-{{ currency_index }}-{{ entry_type }}" data-currency-index="{{ currency_index }}" data-entry-type="{{ entry_type }}" data-entry-index="{{ entry_index }}" data-prefix="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}">
+<li id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}" class="list-group-item list-group-item-action d-flex justify-content-between accounting-entry accounting-currency-{{ currency_index }}-{{ entry_type }}" data-currency-index="{{ currency_index }}" data-entry-type="{{ entry_type }}" data-entry-index="{{ entry_index }}">
   {% if entry_id %}
     <input type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-eid" value="{{ entry_id }}">
   {% endif %}
