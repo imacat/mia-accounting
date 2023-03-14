@@ -38,3 +38,4 @@ excludes
 *.mo
 zh_Hans
 test_temp.py
+dummy.js
