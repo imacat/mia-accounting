@@ -17,8 +17,6 @@
 """The transaction forms for the transaction management.
 
 """
-from __future__ import annotations
-
 import typing as t
 from abc import ABC, abstractmethod
 
