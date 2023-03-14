@@ -17,8 +17,6 @@
 """The journal entry sub-forms for the transaction management.
 
 """
-from __future__ import annotations
-
 import re
 
 from flask_babel import LazyString

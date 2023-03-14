@@ -17,8 +17,6 @@
 """The reorder forms for the transaction management.
 
 """
-from __future__ import annotations
-
 from datetime import date
 
 from flask import request

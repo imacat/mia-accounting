@@ -17,8 +17,6 @@
 """The account option for the transaction management.
 
 """
-from __future__ import annotations
-
 from accounting.models import Account
 
 
