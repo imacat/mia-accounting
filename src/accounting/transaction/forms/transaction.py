@@ -51,8 +51,7 @@ class NeedSomeCurrencies:
 
     def __call__(self, form: FlaskForm, field: FieldList) -> None:
         if len(field) == 0:
-            raise ValidationError(lazy_gettext(
-                "Please add some currencies."))
+            raise ValidationError(lazy_gettext("Please add some currencies."))
 
 
 class TransactionForm(FlaskForm):
