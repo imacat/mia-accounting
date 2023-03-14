@@ -183,4 +183,3 @@ def __get_detail_uri(currency: Currency) -> str:
     :return: The detail URI of the currency.
     """
     return url_for("accounting.currency.detail", currency=currency)
-
