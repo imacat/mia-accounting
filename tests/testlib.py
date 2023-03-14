@@ -18,13 +18,39 @@
 
 """
 import typing as t
-from html.parser import HTMLParser
 
 import httpx
-from flask import Flask
+from flask import Flask, render_template_string
+
+from test_site import create_app
 
 TEST_SERVER: str = "https://testserver"
 """The test server URI."""
+
+
+def create_test_app() -> Flask:
+    """Creates and returns the testing Flask application.
+
+    :return: The testing Flask application.
+    """
+    app: Flask = create_app(is_testing=True)
+
+    @app.get("/.csrf-token")
+    def get_csrf_token_view() -> str:
+        """The test view to return the CSRF token."""
+        return render_template_string("{{csrf_token()}}")
+
+    return app
+
+
+def get_csrf_token(client: httpx.Client) -> str:
+    """Returns the CSRF token.
+
+    :param client: The httpx client.
+    :return: The CSRF token.
+    """
+    return client.get("/.csrf-token").text
+
 
 
 def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
@@ -36,45 +62,13 @@ def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
     """
     client: httpx.Client = httpx.Client(app=app, base_url=TEST_SERVER)
     client.headers["Referer"] = TEST_SERVER
-    csrf_token: str = get_csrf_token(client, "/login")
+    csrf_token: str = get_csrf_token(client)
     response: httpx.Response = client.post("/login",
                                            data={"csrf_token": csrf_token,
                                                  "username": username})
     assert response.status_code == 302
     assert response.headers["Location"] == "/"
     return client, csrf_token
-
-
-def get_csrf_token(client: httpx.Client, uri: str) -> str:
-    """Returns the CSRF token from a form in a URI.
-
-    :param client: The httpx client.
-    :param uri: The URI.
-    :return: The CSRF token.
-    """
-
-    class CsrfParser(HTMLParser):
-        """The CSRF token parser."""
-
-        def __init__(self):
-            """Constructs the CSRF token parser."""
-            super().__init__()
-            self.csrf_token: str | None = None
-            """The CSRF token."""
-
-        def handle_starttag(self, tag: str,
-                            attrs: list[tuple[str, str | None]]) -> None:
-            """Handles when a start tag is found."""
-            attrs_dict: dict[str, str] = dict(attrs)
-            if attrs_dict.get("name") == "csrf_token":
-                self.csrf_token = attrs_dict["value"]
-
-    response: httpx.Response = client.get(uri)
-    assert response.status_code == 200
-    parser: CsrfParser = CsrfParser()
-    parser.feed(response.text)
-    assert parser.csrf_token is not None
-    return parser.csrf_token
 
 
 def set_locale(client: httpx.Client, csrf_token: str,

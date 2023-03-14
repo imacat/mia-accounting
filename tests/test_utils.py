@@ -21,13 +21,12 @@ import unittest
 from urllib.parse import quote_plus
 
 import httpx
-from flask import Flask, request, render_template_string
+from flask import Flask, request
 
 from accounting.utils.next_uri import append_next, inherit_next, or_next
 from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
-from test_site import create_app
-from testlib import TEST_SERVER
+from testlib import TEST_SERVER, create_test_app, get_csrf_token
 
 
 class NextUriTestCase(unittest.TestCase):
@@ -40,12 +39,7 @@ class NextUriTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
-
-        @self.app.get("/test-csrf")
-        def test_csrf() -> str:
-            """The test view to return the CSRF token."""
-            return render_template_string("{{csrf_token()}}")
+        self.app: Flask = create_test_app()
 
     def test_next_uri(self) -> None:
         """Tests the next URI utilities with the next URI.
@@ -69,7 +63,7 @@ class NextUriTestCase(unittest.TestCase):
                               methods=["GET", "POST"])
         client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
-        csrf_token: str = client.get("/test-csrf").text
+        csrf_token: str = get_csrf_token(client)
         response: httpx.Response
 
         response = client.get("/test-next?next=/next&q=abc&page-no=4")
@@ -98,7 +92,7 @@ class NextUriTestCase(unittest.TestCase):
                               methods=["GET", "POST"])
         client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
-        csrf_token: str = client.get("/test-csrf").text
+        csrf_token: str = get_csrf_token(client)
         response: httpx.Response
 
         response = client.get("/test-no-next?q=abc&page-no=4")
@@ -171,7 +165,7 @@ class PaginationTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
         self.params = self.Params([], None, [], True)
 
         @self.app.get("/test-pagination")

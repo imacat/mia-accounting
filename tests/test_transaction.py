@@ -26,8 +26,8 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from test_site import create_app, db
-from testlib import get_client
+from test_site import db
+from testlib import create_test_app, get_client
 from testlib_txn import Accounts, get_add_form, get_unchanged_update_form, \
     get_update_form, match_txn_detail, set_negative_amount, \
     remove_debit_in_a_currency, remove_credit_in_a_currency, NEXT_URI, \
@@ -48,7 +48,7 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
@@ -600,7 +600,7 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
@@ -1159,7 +1159,7 @@ class TransferTransactionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
@@ -1973,7 +1973,7 @@ class TransactionReorderTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():

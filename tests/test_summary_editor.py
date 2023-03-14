@@ -24,8 +24,7 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from test_site import create_app
-from testlib import get_client
+from testlib import create_test_app, get_client
 from testlib_txn import Accounts, NEXT_URI, add_txn
 
 
@@ -38,7 +37,7 @@ class SummeryEditorTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():

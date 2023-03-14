@@ -26,8 +26,7 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from test_site import create_app
-from testlib import get_client
+from testlib import create_test_app, get_client
 
 LIST_URI: str = "/accounting/base-accounts"
 """The list URI."""
@@ -45,7 +44,7 @@ class BaseAccountCommandTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import BaseAccount, BaseAccountL10n
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
@@ -98,7 +97,7 @@ class BaseAccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import BaseAccount
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():

@@ -26,8 +26,8 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from test_site import create_app, db
-from testlib import get_client, set_locale
+from test_site import db
+from testlib import create_test_app, get_client, set_locale
 
 NEXT_URI: str = "/_next"
 """The next URI."""
@@ -74,7 +74,7 @@ class AccountCommandTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
@@ -127,7 +127,7 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_app(is_testing=True)
+        self.app: Flask = create_test_app()
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
