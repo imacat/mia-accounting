@@ -36,6 +36,7 @@ from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.urls import ledger_url
+from accounting.utils.cast import be
 from accounting.utils.pagination import Pagination
 
 
@@ -116,8 +117,8 @@ class EntryCollector:
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount))
         select: sa.Select = sa.Select(balance_func).join(Transaction)\
-            .filter(JournalEntry.currency_code == self.__currency.code,
-                    JournalEntry.account_id == self.__account.id,
+            .filter(be(JournalEntry.currency_code == self.__currency.code),
+                    be(JournalEntry.account_id == self.__account.id),
                     Transaction.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
@@ -303,7 +304,7 @@ class PageParams(BasePageParams):
         :return: The account options.
         """
         in_use: sa.Select = sa.Select(JournalEntry.account_id)\
-            .filter(JournalEntry.currency_code == self.currency.code)\
+            .filter(be(JournalEntry.currency_code == self.currency.code))\
             .group_by(JournalEntry.account_id)
         return [OptionLink(str(x), ledger_url(self.currency, x, self.period),
                            x.id == self.account.id)

@@ -27,6 +27,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency
+from accounting.utils.cast import s
 from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
@@ -88,7 +89,7 @@ def add_currency() -> redirect:
     form.populate_obj(currency)
     db.session.add(currency)
     db.session.commit()
-    flash(lazy_gettext("The currency is added successfully"), "success")
+    flash(s(lazy_gettext("The currency is added successfully")), "success")
     return redirect(inherit_next(__get_detail_uri(currency)))
 
 
@@ -141,12 +142,12 @@ def update_currency(currency: Currency) -> redirect:
     with db.session.no_autoflush:
         form.populate_obj(currency)
     if not currency.is_modified:
-        flash(lazy_gettext("The currency was not modified."), "success")
+        flash(s(lazy_gettext("The currency was not modified.")), "success")
         return redirect(inherit_next(__get_detail_uri(currency)))
     currency.updated_by_id = get_current_user_pk()
     currency.updated_at = sa.func.now()
     db.session.commit()
-    flash(lazy_gettext("The currency is updated successfully."), "success")
+    flash(s(lazy_gettext("The currency is updated successfully.")), "success")
     return redirect(inherit_next(__get_detail_uri(currency)))
 
 
@@ -161,7 +162,7 @@ def delete_currency(currency: Currency) -> redirect:
     """
     currency.delete()
     db.session.commit()
-    flash(lazy_gettext("The currency is deleted successfully."), "success")
+    flash(s(lazy_gettext("The currency is deleted successfully.")), "success")
     return redirect(or_next(url_for("accounting.currency.list")))
 
 

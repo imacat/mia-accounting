@@ -37,6 +37,7 @@ from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.urls import income_expenses_url
+from accounting.utils.cast import be
 from accounting.utils.pagination import Pagination
 
 
@@ -120,7 +121,7 @@ class EntryCollector:
             else_=-JournalEntry.amount))
         select: sa.Select = sa.Select(balance_func)\
             .join(Transaction).join(Account)\
-            .filter(JournalEntry.currency_code == self.__currency.code,
+            .filter(be(JournalEntry.currency_code == self.__currency.code),
                     self.__account_condition,
                     Transaction.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
@@ -342,7 +343,7 @@ class PageParams(BasePageParams):
                           self.account.id == 0)]
         in_use: sa.Select = sa.Select(JournalEntry.account_id)\
             .join(Account)\
-            .filter(JournalEntry.currency_code == self.currency.code,
+            .filter(be(JournalEntry.currency_code == self.currency.code),
                     sa.or_(Account.base_code.startswith("11"),
                            Account.base_code.startswith("12"),
                            Account.base_code.startswith("21"),

@@ -27,6 +27,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Account, BaseAccount
+from accounting.utils.cast import s
 from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.pagination import Pagination
@@ -86,7 +87,7 @@ def add_account() -> redirect:
     form.populate_obj(account)
     db.session.add(account)
     db.session.commit()
-    flash(lazy_gettext("The account is added successfully"), "success")
+    flash(s(lazy_gettext("The account is added successfully")), "success")
     return redirect(inherit_next(__get_detail_uri(account)))
 
 
@@ -138,12 +139,12 @@ def update_account(account: Account) -> redirect:
     with db.session.no_autoflush:
         form.populate_obj(account)
     if not account.is_modified:
-        flash(lazy_gettext("The account was not modified."), "success")
+        flash(s(lazy_gettext("The account was not modified.")), "success")
         return redirect(inherit_next(__get_detail_uri(account)))
     account.updated_by_id = get_current_user_pk()
     account.updated_at = sa.func.now()
     db.session.commit()
-    flash(lazy_gettext("The account is updated successfully."), "success")
+    flash(s(lazy_gettext("The account is updated successfully.")), "success")
     return redirect(inherit_next(__get_detail_uri(account)))
 
 
@@ -159,7 +160,7 @@ def delete_account(account: Account) -> redirect:
     account.delete()
     sort_accounts_in(account.base_code, account.id)
     db.session.commit()
-    flash(lazy_gettext("The account is deleted successfully."), "success")
+    flash(s(lazy_gettext("The account is deleted successfully.")), "success")
     return redirect(or_next(__get_list_uri()))
 
 
@@ -186,10 +187,10 @@ def sort_accounts(base: BaseAccount) -> redirect:
     form: AccountReorderForm = AccountReorderForm(base)
     form.save_order()
     if not form.is_modified:
-        flash(lazy_gettext("The order was not modified."), "success")
+        flash(s(lazy_gettext("The order was not modified.")), "success")
         return redirect(or_next(__get_list_uri()))
     db.session.commit()
-    flash(lazy_gettext("The order is updated successfully."), "success")
+    flash(s(lazy_gettext("The order is updated successfully.")), "success")
     return redirect(or_next(__get_list_uri()))
 
 
