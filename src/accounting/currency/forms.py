@@ -17,8 +17,6 @@
 """The forms for the currency management.
 
 """
-from __future__ import annotations
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
 from wtforms.validators import DataRequired, Regexp, NoneOf
@@ -30,22 +28,25 @@ from accounting.utils.strip_text import strip_text
 from accounting.utils.user import get_current_user_pk
 
 
+class CodeUnique:
+    """The validator to check if the code is unique."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data == "":
+            return
+        if not isinstance(form, CurrencyForm):
+            return
+        if form.obj_code is not None and form.obj_code == field.data:
+            return
+        if db.session.get(Currency, field.data) is not None:
+            raise ValidationError(lazy_gettext(
+                "Code conflicts with another currency."))
+
+
 class CurrencyForm(FlaskForm):
     """The form to create or edit a currency."""
     CODE_BLOCKLIST: list[str] = ["create", "store", "exists-code"]
     """The reserved codes that are not available."""
-
-    class CodeUnique:
-        """The validator to check if the code is unique."""
-        def __call__(self, form: CurrencyForm, field: StringField) -> None:
-            if field.data == "":
-                return
-            if form.obj_code is not None and form.obj_code == field.data:
-                return
-            if db.session.get(Currency, field.data) is not None:
-                raise ValidationError(lazy_gettext(
-                    "Code conflicts with another currency."))
-
     code = StringField(
         filters=[strip_text],
         validators=[DataRequired(lazy_gettext("Please fill in the code.")),
