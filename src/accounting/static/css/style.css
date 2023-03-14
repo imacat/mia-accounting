@@ -136,9 +136,6 @@
 .accounting-list-group-stripped .list-group-item:nth-child(2n+1) {
     background-color: #f2f2f2;
 }
-.accounting-list-group-stripped .list-group-item-success:nth-child(2n+1) {
-    background-color: #c7dbd2;
-}
 .accounting-list-group-hover .list-group-item:hover {
     background-color: #ececec;
 }
