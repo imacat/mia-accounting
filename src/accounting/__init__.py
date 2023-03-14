@@ -17,7 +17,6 @@
 """The accounting application.
 
 """
-import typing as t
 from pathlib import Path
 
 from flask import Flask, Blueprint
