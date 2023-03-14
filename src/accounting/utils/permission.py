@@ -23,7 +23,7 @@ import typing as t
 
 from flask import abort, Blueprint
 
-from accounting.utils.user import get_current_user
+from accounting.utils.user import get_current_user, UserUtilityInterface
 
 
 def has_permission(rule: t.Callable[[], bool]) -> t.Callable:
@@ -87,22 +87,15 @@ def can_edit() -> bool:
     return __can_edit_func()
 
 
-def init_app(bp: Blueprint,
-             can_view_func: t.Callable[[], bool] | None = None,
-             can_edit_func: t.Callable[[], bool] | None = None) -> None:
+def init_app(bp: Blueprint, user_utils: UserUtilityInterface) -> None:
     """Initializes the application.
 
     :param bp: The blueprint of the accounting application.
-    :param can_view_func: A callback that returns whether the current user can
-        view the accounting data.
-    :param can_edit_func: A callback that returns whether the current user can
-        edit the accounting data.
+    :param user_utils: The user utilities.
     :return: None.
     """
     global __can_view_func, __can_edit_func
-    if can_view_func is not None:
-        __can_view_func = can_view_func
-    if can_edit_func is not None:
-        __can_edit_func = can_edit_func
-    bp.add_app_template_global(can_view, "accounting_can_view")
-    bp.add_app_template_global(can_edit, "accounting_can_edit")
+    __can_view_func = user_utils.can_view
+    __can_edit_func = user_utils.can_edit
+    bp.add_app_template_global(user_utils.can_view, "accounting_can_view")
+    bp.add_app_template_global(user_utils.can_edit, "accounting_can_edit")

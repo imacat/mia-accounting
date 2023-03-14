@@ -29,8 +29,26 @@ from flask_sqlalchemy.model import Model
 T = t.TypeVar("T", bound=Model)
 
 
-class AbstractUserUtils(t.Generic[T], ABC):
-    """The abstract user utilities."""
+class UserUtilityInterface(t.Generic[T], ABC):
+    """The interface for the user utilities."""
+
+    @abstractmethod
+    def can_view(self) -> bool:
+        """Returns whether the currently logged-in user can view the accounting
+        data.
+
+        :return: True if the currently logged-in user can view the accounting
+            data, or False otherwise.
+        """
+
+    @abstractmethod
+    def can_edit(self) -> bool:
+        """Returns whether the currently logged-in user can edit the accounting
+        data.
+
+        :return: True if the currently logged-in user can edit the accounting
+            data, or False otherwise.
+        """
 
     @property
     @abstractmethod
@@ -72,7 +90,7 @@ class AbstractUserUtils(t.Generic[T], ABC):
         """
 
 
-__user_utils: AbstractUserUtils
+__user_utils: UserUtilityInterface
 """The user utilities."""
 user_cls: t.Type[Model] = Model
 """The user class."""
@@ -80,7 +98,7 @@ user_pk_column: sa.Column = sa.Column(sa.Integer)
 """The primary key column of the user class."""
 
 
-def init_user_utils(utils: AbstractUserUtils) -> None:
+def init_user_utils(utils: UserUtilityInterface) -> None:
     """Initializes the user utilities.
 
     :param utils: The user utilities.

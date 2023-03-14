@@ -23,7 +23,7 @@ from pathlib import Path
 from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 
-from accounting.utils.user import AbstractUserUtils
+from accounting.utils.user import UserUtilityInterface
 
 db: SQLAlchemy = SQLAlchemy()
 """The database instance."""
@@ -31,19 +31,13 @@ data_dir: Path = Path(__file__).parent / "data"
 """The data directory."""
 
 
-def init_app(app: Flask, user_utils: AbstractUserUtils,
-             url_prefix: str = "/accounting",
-             can_view_func: t.Callable[[], bool] | None = None,
-             can_edit_func: t.Callable[[], bool] | None = None) -> None:
+def init_app(app: Flask, user_utils: UserUtilityInterface,
+             url_prefix: str = "/accounting") -> None:
     """Initialize the application.
 
     :param app: The Flask application.
     :param user_utils: The user utilities.
     :param url_prefix: The URL prefix of the accounting application.
-    :param can_view_func: A callback that returns whether the current user can
-        view the accounting data.
-    :param can_edit_func: A callback that returns whether the current user can
-        edit the accounting data.
     :return: None.
     """
     # The database instance must be set before loading everything
@@ -73,7 +67,7 @@ def init_app(app: Flask, user_utils: AbstractUserUtils,
     locale.init_app(app, bp)
 
     from .utils import permission
-    permission.init_app(bp, can_view_func, can_edit_func)
+    permission.init_app(bp, user_utils)
 
     from .utils import next_uri
     next_uri.init_app(bp)

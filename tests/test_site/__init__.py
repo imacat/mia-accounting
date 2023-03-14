@@ -29,8 +29,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from sqlalchemy import Column
 
-import accounting.utils.user
-
 bp: Blueprint = Blueprint("home", __name__)
 babel_js: BabelJS = BabelJS()
 csrf: CSRFProtect = CSRFProtect()
@@ -69,7 +67,16 @@ def create_app(is_testing: bool = False) -> Flask:
     from . import auth
     auth.init_app(app)
 
-    class UserUtils(accounting.utils.user.AbstractUserUtils[auth.User]):
+    class UserUtilities(accounting.UserUtilityInterface[auth.User]):
+
+        def can_view(self) -> bool:
+            return auth.current_user() is not None \
+                and auth.current_user().username in ["viewer", "editor",
+                                                     "editor2"]
+
+        def can_edit(self) -> bool:
+            return auth.current_user() is not None \
+                and auth.current_user().username in ["editor", "editor2"]
 
         @property
         def cls(self) -> t.Type[auth.User]:
@@ -90,12 +97,7 @@ def create_app(is_testing: bool = False) -> Flask:
         def get_pk(self, user: auth.User) -> int:
             return user.id
 
-    can_view: t.Callable[[], bool] = lambda: auth.current_user() is not None \
-        and auth.current_user().username in ["viewer", "editor", "editor2"]
-    can_edit: t.Callable[[], bool] = lambda: auth.current_user() is not None \
-        and auth.current_user().username in ["editor", "editor2"]
-    accounting.init_app(app, user_utils=UserUtils(),
-                        can_view_func=can_view, can_edit_func=can_edit)
+    accounting.init_app(app, user_utils=UserUtilities())
 
     return app
 
