@@ -51,8 +51,7 @@ DATE_REQUIRED: DataRequired = DataRequired(
 class NeedSomeCurrencies:
     """The validator to check if there is any currency sub-form."""
 
-    def __call__(self, form: CurrencyForm, field: FieldList) \
-            -> None:
+    def __call__(self, form: FlaskForm, field: FieldList) -> None:
         if len(field) == 0:
             raise ValidationError(lazy_gettext(
                 "Please add some currencies."))
