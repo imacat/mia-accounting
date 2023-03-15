@@ -31,6 +31,7 @@ def be(expression: t.Any) -> sa.BinaryExpression:
     :param expression: The binary expression.
     :return: The binary expression itself.
     """
+    assert isinstance(expression, sa.BinaryExpression)
     return expression
 
 
