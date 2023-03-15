@@ -57,9 +57,8 @@ class NoOffsetNominalAccount:
     """The validator to check nominal account is not to be offset."""
 
     def __call__(self, form: FlaskForm, field: BooleanField) -> None:
+        assert isinstance(form, AccountForm)
         if not field.data:
-            return
-        if not isinstance(form, AccountForm):
             return
         if form.base_code.data is None:
             return

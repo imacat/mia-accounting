@@ -61,8 +61,7 @@ class IsBalanced:
     entries are equal."""
 
     def __call__(self, form: FlaskForm, field: BooleanField) -> None:
-        if not isinstance(form, TransferCurrencyForm):
-            return
+        assert isinstance(form, TransferCurrencyForm)
         if len(form.debit) == 0 or len(form.credit) == 0:
             return
         if form.debit_total != form.credit_total:

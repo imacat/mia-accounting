@@ -32,9 +32,8 @@ class CodeUnique:
     """The validator to check if the code is unique."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
+        assert isinstance(form, CurrencyForm)
         if field.data == "":
-            return
-        if not isinstance(form, CurrencyForm):
             return
         if form.obj_code is not None and form.obj_code == field.data:
             return
