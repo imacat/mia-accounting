@@ -46,17 +46,6 @@ class AccountExists:
                 "The account does not exist."))
 
 
-class PositiveAmount:
-    """The validator to check if the amount is positive."""
-
-    def __call__(self, form: FlaskForm, field: DecimalField) -> None:
-        if field.data is None:
-            return
-        if field.data <= 0:
-            raise ValidationError(lazy_gettext(
-                "Please fill in a positive amount."))
-
-
 class IsDebitAccount:
     """The validator to check if the account is for debit journal entries."""
 
@@ -83,6 +72,17 @@ class IsCreditAccount:
             return
         raise ValidationError(lazy_gettext(
             "This account is not for credit entries."))
+
+
+class PositiveAmount:
+    """The validator to check if the amount is positive."""
+
+    def __call__(self, form: FlaskForm, field: DecimalField) -> None:
+        if field.data is None:
+            return
+        if field.data <= 0:
+            raise ValidationError(lazy_gettext(
+                "Please fill in a positive amount."))
 
 
 class JournalEntryForm(FlaskForm):
