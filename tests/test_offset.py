@@ -159,12 +159,13 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not before the original entries
-        txn_data.days = self.data.e_r_or3d.txn.days + 1
+        old_days = txn_data.days
+        txn_data.days = old_days + 1
         form = txn_data.new_form(self.csrf_token)
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
-        txn_data.days = 0
+        txn_data.days = old_days
 
         # Success
         form = txn_data.new_form(self.csrf_token)
@@ -187,6 +188,8 @@ class OffsetTestCase(unittest.TestCase):
         update_uri: str = f"{PREFIX}/{txn_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
+
+        txn_data.days = self.data.t_r_or2.days
 
         # Non-existing original entry ID
         form = txn_data.update_form(self.csrf_token)
@@ -258,12 +261,13 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not before the original entries
-        txn_data.days = self.data.e_r_or3d.txn.days + 1
+        old_days: int = txn_data.days
+        txn_data.days = old_days + 1
         form = txn_data.update_form(self.csrf_token)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
-        txn_data.days = 0
+        txn_data.days = old_days
 
         # Success
         form = txn_data.update_form(self.csrf_token)
@@ -326,7 +330,7 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not after the offset entries
         old_days: int = txn_data.days
-        txn_data.days = self.data.t_r_of1.days - 1
+        txn_data.days = old_days - 1
         form = txn_data.update_form(self.csrf_token)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -451,12 +455,13 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not before the original entries
-        txn_data.days = self.data.e_p_or3c.txn.days + 1
+        old_days: int = txn_data.days
+        txn_data.days = old_days + 1
         form = txn_data.new_form(self.csrf_token)
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
-        txn_data.days = 0
+        txn_data.days = old_days
 
         # Success
         form = txn_data.new_form(self.csrf_token)
@@ -479,6 +484,8 @@ class OffsetTestCase(unittest.TestCase):
         update_uri: str = f"{PREFIX}/{txn_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
+
+        txn_data.days = self.data.t_p_or2.days
 
         # Non-existing original entry ID
         form = txn_data.update_form(self.csrf_token)
@@ -551,7 +558,7 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not before the original entries
         old_days: int = txn_data.days
-        txn_data.days = self.data.e_p_or3c.txn.days + 1
+        txn_data.days = old_days + 1
         form = txn_data.update_form(self.csrf_token)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -622,7 +629,7 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not after the offset entries
         old_days: int = txn_data.days
-        txn_data.days = self.data.t_p_of1.days - 1
+        txn_data.days = old_days - 1
         form = txn_data.update_form(self.csrf_token)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
