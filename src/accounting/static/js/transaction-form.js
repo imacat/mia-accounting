@@ -159,15 +159,14 @@ class TransactionForm {
             this.#currencies[0].deleteButton.classList.add("d-none");
         } else {
             for (const currency of this.#currencies) {
-                const isAnyEntryMatched = () => {
-                    for (const entry of currency.getEntries()) {
-                        if (entry.isMatched) {
-                            return true;
-                        }
+                let isAnyEntryMatched = false;
+                for (const entry of currency.getEntries()) {
+                    if (entry.isMatched) {
+                        isAnyEntryMatched = true;
+                        break;
                     }
-                    return false;
-                };
-                if (isAnyEntryMatched()) {
+                }
+                if (isAnyEntryMatched) {
                     currency.deleteButton.classList.add("d-none");
                 } else {
                     currency.deleteButton.classList.remove("d-none");
