@@ -70,6 +70,12 @@ class SummaryEditor {
     summary;
 
     /**
+     * The button to the original entry selector
+     * @type {HTMLButtonElement}
+     */
+    #offsetButton;
+
+    /**
      * The number input
      * @type {HTMLInputElement}
      */
@@ -116,6 +122,7 @@ class SummaryEditor {
         this.prefix = "accounting-summary-editor-" + form.dataset.entryType;
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
+        this.#offsetButton = document.getElementById(this.prefix + "-offset");
         this.number = document.getElementById(this.prefix + "-annotation-number");
         this.note = document.getElementById(this.prefix + "-annotation-note");
         // noinspection JSValidateTypes
@@ -128,6 +135,7 @@ class SummaryEditor {
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
         this.summary.onchange = () => this.#onSummaryChange();
+        this.#offsetButton.onclick = () => OriginalEntrySelector.start(this.#entryEditor);
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
                 this.#submit();
@@ -210,7 +218,7 @@ class SummaryEditor {
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
         if (this.#selectedAccount !== null) {
-            this.#entryEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text);
+            this.#entryEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-offset-needed"));
         } else {
             this.#entryEditor.saveSummary(this.summary.value);
         }

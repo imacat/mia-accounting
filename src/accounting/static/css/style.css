@@ -31,6 +31,9 @@
     color: #141619;
     background-color: #D3D3D4;
 }
+.form-control.accounting-disabled {
+    background-color: #e9ecef;
+}
 
 /** The toolbar */
 .accounting-toolbar {
@@ -113,6 +116,33 @@
     border-bottom: thick double slategray;
 }
 
+/* Links between objects */
+.accounting-original-entry {
+    border-top: thin solid darkslategray;
+    padding: 0.2rem 0.5rem;
+}
+.accounting-original-entry a {
+    color: inherit;
+    text-decoration: none;
+}
+.accounting-original-entry a:hover {
+    color: inherit;
+}
+.accounting-offset-entries {
+    border-top: thin solid darkslategray;
+    padding: 0.2rem 0.5rem;
+}
+.accounting-offset-entries ul li {
+    list-style: none;
+}
+.accounting-offset-entries ul li a {
+    color: inherit;
+    text-decoration: none;
+}
+.accounting-offset-entries ul li a:hover {
+    color: inherit;
+}
+
 /** The option selector */
 .accounting-selector-list {
     height: 20rem;
@@ -149,6 +179,9 @@
 .list-group-item.accounting-transaction-entry-total {
     font-weight: bolder;
     border-top: thick double slategray;
+}
+.accounting-entry-editor-original-entry-content {
+    width: calc(100% - 3rem);
 }
 
 /* The report table */

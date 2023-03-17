@@ -21,15 +21,16 @@ First written: 2023/2/25
 #}
 <div id="accounting-currency-{{ currency_index }}" class="mb-3 accounting-currency" data-index="{{ currency_index }}">
   <input id="accounting-currency-{{ currency_index }}-no" type="hidden" name="currency-{{ currency_index }}-no" value="{{ currency_index }}">
+  <input id="accounting-currency-{{ currency_index }}-code" type="hidden" name="currency-{{ currency_index }}-code" value="{{ currency_code_data }}">
   <div id="accounting-currency-{{ currency_index }}-control" class="form-control accounting-currency-control {% if currency_errors %} is-invalid {% endif %}">
     <div class="d-flex justify-content-between mt-2 mb-3">
       <div class="form-floating accounting-currency-content">
-        <select id="accounting-currency-{{ currency_index }}-code" class="form-select {% if currency_code_errors %} is-invalid {% endif %}" name="currency-{{ currency_index }}-code">
+        <select id="accounting-currency-{{ currency_index }}-code-select" class="form-select {% if currency_code_errors %} is-invalid {% endif %}" {% if currency_code_is_locked %} disabled="disabled" {% endif %}>
           {% for currency in accounting_currency_options() %}
             <option value="{{ currency.code }}" {% if currency.code == currency_code_data %} selected="selected" {% endif %}>{{ currency }}</option>
           {% endfor %}
         </select>
-        <label class="form-label" for="accounting-currency-{{ currency_index }}-code">{{ A_("Currency") }}</label>
+        <label class="form-label" for="accounting-currency-{{ currency_index }}-code-select">{{ A_("Currency") }}</label>
         <div id="accounting-currency-{{ currency_index }}-code-error" class="invalid-feedback">{% if currency_code_errors %}{{ currency_code_errors[0] }}{% endif %}</div>
       </div>
 
@@ -57,9 +58,17 @@ First written: 2023/2/25
                       account_text = entry_form.account_text,
                       summary_data = entry_form.summary.data|accounting_default,
                       summary_errors = entry_form.summary.errors,
+                      original_entry_id_data = entry_form.original_entry_id.data|accounting_default,
+                      original_entry_date = entry_form.original_entry_date|accounting_default,
+                      original_entry_text = entry_form.original_entry_text|accounting_default,
+                      is_original_entry = entry_form.is_original_entry,
+                      offset_entries = entry_form.offsets,
+                      offset_total = entry_form.offset_total|accounting_default,
+                      net_balance_data = entry_form.net_balance,
+                      net_balance_text = entry_form.net_balance|accounting_format_amount,
                       amount_data = entry_form.amount.data|accounting_txn_format_amount_input,
                       amount_errors = entry_form.amount.errors,
-                      amount_text = entry_form.amount.data|accounting_format_amount|accounting_default("-"),
+                      amount_text = entry_form.amount.data|accounting_format_amount,
                       entry_errors = entry_form.all_errors %}
                 {% include "accounting/transaction/include/form-entry-item.html" %}
               {% endwith %}
@@ -97,9 +106,17 @@ First written: 2023/2/25
                       account_text = entry_form.account_text,
                       summary_data = entry_form.summary.data|accounting_default,
                       summary_errors = entry_form.summary.errors,
+                      original_entry_id_data = entry_form.original_entry_id.data|accounting_default,
+                      original_entry_date = entry_form.original_entry_date|accounting_default,
+                      original_entry_text = entry_form.original_entry_text|accounting_default,
+                      is_original_entry = entry_form.is_original_entry,
+                      offset_entries = entry_form.offsets,
+                      offset_total = entry_form.offset_total|accounting_default("0"),
+                      net_balance_data = entry_form.net_balance,
+                      net_balance_text = entry_form.net_balance|accounting_format_amount,
                       amount_data = entry_form.amount.data|accounting_txn_format_amount_input,
                       amount_errors = entry_form.amount.errors,
-                      amount_text = entry_form.amount.data|accounting_format_amount|accounting_default("-"),
+                      amount_text = entry_form.amount.data|accounting_format_amount,
                       entry_errors = entry_form.all_errors %}
                 {% include "accounting/transaction/include/form-entry-item.html" %}
               {% endwith %}

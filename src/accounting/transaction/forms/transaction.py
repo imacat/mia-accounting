@@ -17,14 +17,15 @@
 """The transaction forms for the transaction management.
 
 """
+import datetime as dt
 import typing as t
 from abc import ABC, abstractmethod
 
 import sqlalchemy as sa
 from flask_babel import LazyString
 from flask_wtf import FlaskForm
-from wtforms import DateField, FieldList, FormField, \
-    TextAreaField
+from wtforms import DateField, FieldList, FormField, TextAreaField, \
+    BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
 from accounting import db
@@ -32,6 +33,8 @@ from accounting.locale import lazy_gettext
 from accounting.models import Transaction, Account, JournalEntry, \
     TransactionCurrency
 from accounting.transaction.utils.account_option import AccountOption
+from accounting.transaction.utils.original_entries import \
+    get_selectable_original_entries
 from accounting.transaction.utils.summary_editor import SummaryEditor
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_multiline_text
@@ -46,12 +49,60 @@ DATE_REQUIRED: DataRequired = DataRequired(
 """The validator to check if the date is empty."""
 
 
+class NotBeforeOriginalEntries:
+    """The validator to check if the date is not before the original
+    entries."""
+
+    def __call__(self, form: FlaskForm, field: DateField) -> None:
+        assert isinstance(form, TransactionForm)
+        if field.data is None:
+            return
+        min_date: dt.date | None = form.min_date
+        if min_date is None:
+            return
+        if field.data < min_date:
+            raise ValidationError(lazy_gettext(
+                "The date cannot be earlier than the original entries."))
+
+
+class NotAfterOffsetEntries:
+    """The validator to check if the date is not after the offset entries."""
+
+    def __call__(self, form: FlaskForm, field: DateField) -> None:
+        assert isinstance(form, TransactionForm)
+        if field.data is None:
+            return
+        max_date: dt.date | None = form.max_date
+        if max_date is None:
+            return
+        if field.data > max_date:
+            raise ValidationError(lazy_gettext(
+                "The date cannot be later than the offset entries."))
+
+
 class NeedSomeCurrencies:
     """The validator to check if there is any currency sub-form."""
 
     def __call__(self, form: FlaskForm, field: FieldList) -> None:
         if len(field) == 0:
             raise ValidationError(lazy_gettext("Please add some currencies."))
+
+
+class CannotDeleteOriginalEntriesWithOffset:
+    """The validator to check the original entries with offset."""
+
+    def __call__(self, form: FlaskForm, field: FieldList) -> None:
+        assert isinstance(form, TransactionForm)
+        if form.obj is None:
+            return
+        existing_matched_original_entry_id: set[int] \
+            = {x.id for x in form.obj.entries if len(x.offsets) > 0}
+        entry_id_in_form: set[int] \
+            = {x.eid.data for x in form.entries if x.eid.data is not None}
+        for entry_id in existing_matched_original_entry_id:
+            if entry_id not in entry_id_in_form:
+                raise ValidationError(lazy_gettext(
+                    "Journal entries with offset cannot be deleted."))
 
 
 class TransactionForm(FlaskForm):
@@ -76,6 +127,19 @@ class TransactionForm(FlaskForm):
         """The journal entry collector.  The default is the base abstract
         collector only to provide the correct type.  The subclass forms should
         provide their own collectors."""
+        self.obj: Transaction | None = kwargs.get("obj")
+        """The transaction, when editing an existing one."""
+        self._is_payable_needed: bool = False
+        """Whether we need the payable original entries."""
+        self._is_receivable_needed: bool = False
+        """Whether we need the receivable original entries."""
+        self.__original_entry_options: list[JournalEntry] | None = None
+        """The options of the original entries."""
+        self.__net_balance_exceeded: dict[int, LazyString] | None = None
+        """The original entries whose net balances were exceeded by the
+        amounts in the journal entry sub-forms."""
+        for entry in self.entries:
+            entry.txn_form = self
 
     def populate_obj(self, obj: Transaction) -> None:
         """Populates the form data into a transaction object.
@@ -86,6 +150,7 @@ class TransactionForm(FlaskForm):
         is_new: bool = obj.id is None
         if is_new:
             obj.id = new_id(Transaction)
+        self.date: DateField
         self.__set_date(obj, self.date.data)
         obj.note = self.note.data
 
@@ -107,8 +172,18 @@ class TransactionForm(FlaskForm):
             obj.created_by_id = current_user_pk
             obj.updated_by_id = current_user_pk
 
-    @staticmethod
-    def __set_date(obj: Transaction, new_date: date) -> None:
+    @property
+    def entries(self) -> list[JournalEntryForm]:
+        """Collects and returns the journal entry sub-forms.
+
+        :return: The journal entry sub-forms.
+        """
+        entries: list[JournalEntryForm] = []
+        for currency in self.currencies:
+            entries.extend(currency.entries)
+        return entries
+
+    def __set_date(self, obj: Transaction, new_date: dt.date) -> None:
         """Sets the transaction date and number.
 
         :param obj: The transaction object.
@@ -118,11 +193,23 @@ class TransactionForm(FlaskForm):
         if obj.date is None or obj.date != new_date:
             if obj.date is not None:
                 sort_transactions_in(obj.date, obj.id)
-            sort_transactions_in(new_date, obj.id)
-            count: int = Transaction.query\
-                .filter(Transaction.date == new_date).count()
-            obj.date = new_date
-            obj.no = count + 1
+            if self.max_date is not None and new_date == self.max_date:
+                db_min_no: int | None = db.session.scalar(
+                    sa.select(sa.func.min(Transaction.no))
+                    .filter(Transaction.date == new_date))
+                if db_min_no is None:
+                    obj.date = new_date
+                    obj.no = 1
+                else:
+                    obj.date = new_date
+                    obj.no = db_min_no - 1
+                    sort_transactions_in(new_date)
+            else:
+                sort_transactions_in(new_date, obj.id)
+                count: int = Transaction.query\
+                    .filter(Transaction.date == new_date).count()
+                obj.date = new_date
+                obj.no = count + 1
 
     @property
     def debit_account_options(self) -> list[AccountOption]:
@@ -131,7 +218,8 @@ class TransactionForm(FlaskForm):
         :return: The selectable debit accounts.
         """
         accounts: list[AccountOption] \
-            = [AccountOption(x) for x in Account.debit()]
+            = [AccountOption(x) for x in Account.debit()
+               if not (x.code[0] == "2" and x.is_offset_needed)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntry.account_id)
             .filter(JournalEntry.is_debit)
@@ -147,7 +235,8 @@ class TransactionForm(FlaskForm):
         :return: The selectable credit accounts.
         """
         accounts: list[AccountOption] \
-            = [AccountOption(x) for x in Account.credit()]
+            = [AccountOption(x) for x in Account.credit()
+               if not (x.code[0] == "1" and x.is_offset_needed)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntry.account_id)
             .filter(sa.not_(JournalEntry.is_debit))
@@ -172,6 +261,46 @@ class TransactionForm(FlaskForm):
         :return: The summary editor.
         """
         return SummaryEditor()
+
+    @property
+    def original_entry_options(self) -> list[JournalEntry]:
+        """Returns the selectable original entries.
+
+        :return: The selectable original entries.
+        """
+        if self.__original_entry_options is None:
+            self.__original_entry_options = get_selectable_original_entries(
+                {x.eid.data for x in self.entries if x.eid.data is not None},
+                self._is_payable_needed, self._is_receivable_needed)
+        return self.__original_entry_options
+
+    @property
+    def min_date(self) -> dt.date | None:
+        """Returns the minimal available date.
+
+        :return: The minimal available date.
+        """
+        original_entry_id: set[int] \
+            = {x.original_entry_id.data for x in self.entries
+               if x.original_entry_id.data is not None}
+        if len(original_entry_id) == 0:
+            return None
+        select: sa.Select = sa.select(sa.func.max(Transaction.date))\
+            .join(JournalEntry).filter(JournalEntry.id.in_(original_entry_id))
+        return db.session.scalar(select)
+
+    @property
+    def max_date(self) -> dt.date | None:
+        """Returns the maximum available date.
+
+        :return: The maximum available date.
+        """
+        entry_id: set[int] = {x.eid.data for x in self.entries
+                              if x.eid.data is not None}
+        select: sa.Select = sa.select(sa.func.min(Transaction.date))\
+            .join(JournalEntry)\
+            .filter(JournalEntry.original_entry_id.in_(entry_id))
+        return db.session.scalar(select)
 
 
 T = t.TypeVar("T", bound=TransactionForm)
@@ -314,16 +443,23 @@ class JournalEntryCollector(t.Generic[T], ABC):
 
 class IncomeTransactionForm(TransactionForm):
     """The form to create or edit a cash income transaction."""
-    date = DateField(validators=[DATE_REQUIRED])
+    date = DateField(
+        validators=[DATE_REQUIRED,
+                    NotBeforeOriginalEntries(),
+                    NotAfterOffsetEntries()])
     """The date."""
     currencies = FieldList(FormField(IncomeCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
     """The journal entries categorized by their currencies."""
     note = TextAreaField(filters=[strip_multiline_text])
     """The note."""
+    whole_form = BooleanField(
+        validators=[CannotDeleteOriginalEntriesWithOffset()])
+    """The pseudo field for the whole form validators."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._is_receivable_needed = True
 
         class Collector(JournalEntryCollector[IncomeTransactionForm]):
             """The journal entry collector for the cash income transactions."""
@@ -352,16 +488,23 @@ class IncomeTransactionForm(TransactionForm):
 
 class ExpenseTransactionForm(TransactionForm):
     """The form to create or edit a cash expense transaction."""
-    date = DateField(validators=[DATE_REQUIRED])
+    date = DateField(
+        validators=[DATE_REQUIRED,
+                    NotBeforeOriginalEntries(),
+                    NotAfterOffsetEntries()])
     """The date."""
     currencies = FieldList(FormField(ExpenseCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
     """The journal entries categorized by their currencies."""
     note = TextAreaField(filters=[strip_multiline_text])
     """The note."""
+    whole_form = BooleanField(
+        validators=[CannotDeleteOriginalEntriesWithOffset()])
+    """The pseudo field for the whole form validators."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._is_payable_needed = True
 
         class Collector(JournalEntryCollector[ExpenseTransactionForm]):
             """The journal entry collector for the cash expense
@@ -391,16 +534,24 @@ class ExpenseTransactionForm(TransactionForm):
 
 class TransferTransactionForm(TransactionForm):
     """The form to create or edit a transfer transaction."""
-    date = DateField(validators=[DATE_REQUIRED])
+    date = DateField(
+        validators=[DATE_REQUIRED,
+                    NotBeforeOriginalEntries(),
+                    NotAfterOffsetEntries()])
     """The date."""
     currencies = FieldList(FormField(TransferCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
     """The journal entries categorized by their currencies."""
     note = TextAreaField(filters=[strip_multiline_text])
     """The note."""
+    whole_form = BooleanField(
+        validators=[CannotDeleteOriginalEntriesWithOffset()])
+    """The pseudo field for the whole form validators."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._is_payable_needed = True
+        self._is_receivable_needed = True
 
         class Collector(JournalEntryCollector[TransferTransactionForm]):
             """The journal entry collector for the transfer transactions."""

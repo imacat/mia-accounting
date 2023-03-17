@@ -42,10 +42,17 @@ First written: 2023/2/26
   </a>
   {% if accounting_can_edit() %}
     {% block to_transfer %}{% endblock %}
-    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
-      <i class="fa-solid fa-trash"></i>
-      {{ A_("Delete") }}
-    </button>
+    {% if obj.can_delete %}
+      <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
+        <i class="fa-solid fa-trash"></i>
+        {{ A_("Delete") }}
+      </button>
+    {% else %}
+      <button class="btn btn-secondary" type="button" disabled="disabled">
+        <i class="fa-solid fa-trash"></i>
+        {{ A_("Delete") }}
+      </button>
+    {% endif %}
   {% endif %}
 </div>
 
@@ -57,7 +64,7 @@ First written: 2023/2/26
   </div>
 {% endif %}
 
-{% if accounting_can_edit() %}
+{% if accounting_can_edit() and obj.can_delete %}
   <form action="{{ url_for("accounting.transaction.delete", txn=obj) }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if request.args.next %}

@@ -35,19 +35,9 @@ First written: 2023/2/26
 
       <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
         <li class="list-group-item accounting-transaction-entry accounting-transaction-entry-header">{{ A_("Content") }}</li>
-        {% for entry in currency.credit %}
-          <li class="list-group-item accounting-transaction-entry">
-            <div class="d-flex justify-content-between">
-              <div>
-                <div class="small">{{ entry.account }}</div>
-                {% if entry.summary is not none %}
-                  <div>{{ entry.summary }}</div>
-                {% endif %}
-              </div>
-              <div>{{ entry.amount|accounting_format_amount }}</div>
-            </div>
-          </li>
-        {% endfor %}
+        {% with entries = currency.credit %}
+          {% include "accounting/transaction/include/detail-entries.html" %}
+        {% endwith %}
         <li class="list-group-item accounting-transaction-entry accounting-transaction-entry-total">
           <div class="d-flex justify-content-between">
             <div>{{ A_("Total") }}</div>

@@ -37,7 +37,7 @@ First written: 2023/2/25
 
         <ul id="accounting-account-selector-{{ entry_type }}-option-list" class="list-group accounting-selector-list">
           {% for account in account_options %}
-            <li id="accounting-account-selector-{{ entry_type }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-account-selector-{{ entry_type }}-option {% if account.is_in_use %} accounting-account-in-use {% endif %}" data-code="{{ account.code }}" data-content="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">
+            <li id="accounting-account-selector-{{ entry_type }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-account-selector-{{ entry_type }}-option {% if account.is_in_use %} accounting-account-in-use {% endif %} {% if account.is_offset_needed %} accounting-account-is-offset-needed {% endif %}" data-code="{{ account.code }}" data-content="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">
               {{ account }}
             </li>
           {% endfor %}

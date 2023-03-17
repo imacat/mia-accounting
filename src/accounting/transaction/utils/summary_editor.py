@@ -218,7 +218,8 @@ class SummaryEditor:
                                       JournalEntry.account_id,
                                       sa.func.count().label("freq"))\
             .filter(JournalEntry.summary.is_not(None),
-                    JournalEntry.summary.like("_%—_%"))\
+                    JournalEntry.summary.like("_%—_%"),
+                    JournalEntry.original_entry_id.is_(None))\
             .group_by(entry_type, tag_type, tag, JournalEntry.account_id)
         result: list[sa.Row] = db.session.execute(select).all()
         accounts: dict[int, Account] \

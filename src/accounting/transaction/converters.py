@@ -20,10 +20,10 @@
 from datetime import date
 
 from flask import abort
+from sqlalchemy.orm import selectinload
 from werkzeug.routing import BaseConverter
 
-from accounting import db
-from accounting.models import Transaction
+from accounting.models import Transaction, JournalEntry
 from accounting.utils.txn_types import TransactionType
 
 
@@ -37,7 +37,13 @@ class TransactionConverter(BaseConverter):
         :param value: The transaction ID.
         :return: The corresponding transaction.
         """
-        transaction: Transaction | None = db.session.get(Transaction, value)
+        transaction: Transaction | None = Transaction.query\
+            .join(JournalEntry)\
+            .filter(Transaction.id == value)\
+            .options(selectinload(Transaction.entries)
+                     .selectinload(JournalEntry.offsets)
+                     .selectinload(JournalEntry.transaction))\
+            .first()
         if transaction is None:
             abort(404)
         return transaction

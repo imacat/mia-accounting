@@ -117,6 +117,7 @@ def show_transaction_edit_form(txn: Transaction) -> str:
     if "form" in session:
         form = txn_op.form(ImmutableMultiDict(parse_qsl(session["form"])))
         del session["form"]
+        form.obj = txn
         form.validate()
     else:
         form = txn_op.form(obj=txn)
@@ -134,6 +135,7 @@ def update_transaction(txn: Transaction) -> redirect:
     """
     txn_op: TransactionOperator = get_txn_op(txn, is_check_as=True)
     form: txn_op.form = txn_op.form(request.form)
+    form.obj = txn
     if not form.validate():
         flash_form_errors(form)
         session["form"] = urlencode(list(request.form.items()))

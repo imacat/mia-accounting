@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import re
 import typing as t
+from datetime import date
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -568,6 +569,21 @@ class Transaction(db.Model):
                 return False
         return True
 
+    @property
+    def can_delete(self) -> bool:
+        """Returns whether the transaction can be deleted.
+
+        :return: True if the transaction can be deleted, or False otherwise.
+        """
+        if not hasattr(self, "__can_delete"):
+            def has_offset() -> bool:
+                for entry in self.entries:
+                    if len(entry.offsets) > 0:
+                        return True
+                return False
+            setattr(self, "__can_delete", not has_offset())
+        return getattr(self, "__can_delete")
+
     def delete(self) -> None:
         """Deletes the transaction.
 
@@ -624,6 +640,21 @@ class JournalEntry(db.Model):
     amount = db.Column(db.Numeric(14, 2), nullable=False)
     """The amount."""
 
+    def __str__(self) -> str:
+        """Returns the string representation of the journal entry.
+
+        :return: The string representation of the journal entry.
+        """
+        if not hasattr(self, "__str"):
+            from accounting.template_filters import format_date, format_amount
+            setattr(self, "__str",
+                    gettext("%(date)s %(summary)s %(amount)s",
+                            date=format_date(self.transaction.date),
+                            summary="" if self.summary is None
+                            else self.summary,
+                            amount=format_amount(self.amount)))
+        return getattr(self, "__str")
+
     @property
     def eid(self) -> int | None:
         """Returns the journal entry ID.  This is the alternative name of the
@@ -650,9 +681,65 @@ class JournalEntry(db.Model):
         return self.amount if self.is_debit else None
 
     @property
+    def is_original_entry(self) -> bool:
+        """Returns whether the entry is an original entry.
+
+        :return: True if the entry is an original entry, or False otherwise.
+        """
+        if not self.account.is_offset_needed:
+            return False
+        if self.account.base_code[0] == "1" and not self.is_debit:
+            return False
+        if self.account.base_code[0] == "2" and self.is_debit:
+            return False
+        return True
+
+    @property
     def credit(self) -> Decimal | None:
         """Returns the credit amount.
 
         :return: The credit amount, or None if this is not a credit entry.
         """
         return None if self.is_debit else self.amount
+
+    @property
+    def net_balance(self) -> Decimal:
+        """Returns the net balance.
+
+        :return: The net balance.
+        """
+        if not hasattr(self, "__net_balance"):
+            setattr(self, "__net_balance", self.amount + sum(
+                [x.amount if x.is_debit == self.is_debit else -x.amount
+                 for x in self.offsets]))
+        return getattr(self, "__net_balance")
+
+    @net_balance.setter
+    def net_balance(self, net_balance: Decimal) -> None:
+        """Sets the net balance.
+
+        :param net_balance: The net balance.
+        :return: None.
+        """
+        setattr(self, "__net_balance", net_balance)
+
+    @property
+    def query_values(self) -> tuple[list[str], list[str]]:
+        """Returns the values to be queried.
+
+        :return: The values to be queried.
+        """
+        def format_amount(value: Decimal) -> str:
+            whole: int = int(value)
+            frac: Decimal = (value - whole).normalize()
+            return str(whole) + str(abs(frac))[1:]
+
+        txn_day: date = self.transaction.date
+        summary: str = "" if self.summary is None else self.summary
+        return ([summary],
+                [str(txn_day.year),
+                 "{}/{}".format(txn_day.year, txn_day.month),
+                 "{}/{}".format(txn_day.month, txn_day.day),
+                 "{}/{}/{}".format(txn_day.year, txn_day.month, txn_day.day),
+                 format_amount(self.amount),
+                 format_amount(self.net_balance)])

@@ -29,6 +29,7 @@ First written: 2023/2/25
               currency_errors = currency_form.whole_form.errors,
               currency_code_data = currency_form.code.data,
               currency_code_errors = currency_form.code.errors,
+              currency_code_is_locked = currency_form.is_code_locked,
               debit_forms = currency_form.debit,
               debit_errors = currency_form.debit_errors,
               debit_total = currency_form.form.debit_total|accounting_format_amount %}

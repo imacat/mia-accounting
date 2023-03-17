@@ -229,6 +229,15 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
+        # A receivable entry cannot start from the credit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-credit-" in x][0]
+        form[key] = Accounts.RECEIVABLE
+        response = self.client.post(store_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
         # Negative amount
         form = self.__get_add_form()
         set_negative_amount(form)
@@ -376,6 +385,15 @@ class CashIncomeTransactionTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.OFFICE
+        response = self.client.post(update_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # A receivable entry cannot start from the credit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-credit-" in x][0]
+        form[key] = Accounts.RECEIVABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -781,6 +799,15 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
+        # A payable entry cannot start from the debit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-debit-" in x][0]
+        form[key] = Accounts.PAYABLE
+        response = self.client.post(store_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
         # Negative amount
         form = self.__get_add_form()
         set_negative_amount(form)
@@ -931,6 +958,15 @@ class CashExpenseTransactionTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.SERVICE
+        response = self.client.post(update_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # A payable entry cannot start from the debit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-debit-" in x][0]
+        form[key] = Accounts.PAYABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -1356,6 +1392,24 @@ class TransferTransactionTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
+        # A receivable entry cannot start from the credit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-credit-" in x][0]
+        form[key] = Accounts.RECEIVABLE
+        response = self.client.post(store_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
+        # A payable entry cannot start from the debit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-debit-" in x][0]
+        form[key] = Accounts.PAYABLE
+        response = self.client.post(store_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], create_uri)
+
         # Negative amount
         form = self.__get_add_form()
         set_negative_amount(form)
@@ -1533,6 +1587,24 @@ class TransferTransactionTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.OFFICE
+        response = self.client.post(update_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # A receivable entry cannot start from the credit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-credit-" in x][0]
+        form[key] = Accounts.RECEIVABLE
+        response = self.client.post(update_uri, data=form)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], edit_uri)
+
+        # A payable entry cannot start from the debit side
+        form = self.__get_add_form()
+        key: str = [x for x in form.keys()
+                    if x.endswith("-account_code") and "-debit-" in x][0]
+        form[key] = Accounts.PAYABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)

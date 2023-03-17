@@ -159,7 +159,19 @@ class TransactionForm {
             this.#currencies[0].deleteButton.classList.add("d-none");
         } else {
             for (const currency of this.#currencies) {
-                currency.deleteButton.classList.remove("d-none");
+                const isAnyEntryMatched = () => {
+                    for (const entry of currency.getEntries()) {
+                        if (entry.isMatched) {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+                if (isAnyEntryMatched()) {
+                    currency.deleteButton.classList.add("d-none");
+                } else {
+                    currency.deleteButton.classList.remove("d-none");
+                }
             }
         }
     }
@@ -179,17 +191,55 @@ class TransactionForm {
     }
 
     /**
+     * Returns all the journal entries in the form.
+     *
+     * @param entryType {string|null} the entry type, either "debit" or "credit", or null for both
+     * @return {JournalEntrySubForm[]} all the journal entry sub-forms
+     */
+    getEntries(entryType = null) {
+        const entries = [];
+        for (const currency of this.#currencies) {
+            entries.push(...currency.getEntries(entryType));
+        }
+        return entries;
+    }
+
+    /**
      * Returns the account codes used in the form.
      *
      * @param entryType {string} the entry type, either "debit" or "credit"
      * @return {string[]} the account codes used in the form
      */
     getAccountCodesUsed(entryType) {
-        let inUse = [];
-        for (const currency of this.#currencies) {
-            inUse = inUse.concat(currency.getAccountCodesUsed(entryType));
+        return this.getEntries(entryType).map((entry) => entry.getAccountCode())
+            .filter((code) => code !== null);
+    }
+
+    /**
+     * Returns the date.
+     *
+     * @return {string} the date
+     */
+    getDate() {
+        return this.#date.value;
+    }
+
+    /**
+     * Updates the minimal date.
+     *
+     */
+    updateMinDate() {
+        let lastOriginalEntryDate = null;
+        for (const entry of this.getEntries()) {
+            const date = entry.getOriginalEntryDate();
+            if (date !== null) {
+                if (lastOriginalEntryDate === null || lastOriginalEntryDate < date) {
+                    lastOriginalEntryDate = date;
+                }
+            }
         }
-        return inUse;
+        this.#date.min = lastOriginalEntryDate === null? "": lastOriginalEntryDate;
+        this.#validateDate();
     }
 
     /**
@@ -216,6 +266,11 @@ class TransactionForm {
         if (this.#date.value === "") {
             this.#date.classList.add("is-invalid");
             this.#dateError.innerText = A_("Please fill in the date.");
+            return false;
+        }
+        if (this.#date.value < this.#date.min) {
+            this.#date.classList.add("is-invalid");
+            this.#dateError.innerText = A_("The date cannot be earlier than the original entries.");
             return false;
         }
         this.#date.classList.remove("is-invalid");
@@ -331,6 +386,18 @@ class CurrencySubForm {
     no;
 
     /**
+     * The currency code
+     * @type {HTMLInputElement}
+     */
+    #code;
+
+    /**
+     * The currency code selector
+     * @type {HTMLSelectElement}
+     */
+    #codeSelect;
+
+    /**
      * The button to delete the currency
      * @type {HTMLButtonElement}
      */
@@ -362,11 +429,16 @@ class CurrencySubForm {
         this.#control = document.getElementById(this.#prefix + "-control");
         this.#error = document.getElementById(this.#prefix + "-error");
         this.no = document.getElementById(this.#prefix + "-no");
+        this.#code = document.getElementById(this.#prefix + "-code");
+        this.#codeSelect = document.getElementById(this.#prefix + "-code-select");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
         const debitElement = document.getElementById(this.#prefix + "-debit");
         this.#debit = debitElement === null? null: new DebitCreditSideSubForm(this, debitElement, "debit");
         const creditElement = document.getElementById(this.#prefix + "-credit");
         this.#credit = creditElement == null? null: new DebitCreditSideSubForm(this, creditElement, "credit");
+        this.#codeSelect.onchange = () => {
+            this.#code.value = this.#codeSelect.value;
+        };
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
             this.form.deleteCurrency(this);
@@ -374,18 +446,45 @@ class CurrencySubForm {
     }
 
     /**
-     * Returns the account codes used in the form.
+     * Returns the currency code.
      *
-     * @param entryType {string} the entry type, either "debit" or "credit"
-     * @return {string[]} the account codes used in the form
+     * @return {string} the currency code
      */
-    getAccountCodesUsed(entryType) {
-        if (entryType === "debit") {
-            return this.#debit.getAccountCodesUsed();
-        } else if (entryType === "credit") {
-            return this.#credit.getAccountCodesUsed();
+    getCurrencyCode() {
+        return this.#code.value;
+    }
+
+    /**
+     * Returns all the journal entries in the form.
+     *
+     * @param entryType {string|null} the entry type, either "debit" or "credit", or null for both
+     * @return {JournalEntrySubForm[]} all the journal entry sub-forms
+     */
+    getEntries(entryType = null) {
+        const entries = []
+        for (const side of [this.#debit, this.#credit]) {
+            if (side !== null ) {
+                if (entryType === null || side.entryType === entryType) {
+                    entries.push(...side.entries);
+                }
+            }
         }
-        return []
+        return entries;
+    }
+
+    /**
+     * Updates whether to enable the currency code selector
+     *
+     */
+    updateCodeSelectorStatus() {
+        let isEnabled = true;
+        for (const entry of this.getEntries()) {
+            if (entry.getOriginalEntryId() !== null) {
+                isEnabled = false;
+                break;
+            }
+        }
+        this.#codeSelect.disabled = !isEnabled;
     }
 
     /**
@@ -476,7 +575,7 @@ class DebitCreditSideSubForm {
      * The journal entry sub-forms
      * @type {JournalEntrySubForm[]}
      */
-    #entries;
+    entries;
 
     /**
      * The total
@@ -506,7 +605,7 @@ class DebitCreditSideSubForm {
         this.#error = document.getElementById(this.#prefix + "-error");
         this.#entryList = document.getElementById(this.#prefix + "-list");
         // noinspection JSValidateTypes
-        this.#entries = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new JournalEntrySubForm(this, element));
+        this.entries = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new JournalEntrySubForm(this, element));
         this.#total = document.getElementById(this.#prefix + "-total");
         this.#addEntryButton = document.getElementById(this.#prefix + "-add-entry");
         this.#addEntryButton.onclick = () => {
@@ -522,14 +621,14 @@ class DebitCreditSideSubForm {
      * @returns {JournalEntrySubForm} the newly-added journal entry sub-form
      */
     addJournalEntry() {
-        const newIndex = 1 + (this.#entries.length === 0? 0: Math.max(...this.#entries.map((entry) => entry.entryIndex)));
+        const newIndex = 1 + (this.entries.length === 0? 0: Math.max(...this.entries.map((entry) => entry.entryIndex)));
         const html = this.currency.form.entryTemplate
             .replaceAll("CURRENCY_INDEX", escapeHtml(String(this.#currencyIndex)))
             .replaceAll("ENTRY_TYPE", escapeHtml(this.entryType))
             .replaceAll("ENTRY_INDEX", escapeHtml(String(newIndex)));
         this.#entryList.insertAdjacentHTML("beforeend", html);
         const entry = new JournalEntrySubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
-        this.#entries.push(entry);
+        this.entries.push(entry);
         this.#resetDeleteJournalEntryButtons();
         this.#initializeDragAndDropReordering();
         this.validate();
@@ -542,9 +641,11 @@ class DebitCreditSideSubForm {
      * @param entry {JournalEntrySubForm}
      */
     deleteJournalEntry(entry) {
-        const index = this.#entries.indexOf(entry);
-        this.#entries.splice(index, 1);
+        const index = this.entries.indexOf(entry);
+        this.entries.splice(index, 1);
         this.updateTotal();
+        this.currency.updateCodeSelectorStatus();
+        this.currency.form.updateMinDate();
         this.#resetDeleteJournalEntryButtons();
     }
 
@@ -553,11 +654,15 @@ class DebitCreditSideSubForm {
      *
      */
     #resetDeleteJournalEntryButtons() {
-        if (this.#entries.length === 1) {
-            this.#entries[0].deleteButton.classList.add("d-none");
+        if (this.entries.length === 1) {
+            this.entries[0].deleteButton.classList.add("d-none");
         } else {
-            for (const entry of this.#entries) {
-                entry.deleteButton.classList.remove("d-none");
+            for (const entry of this.entries) {
+                if (entry.isMatched) {
+                    entry.deleteButton.classList.add("d-none");
+                } else {
+                    entry.deleteButton.classList.remove("d-none");
+                }
             }
         }
     }
@@ -569,9 +674,10 @@ class DebitCreditSideSubForm {
      */
     getTotal() {
         let total = new Decimal("0");
-        for (const entry of this.#entries) {
-            if (entry.amount.value !== "") {
-                total = total.plus(new Decimal(entry.amount.value));
+        for (const entry of this.entries) {
+            const amount = entry.getAmount();
+            if (amount !== null) {
+                total = total.plus(amount);
             }
         }
         return total;
@@ -582,16 +688,9 @@ class DebitCreditSideSubForm {
      *
      */
     updateTotal() {
-        let total = new Decimal("0");
-        for (const entry of this.#entries) {
-            if (entry.amount.value !== "") {
-                total = total.plus(new Decimal(entry.amount.value));
-            }
-        }
         this.#total.innerText = formatDecimal(this.getTotal());
         this.currency.validateBalance();
     }
-
 
     /**
      * Initializes the drag and drop reordering on the currency sub-forms.
@@ -600,20 +699,11 @@ class DebitCreditSideSubForm {
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#entryList, () => {
             const entryId = Array.from(this.#entryList.children).map((entry) => entry.id);
-            this.#entries.sort((a, b) => entryId.indexOf(a.element.id) - entryId.indexOf(b.element.id));
-            for (let i = 0; i < this.#entries.length; i++) {
-                this.#entries[i].no.value = String(i + 1);
+            this.entries.sort((a, b) => entryId.indexOf(a.element.id) - entryId.indexOf(b.element.id));
+            for (let i = 0; i < this.entries.length; i++) {
+                this.entries[i].no.value = String(i + 1);
             }
         });
-    }
-
-    /**
-     * Returns the account codes used in the form.
-     *
-     * @return {string[]} the account codes used in the form
-     */
-    getAccountCodesUsed() {
-        return this.#entries.filter((entry) => entry.getAccountCode() !== null).map((entry) => entry.getAccountCode());
     }
 
     /**
@@ -624,7 +714,7 @@ class DebitCreditSideSubForm {
     validate() {
         let isValid = true;
         isValid = this.#validateReal() && isValid;
-        for (const entry of this.#entries) {
+        for (const entry of this.entries) {
             isValid = entry.validate() && isValid;
         }
         return isValid;
@@ -636,7 +726,7 @@ class DebitCreditSideSubForm {
      * @returns {boolean} true if valid, or false otherwise
      */
     #validateReal() {
-        if (this.#entries.length === 0) {
+        if (this.entries.length === 0) {
             this.#element.classList.add("is-invalid");
             this.#error.innerText = A_("Please add some journal entries.");
             return false;
@@ -676,6 +766,12 @@ class JournalEntrySubForm {
      * @type {number}
      */
     entryIndex;
+
+    /**
+     * Whether this is an original entry with offsets
+     * @type {boolean}
+     */
+    isMatched;
 
     /**
      * The prefix of the HTML ID and class
@@ -726,10 +822,28 @@ class JournalEntrySubForm {
     #summaryText;
 
     /**
+     * The ID of the original entry
+     * @type {HTMLInputElement}
+     */
+    #originalEntryId;
+
+    /**
+     * The text of the original entry
+     * @type {HTMLDivElement}
+     */
+    #originalEntryText;
+
+    /**
+     * The offset entries
+     * @type {HTMLInputElement}
+     */
+    #offsets;
+
+    /**
      * The amount
      * @type {HTMLInputElement}
      */
-    amount;
+    #amount;
 
     /**
      * The text display of the amount
@@ -754,6 +868,7 @@ class JournalEntrySubForm {
         this.element = element;
         this.entryType = element.dataset.entryType;
         this.entryIndex = parseInt(element.dataset.entryIndex);
+        this.isMatched = element.classList.contains("accounting-matched-entry");
         this.#prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.entryType + "-" + this.entryIndex;
         this.#control = document.getElementById(this.#prefix + "-control");
         this.#error = document.getElementById(this.#prefix + "-error");
@@ -762,16 +877,46 @@ class JournalEntrySubForm {
         this.#accountText = document.getElementById(this.#prefix + "-account-text");
         this.#summary = document.getElementById(this.#prefix + "-summary");
         this.#summaryText = document.getElementById(this.#prefix + "-summary-text");
-        this.amount = document.getElementById(this.#prefix + "-amount");
+        this.#originalEntryId = document.getElementById(this.#prefix + "-original-entry-id");
+        this.#originalEntryText = document.getElementById(this.#prefix + "-original-entry-text");
+        this.#offsets = document.getElementById(this.#prefix + "-offsets");
+        this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
         this.#control.onclick = () => {
-            JournalEntryEditor.edit(this, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.amount.value);
+            JournalEntryEditor.edit(this, this.#originalEntryId.value, this.#originalEntryId.dataset.date, this.#originalEntryId.dataset.text, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.#amount.value, this.#amount.dataset.min);
         };
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
             this.side.deleteJournalEntry(this);
         };
+    }
+
+    /**
+     * Returns whether the entry is an original entry.
+     *
+     * @return {boolean} true if the entry is an original entry, or false otherwise
+     */
+    isOriginalEntry() {
+        return "isOriginalEntry" in this.element.dataset;
+    }
+
+    /**
+     * Returns the ID of the original entry.
+     *
+     * @return {string|null} the ID of the original entry
+     */
+    getOriginalEntryId() {
+        return this.#originalEntryId.value === ""? null: this.#originalEntryId.value;
+    }
+
+    /**
+     * Returns the date of the original entry.
+     *
+     * @return {string|null} the date of the original entry
+     */
+    getOriginalEntryDate() {
+        return this.#originalEntryId.dataset.date === ""? null: this.#originalEntryId.dataset.date;
     }
 
     /**
@@ -781,6 +926,15 @@ class JournalEntrySubForm {
      */
     getAccountCode() {
         return this.#accountCode.value === ""? null: this.#accountCode.value;
+    }
+
+    /**
+     * Returns the amount.
+     *
+     * @return {Decimal|null} the amount
+     */
+    getAmount() {
+        return this.#amount.value === ""? null: new Decimal(this.#amount.value);
     }
 
     /**
@@ -794,7 +948,7 @@ class JournalEntrySubForm {
             this.#error.innerText = A_("Please select the account.");
             return false;
         }
-        if (this.amount.value === "") {
+        if (this.#amount.value === "") {
             this.#control.classList.add("is-invalid");
             this.#error.innerText = A_("Please fill in the amount.");
             return false;
@@ -807,21 +961,42 @@ class JournalEntrySubForm {
     /**
      * Stores the data into the journal entry sub-form.
      *
+     * @param isOriginalEntry {boolean} true if this is an original entry, or false otherwise
+     * @param originalEntryId {string} the ID of the original entry
+     * @param originalEntryDate {string} the date of the original entry
+     * @param originalEntryText {string} the text of the original entry
      * @param accountCode {string} the account code
      * @param accountText {string} the account text
      * @param summary {string} the summary
      * @param amount {string} the amount
      */
-    save(accountCode, accountText, summary, amount) {
+    save(isOriginalEntry, originalEntryId, originalEntryDate, originalEntryText, accountCode, accountText, summary, amount) {
+        if (isOriginalEntry) {
+            this.#offsets.classList.remove("d-none");
+        } else {
+            this.#offsets.classList.add("d-none");
+        }
+        this.#originalEntryId.value = originalEntryId;
+        this.#originalEntryId.dataset.date = originalEntryDate;
+        this.#originalEntryId.dataset.text = originalEntryText;
+        if (originalEntryText === "") {
+            this.#originalEntryText.classList.add("d-none");
+            this.#originalEntryText.innerText = "";
+        } else {
+            this.#originalEntryText.classList.remove("d-none");
+            this.#originalEntryText.innerText = A_("Offset %(entry)s", {entry: originalEntryText});
+        }
         this.#accountCode.value = accountCode;
         this.#accountCode.dataset.text = accountText;
         this.#accountText.innerText = accountText;
         this.#summary.value = summary;
         this.#summaryText.innerText = summary;
-        this.amount.value = amount;
+        this.#amount.value = amount;
         this.#amountText.innerText = formatDecimal(new Decimal(amount));
         this.validate();
         this.side.updateTotal();
+        this.side.currency.updateCodeSelectorStatus();
+        this.side.currency.form.updateMinDate();
     }
 }
 

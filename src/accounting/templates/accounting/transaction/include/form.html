@@ -26,6 +26,7 @@ First written: 2023/2/26
   <script src="{{ url_for("accounting.static", filename="js/transaction-form.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/journal-entry-editor.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/account-selector.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/original-entry-selector.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/summary-editor.js") }}"></script>
 {% endblock %}
 
@@ -45,7 +46,7 @@ First written: 2023/2/26
   {% endif %}
 
   <div class="form-floating mb-3">
-    <input id="accounting-date" class="form-control {% if form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ form.date.data|accounting_default }}" placeholder=" " required="required">
+    <input id="accounting-date" class="form-control {% if form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ form.date.data|accounting_default }}" max="{{ form.max_date|accounting_default }}" min="{{ form.min_date|accounting_default }}" placeholder=" " required="required">
     <label class="form-label" for="accounting-date">{{ A_("Date") }}</label>
     <div id="accounting-date-error" class="invalid-feedback">{% if form.date.errors %}{{ form.date.errors[0] }}{% endif %}</div>
   </div>
@@ -89,5 +90,6 @@ First written: 2023/2/26
 
 {% include "accounting/transaction/include/journal-entry-editor-modal.html" %}
 {% block form_modals %}{% endblock %}
+{% include "accounting/transaction/include/original-entry-selector-modal.html" %}
 
 {% endblock %}

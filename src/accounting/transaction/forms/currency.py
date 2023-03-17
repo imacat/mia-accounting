@@ -19,6 +19,7 @@
 """
 from decimal import Decimal
 
+import sqlalchemy as sa
 from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError, FieldList, IntegerField, \
@@ -27,9 +28,11 @@ from wtforms.validators import DataRequired
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Currency
+from accounting.models import Currency, JournalEntry
+from accounting.transaction.utils.offset_alias import offset_alias
+from accounting.utils.cast import be
 from accounting.utils.strip_text import strip_text
-from .journal_entry import CreditEntryForm, DebitEntryForm
+from .journal_entry import JournalEntryForm, CreditEntryForm, DebitEntryForm
 
 CURRENCY_REQUIRED: DataRequired = DataRequired(
     lazy_gettext("Please select the currency."))
@@ -45,6 +48,50 @@ class CurrencyExists:
         if db.session.get(Currency, field.data) is None:
             raise ValidationError(lazy_gettext(
                 "The currency does not exist."))
+
+
+class SameCurrencyAsOriginalEntries:
+    """The validator to check if the currency is the same as the original
+    entries."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        assert isinstance(form, CurrencyForm)
+        if field.data is None:
+            return
+        original_entry_id: set[int] = {x.original_entry_id.data
+                                       for x in form.entries
+                                       if x.original_entry_id.data is not None}
+        if len(original_entry_id) == 0:
+            return
+        original_entry_currency_codes: set[str] = set(db.session.scalars(
+            sa.select(JournalEntry.currency_code)
+            .filter(JournalEntry.id.in_(original_entry_id))).all())
+        for currency_code in original_entry_currency_codes:
+            if field.data != currency_code:
+                raise ValidationError(lazy_gettext(
+                    "The currency must be the same as the original entry."))
+
+
+class KeepCurrencyWhenHavingOffset:
+    """The validator to check if the currency is the same when there is
+    offset."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        assert isinstance(form, CurrencyForm)
+        if field.data is None:
+            return
+        offset: sa.Alias = offset_alias()
+        original_entries: list[JournalEntry] = JournalEntry.query\
+            .join(offset, be(JournalEntry.id == offset.c.original_entry_id),
+                  isouter=True)\
+            .filter(JournalEntry.id.in_({x.eid.data for x in form.entries
+                                         if x.eid.data is not None}))\
+            .group_by(JournalEntry.id, JournalEntry.currency_code)\
+            .having(sa.func.count(offset.c.id) > 0).all()
+        for original_entry in original_entries:
+            if original_entry.currency_code != field.data:
+                raise ValidationError(lazy_gettext(
+                    "The currency must not be changed when there is offset."))
 
 
 class NeedSomeJournalEntries:
@@ -78,6 +125,41 @@ class CurrencyForm(FlaskForm):
     whole_form = BooleanField()
     """The pseudo field for the whole form validators."""
 
+    @property
+    def entries(self) -> list[JournalEntryForm]:
+        """Returns the journal entry sub-forms.
+
+        :return: The journal entry sub-forms.
+        """
+        entry_forms: list[JournalEntryForm] = []
+        if isinstance(self, IncomeCurrencyForm):
+            entry_forms.extend([x.form for x in self.credit])
+        elif isinstance(self, ExpenseCurrencyForm):
+            entry_forms.extend([x.form for x in self.debit])
+        elif isinstance(self, TransferCurrencyForm):
+            entry_forms.extend([x.form for x in self.debit])
+            entry_forms.extend([x.form for x in self.credit])
+        return entry_forms
+
+    @property
+    def is_code_locked(self) -> bool:
+        """Returns whether the currency code should not be changed.
+
+        :return: True if the currency code should not be changed, or False
+            otherwise
+        """
+        entry_forms: list[JournalEntryForm] = self.entries
+        original_entry_id: set[int] \
+            = {x.original_entry_id.data for x in entry_forms
+               if x.original_entry_id.data is not None}
+        if len(original_entry_id) > 0:
+            return True
+        entry_id: set[int] = {x.eid.data for x in entry_forms
+                              if x.eid.data is not None}
+        select: sa.Select = sa.select(sa.func.count(JournalEntry.id))\
+            .filter(JournalEntry.original_entry_id.in_(entry_id))
+        return db.session.scalar(select) > 0
+
 
 class IncomeCurrencyForm(CurrencyForm):
     """The form to create or edit a currency in a cash income transaction."""
@@ -86,7 +168,9 @@ class IncomeCurrencyForm(CurrencyForm):
     code = StringField(
         filters=[strip_text],
         validators=[CURRENCY_REQUIRED,
-                    CurrencyExists()])
+                    CurrencyExists(),
+                    SameCurrencyAsOriginalEntries(),
+                    KeepCurrencyWhenHavingOffset()])
     """The currency code."""
     credit = FieldList(FormField(CreditEntryForm),
                        validators=[NeedSomeJournalEntries()])
@@ -121,7 +205,9 @@ class ExpenseCurrencyForm(CurrencyForm):
     code = StringField(
         filters=[strip_text],
         validators=[CURRENCY_REQUIRED,
-                    CurrencyExists()])
+                    CurrencyExists(),
+                    SameCurrencyAsOriginalEntries(),
+                    KeepCurrencyWhenHavingOffset()])
     """The currency code."""
     debit = FieldList(FormField(DebitEntryForm),
                       validators=[NeedSomeJournalEntries()])
@@ -156,7 +242,9 @@ class TransferCurrencyForm(CurrencyForm):
     code = StringField(
         filters=[strip_text],
         validators=[CURRENCY_REQUIRED,
-                    CurrencyExists()])
+                    CurrencyExists(),
+                    SameCurrencyAsOriginalEntries(),
+                    KeepCurrencyWhenHavingOffset()])
     """The currency code."""
     debit = FieldList(FormField(DebitEntryForm),
                       validators=[NeedSomeJournalEntries()])

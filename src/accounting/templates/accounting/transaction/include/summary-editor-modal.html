@@ -30,8 +30,11 @@ First written: 2023/2/28
           <button class="btn-close" type="button" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal" aria-label="{{ A_("Close") }}"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3">
+          <div class="d-flex justify-content-between mb-3">
             <input id="accounting-summary-editor-{{ summary_editor.type }}-summary" class="form-control" type="text" aria-labelledby="accounting-summary-editor-{{ summary_editor.type }}-modal-label">
+            <button id="accounting-summary-editor-{{ summary_editor.type }}-offset" class="btn btn-primary ms-2" type="button" data-bs-toggle="modal" data-bs-target="#accounting-original-entry-selector-modal">
+              {{ A_("Offset...") }}
+            </button>
           </div>
 
           {# Tab navigation #}
@@ -174,7 +177,7 @@ First written: 2023/2/28
           {# The suggested accounts #}
           <div class="mt-3">
             {% for account in summary_editor.accounts %}
-              <button class="btn btn-outline-primary d-none accounting-summary-editor-{{ summary_editor.type }}-account" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
+              <button class="btn btn-outline-primary d-none accounting-summary-editor-{{ summary_editor.type }}-account {% if account.is_offset_needed %} accounting-account-is-offset-needed {% endif %}" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
                 {{ account }}
               </button>
             {% endfor %}

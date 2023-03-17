@@ -19,13 +19,14 @@
 """
 from datetime import date
 
+import sqlalchemy as sa
 from flask import request
 
 from accounting import db
 from accounting.models import Transaction
 
 
-def sort_transactions_in(txn_date: date, exclude: int) -> None:
+def sort_transactions_in(txn_date: date, exclude: int | None = None) -> None:
     """Sorts the transactions under a date after changing the date or deleting
     a transaction.
 
@@ -33,9 +34,11 @@ def sort_transactions_in(txn_date: date, exclude: int) -> None:
     :param exclude: The transaction ID to exclude.
     :return: None.
     """
+    conditions: list[sa.BinaryExpression] = [Transaction.date == txn_date]
+    if exclude is not None:
+        conditions.append(Transaction.id != exclude)
     transactions: list[Transaction] = Transaction.query\
-        .filter(Transaction.date == txn_date,
-                Transaction.id != exclude)\
+        .filter(*conditions)\
         .order_by(Transaction.no).all()
     for i in range(len(transactions)):
         if transactions[i].no != i + 1:

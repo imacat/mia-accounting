@@ -28,6 +28,22 @@ First written: 2023/2/25
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ A_("Close") }}"></button>
         </div>
         <div class="modal-body">
+          <div id="accounting-entry-editor-original-entry-container" class="d-flex justify-content-between mb-3">
+            <div class="accounting-entry-editor-original-entry-content">
+              <div id="accounting-entry-editor-original-entry-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="#accounting-original-entry-selector-modal">
+                <label class="form-label" for="accounting-entry-editor-original-entry">{{ A_("Original Entry") }}</label>
+                <div id="accounting-entry-editor-original-entry" data-id="" data-date="" data-text=""></div>
+              </div>
+              <div id="accounting-entry-editor-original-entry-error" class="invalid-feedback"></div>
+            </div>
+
+            <div>
+              <button id="accounting-entry-editor-original-entry-delete" class="btn btn-danger rounded-circle" type="button">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+
           <div class="mb-3">
             <div id="accounting-entry-editor-summary-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="">
               <label class="form-label" for="accounting-entry-editor-summary">{{ A_("Summary") }}</label>
@@ -45,7 +61,7 @@ First written: 2023/2/25
           </div>
 
           <div class="form-floating mb-3">
-            <input id="accounting-entry-editor-amount" class="form-control" type="number" value="" min="0.01" max="" step="0.01" placeholder=" " required="required">
+            <input id="accounting-entry-editor-amount" class="form-control" type="number" value="" min="0" max="" step="0.01" placeholder=" " required="required">
             <label for="accounting-entry-editor-amount">{{ A_("Amount") }}</label>
             <div id="accounting-entry-editor-amount-error" class="invalid-feedback"></div>
           </div>
