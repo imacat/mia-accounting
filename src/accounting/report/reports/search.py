@@ -71,6 +71,7 @@ class EntryCollector:
             conditions.append(sa.or_(*sub_conditions))
         return JournalEntry.query.join(Transaction).filter(*conditions)\
             .order_by(Transaction.date,
+                      Transaction.no,
                       JournalEntry.is_debit,
                       JournalEntry.no)\
             .options(selectinload(JournalEntry.account),

@@ -188,6 +188,7 @@ class Journal(BaseReport):
         return JournalEntry.query.join(Transaction)\
             .filter(*conditions)\
             .order_by(Transaction.date,
+                      Transaction.no,
                       JournalEntry.is_debit.desc(),
                       JournalEntry.no)\
             .options(selectinload(JournalEntry.account),

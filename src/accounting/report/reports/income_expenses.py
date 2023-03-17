@@ -160,6 +160,7 @@ class EntryCollector:
                         JournalEntry.currency_code == self.__currency.code,
                         sa.not_(self.__account_condition))
                 .order_by(Transaction.date,
+                          Transaction.no,
                           JournalEntry.is_debit,
                           JournalEntry.no)
                 .options(selectinload(JournalEntry.account),
