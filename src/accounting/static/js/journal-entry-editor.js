@@ -183,7 +183,7 @@ class JournalEntryEditor {
                 if (this.entry === null) {
                     this.entry = this.#side.addJournalEntry();
                 }
-                this.entry.save("isOriginalEntry" in this.#element.dataset,this.#originalEntry.dataset.id, this.#originalEntry.dataset.date, this.#originalEntry.dataset.text, this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
+                this.entry.save("isOriginalEntry" in this.#element.dataset, this.#originalEntry.dataset.id, this.#originalEntry.dataset.date, this.#originalEntry.dataset.text, this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
