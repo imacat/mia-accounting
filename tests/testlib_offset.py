@@ -197,7 +197,7 @@ class TestData:
 
         # Payable original entries
         self.e_p_or1d, self.e_p_or1c = couple(
-            "Airplane ticket", "2000", Accounts.TRAVEL, Accounts.PAYABLE)
+            "Airplane", "2000", Accounts.TRAVEL, Accounts.PAYABLE)
         self.e_p_or2d, self.e_p_or2c = couple(
             "Phone", "900", Accounts.OFFICE, Accounts.PAYABLE)
         self.e_p_or3d, self.e_p_or3c = couple(
@@ -243,13 +243,13 @@ class TestData:
 
         # Payable offset entries
         self.e_p_of1d, self.e_p_of1c = couple(
-            "Airplane ticket", "800", Accounts.PAYABLE, Accounts.CASH)
+            "Airplane", "800", Accounts.PAYABLE, Accounts.CASH)
         self.e_p_of1d.original_entry = self.e_p_or1c
         self.e_p_of2d, self.e_p_of2c = couple(
-            "Airplane ticket", "300", Accounts.PAYABLE, Accounts.CASH)
+            "Airplane", "300", Accounts.PAYABLE, Accounts.CASH)
         self.e_p_of2d.original_entry = self.e_p_or1c
         self.e_p_of3d, self.e_p_of3c = couple(
-            "Airplane ticket", "100", Accounts.PAYABLE, Accounts.CASH)
+            "Airplane", "100", Accounts.PAYABLE, Accounts.CASH)
         self.e_p_of3d.original_entry = self.e_p_or1c
         self.e_p_of4d, self.e_p_of4c = couple(
             "Phone", "400", Accounts.PAYABLE, Accounts.CASH)
