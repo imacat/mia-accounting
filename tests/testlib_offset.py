@@ -18,7 +18,9 @@
 
 """
 from __future__ import annotations
+
 from datetime import date, timedelta
+from decimal import Decimal
 
 import httpx
 from flask import Flask
@@ -45,7 +47,7 @@ class JournalEntryData:
         self.original_entry: JournalEntryData | None = original_entry
         self.account: str = account
         self.summary: str = summary
-        self.amount: str = amount
+        self.amount: Decimal = Decimal(amount)
 
     def form(self, prefix: str, entry_type: str, index: int, is_update: bool) \
             -> dict[str, str]:
@@ -60,7 +62,7 @@ class JournalEntryData:
         prefix = f"{prefix}-{entry_type}-{index}"
         form: dict[str, str] = {f"{prefix}-account_code": self.account,
                                 f"{prefix}-summary": self.summary,
-                                f"{prefix}-amount": self.amount}
+                                f"{prefix}-amount": str(self.amount)}
         if is_update and self.id != -1:
             form[f"{prefix}-eid"] = str(self.id)
         form[f"{prefix}-no"] = str(index) if self.no == -1 else str(self.no)
