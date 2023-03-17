@@ -345,26 +345,6 @@ class JournalEntryForm(FlaskForm):
             else str(self.__original_entry)
 
     @property
-    def __entry(self) -> JournalEntry | None:
-        """Returns the journal entry.
-
-        :return: The journal entry.
-        """
-        if not hasattr(self, "____entry"):
-            def get_entry() -> JournalEntry | None:
-                if self.eid.data is None:
-                    return None
-                return JournalEntry.query\
-                    .filter(JournalEntry.id == self.eid.data)\
-                    .options(selectinload(JournalEntry.transaction),
-                             selectinload(JournalEntry.account),
-                             selectinload(JournalEntry.offsets)
-                             .selectinload(JournalEntry.transaction))\
-                    .first()
-            setattr(self, "____entry", get_entry())
-        return getattr(self, "____entry")
-
-    @property
     def is_original_entry(self) -> bool:
         """Returns whether the entry is an original entry.
 
