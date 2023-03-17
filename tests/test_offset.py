@@ -18,6 +18,7 @@
 
 """
 import unittest
+from decimal import Decimal
 
 import httpx
 from click.testing import Result
@@ -76,6 +77,7 @@ class OffsetTestCase(unittest.TestCase):
         create_uri: str = f"{PREFIX}/create/income?next=%2F_next"
         store_uri: str = f"{PREFIX}/store/income"
         form: dict[str, str]
+        old_amount: Decimal
         response: httpx.Response
 
         txn_data: TransactionData = TransactionData(
@@ -146,14 +148,16 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not exceeding net balance - partially offset
         form = txn_data.new_form(self.csrf_token)
-        form["currency-1-credit-1-amount"] = "300.01"
+        form["currency-1-credit-1-amount"] \
+            = str(txn_data.currencies[0].credit[0].amount + Decimal("0.01"))
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not exceeding net balance - unmatched
         form = txn_data.new_form(self.csrf_token)
-        form["currency-1-credit-3-amount"] = "100.01"
+        form["currency-1-credit-3-amount"] \
+            = str(txn_data.currencies[0].credit[2].amount + Decimal("0.01"))
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
@@ -190,6 +194,10 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         txn_data.days = self.data.t_r_or2.days
+        txn_data.currencies[0].debit[0].amount = Decimal("600")
+        txn_data.currencies[0].credit[0].amount = Decimal("600")
+        txn_data.currencies[0].debit[2].amount = Decimal("600")
+        txn_data.currencies[0].credit[2].amount = Decimal("600")
 
         # Non-existing original entry ID
         form = txn_data.update_form(self.csrf_token)
@@ -246,16 +254,20 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not exceeding net balance - partially offset
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "600.01"
-        form["currency-1-credit-1-amount"] = "600.01"
+        form["currency-1-debit-1-amount"] \
+            = str(txn_data.currencies[0].debit[0].amount + Decimal("0.01"))
+        form["currency-1-credit-1-amount"] \
+            = str(txn_data.currencies[0].credit[0].amount + Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not exceeding net balance - unmatched
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-3-amount"] = "600.01"
-        form["currency-1-credit-3-amount"] = "600.01"
+        form["currency-1-debit-3-amount"] \
+            = str(txn_data.currencies[0].debit[2].amount + Decimal("0.01"))
+        form["currency-1-credit-3-amount"] \
+            = str(txn_data.currencies[0].credit[2].amount + Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -271,10 +283,6 @@ class OffsetTestCase(unittest.TestCase):
 
         # Success
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "600"
-        form["currency-1-credit-1-amount"] = "600"
-        form["currency-1-debit-3-amount"] = "600"
-        form["currency-1-credit-3-amount"] = "600"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
@@ -293,10 +301,10 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         txn_data.days = self.data.t_r_of1.days
-        txn_data.currencies[0].debit[0].amount = "800"
-        txn_data.currencies[0].credit[0].amount = "800"
-        txn_data.currencies[0].debit[1].amount = "3.4"
-        txn_data.currencies[0].credit[1].amount = "3.4"
+        txn_data.currencies[0].debit[0].amount = Decimal("800")
+        txn_data.currencies[0].credit[0].amount = Decimal("800")
+        txn_data.currencies[0].debit[1].amount = Decimal("3.4")
+        txn_data.currencies[0].credit[1].amount = Decimal("3.4")
 
         # Not the same currency
         form = txn_data.update_form(self.csrf_token)
@@ -314,16 +322,20 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not less than offset total - partially offset
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "799.99"
-        form["currency-1-credit-1-amount"] = "799.99"
+        form["currency-1-debit-1-amount"] \
+            = str(txn_data.currencies[0].debit[0].amount - Decimal("0.01"))
+        form["currency-1-credit-1-amount"] \
+            = str(txn_data.currencies[0].credit[0].amount - Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not less than offset total - fully offset
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-2-amount"] = "3.39"
-        form["currency-1-credit-2-amount"] = "3.39"
+        form["currency-1-debit-2-amount"] \
+            = str(txn_data.currencies[0].debit[1].amount - Decimal("0.01"))
+        form["currency-1-credit-2-amount"] \
+            = str(txn_data.currencies[0].credit[1].amount - Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -442,14 +454,16 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not exceeding net balance - partially offset
         form = txn_data.new_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "500.01"
+        form["currency-1-debit-1-amount"] \
+            = str(txn_data.currencies[0].debit[0].amount + Decimal("0.01"))
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not exceeding net balance - unmatched
         form = txn_data.new_form(self.csrf_token)
-        form["currency-1-debit-3-amount"] = "120.01"
+        form["currency-1-debit-3-amount"] \
+            = str(txn_data.currencies[0].debit[2].amount + Decimal("0.01"))
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
@@ -486,6 +500,10 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         txn_data.days = self.data.t_p_or2.days
+        txn_data.currencies[0].debit[0].amount = Decimal("1100")
+        txn_data.currencies[0].credit[0].amount = Decimal("1100")
+        txn_data.currencies[0].debit[2].amount = Decimal("900")
+        txn_data.currencies[0].credit[2].amount = Decimal("900")
 
         # Non-existing original entry ID
         form = txn_data.update_form(self.csrf_token)
@@ -542,16 +560,20 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not exceeding net balance - partially offset
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "1100.01"
-        form["currency-1-credit-1-amount"] = "1100.01"
+        form["currency-1-debit-1-amount"] \
+            = str(txn_data.currencies[0].debit[0].amount + Decimal("0.01"))
+        form["currency-1-credit-1-amount"] \
+            = str(txn_data.currencies[0].credit[0].amount + Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not exceeding net balance - unmatched
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-3-amount"] = "900.01"
-        form["currency-1-credit-3-amount"] = "900.01"
+        form["currency-1-debit-3-amount"] \
+            = str(txn_data.currencies[0].debit[2].amount + Decimal("0.01"))
+        form["currency-1-credit-3-amount"] \
+            = str(txn_data.currencies[0].credit[2].amount + Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -567,10 +589,6 @@ class OffsetTestCase(unittest.TestCase):
 
         # Success
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "1100"
-        form["currency-1-credit-1-amount"] = "1100"
-        form["currency-1-debit-3-amount"] = "900"
-        form["currency-1-credit-3-amount"] = "900"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         txn_id: int = match_txn_detail(response.headers["Location"])
@@ -592,10 +610,10 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         txn_data.days = self.data.t_p_of1.days
-        txn_data.currencies[0].debit[0].amount = "1200"
-        txn_data.currencies[0].credit[0].amount = "1200"
-        txn_data.currencies[0].debit[1].amount = "0.9"
-        txn_data.currencies[0].credit[1].amount = "0.9"
+        txn_data.currencies[0].debit[0].amount = Decimal("1200")
+        txn_data.currencies[0].credit[0].amount = Decimal("1200")
+        txn_data.currencies[0].debit[1].amount = Decimal("0.9")
+        txn_data.currencies[0].credit[1].amount = Decimal("0.9")
 
         # Not the same currency
         form = txn_data.update_form(self.csrf_token)
@@ -613,16 +631,20 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not less than offset total - partially offset
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-1-amount"] = "1199.99"
-        form["currency-1-credit-1-amount"] = "1199.99"
+        form["currency-1-debit-1-amount"] \
+            = str(txn_data.currencies[0].debit[0].amount - Decimal("0.01"))
+        form["currency-1-credit-1-amount"] \
+            = str(txn_data.currencies[0].credit[0].amount - Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not less than offset total - fully offset
         form = txn_data.update_form(self.csrf_token)
-        form["currency-1-debit-2-amount"] = "0.89"
-        form["currency-1-credit-2-amount"] = "0.89"
+        form["currency-1-debit-2-amount"] \
+            = str(txn_data.currencies[0].debit[1].amount - Decimal("0.01"))
+        form["currency-1-credit-2-amount"] \
+            = str(txn_data.currencies[0].credit[1].amount - Decimal("0.01"))
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
