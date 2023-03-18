@@ -188,10 +188,10 @@ class AccountCollector:
         :return: None.
         """
         self.__add_owner_s_equity(Account.NET_CHANGE_CODE,
-                                  self.__query_currency_period(),
+                                  self.__query_current_period(),
                                   self.__period)
 
-    def __query_currency_period(self) -> Decimal | None:
+    def __query_current_period(self) -> Decimal | None:
         """Queries and returns the net income or loss for current period.
 
         :return: The net income or loss for current period.
