@@ -148,6 +148,12 @@ class JournalEntryEditor {
     #side;
 
     /**
+     * Whether the journal entry needs offset
+     * @type {boolean}
+     */
+    isNeedOffset = false;
+
+    /**
      * Constructs a new journal entry editor.
      *
      */
@@ -183,7 +189,7 @@ class JournalEntryEditor {
                 if (this.entry === null) {
                     this.entry = this.#side.addJournalEntry();
                 }
-                this.entry.save("isOriginalEntry" in this.#element.dataset, this.#originalEntry.dataset.id, this.#originalEntry.dataset.date, this.#originalEntry.dataset.text, this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
+                this.entry.save(this.isNeedOffset, this.#originalEntry.dataset.id, this.#originalEntry.dataset.date, this.#originalEntry.dataset.text, this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
@@ -196,7 +202,7 @@ class JournalEntryEditor {
      * @param originalEntry {OriginalEntry} the original entry
      */
     saveOriginalEntry(originalEntry) {
-        delete this.#element.dataset.isOriginalEntry;
+        this.isNeedOffset = false;
         this.#originalEntryContainer.classList.remove("d-none");
         this.#originalEntryControl.classList.add("accounting-not-empty");
         this.#originalEntry.dataset.id = originalEntry.id;
@@ -226,7 +232,7 @@ class JournalEntryEditor {
      *
      */
     clearOriginalEntry() {
-        delete this.#element.dataset.isOriginalEntry;
+        this.isNeedOffset = false;
         this.#originalEntryContainer.classList.add("d-none");
         this.#originalEntryControl.classList.remove("accounting-not-empty");
         this.#originalEntry.dataset.id = "";
@@ -285,11 +291,7 @@ class JournalEntryEditor {
      * @param isAccountOffsetNeeded {boolean} true if the journal entries in the account need offset, or false otherwise
      */
     saveSummaryWithAccount(summary, accountCode, accountText, isAccountOffsetNeeded) {
-        if (isAccountOffsetNeeded) {
-            this.#element.dataset.isOriginalEntry = "true";
-        } else {
-            delete this.#element.dataset.isOriginalEntry;
-        }
+        this.isNeedOffset = isAccountOffsetNeeded;
         this.#accountControl.classList.add("accounting-not-empty");
         this.#account.dataset.code = accountCode;
         this.#account.dataset.text = accountText;
@@ -312,7 +314,7 @@ class JournalEntryEditor {
      *
      */
     clearAccount() {
-        delete this.#element.dataset.isOriginalEntry;
+        this.isNeedOffset = false;
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#account.dataset.code = "";
         this.#account.dataset.text = "";
@@ -328,11 +330,7 @@ class JournalEntryEditor {
      * @param isOffsetNeeded {boolean} true if the journal entries in the account need offset or false otherwise
      */
     saveAccount(code, text, isOffsetNeeded) {
-        if (isOffsetNeeded) {
-            this.#element.dataset.isOriginalEntry = "true";
-        } else {
-            delete this.#element.dataset.isOriginalEntry;
-        }
+        this.isNeedOffset = isOffsetNeeded;
         this.#accountControl.classList.add("accounting-not-empty");
         this.#account.dataset.code = code;
         this.#account.dataset.text = text;
@@ -444,7 +442,7 @@ class JournalEntryEditor {
         this.#side = side;
         this.entryType = this.#side.entryType;
         this.#element.dataset.entryType = side.entryType;
-        delete this.#element.dataset.isOriginalEntry;
+        this.isNeedOffset = false;
         this.#originalEntryContainer.classList.add("d-none");
         this.#originalEntryControl.classList.remove("accounting-not-empty");
         this.#originalEntryControl.classList.remove("is-invalid");
@@ -489,11 +487,7 @@ class JournalEntryEditor {
         this.#side = entry.side;
         this.entryType = this.#side.entryType;
         this.#element.dataset.entryType = entry.entryType;
-        if (entry.isOriginalEntry()) {
-            this.#element.dataset.isOriginalEntry = "true";
-        } else {
-            delete this.#element.dataset.isOriginalEntry;
-        }
+        this.isNeedOffset = entry.isOriginalEntry();
         if (originalEntryId === "") {
             this.#originalEntryContainer.classList.add("d-none");
             this.#originalEntryControl.classList.remove("accounting-not-empty");
