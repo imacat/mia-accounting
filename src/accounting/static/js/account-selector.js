@@ -151,8 +151,8 @@ class AccountSelector {
      */
     #getCodesUsedInForm() {
         const inUse = this.#entryEditor.getTransactionForm().getAccountCodesUsed(this.#entryType);
-        if (this.#entryEditor.getAccountCode() !== null) {
-            inUse.push(this.#entryEditor.getAccountCode());
+        if (this.#entryEditor.accountCode !== null) {
+            inUse.push(this.#entryEditor.accountCode);
         }
         return inUse
     }
@@ -199,13 +199,13 @@ class AccountSelector {
         this.#more.classList.remove("d-none");
         this.#filterOptions();
         for (const option of this.#options) {
-            if (option.dataset.code === entryEditor.getAccountCode()) {
+            if (option.dataset.code === entryEditor.accountCode) {
                 option.classList.add("active");
             } else {
                 option.classList.remove("active");
             }
         }
-        if (entryEditor.getAccountCode() === null) {
+        if (entryEditor.accountCode === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;

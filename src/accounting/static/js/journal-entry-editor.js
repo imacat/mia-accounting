@@ -154,6 +154,42 @@ class JournalEntryEditor {
     isNeedOffset = false;
 
     /**
+     * The ID of the original entry
+     * @type {string|null}
+     */
+    originalEntryId = null;
+
+    /**
+     * The date of the original entry
+     * @type {string|null}
+     */
+    originalEntryDate = null;
+
+    /**
+     * The text of the original entry
+     * @type {string|null}
+     */
+    originalEntryText = null;
+
+    /**
+     * The account code
+     * @type {string|null}
+     */
+    accountCode = null;
+
+    /**
+     * The account text
+     * @type {string|null}
+     */
+    accountText = null;
+
+    /**
+     * The summary
+     * @type {string|null}
+     */
+    summary = null;
+
+    /**
      * Constructs a new journal entry editor.
      *
      */
@@ -173,11 +209,9 @@ class JournalEntryEditor {
         this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
-        this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.#originalEntry.dataset.id);
+        this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.originalEntryId);
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
-        this.#summaryControl.onclick = () => {
-            SummaryEditor.start(this, this.#summary.dataset.value);
-        };
+        this.#summaryControl.onclick = () => SummaryEditor.start(this, this.summary);
         this.#accountControl.onclick = () => {
             AccountSelector.start(this, this.entryType);
         }
@@ -189,7 +223,7 @@ class JournalEntryEditor {
                 if (this.entry === null) {
                     this.entry = this.#side.addJournalEntry();
                 }
-                this.entry.save(this.isNeedOffset, this.#originalEntry.dataset.id, this.#originalEntry.dataset.date, this.#originalEntry.dataset.text, this.#account.dataset.code, this.#account.dataset.text, this.#summary.dataset.value, this.#amount.value);
+                this.entry.save(this.isNeedOffset, this.originalEntryId, this.originalEntryDate, this.originalEntryText, this.accountCode, this.accountText, this.summary, this.#amount.value);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
@@ -205,9 +239,9 @@ class JournalEntryEditor {
         this.isNeedOffset = false;
         this.#originalEntryContainer.classList.remove("d-none");
         this.#originalEntryControl.classList.add("accounting-not-empty");
-        this.#originalEntry.dataset.id = originalEntry.id;
-        this.#originalEntry.dataset.date = originalEntry.date;
-        this.#originalEntry.dataset.text = originalEntry.text;
+        this.originalEntryId = originalEntry.id;
+        this.originalEntryDate = originalEntry.date;
+        this.originalEntryText = originalEntry.text;
         this.#originalEntry.innerText = originalEntry.text;
         this.#setEnableSummaryAccount(false);
         if (originalEntry.summary === "") {
@@ -215,11 +249,11 @@ class JournalEntryEditor {
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
-        this.#summary.dataset.value = originalEntry.summary;
+        this.summary = originalEntry.summary === ""? null: originalEntry.summary;
         this.#summary.innerText = originalEntry.summary;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.#account.dataset.code = originalEntry.accountCode;
-        this.#account.dataset.text = originalEntry.accountText;
+        this.accountCode = originalEntry.accountCode;
+        this.accountText = originalEntry.accountText
         this.#account.innerText = originalEntry.accountText;
         this.#amount.value = String(originalEntry.netBalance);
         this.#amount.max = String(originalEntry.netBalance);
@@ -235,14 +269,14 @@ class JournalEntryEditor {
         this.isNeedOffset = false;
         this.#originalEntryContainer.classList.add("d-none");
         this.#originalEntryControl.classList.remove("accounting-not-empty");
-        this.#originalEntry.dataset.id = "";
-        this.#originalEntry.dataset.date = "";
-        this.#originalEntry.dataset.text = "";
+        this.originalEntryId = null;
+        this.originalEntryDate = null;
+        this.originalEntryText = null;
         this.#originalEntry.innerText = "";
         this.#setEnableSummaryAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
-        this.#account.dataset.code = "";
-        this.#account.dataset.text = "";
+        this.accountCode = null;
+        this.accountText = null;
         this.#account.innerText = "";
         this.#amount.max = "";
     }
@@ -276,7 +310,7 @@ class JournalEntryEditor {
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
-        this.#summary.dataset.value = summary;
+        this.summary = summary === ""? null: summary;
         this.#summary.innerText = summary;
         this.#validateSummary();
         bootstrap.Modal.getOrCreateInstance(this.#modal).show();
@@ -293,20 +327,11 @@ class JournalEntryEditor {
     saveSummaryWithAccount(summary, accountCode, accountText, isAccountOffsetNeeded) {
         this.isNeedOffset = isAccountOffsetNeeded;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.#account.dataset.code = accountCode;
-        this.#account.dataset.text = accountText;
+        this.accountCode = accountCode;
+        this.accountText = accountText;
         this.#account.innerText = accountText;
         this.#validateAccount();
         this.saveSummary(summary)
-    }
-
-    /**
-     * Returns the account code.
-     *
-     * @return {string|null} the account code
-     */
-    getAccountCode() {
-        return this.#account.dataset.code === "" ? null : this.#account.dataset.code;
     }
 
     /**
@@ -316,8 +341,8 @@ class JournalEntryEditor {
     clearAccount() {
         this.isNeedOffset = false;
         this.#accountControl.classList.remove("accounting-not-empty");
-        this.#account.dataset.code = "";
-        this.#account.dataset.text = "";
+        this.accountCode = null;
+        this.accountText = null;
         this.#account.innerText = "";
         this.#validateAccount();
     }
@@ -332,8 +357,8 @@ class JournalEntryEditor {
     saveAccount(code, text, isOffsetNeeded) {
         this.isNeedOffset = isOffsetNeeded;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.#account.dataset.code = code;
-        this.#account.dataset.text = text;
+        this.accountCode = code;
+        this.accountText = text;
         this.#account.innerText = text;
         this.#validateAccount();
     }
@@ -382,7 +407,7 @@ class JournalEntryEditor {
      * @return {boolean} true if valid, or false otherwise
      */
     #validateAccount() {
-        if (this.#account.dataset.code === "") {
+        if (this.accountCode === null) {
             this.#accountControl.classList.add("is-invalid");
             this.#accountError.innerText = A_("Please select the account.");
             return false;
@@ -446,20 +471,20 @@ class JournalEntryEditor {
         this.#originalEntryContainer.classList.add("d-none");
         this.#originalEntryControl.classList.remove("accounting-not-empty");
         this.#originalEntryControl.classList.remove("is-invalid");
-        this.#originalEntry.dataset.id = "";
-        this.#originalEntry.dataset.date = "";
-        this.#originalEntry.dataset.text = "";
+        this.originalEntryId = null;
+        this.originalEntryDate = null;
+        this.originalEntryText = null;
         this.#originalEntry.innerText = "";
         this.#setEnableSummaryAccount(true);
         this.#summaryControl.classList.remove("accounting-not-empty");
         this.#summaryControl.classList.remove("is-invalid");
-        this.#summary.dataset.value = "";
+        this.summary = null;
         this.#summary.innerText = ""
         this.#summaryError.innerText = ""
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
-        this.#account.dataset.code = "";
-        this.#account.dataset.text = "";
+        this.accountCode = null;
+        this.accountText = null;
         this.#account.innerText = "";
         this.#accountError.innerText = "";
         this.#amount.value = "";
@@ -495,9 +520,9 @@ class JournalEntryEditor {
             this.#originalEntryContainer.classList.remove("d-none");
             this.#originalEntryControl.classList.add("accounting-not-empty");
         }
-        this.#originalEntry.dataset.id = originalEntryId;
-        this.#originalEntry.dataset.date = originalEntryDate;
-        this.#originalEntry.dataset.text = originalEntryText;
+        this.originalEntryId = originalEntryId === ""? null: originalEntryId;
+        this.originalEntryDate = originalEntryDate === ""? null: originalEntryDate;
+        this.originalEntryText = originalEntryText === ""? null: originalEntryText;
         this.#originalEntry.innerText = originalEntryText;
         this.#setEnableSummaryAccount(!entry.isMatched && originalEntryId === "");
         if (summary === "") {
@@ -505,15 +530,15 @@ class JournalEntryEditor {
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
-        this.#summary.dataset.value = summary;
+        this.summary = summary === ""? null: summary;
         this.#summary.innerText = summary;
         if (accountCode === "") {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.#account.dataset.code = accountCode;
-        this.#account.dataset.text = accountText;
+        this.accountCode = accountCode;
+        this.accountText = accountText;
         this.#account.innerText = accountText;
         this.#amount.value = amount;
         const maxAmount = this.#getMaxAmount();
@@ -528,10 +553,10 @@ class JournalEntryEditor {
      * @return {Decimal|null} the max amount
      */
     #getMaxAmount() {
-        if (this.#originalEntry.dataset.id === "") {
+        if (this.originalEntryId === null) {
             return null;
         }
-        return OriginalEntrySelector.getNetBalance(this.entry, this.getTransactionForm(), this.#originalEntry.dataset.id);
+        return OriginalEntrySelector.getNetBalance(this.entry, this.getTransactionForm(), this.originalEntryId);
     }
 
     /**

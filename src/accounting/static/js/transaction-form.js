@@ -961,12 +961,12 @@ class JournalEntrySubForm {
      * Stores the data into the journal entry sub-form.
      *
      * @param isOriginalEntry {boolean} true if this is an original entry, or false otherwise
-     * @param originalEntryId {string} the ID of the original entry
-     * @param originalEntryDate {string} the date of the original entry
-     * @param originalEntryText {string} the text of the original entry
-     * @param accountCode {string} the account code
-     * @param accountText {string} the account text
-     * @param summary {string} the summary
+     * @param originalEntryId {string|null} the ID of the original entry
+     * @param originalEntryDate {string|null} the date of the original entry
+     * @param originalEntryText {string|null} the text of the original entry
+     * @param accountCode {string|null} the account code
+     * @param accountText {string|null} the account text
+     * @param summary {string|null} the summary
      * @param amount {string} the amount
      */
     save(isOriginalEntry, originalEntryId, originalEntryDate, originalEntryText, accountCode, accountText, summary, amount) {
@@ -975,21 +975,21 @@ class JournalEntrySubForm {
         } else {
             this.#offsets.classList.add("d-none");
         }
-        this.#originalEntryId.value = originalEntryId;
-        this.#originalEntryId.dataset.date = originalEntryDate;
-        this.#originalEntryId.dataset.text = originalEntryText;
-        if (originalEntryText === "") {
+        this.#originalEntryId.value = originalEntryId === null? "": originalEntryId;
+        this.#originalEntryId.dataset.date = originalEntryDate === null? "": originalEntryDate;
+        this.#originalEntryId.dataset.text = originalEntryText === null? "": originalEntryText;
+        if (originalEntryText === null) {
             this.#originalEntryText.classList.add("d-none");
             this.#originalEntryText.innerText = "";
         } else {
             this.#originalEntryText.classList.remove("d-none");
             this.#originalEntryText.innerText = A_("Offset %(entry)s", {entry: originalEntryText});
         }
-        this.#accountCode.value = accountCode;
-        this.#accountCode.dataset.text = accountText;
-        this.#accountText.innerText = accountText;
-        this.#summary.value = summary;
-        this.#summaryText.innerText = summary;
+        this.#accountCode.value = accountCode === null? "": accountCode;
+        this.#accountCode.dataset.text = accountText === null? "": accountText;
+        this.#accountText.innerText = accountText === null? "": accountText;
+        this.#summary.value = summary === null? "": summary;
+        this.#summaryText.innerText = summary === null? "": summary;
         this.#amount.value = amount;
         this.#amountText.innerText = formatDecimal(new Decimal(amount));
         this.validate();
