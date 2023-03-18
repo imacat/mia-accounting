@@ -38,7 +38,7 @@ class AccountSelector {
      * The entry type
      * @type {string}
      */
-    entryType;
+    #entryType;
 
     /**
      * The prefix of the HTML ID and class
@@ -90,7 +90,7 @@ class AccountSelector {
      */
     constructor(entryEditor, entryType) {
         this.#entryEditor = entryEditor
-        this.entryType = entryType;
+        this.#entryType = entryType;
         this.#prefix = "accounting-account-selector-" + entryType;
         this.#query = document.getElementById(this.#prefix + "-query");
         this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
@@ -143,7 +143,7 @@ class AccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getCodesUsedInForm() {
-        const inUse = this.#entryEditor.form.getAccountCodesUsed(this.entryType);
+        const inUse = this.#entryEditor.form.getAccountCodesUsed(this.#entryType);
         if (this.#entryEditor.accountCode !== null) {
             inUse.push(this.#entryEditor.accountCode);
         }
