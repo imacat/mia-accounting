@@ -203,6 +203,12 @@ class JournalEntryEditor {
     #summaryEditors;
 
     /**
+     * The account selectors
+     * @type {{debit: AccountSelector, credit: AccountSelector}}
+     */
+    #accountSelectors;
+
+    /**
      * Constructs a new journal entry editor.
      *
      * @param form {TransactionForm} the transaction form
@@ -225,10 +231,11 @@ class JournalEntryEditor {
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
         this.#summaryEditors = this.#initializeSummaryEditors();
+        this.#accountSelectors = this.#initializeAccountSelectors();
         this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.originalEntryId);
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
         this.#summaryControl.onclick = () => this.#summaryEditors[this.entryType].onOpen();
-        this.#accountControl.onclick = () => AccountSelector.start(this);
+        this.#accountControl.onclick = () => this.#accountSelectors[this.entryType].onOpen();
         this.#amount.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
             if (this.#validate()) {
@@ -256,6 +263,19 @@ class JournalEntryEditor {
             editors[summaryEditor.entryType] = summaryEditor;
         }
         return editors;
+    }
+
+    /**
+     * Initializes the account selectors.
+     *
+     * @return {{debit: AccountSelector, credit: AccountSelector}} the account selectors
+     */
+    #initializeAccountSelectors() {
+        const selectors = {};
+        for (const entryType of ["debit", "credit"]) {
+            selectors[entryType] = new AccountSelector(this, entryType);
+        }
+        return selectors;
     }
 
     /**
