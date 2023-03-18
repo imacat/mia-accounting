@@ -384,7 +384,7 @@ class Ledger(BaseReport):
         if self.__total is not None:
             all_entries.append(self.__total)
         pagination: Pagination[ReportEntry] \
-            = Pagination[ReportEntry](all_entries)
+            = Pagination[ReportEntry](all_entries, is_reversed=True)
         page_entries: list[ReportEntry] = pagination.list
         has_data: bool = len(page_entries) > 0
         brought_forward: ReportEntry | None = None

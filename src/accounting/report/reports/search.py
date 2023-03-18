@@ -199,7 +199,7 @@ class Search(BaseReport):
         :return: The report as HTML.
         """
         pagination: Pagination[JournalEntry] \
-            = Pagination[JournalEntry](self.__entries)
+            = Pagination[JournalEntry](self.__entries, is_reversed=True)
         params: PageParams = PageParams(pagination=pagination,
                                         entries=pagination.list)
         return render_template("accounting/report/search.html",
