@@ -22,16 +22,17 @@
  */
 "use strict";
 
-// Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", () => {
-    SummaryEditor.initialize();
-});
-
 /**
  * A summary editor.
  *
  */
 class SummaryEditor {
+
+    /**
+     * The journal entry editor
+     * @type {JournalEntryEditor}
+     */
+    #entryEditor;
 
     /**
      * The summary editor form
@@ -55,7 +56,7 @@ class SummaryEditor {
      * The entry type, either "debit" or "credit"
      * @type {string}
      */
-    #entryType;
+    entryType;
 
     /**
      * The current tab
@@ -100,12 +101,6 @@ class SummaryEditor {
     #selectedAccount = null;
 
     /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
-     */
-    #entryEditor;
-
-    /**
      * The tab planes
      * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, regular: RegularPaymentTab, annotation: AnnotationTab}}
      */
@@ -114,11 +109,13 @@ class SummaryEditor {
     /**
      * Constructs a summary editor.
      *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
      * @param form {HTMLFormElement} the summary editor form
      */
-    constructor(form) {
+    constructor(entryEditor, form) {
+        this.#entryEditor = entryEditor;
         this.#form = form;
-        this.#entryType = form.dataset.entryType;
+        this.entryType = form.dataset.entryType;
         this.prefix = "accounting-summary-editor-" + form.dataset.entryType;
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
@@ -227,12 +224,10 @@ class SummaryEditor {
     /**
      * The callback when the summary editor is shown.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
      */
-    #onOpen(entryEditor) {
-        this.#entryEditor = entryEditor;
+    onOpen() {
         this.#reset();
-        this.summary.value = entryEditor.summary === null? "": entryEditor.summary;
+        this.summary.value = this.#entryEditor.summary === null? "": this.#entryEditor.summary;
         this.#onSummaryChange();
     }
 
@@ -246,33 +241,6 @@ class SummaryEditor {
             tabPlane.reset();
         }
         this.tabPlanes.general.switchToMe();
-    }
-
-    /**
-     * The summary editors.
-     * @type {{debit: SummaryEditor, credit: SummaryEditor}}
-     */
-    static #editors = {}
-
-    /**
-     * Initializes the summary editors.
-     *
-     */
-    static initialize() {
-        const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
-        for (const form of forms) {
-            const editor = new SummaryEditor(form);
-            this.#editors[editor.#entryType] = editor;
-        }
-    }
-
-    /**
-     * The callback when the summary editor is shown.
-     *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
-     */
-    static start(entryEditor) {
-        this.#editors[entryEditor.entryType].#onOpen(entryEditor);
     }
 }
 

@@ -197,6 +197,12 @@ class JournalEntryEditor {
     amount = "";
 
     /**
+     * The summary editors
+     * @type {{debit: SummaryEditor, credit: SummaryEditor}}
+     */
+    #summaryEditors;
+
+    /**
      * Constructs a new journal entry editor.
      *
      * @param form {TransactionForm} the transaction form
@@ -218,9 +224,10 @@ class JournalEntryEditor {
         this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
+        this.#summaryEditors = this.#initializeSummaryEditors();
         this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.originalEntryId);
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
-        this.#summaryControl.onclick = () => SummaryEditor.start(this);
+        this.#summaryControl.onclick = () => this.#summaryEditors[this.entryType].onOpen();
         this.#accountControl.onclick = () => AccountSelector.start(this);
         this.#amount.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
@@ -234,6 +241,21 @@ class JournalEntryEditor {
             }
             return false;
         };
+    }
+
+    /**
+     * Initializes the summary editors.
+     *
+     * @return {{debit: SummaryEditor, credit: SummaryEditor}} the summary editors
+     */
+    #initializeSummaryEditors() {
+        const editors = {};
+        const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
+        for (const form of forms) {
+            const summaryEditor = new SummaryEditor(this, form);
+            editors[summaryEditor.entryType] = summaryEditor;
+        }
+        return editors;
     }
 
     /**
