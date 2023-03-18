@@ -71,7 +71,7 @@ class OriginalEntrySelector {
     #optionById;
 
     /**
-     * The journal entry editor.
+     * The journal entry editor
      * @type {JournalEntryEditor}
      */
     entryEditor;
