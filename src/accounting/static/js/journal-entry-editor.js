@@ -288,7 +288,7 @@ class JournalEntryEditor {
         this.#summary.innerText = originalEntry.summary;
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = originalEntry.accountCode;
-        this.accountText = originalEntry.accountText
+        this.accountText = originalEntry.accountText;
         this.#account.innerText = originalEntry.accountText;
         this.#amount.value = String(originalEntry.netBalance);
         this.#amount.max = String(originalEntry.netBalance);
