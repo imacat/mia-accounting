@@ -77,6 +77,17 @@ class OriginalEntrySelector {
     entryEditor;
 
     /**
+     * The currency code
+     * @type {string}
+     */
+    #currencyCode;
+
+    /**
+     * The entry
+     */
+    #entryType;
+
+    /**
      * Constructs an original entry selector.
      *
      */
@@ -151,7 +162,7 @@ class OriginalEntrySelector {
     #filterOptions() {
         let hasAnyMatched = false;
         for (const option of this.#options) {
-            if (option.isMatched(this.#modal.dataset.entryType, this.#modal.dataset.currencyCode, this.#query.value)) {
+            if (option.isMatched(this.#entryType, this.#currencyCode, this.#query.value)) {
                 option.setShown(true);
                 hasAnyMatched = true;
             } else {
@@ -175,8 +186,8 @@ class OriginalEntrySelector {
      */
     onOpen(entryEditor, originalEntryId = null) {
         this.entryEditor = entryEditor
-        this.#modal.dataset.currencyCode = entryEditor.getCurrencyCode();
-        this.#modal.dataset.entryType = entryEditor.entryType;
+        this.#currencyCode = entryEditor.getCurrencyCode();
+        this.#entryType = entryEditor.entryType;
         for (const option of this.#options) {
             option.setActive(option.id === originalEntryId);
         }
