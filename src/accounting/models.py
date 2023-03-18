@@ -199,12 +199,20 @@ class Account(db.Model):
         self.l10n.append(AccountL10n(locale=current_locale, title=value))
 
     @property
+    def is_real(self) -> bool:
+        """Returns whether the account is a real account.
+
+        :return: True if the account is a real account, or False otherwise.
+        """
+        return self.base_code[0] in {"1", "2", "3"}
+
+    @property
     def is_nominal(self) -> bool:
         """Returns whether the account is a nominal account.
 
         :return: True if the account is a nominal account, or False otherwise.
         """
-        return self.base_code[0] not in {"1", "2", "3"}
+        return not self.is_real
 
     @property
     def query_values(self) -> list[str]:
