@@ -234,9 +234,8 @@ class AccountSelector {
      * Starts the account selector.
      *
      * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param entryType {string} the entry type, either "debit" or "credit"
      */
-    static start(entryEditor, entryType) {
-        this.#selectors[entryType].#onOpen(entryEditor);
+    static start(entryEditor) {
+        this.#selectors[entryEditor.entryType].#onOpen(entryEditor);
     }
 }
