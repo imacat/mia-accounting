@@ -22,11 +22,6 @@
  */
 "use strict";
 
-// Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", () => {
-    JournalEntryEditor.initialize();
-});
-
 /**
  * The journal entry editor.
  *
@@ -461,11 +456,11 @@ class JournalEntryEditor {
     }
 
     /**
-     * Adds a new journal entry.
+     * The callback when adding a new journal entry.
      *
      * @param side {DebitCreditSideSubForm} the debit or credit side sub-form
      */
-    #onAddNew(side) {
+    onAddNew(side) {
         this.entry = null;
         this.#side = side;
         this.entryType = this.#side.entryType;
@@ -498,7 +493,7 @@ class JournalEntryEditor {
     }
 
     /**
-     * Edits a journal entry.
+     * The callback when editing a journal entry.
      *
      * @param entry {JournalEntrySubForm} the journal entry sub-form
      * @param originalEntryId {string} the ID of the original entry
@@ -510,7 +505,7 @@ class JournalEntryEditor {
      * @param amount {string} the amount
      * @param amountMin {string} the minimal amount
      */
-    #onEdit(entry, originalEntryId, originalEntryDate, originalEntryText, summary, accountCode, accountText, amount, amountMin) {
+    onEdit(entry, originalEntryId, originalEntryDate, originalEntryText, summary, accountCode, accountText, amount, amountMin) {
         this.entry = entry;
         this.#side = entry.side;
         this.entryType = this.#side.entryType;
@@ -587,45 +582,5 @@ class JournalEntryEditor {
             this.#accountControl.classList.add("accounting-disabled");
             this.#accountControl.classList.remove("accounting-clickable");
         }
-    }
-
-    /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
-     */
-    static #editor;
-
-    /**
-     * Initializes the journal entry editor.
-     *
-     */
-    static initialize() {
-        this.#editor = new JournalEntryEditor();
-    }
-
-    /**
-     * Adds a new journal entry.
-     *
-     * @param side {DebitCreditSideSubForm} the debit or credit side sub-form
-     */
-    static addNew(side) {
-        this.#editor.#onAddNew(side);
-    }
-
-    /**
-     * Edits a journal entry.
-     *
-     * @param entry {JournalEntrySubForm} the journal entry sub-form
-     * @param originalEntryId {string} the ID of the original entry
-     * @param originalEntryDate {string} the date of the original entry
-     * @param originalEntryText {string} the text of the original entry
-     * @param summary {string} the summary
-     * @param accountCode {string} the account code
-     * @param accountText {string} the account text
-     * @param amount {string} the amount
-     * @param amountMin {string} the minimal amount
-     */
-    static edit(entry, originalEntryId, originalEntryDate, originalEntryText, summary, accountCode, accountText, amount, amountMin) {
-        this.#editor.#onEdit(entry, originalEntryId, originalEntryDate, originalEntryText, summary, accountCode, accountText, amount, amountMin);
     }
 }

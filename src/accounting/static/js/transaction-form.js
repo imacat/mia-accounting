@@ -99,6 +99,12 @@ class TransactionForm {
     #noteError;
 
     /**
+     * The journal entry editor
+     * @type {JournalEntryEditor}
+     */
+    entryEditor;
+
+    /**
      * Constructs the transaction form.
      *
      */
@@ -115,6 +121,7 @@ class TransactionForm {
         this.#addCurrencyButton = document.getElementById("accounting-add-currency");
         this.#note = document.getElementById("accounting-note");
         this.#noteError = document.getElementById("accounting-note-error");
+        this.entryEditor = new JournalEntryEditor();
 
         this.#addCurrencyButton.onclick = () => {
             const newIndex = 1 + (this.#currencies.length === 0? 0: Math.max(...this.#currencies.map((currency) => currency.index)));
@@ -601,7 +608,7 @@ class DebitCreditSideSubForm {
         this.entries = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new JournalEntrySubForm(this, element));
         this.#total = document.getElementById(this.#prefix + "-total");
         this.#addEntryButton = document.getElementById(this.#prefix + "-add-entry");
-        this.#addEntryButton.onclick = () => JournalEntryEditor.addNew(this);
+        this.#addEntryButton.onclick = () => this.currency.form.entryEditor.onAddNew(this);
         this.#resetDeleteJournalEntryButtons();
         this.#initializeDragAndDropReordering();
     }
@@ -874,7 +881,7 @@ class JournalEntrySubForm {
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
-        this.#control.onclick = () => JournalEntryEditor.edit(this, this.#originalEntryId.value, this.#originalEntryId.dataset.date, this.#originalEntryId.dataset.text, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.#amount.value, this.#amount.dataset.min);
+        this.#control.onclick = () => this.side.currency.form.entryEditor.onEdit(this, this.#originalEntryId.value, this.#originalEntryId.dataset.date, this.#originalEntryId.dataset.text, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.#amount.value, this.#amount.dataset.min);
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
             this.side.deleteJournalEntry(this);
