@@ -259,10 +259,8 @@ class JournalEntryEditor {
      */
     #initializeSummaryEditors() {
         const editors = {};
-        const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
-        for (const form of forms) {
-            const summaryEditor = new SummaryEditor(this, form);
-            editors[summaryEditor.entryType] = summaryEditor;
+        for (const entryType of ["debit", "credit"]) {
+            editors[entryType] = new SummaryEditor(this, entryType);
         }
         return editors;
     }

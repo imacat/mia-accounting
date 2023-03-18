@@ -110,13 +110,13 @@ class SummaryEditor {
      * Constructs a summary editor.
      *
      * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param form {HTMLFormElement} the summary editor form
+     * @param entryType {string} the entry type, either "debit" or "credit"
      */
-    constructor(entryEditor, form) {
+    constructor(entryEditor, entryType) {
         this.#entryEditor = entryEditor;
-        this.#form = form;
-        this.entryType = form.dataset.entryType;
-        this.prefix = "accounting-summary-editor-" + form.dataset.entryType;
+        this.entryType = entryType;
+        this.prefix = "accounting-summary-editor-" + entryType;
+        this.#form = document.getElementById(this.prefix);
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
         this.#offsetButton = document.getElementById(this.prefix + "-offset");
