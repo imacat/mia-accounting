@@ -881,7 +881,7 @@ class JournalEntrySubForm {
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
-        this.#control.onclick = () => this.side.currency.form.entryEditor.onEdit(this, this.#originalEntryId.value, this.#originalEntryId.dataset.date, this.#originalEntryId.dataset.text, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.#amount.value, this.#amount.dataset.min);
+        this.#control.onclick = () => this.side.currency.form.entryEditor.onEdit(this);
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
             this.side.deleteJournalEntry(this);
@@ -916,6 +916,24 @@ class JournalEntrySubForm {
     }
 
     /**
+     * Returns the text of the original entry.
+     *
+     * @return {string|null} the text of the original entry
+     */
+    getOriginalEntryText() {
+        return this.#originalEntryId.dataset.text === ""? null: this.#originalEntryId.dataset.text;
+    }
+
+    /**
+     * Returns the summary.
+     *
+     * @return {string|null} the summary
+     */
+    getSummary() {
+        return this.#summary.value === ""? null: this.#summary.value;
+    }
+
+    /**
      * Returns the account code.
      *
      * @return {string|null} the account code
@@ -925,12 +943,30 @@ class JournalEntrySubForm {
     }
 
     /**
+     * Returns the account text.
+     *
+     * @return {string|null} the account text
+     */
+    getAccountText() {
+        return this.#accountCode.dataset.text === ""? null: this.#accountCode.dataset.text;
+    }
+
+    /**
      * Returns the amount.
      *
      * @return {Decimal|null} the amount
      */
     getAmount() {
         return this.#amount.value === ""? null: new Decimal(this.#amount.value);
+    }
+
+    /**
+     * Returns the minimal amount.
+     *
+     * @return {Decimal|null} the minimal amount
+     */
+    getAmountMin() {
+        return this.#amount.dataset.min === ""? null: new Decimal(this.#amount.dataset.min);
     }
 
     /**

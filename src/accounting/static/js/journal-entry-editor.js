@@ -519,51 +519,43 @@ class JournalEntryEditor {
      * The callback when editing a journal entry.
      *
      * @param entry {JournalEntrySubForm} the journal entry sub-form
-     * @param originalEntryId {string} the ID of the original entry
-     * @param originalEntryDate {string} the date of the original entry
-     * @param originalEntryText {string} the text of the original entry
-     * @param summary {string} the summary
-     * @param accountCode {string} the account code
-     * @param accountText {string} the account text
-     * @param amount {string} the amount
-     * @param amountMin {string} the minimal amount
      */
-    onEdit(entry, originalEntryId, originalEntryDate, originalEntryText, summary, accountCode, accountText, amount, amountMin) {
+    onEdit(entry) {
         this.entry = entry;
         this.#side = entry.side;
         this.entryType = this.#side.entryType;
         this.isNeedOffset = entry.isNeedOffset();
-        if (originalEntryId === "") {
+        this.originalEntryId = entry.getOriginalEntryId();
+        this.originalEntryDate = entry.getOriginalEntryDate();
+        this.originalEntryText = entry.getOriginalEntryText();
+        this.#originalEntry.innerText = this.originalEntryText;
+        if (this.originalEntryId === null) {
             this.#originalEntryContainer.classList.add("d-none");
             this.#originalEntryControl.classList.remove("accounting-not-empty");
         } else {
             this.#originalEntryContainer.classList.remove("d-none");
             this.#originalEntryControl.classList.add("accounting-not-empty");
         }
-        this.originalEntryId = originalEntryId === ""? null: originalEntryId;
-        this.originalEntryDate = originalEntryDate === ""? null: originalEntryDate;
-        this.originalEntryText = originalEntryText === ""? null: originalEntryText;
-        this.#originalEntry.innerText = originalEntryText;
-        this.#setEnableSummaryAccount(!entry.isMatched && originalEntryId === "");
-        if (summary === "") {
+        this.#setEnableSummaryAccount(!entry.isMatched && this.originalEntryId === null);
+        this.summary = entry.getSummary();
+        if (this.summary === null) {
             this.#summaryControl.classList.remove("accounting-not-empty");
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
-        this.summary = summary === ""? null: summary;
-        this.#summary.innerText = summary;
-        if (accountCode === "") {
+        this.#summary.innerText = this.summary === null? "": this.summary;
+        if (entry.getAccountCode() === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.accountCode = accountCode;
-        this.accountText = accountText;
-        this.#account.innerText = accountText;
-        this.#amount.value = amount;
+        this.accountCode = entry.getAccountCode();
+        this.accountText = entry.getAccountText();
+        this.#account.innerText = this.accountText;
+        this.#amount.value = entry.getAmount() === null? "": String(entry.getAmount());
         const maxAmount = this.#getMaxAmount();
         this.#amount.max = maxAmount === null? "": maxAmount;
-        this.#amount.min = amountMin;
+        this.#amount.min = entry.getAmountMin() === null? "": String(entry.getAmountMin());
         this.#validate();
     }
 
