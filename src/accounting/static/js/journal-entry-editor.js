@@ -200,7 +200,7 @@ class JournalEntryEditor {
      * The summary editors
      * @type {{debit: SummaryEditor, credit: SummaryEditor}}
      */
-    #summaryEditors;
+    #summaryEditors = {};
 
     /**
      * The account selectors
@@ -230,7 +230,9 @@ class JournalEntryEditor {
         this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
-        this.#summaryEditors = this.#initializeSummaryEditors();
+        for (const entryType of ["debit", "credit"]) {
+            this.#summaryEditors[entryType] = new SummaryEditor(this, entryType);
+        }
         for (const entryType of ["debit", "credit"]) {
             this.#accountSelectors[entryType] = new AccountSelector(this, entryType);
         }
@@ -250,19 +252,6 @@ class JournalEntryEditor {
             }
             return false;
         };
-    }
-
-    /**
-     * Initializes the summary editors.
-     *
-     * @return {{debit: SummaryEditor, credit: SummaryEditor}} the summary editors
-     */
-    #initializeSummaryEditors() {
-        const editors = {};
-        for (const entryType of ["debit", "credit"]) {
-            editors[entryType] = new SummaryEditor(this, entryType);
-        }
-        return editors;
     }
 
     /**
