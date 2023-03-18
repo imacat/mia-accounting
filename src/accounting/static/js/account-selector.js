@@ -206,4 +206,19 @@ class AccountSelector {
             this.#clearButton.disabled = false;
         }
     }
+
+    /**
+     * Returns the account selector instances.
+     *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @return {{debit: AccountSelector, credit: AccountSelector}}
+     */
+    static getInstances(entryEditor) {
+        const selectors = {}
+        const modals = Array.from(document.getElementsByClassName("accounting-account-selector"));
+        for (const modal of modals) {
+            selectors[modal.dataset.entryType] = new AccountSelector(entryEditor, modal.dataset.entryType);
+        }
+        return selectors;
+    }
 }

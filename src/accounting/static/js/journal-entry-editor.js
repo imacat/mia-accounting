@@ -200,13 +200,13 @@ class JournalEntryEditor {
      * The summary editors
      * @type {{debit: SummaryEditor, credit: SummaryEditor}}
      */
-    #summaryEditors = {};
+    #summaryEditors;
 
     /**
      * The account selectors
      * @type {{debit: AccountSelector, credit: AccountSelector}}
      */
-    #accountSelectors = {};
+    #accountSelectors;
 
     /**
      * The original entry selector
@@ -236,12 +236,8 @@ class JournalEntryEditor {
         this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
-        for (const entryType of ["debit", "credit"]) {
-            this.#summaryEditors[entryType] = new SummaryEditor(this, entryType);
-        }
-        for (const entryType of ["debit", "credit"]) {
-            this.#accountSelectors[entryType] = new AccountSelector(this, entryType);
-        }
+        this.#summaryEditors = SummaryEditor.getInstances(this);
+        this.#accountSelectors = AccountSelector.getInstances(this);
         this.originalEntrySelector = new OriginalEntrySelector();
         this.#originalEntryControl.onclick = () => this.originalEntrySelector.onOpen(this, this.originalEntryId)
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();

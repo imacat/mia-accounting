@@ -242,6 +242,21 @@ class SummaryEditor {
         }
         this.tabPlanes.general.switchToMe();
     }
+
+    /**
+     * Returns the summary editor instances.
+     *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @return {{debit: SummaryEditor, credit: SummaryEditor}}
+     */
+    static getInstances(entryEditor) {
+        const editors = {}
+        const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
+        for (const form of forms) {
+            editors[form.dataset.entryType] = new SummaryEditor(entryEditor, form.dataset.entryType);
+        }
+        return editors;
+    }
 }
 
 /**
