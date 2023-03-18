@@ -37,5 +37,7 @@ First written: 2023/3/5
   {% if entry.credit %}
     <span class="badge rounded-pill bg-warning">-{{ entry.credit|accounting_format_amount }}</span>
   {% endif %}
-  <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
+  {% if report.account.is_real %}
+    <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
+  {% endif %}
 </div>

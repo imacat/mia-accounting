@@ -221,11 +221,17 @@ a.accounting-report-table-row {
 .accounting-journal-table .accounting-report-table-row {
     grid-template-columns: 1fr 1fr 2fr 4fr 1fr 1fr;
 }
-.accounting-ledger-table .accounting-report-table-row {
+.accounting-ledger-real-table .accounting-report-table-row {
     grid-template-columns: 1fr 4fr 1fr 1fr 1fr;
 }
-.accounting-ledger-table .accounting-report-table-footer .accounting-report-table-row {
+.accounting-ledger-real-table .accounting-report-table-footer .accounting-report-table-row {
     grid-template-columns: 5fr 1fr 1fr 1fr;
+}
+.accounting-ledger-nominal-table .accounting-report-table-row {
+    grid-template-columns: 1fr 4fr 1fr 1fr;
+}
+.accounting-ledger-nominal-table .accounting-report-table-footer .accounting-report-table-row {
+    grid-template-columns: 5fr 1fr 1fr;
 }
 .accounting-income-expenses-table .accounting-report-table-row {
     grid-template-columns: 1fr 2fr 4fr 1fr 1fr 1fr;

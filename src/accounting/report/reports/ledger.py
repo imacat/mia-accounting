@@ -178,6 +178,8 @@ class EntryCollector:
 
         :return: None.
         """
+        if self.__account.is_nominal:
+            return None
         balance: Decimal = 0 if self.brought_forward is None \
             else self.brought_forward.balance
         for entry in self.entries:

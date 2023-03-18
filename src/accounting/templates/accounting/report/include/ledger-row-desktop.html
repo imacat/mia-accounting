@@ -23,4 +23,6 @@ First written: 2023/3/8
 <div>{{ entry.summary|accounting_default }}</div>
 <div class="accounting-amount">{{ entry.debit|accounting_format_amount|accounting_default }}</div>
 <div class="accounting-amount">{{ entry.credit|accounting_format_amount|accounting_default }}</div>
-<div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
+{% if report.account.is_real %}
+  <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
+{% endif %}
