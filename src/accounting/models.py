@@ -198,6 +198,36 @@ class Account(db.Model):
                 return
         self.l10n.append(AccountL10n(locale=current_locale, title=value))
 
+    @property
+    def query_values(self) -> list[str]:
+        """Returns the values to be queried.
+
+        :return: The values to be queried.
+        """
+        return [self.code, self.title_l10n] + [x.title for x in self.l10n]
+
+    @property
+    def is_modified(self) -> bool:
+        """Returns whether a product account was modified.
+
+        :return: True if modified, or False otherwise.
+        """
+        if db.session.is_modified(self):
+            return True
+        for l10n in self.l10n:
+            if db.session.is_modified(l10n):
+                return True
+        return False
+
+    def delete(self) -> None:
+        """Deletes this account.
+
+        :return: None.
+        """
+        AccountL10n.query.filter(AccountL10n.account == self).delete()
+        cls: t.Type[t.Self] = self.__class__
+        cls.query.filter(cls.id == self.id).delete()
+
     @classmethod
     def find_by_code(cls, code: str) -> t.Self | None:
         """Finds an account by its code.
@@ -252,14 +282,6 @@ class Account(db.Model):
                                 cls.base_code != "3353")\
             .order_by(cls.base_code, cls.no).all()
 
-    @property
-    def query_values(self) -> list[str]:
-        """Returns the values to be queried.
-
-        :return: The values to be queried.
-        """
-        return [self.code, self.title_l10n] + [x.title for x in self.l10n]
-
     @classmethod
     def cash(cls) -> t.Self:
         """Returns the cash account.
@@ -275,28 +297,6 @@ class Account(db.Model):
         :return: The accumulated-change account
         """
         return cls.find_by_code(cls.ACCUMULATED_CHANGE_CODE)
-
-    @property
-    def is_modified(self) -> bool:
-        """Returns whether a product account was modified.
-
-        :return: True if modified, or False otherwise.
-        """
-        if db.session.is_modified(self):
-            return True
-        for l10n in self.l10n:
-            if db.session.is_modified(l10n):
-                return True
-        return False
-
-    def delete(self) -> None:
-        """Deletes this account.
-
-        :return: None.
-        """
-        AccountL10n.query.filter(AccountL10n.account == self).delete()
-        cls: t.Type[t.Self] = self.__class__
-        cls.query.filter(cls.id == self.id).delete()
 
 
 class AccountL10n(db.Model):
