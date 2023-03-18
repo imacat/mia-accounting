@@ -137,7 +137,7 @@ class AccountForm {
     setBaseAccount(code, text) {
         this.#baseCode.value = code;
         this.#base.innerText = text;
-        if (["1", "2"].includes(code.substring(0, 1))) {
+        if (["1", "2", "3"].includes(code.substring(0, 1))) {
             this.#isOffsetNeededControl.classList.remove("d-none");
             this.#isOffsetNeeded.disabled = false;
         } else {

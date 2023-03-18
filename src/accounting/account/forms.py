@@ -62,7 +62,7 @@ class NoOffsetNominalAccount:
             return
         if form.base_code.data is None:
             return
-        if form.base_code.data[0] not in {"1", "2"}:
+        if form.base_code.data[0] not in {"1", "2", "3"}:
             raise ValidationError(lazy_gettext(
                 "A nominal account does not need offset."))
 
@@ -102,7 +102,7 @@ class AccountForm(FlaskForm):
             obj.base_code = self.base_code.data
             obj.no = count + 1
         obj.title = self.title.data
-        if self.base_code.data[0] in {"1", "2"}:
+        if self.base_code.data[0] in {"1", "2", "3"}:
             obj.is_offset_needed = self.is_offset_needed.data
         else:
             obj.is_offset_needed = False
