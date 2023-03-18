@@ -361,10 +361,10 @@ class JournalEntryEditor {
      * @param summary {string} the summary
      * @param accountCode {string} the account code
      * @param accountText {string} the account text
-     * @param isAccountOffsetNeeded {boolean} true if the journal entries in the account need offset, or false otherwise
+     * @param isAccountNeedOffset {boolean} true if the journal entries in the account need offset, or false otherwise
      */
-    saveSummaryWithAccount(summary, accountCode, accountText, isAccountOffsetNeeded) {
-        this.isNeedOffset = isAccountOffsetNeeded;
+    saveSummaryWithAccount(summary, accountCode, accountText, isAccountNeedOffset) {
+        this.isNeedOffset = isAccountNeedOffset;
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = accountCode;
         this.accountText = accountText;
