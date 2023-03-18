@@ -190,6 +190,12 @@ class JournalEntryEditor {
     summary = null;
 
     /**
+     * The amount
+     * @type {string}
+     */
+    amount = "";
+
+    /**
      * Constructs a new journal entry editor.
      *
      */
@@ -223,7 +229,8 @@ class JournalEntryEditor {
                 if (this.entry === null) {
                     this.entry = this.#side.addJournalEntry();
                 }
-                this.entry.save(this.isNeedOffset, this.originalEntryId, this.originalEntryDate, this.originalEntryText, this.accountCode, this.accountText, this.summary, this.#amount.value);
+                this.amount = this.#amount.value;
+                this.entry.save(this.isNeedOffset, this.originalEntryId, this.originalEntryDate, this.originalEntryText, this.accountCode, this.accountText, this.summary, this.amount);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
