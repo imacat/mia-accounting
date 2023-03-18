@@ -20,7 +20,7 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
 {# <ul> For SonarQube not to complain about incorrect HTML #}
-<li id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}" class="list-group-item list-group-item-action d-flex justify-content-between accounting-currency-{{ currency_index }}-{{ entry_type }} {% if offset_entries %} accounting-matched-entry {% endif %}" data-currency-index="{{ currency_index }}" data-entry-type="{{ entry_type }}" data-entry-index="{{ entry_index }}" {% if is_original_entry %} data-is-original-entry="true" {% endif %}>
+<li id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}" class="list-group-item list-group-item-action d-flex justify-content-between accounting-currency-{{ currency_index }}-{{ entry_type }} {% if offset_entries %} accounting-matched-entry {% endif %}" data-currency-index="{{ currency_index }}" data-entry-type="{{ entry_type }}" data-entry-index="{{ entry_index }}" {% if is_need_offset %} data-is-need-offset="true" {% endif %}>
   {% if entry_id %}
     <input type="hidden" name="currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-eid" value="{{ entry_id }}">
   {% endif %}
@@ -37,7 +37,7 @@ First written: 2023/2/25
         <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-original-entry-text" class="fst-italic small accounting-original-entry {% if not original_entry_text %} d-none {% endif %}">
           {% if original_entry_text %}{{ A_("Offset %(entry)s", entry=original_entry_text) }}{% endif %}
         </div>
-        <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-offsets" class="fst-italic small accounting-offset-entries {% if not is_original_entry %} d-none {% endif %}">
+        <div id="accounting-currency-{{ currency_index }}-{{ entry_type }}-{{ entry_index }}-offsets" class="fst-italic small accounting-offset-entries {% if not is_need_offset %} d-none {% endif %}">
           {% if offset_entries %}
             <div class="d-flex justify-content-between {% if not offset_entries %} d-none {% endif %}">
               <div>{{ A_("Offsets") }}</div>

@@ -893,8 +893,8 @@ class JournalEntrySubForm {
      *
      * @return {boolean} true if the entry is an original entry, or false otherwise
      */
-    isOriginalEntry() {
-        return "isOriginalEntry" in this.element.dataset;
+    isNeedOffset() {
+        return "isNeedOffset" in this.element.dataset;
     }
 
     /**

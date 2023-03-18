@@ -681,10 +681,10 @@ class JournalEntry(db.Model):
         return self.amount if self.is_debit else None
 
     @property
-    def is_original_entry(self) -> bool:
-        """Returns whether the entry is an original entry.
+    def is_need_offset(self) -> bool:
+        """Returns whether the entry needs offset.
 
-        :return: True if the entry is an original entry, or False otherwise.
+        :return: True if the entry needs offset, or False otherwise.
         """
         if not self.account.is_offset_needed:
             return False

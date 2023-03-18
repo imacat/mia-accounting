@@ -345,10 +345,10 @@ class JournalEntryForm(FlaskForm):
             else str(self.__original_entry)
 
     @property
-    def is_original_entry(self) -> bool:
-        """Returns whether the entry is an original entry.
+    def is_need_offset(self) -> bool:
+        """Returns whether the entry needs offset.
 
-        :return: True if the entry is an original entry, or False otherwise.
+        :return: True if the entry needs offset, or False otherwise.
         """
         if self.account_code.data is None:
             return False
@@ -371,7 +371,7 @@ class JournalEntryForm(FlaskForm):
         """
         if not hasattr(self, "__offsets"):
             def get_offsets() -> list[JournalEntry]:
-                if not self.is_original_entry or self.eid.data is None:
+                if not self.is_need_offset or self.eid.data is None:
                     return []
                 return JournalEntry.query\
                     .filter(JournalEntry.original_entry_id == self.eid.data)\
@@ -390,7 +390,7 @@ class JournalEntryForm(FlaskForm):
         """
         if not hasattr(self, "__offset_total"):
             def get_offset_total():
-                if not self.is_original_entry or self.eid.data is None:
+                if not self.is_need_offset or self.eid.data is None:
                     return None
                 is_debit: bool = isinstance(self, DebitEntryForm)
                 return sum([x.amount if x.is_debit != is_debit else -x.amount
@@ -404,7 +404,7 @@ class JournalEntryForm(FlaskForm):
 
         :return: The net balance.
         """
-        if not self.is_original_entry or self.eid.data is None \
+        if not self.is_need_offset or self.eid.data is None \
                 or self.amount.data is None:
             return None
         return self.amount.data - self.offset_total

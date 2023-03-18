@@ -549,7 +549,7 @@ class JournalEntryEditor {
         this.entry = entry;
         this.#side = entry.side;
         this.entryType = this.#side.entryType;
-        this.isNeedOffset = entry.isOriginalEntry();
+        this.isNeedOffset = entry.isNeedOffset();
         if (originalEntryId === "") {
             this.#originalEntryContainer.classList.add("d-none");
             this.#originalEntryControl.classList.remove("accounting-not-empty");
