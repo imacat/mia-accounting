@@ -213,7 +213,7 @@ class AccountCollector:
         :return: The balance.
         """
         conditions.extend([sa.not_(Account.base_code.startswith(x))
-                           for x in {"1", "2"}])
+                           for x in {"1", "2", "3"}])
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount))
