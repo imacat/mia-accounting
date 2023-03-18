@@ -106,13 +106,9 @@ class AccountSelector {
             this.#more.classList.add("d-none");
             this.#filterOptions();
         };
-        this.#clearButton.onclick = () => {
-            this.#entryEditor.clearAccount();
-        };
+        this.#clearButton.onclick = () => this.#entryEditor.clearAccount();
         for (const option of this.#options) {
-            option.onclick = () => {
-                this.#entryEditor.saveAccount(option.dataset.code, option.dataset.content, option.classList.contains("accounting-account-is-offset-needed"));
-            };
+            option.onclick = () => this.#entryEditor.saveAccount(option.dataset.code, option.dataset.content, option.classList.contains("accounting-account-is-offset-needed"));
         }
         this.#query.addEventListener("input", () => {
             this.#filterOptions();

@@ -218,12 +218,8 @@ class JournalEntryEditor {
         this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.originalEntryId);
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
         this.#summaryControl.onclick = () => SummaryEditor.start(this, this.summary);
-        this.#accountControl.onclick = () => {
-            AccountSelector.start(this, this.entryType);
-        }
-        this.#amount.onchange = () => {
-            this.#validateAmount();
-        }
+        this.#accountControl.onclick = () => AccountSelector.start(this, this.entryType);
+        this.#amount.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
             if (this.#validate()) {
                 if (this.entry === null) {

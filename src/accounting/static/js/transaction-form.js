@@ -128,12 +128,8 @@ class TransactionForm {
         };
         this.#resetDeleteCurrencyButtons();
         this.#initializeDragAndDropReordering();
-        this.#date.onchange = () => {
-            this.#validateDate();
-        };
-        this.#note.onchange = () => {
-            this.#validateNote();
-        }
+        this.#date.onchange = () => this.#validateDate();
+        this.#note.onchange = () => this.#validateNote();
         this.#element.onsubmit = () => {
             return this.#validate();
         };
@@ -435,9 +431,7 @@ class CurrencySubForm {
         this.#debit = debitElement === null? null: new DebitCreditSideSubForm(this, debitElement, "debit");
         const creditElement = document.getElementById(this.#prefix + "-credit");
         this.#credit = creditElement == null? null: new DebitCreditSideSubForm(this, creditElement, "credit");
-        this.#codeSelect.onchange = () => {
-            this.#code.value = this.#codeSelect.value;
-        };
+        this.#codeSelect.onchange = () => this.#code.value = this.#codeSelect.value;
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
             this.form.deleteCurrency(this);
@@ -607,9 +601,7 @@ class DebitCreditSideSubForm {
         this.entries = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new JournalEntrySubForm(this, element));
         this.#total = document.getElementById(this.#prefix + "-total");
         this.#addEntryButton = document.getElementById(this.#prefix + "-add-entry");
-        this.#addEntryButton.onclick = () => {
-            JournalEntryEditor.addNew(this);
-        };
+        this.#addEntryButton.onclick = () => JournalEntryEditor.addNew(this);
         this.#resetDeleteJournalEntryButtons();
         this.#initializeDragAndDropReordering();
     }
@@ -882,9 +874,7 @@ class JournalEntrySubForm {
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
-        this.#control.onclick = () => {
-            JournalEntryEditor.edit(this, this.#originalEntryId.value, this.#originalEntryId.dataset.date, this.#originalEntryId.dataset.text, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.#amount.value, this.#amount.dataset.min);
-        };
+        this.#control.onclick = () => JournalEntryEditor.edit(this, this.#originalEntryId.value, this.#originalEntryId.dataset.date, this.#originalEntryId.dataset.text, this.#summary.value, this.#accountCode.value, this.#accountCode.dataset.text, this.#amount.value, this.#amount.dataset.min);
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
             this.side.deleteJournalEntry(this);
