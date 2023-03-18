@@ -48,7 +48,7 @@ def get_account_query() -> list[Account]:
                code.contains(k),
                Account.id.in_(l10n_matches)]
         if k in gettext("Need offset"):
-            sub_conditions.append(Account.is_offset_needed)
+            sub_conditions.append(Account.is_need_offset)
         conditions.append(sa.or_(*sub_conditions))
 
     return Account.query.filter(*conditions)\

@@ -215,7 +215,7 @@ class SummaryEditor {
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
         if (this.#selectedAccount !== null) {
-            this.#entryEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-offset-needed"));
+            this.#entryEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
         } else {
             this.#entryEditor.saveSummary(this.summary.value);
         }

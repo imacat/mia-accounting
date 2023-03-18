@@ -38,7 +38,7 @@ class AccountOption:
         """The string representation of the account option."""
         self.is_in_use: bool = False
         """True if this account is in use, or False otherwise."""
-        self.is_offset_needed: bool = account.is_offset_needed
+        self.is_need_offset: bool = account.is_need_offset
         """True if this account needs offset, or False otherwise."""
 
     def __str__(self) -> str:

@@ -50,7 +50,7 @@ def get_selectable_original_entries(
         (offset.c.id.in_(entry_id_on_form), 0),
         (be(offset.c.is_debit == JournalEntry.is_debit), offset.c.amount),
         else_=-offset.c.amount))).label("net_balance")
-    conditions: list[sa.BinaryExpression] = [Account.is_offset_needed]
+    conditions: list[sa.BinaryExpression] = [Account.is_need_offset]
     sub_conditions: list[sa.BinaryExpression] = []
     if is_payable:
         sub_conditions.append(sa.and_(Account.base_code.startswith("2"),

@@ -113,7 +113,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original entry does not need offset
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
-            account.is_offset_needed = False
+            account.is_need_offset = False
             db.session.commit()
         response = self.client.post(store_uri,
                                     data=txn_data.new_form(self.csrf_token))
@@ -121,7 +121,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
-            account.is_offset_needed = True
+            account.is_need_offset = True
             db.session.commit()
 
         # The original entry is also an offset
@@ -219,7 +219,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original entry does not need offset
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
-            account.is_offset_needed = False
+            account.is_need_offset = False
             db.session.commit()
         response = self.client.post(update_uri,
                                     data=txn_data.update_form(self.csrf_token))
@@ -227,7 +227,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
-            account.is_offset_needed = True
+            account.is_need_offset = True
             db.session.commit()
 
         # The original entry is also an offset
@@ -419,7 +419,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original entry does not need offset
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
-            account.is_offset_needed = False
+            account.is_need_offset = False
             db.session.commit()
         response = self.client.post(store_uri,
                                     data=txn_data.new_form(self.csrf_token))
@@ -427,7 +427,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
-            account.is_offset_needed = True
+            account.is_need_offset = True
             db.session.commit()
 
         # The original entry is also an offset
@@ -525,7 +525,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original entry does not need offset
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
-            account.is_offset_needed = False
+            account.is_need_offset = False
             db.session.commit()
         response = self.client.post(update_uri,
                                     data=txn_data.update_form(self.csrf_token))
@@ -533,7 +533,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
-            account.is_offset_needed = True
+            account.is_need_offset = True
             db.session.commit()
 
         # The original entry is also an offset

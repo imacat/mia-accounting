@@ -80,7 +80,7 @@ class AccountForm(FlaskForm):
         filters=[strip_text],
         validators=[DataRequired(lazy_gettext("Please fill in the title"))])
     """The title."""
-    is_offset_needed = BooleanField(
+    is_need_offset = BooleanField(
         validators=[NoOffsetNominalAccount()])
     """Whether the the entries of this account need offset."""
 
@@ -103,9 +103,9 @@ class AccountForm(FlaskForm):
             obj.no = count + 1
         obj.title = self.title.data
         if self.base_code.data[0] in {"1", "2", "3"}:
-            obj.is_offset_needed = self.is_offset_needed.data
+            obj.is_need_offset = self.is_need_offset.data
         else:
-            obj.is_offset_needed = False
+            obj.is_need_offset = False
         if is_new:
             current_user_pk: int = get_current_user_pk()
             obj.created_by_id = current_user_pk

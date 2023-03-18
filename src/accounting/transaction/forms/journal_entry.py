@@ -81,7 +81,7 @@ class OriginalEntryNeedOffset:
             = db.session.get(JournalEntry, field.data)
         if original_entry is None:
             return
-        if not original_entry.account.is_offset_needed:
+        if not original_entry.account.is_need_offset:
             raise ValidationError(lazy_gettext(
                 "The original entry does not need offset."))
 
@@ -186,7 +186,7 @@ class NotStartPayableFromDebit:
                 or form.original_entry_id.data is not None:
             return
         account: Account | None = Account.find_by_code(field.data)
-        if account is not None and account.is_offset_needed:
+        if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
                 "A payable entry cannot start from the debit side."))
 
@@ -202,7 +202,7 @@ class NotStartReceivableFromCredit:
                 or form.original_entry_id.data is not None:
             return
         account: Account | None = Account.find_by_code(field.data)
-        if account is not None and account.is_offset_needed:
+        if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
                 "A receivable entry cannot start from the credit side."))
 
@@ -361,7 +361,7 @@ class JournalEntryForm(FlaskForm):
         else:
             return False
         account: Account | None = Account.find_by_code(self.account_code.data)
-        return account is not None and account.is_offset_needed
+        return account is not None and account.is_need_offset
 
     @property
     def offsets(self) -> list[JournalEntry]:

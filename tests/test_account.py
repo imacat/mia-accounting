@@ -377,7 +377,7 @@ class AccountTestCase(unittest.TestCase):
                                     data={"csrf_token": self.csrf_token,
                                           "base_code": "6172",
                                           "title": stock.title,
-                                          "is_offset_needed": "yes"})
+                                          "is_need_offset": "yes"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -484,7 +484,7 @@ class AccountTestCase(unittest.TestCase):
                                     data={"csrf_token": self.csrf_token,
                                           "base_code": "6172",
                                           "title": stock.title,
-                                          "is_offset_needed": "yes"})
+                                          "is_need_offset": "yes"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 

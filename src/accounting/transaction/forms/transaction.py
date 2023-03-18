@@ -219,7 +219,7 @@ class TransactionForm(FlaskForm):
         """
         accounts: list[AccountOption] \
             = [AccountOption(x) for x in Account.debit()
-               if not (x.code[0] == "2" and x.is_offset_needed)]
+               if not (x.code[0] == "2" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntry.account_id)
             .filter(JournalEntry.is_debit)
@@ -236,7 +236,7 @@ class TransactionForm(FlaskForm):
         """
         accounts: list[AccountOption] \
             = [AccountOption(x) for x in Account.credit()
-               if not (x.code[0] == "1" and x.is_offset_needed)]
+               if not (x.code[0] == "1" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntry.account_id)
             .filter(sa.not_(JournalEntry.is_debit))

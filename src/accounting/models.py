@@ -114,7 +114,7 @@ class Account(db.Model):
     """The account number under the base account."""
     title_l10n = db.Column("title", db.String, nullable=False)
     """The title."""
-    is_offset_needed = db.Column(db.Boolean, nullable=False, default=False)
+    is_need_offset = db.Column(db.Boolean, nullable=False, default=False)
     """Whether the entries of this account need offset."""
     created_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
@@ -702,7 +702,7 @@ class JournalEntry(db.Model):
 
         :return: True if the entry needs offset, or False otherwise.
         """
-        if not self.account.is_offset_needed:
+        if not self.account.is_need_offset:
             return False
         if self.account.base_code[0] == "1" and not self.is_debit:
             return False

@@ -83,16 +83,16 @@ class AccountForm {
     #titleError;
 
     /**
-     * The control of the is-offset-needed option
+     * The control of the is-need-offset option
      * @type {HTMLDivElement}
      */
-    #isOffsetNeededControl;
+    #isNeedOffsetControl;
 
     /**
-     * The is-offset-needed option
+     * The is-need-offset option
      * @type {HTMLInputElement}
      */
-    #isOffsetNeeded;
+    #isNeedOffset;
 
     /**
      * Constructs the account form.
@@ -107,8 +107,8 @@ class AccountForm {
         this.#baseError = document.getElementById("accounting-base-error");
         this.#title = document.getElementById("accounting-title");
         this.#titleError = document.getElementById("accounting-title-error");
-        this.#isOffsetNeededControl = document.getElementById("accounting-is-offset-needed-control");
-        this.#isOffsetNeeded = document.getElementById("accounting-is-offset-needed");
+        this.#isNeedOffsetControl = document.getElementById("accounting-is-need-offset-control");
+        this.#isNeedOffset = document.getElementById("accounting-is-need-offset");
         this.#formElement.onsubmit = () => {
             return this.#validateForm();
         };
@@ -138,12 +138,12 @@ class AccountForm {
         this.#baseCode.value = code;
         this.#base.innerText = text;
         if (["1", "2", "3"].includes(code.substring(0, 1))) {
-            this.#isOffsetNeededControl.classList.remove("d-none");
-            this.#isOffsetNeeded.disabled = false;
+            this.#isNeedOffsetControl.classList.remove("d-none");
+            this.#isNeedOffset.disabled = false;
         } else {
-            this.#isOffsetNeededControl.classList.add("d-none");
-            this.#isOffsetNeeded.disabled = true;
-            this.#isOffsetNeeded.checked = false;
+            this.#isNeedOffsetControl.classList.add("d-none");
+            this.#isNeedOffset.disabled = true;
+            this.#isNeedOffset.checked = false;
         }
         this.#validateBase();
     }

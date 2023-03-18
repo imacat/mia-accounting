@@ -152,7 +152,7 @@ class PaginationTestCase(unittest.TestCase):
             :param items: All the items in the list.
             :param is_reversed: Whether the default page is the last page.
             :param result: The expected items on the page.
-            :param is_paged: Whether the pagination is needed.
+            :param is_paged: Whether we need pagination.
             """
             self.items: list[int] = items
             self.is_reversed: bool | None = is_reversed
@@ -192,7 +192,7 @@ class PaginationTestCase(unittest.TestCase):
         :param query: The query string.
         :param items: The original items.
         :param result: The expected page content.
-        :param is_paged: Whether the pagination is needed.
+        :param is_paged: Whether we need pagination.
         :param is_reversed: Whether the list is reversed.
         :return: None.
         """

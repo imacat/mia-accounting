@@ -97,7 +97,7 @@ class EntryCollector:
                code.contains(k),
                Account.id.in_(select_l10n)]
         if k in gettext("Need offset"):
-            conditions.append(Account.is_offset_needed)
+            conditions.append(Account.is_need_offset)
         return sa.select(Account.id).filter(sa.or_(*conditions))
 
     @staticmethod

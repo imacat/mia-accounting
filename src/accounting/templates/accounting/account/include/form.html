@@ -62,9 +62,9 @@ First written: 2023/2/1
     <div id="accounting-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
   </div>
 
-  <div id="accounting-is-offset-needed-control" class="form-check form-switch mb-3 {% if form.base_code.data[0] not in ["1", "2", "3"] %} d-none {% endif %}">
-    <input id="accounting-is-offset-needed" class="form-check-input" type="checkbox" name="is_offset_needed" value="1" {% if form.is_offset_needed.data %} checked="checked" {% endif %}>
-    <label class="form-check-label" for="accounting-is-offset-needed">
+  <div id="accounting-is-need-offset-control" class="form-check form-switch mb-3 {% if form.base_code.data[0] not in ["1", "2", "3"] %} d-none {% endif %}">
+    <input id="accounting-is-need-offset" class="form-check-input" type="checkbox" name="is_need_offset" value="1" {% if form.is_need_offset.data %} checked="checked" {% endif %}>
+    <label class="form-check-label" for="accounting-is-need-offset">
       {{ A_("The entries in the account need offset.") }}
     </label>
   </div>

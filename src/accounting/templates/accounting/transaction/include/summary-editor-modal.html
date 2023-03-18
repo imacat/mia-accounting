@@ -177,7 +177,7 @@ First written: 2023/2/28
           {# The suggested accounts #}
           <div class="mt-3">
             {% for account in summary_editor.accounts %}
-              <button class="btn btn-outline-primary d-none accounting-summary-editor-{{ summary_editor.type }}-account {% if account.is_offset_needed %} accounting-account-is-offset-needed {% endif %}" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
+              <button class="btn btn-outline-primary d-none accounting-summary-editor-{{ summary_editor.type }}-account {% if account.is_need_offset %} accounting-account-is-need-offset {% endif %}" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
                 {{ account }}
               </button>
             {% endfor %}
