@@ -960,38 +960,31 @@ class JournalEntrySubForm {
     /**
      * Stores the data into the journal entry sub-form.
      *
-     * @param isOriginalEntry {boolean} true if this is an original entry, or false otherwise
-     * @param originalEntryId {string|null} the ID of the original entry
-     * @param originalEntryDate {string|null} the date of the original entry
-     * @param originalEntryText {string|null} the text of the original entry
-     * @param accountCode {string|null} the account code
-     * @param accountText {string|null} the account text
-     * @param summary {string|null} the summary
-     * @param amount {string} the amount
+     * @param editor {JournalEntryEditor} the journal entry editor
      */
-    save(isOriginalEntry, originalEntryId, originalEntryDate, originalEntryText, accountCode, accountText, summary, amount) {
-        if (isOriginalEntry) {
+    save(editor) {
+        if (editor.isNeedOffset) {
             this.#offsets.classList.remove("d-none");
         } else {
             this.#offsets.classList.add("d-none");
         }
-        this.#originalEntryId.value = originalEntryId === null? "": originalEntryId;
-        this.#originalEntryId.dataset.date = originalEntryDate === null? "": originalEntryDate;
-        this.#originalEntryId.dataset.text = originalEntryText === null? "": originalEntryText;
-        if (originalEntryText === null) {
+        this.#originalEntryId.value = editor.originalEntryId === null? "": editor.originalEntryId;
+        this.#originalEntryId.dataset.date = editor.originalEntryDate === null? "": editor.originalEntryDate;
+        this.#originalEntryId.dataset.text = editor.originalEntryText === null? "": editor.originalEntryText;
+        if (editor.originalEntryText === null) {
             this.#originalEntryText.classList.add("d-none");
             this.#originalEntryText.innerText = "";
         } else {
             this.#originalEntryText.classList.remove("d-none");
-            this.#originalEntryText.innerText = A_("Offset %(entry)s", {entry: originalEntryText});
+            this.#originalEntryText.innerText = A_("Offset %(entry)s", {entry: editor.originalEntryText});
         }
-        this.#accountCode.value = accountCode === null? "": accountCode;
-        this.#accountCode.dataset.text = accountText === null? "": accountText;
-        this.#accountText.innerText = accountText === null? "": accountText;
-        this.#summary.value = summary === null? "": summary;
-        this.#summaryText.innerText = summary === null? "": summary;
-        this.#amount.value = amount;
-        this.#amountText.innerText = formatDecimal(new Decimal(amount));
+        this.#accountCode.value = editor.accountCode === null? "": editor.accountCode;
+        this.#accountCode.dataset.text = editor.accountText === null? "": editor.accountText;
+        this.#accountText.innerText = editor.accountText === null? "": editor.accountText;
+        this.#summary.value = editor.summary === null? "": editor.summary;
+        this.#summaryText.innerText = editor.summary === null? "": editor.summary;
+        this.#amount.value = editor.amount;
+        this.#amountText.innerText = formatDecimal(new Decimal(editor.amount));
         this.validate();
         this.side.updateTotal();
         this.side.currency.updateCodeSelectorStatus();

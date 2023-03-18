@@ -230,7 +230,7 @@ class JournalEntryEditor {
                     this.entry = this.#side.addJournalEntry();
                 }
                 this.amount = this.#amount.value;
-                this.entry.save(this.isNeedOffset, this.originalEntryId, this.originalEntryDate, this.originalEntryText, this.accountCode, this.accountText, this.summary, this.amount);
+                this.entry.save(this);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
