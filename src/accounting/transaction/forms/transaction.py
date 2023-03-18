@@ -129,9 +129,9 @@ class TransactionForm(FlaskForm):
         provide their own collectors."""
         self.obj: Transaction | None = kwargs.get("obj")
         """The transaction, when editing an existing one."""
-        self._is_payable_needed: bool = False
+        self._is_need_payable: bool = False
         """Whether we need the payable original entries."""
-        self._is_receivable_needed: bool = False
+        self._is_need_receivable: bool = False
         """Whether we need the receivable original entries."""
         self.__original_entry_options: list[JournalEntry] | None = None
         """The options of the original entries."""
@@ -271,7 +271,7 @@ class TransactionForm(FlaskForm):
         if self.__original_entry_options is None:
             self.__original_entry_options = get_selectable_original_entries(
                 {x.eid.data for x in self.entries if x.eid.data is not None},
-                self._is_payable_needed, self._is_receivable_needed)
+                self._is_need_payable, self._is_need_receivable)
         return self.__original_entry_options
 
     @property
@@ -459,7 +459,7 @@ class IncomeTransactionForm(TransactionForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._is_receivable_needed = True
+        self._is_need_receivable = True
 
         class Collector(JournalEntryCollector[IncomeTransactionForm]):
             """The journal entry collector for the cash income transactions."""
@@ -504,7 +504,7 @@ class ExpenseTransactionForm(TransactionForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._is_payable_needed = True
+        self._is_need_payable = True
 
         class Collector(JournalEntryCollector[ExpenseTransactionForm]):
             """The journal entry collector for the cash expense
@@ -550,8 +550,8 @@ class TransferTransactionForm(TransactionForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._is_payable_needed = True
-        self._is_receivable_needed = True
+        self._is_need_payable = True
+        self._is_need_receivable = True
 
         class Collector(JournalEntryCollector[TransferTransactionForm]):
             """The journal entry collector for the transfer transactions."""
