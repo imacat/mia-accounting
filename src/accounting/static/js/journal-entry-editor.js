@@ -220,7 +220,7 @@ class JournalEntryEditor {
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
         this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.originalEntryId);
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
-        this.#summaryControl.onclick = () => SummaryEditor.start(this, this.summary);
+        this.#summaryControl.onclick = () => SummaryEditor.start(this);
         this.#accountControl.onclick = () => AccountSelector.start(this, this.entryType);
         this.#amount.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {

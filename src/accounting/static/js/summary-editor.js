@@ -228,12 +228,11 @@ class SummaryEditor {
      * The callback when the summary editor is shown.
      *
      * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param summary {string|null} the summary
      */
-    #onOpen(entryEditor, summary) {
+    #onOpen(entryEditor) {
         this.#entryEditor = entryEditor;
         this.#reset();
-        this.summary.value = summary === null? "": summary;
+        this.summary.value = entryEditor.summary === null? "": entryEditor.summary;
         this.#onSummaryChange();
     }
 
@@ -271,10 +270,9 @@ class SummaryEditor {
      * The callback when the summary editor is shown.
      *
      * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param summary {string|null} the summary
      */
-    static start(entryEditor, summary) {
-        this.#editors[entryEditor.entryType].#onOpen(entryEditor, summary);
+    static start(entryEditor) {
+        this.#editors[entryEditor.entryType].#onOpen(entryEditor);
     }
 }
 
