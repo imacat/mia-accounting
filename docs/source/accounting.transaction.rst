@@ -1,6 +1,15 @@
 accounting.transaction package
 ==============================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   accounting.transaction.forms
+   accounting.transaction.utils
+
 Submodules
 ----------
 
@@ -8,30 +17,6 @@ accounting.transaction.converters module
 ----------------------------------------
 
 .. automodule:: accounting.transaction.converters
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.transaction.forms module
------------------------------------
-
-.. automodule:: accounting.transaction.forms
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.transaction.operators module
----------------------------------------
-
-.. automodule:: accounting.transaction.operators
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.transaction.summary\_editor module
----------------------------------------------
-
-.. automodule:: accounting.transaction.summary_editor
    :members:
    :undoc-members:
    :show-inheritance:

@@ -4,6 +4,14 @@ accounting.utils package
 Submodules
 ----------
 
+accounting.utils.cast module
+----------------------------
+
+.. automodule:: accounting.utils.cast
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.utils.flash\_errors module
 -------------------------------------
 
