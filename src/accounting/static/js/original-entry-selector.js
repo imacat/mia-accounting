@@ -22,11 +22,6 @@
  */
 "use strict";
 
-// Initializes the page JavaScript.
-document.addEventListener("DOMContentLoaded", () => {
-    OriginalEntrySelector.initialize();
-});
-
 /**
  * The original entry selector.
  *
@@ -108,7 +103,7 @@ class OriginalEntrySelector {
      * @param originalEntryId {string} the ID of the original entry
      * @return {Decimal} the net balance of the original entry
      */
-    #getNetBalance(currentEntry, form, originalEntryId) {
+    getNetBalance(currentEntry, form, originalEntryId) {
         const otherEntries = form.getEntries().filter((entry) => entry !== currentEntry);
         let otherOffset = new Decimal(0);
         for (const otherEntry of otherEntries) {
@@ -178,7 +173,7 @@ class OriginalEntrySelector {
      * @param entryEditor {JournalEntryEditor} the journal entry editor
      * @param originalEntryId {string|null} the ID of the original entry
      */
-    #onOpen(entryEditor, originalEntryId) {
+    onOpen(entryEditor, originalEntryId = null) {
         this.entryEditor = entryEditor
         this.#modal.dataset.currencyCode = entryEditor.getCurrencyCode();
         this.#modal.dataset.entryType = entryEditor.entryType;
@@ -188,42 +183,6 @@ class OriginalEntrySelector {
         this.#query.value = "";
         this.#updateNetBalances();
         this.#filterOptions();
-    }
-
-    /**
-     * The original entry selector.
-     * @type {OriginalEntrySelector}
-     */
-    static #selector;
-
-    /**
-     * Initializes the original entry selector.
-     *
-     */
-    static initialize() {
-        this.#selector = new OriginalEntrySelector();
-    }
-
-    /**
-     * Starts the original entry selector.
-     *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param originalEntryId {string|null} the ID of the original entry
-     */
-    static start(entryEditor, originalEntryId = null) {
-        this.#selector.#onOpen(entryEditor, originalEntryId);
-    }
-
-    /**
-     * Returns the net balance for an original entry.
-     *
-     * @param currentEntry {JournalEntrySubForm} the journal entry sub-form that is currently editing
-     * @param form {TransactionForm} the transaction form
-     * @param originalEntryId {string} the ID of the original entry
-     * @return {Decimal} the net balance of the original entry
-     */
-    static getNetBalance(currentEntry, form, originalEntryId) {
-        return this.#selector.#getNetBalance(currentEntry, form, originalEntryId);
     }
 }
 

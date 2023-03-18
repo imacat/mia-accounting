@@ -209,6 +209,12 @@ class JournalEntryEditor {
     #accountSelectors = {};
 
     /**
+     * The original entry selector
+     * @type {OriginalEntrySelector}
+     */
+    originalEntrySelector;
+
+    /**
      * Constructs a new journal entry editor.
      *
      * @param form {TransactionForm} the transaction form
@@ -236,7 +242,8 @@ class JournalEntryEditor {
         for (const entryType of ["debit", "credit"]) {
             this.#accountSelectors[entryType] = new AccountSelector(this, entryType);
         }
-        this.#originalEntryControl.onclick = () => OriginalEntrySelector.start(this, this.originalEntryId);
+        this.originalEntrySelector = new OriginalEntrySelector();
+        this.#originalEntryControl.onclick = () => this.originalEntrySelector.onOpen(this, this.originalEntryId)
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
         this.#summaryControl.onclick = () => this.#summaryEditors[this.entryType].onOpen();
         this.#accountControl.onclick = () => this.#accountSelectors[this.entryType].onOpen();
@@ -569,7 +576,7 @@ class JournalEntryEditor {
         if (this.originalEntryId === null) {
             return null;
         }
-        return OriginalEntrySelector.getNetBalance(this.entry, this.form, this.originalEntryId);
+        return this.originalEntrySelector.getNetBalance(this.entry, this.form, this.originalEntryId);
     }
 
     /**
