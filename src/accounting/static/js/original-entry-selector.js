@@ -35,12 +35,6 @@ class OriginalEntrySelector {
     #prefix = "accounting-original-entry-selector";
 
     /**
-     * The modal of the original entry editor
-     * @type {HTMLDivElement}
-     */
-    #modal;
-
-    /**
      * The query input
      * @type {HTMLInputElement}
      */
@@ -92,7 +86,6 @@ class OriginalEntrySelector {
      *
      */
     constructor() {
-        this.#modal = document.getElementById(this.#prefix + "-modal");
         this.#query = document.getElementById(this.#prefix + "-query");
         this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
         this.#optionList = document.getElementById(this.#prefix + "-option-list");
