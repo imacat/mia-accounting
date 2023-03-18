@@ -29,6 +29,12 @@
 class JournalEntryEditor {
 
     /**
+     * The transaction form
+     * @type {TransactionForm}
+     */
+    form;
+
+    /**
      * The journal entry editor
      * @type {HTMLFormElement}
      */
@@ -193,8 +199,10 @@ class JournalEntryEditor {
     /**
      * Constructs a new journal entry editor.
      *
+     * @param form {TransactionForm} the transaction form
      */
-    constructor() {
+    constructor(form) {
+        this.form = form;
         this.#element = document.getElementById(this.#prefix);
         this.#modal = document.getElementById(this.#prefix + "-modal");
         this.#originalEntryContainer = document.getElementById(this.#prefix + "-original-entry-container");
@@ -286,15 +294,6 @@ class JournalEntryEditor {
      */
     getCurrencyCode() {
         return this.#side.currency.getCurrencyCode();
-    }
-
-    /**
-     * Returns the transaction form.
-     *
-     * @return {TransactionForm} the transaction form
-     */
-    getTransactionForm() {
-        return this.#side.currency.form;
     }
 
     /**
@@ -554,7 +553,7 @@ class JournalEntryEditor {
         if (this.originalEntryId === null) {
             return null;
         }
-        return OriginalEntrySelector.getNetBalance(this.entry, this.getTransactionForm(), this.originalEntryId);
+        return OriginalEntrySelector.getNetBalance(this.entry, this.form, this.originalEntryId);
     }
 
     /**

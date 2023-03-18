@@ -121,7 +121,7 @@ class TransactionForm {
         this.#addCurrencyButton = document.getElementById("accounting-add-currency");
         this.#note = document.getElementById("accounting-note");
         this.#noteError = document.getElementById("accounting-note-error");
-        this.entryEditor = new JournalEntryEditor();
+        this.entryEditor = new JournalEntryEditor(this);
 
         this.#addCurrencyButton.onclick = () => {
             const newIndex = 1 + (this.#currencies.length === 0? 0: Math.max(...this.#currencies.map((currency) => currency.index)));

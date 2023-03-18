@@ -127,7 +127,7 @@ class OriginalEntrySelector {
      *
      */
     #updateNetBalances() {
-        const otherEntries = this.entryEditor.getTransactionForm().getEntries().filter((entry) => entry !== this.entryEditor.entry);
+        const otherEntries = this.entryEditor.form.getEntries().filter((entry) => entry !== this.entryEditor.entry);
         const otherOffsets = {}
         for (const otherEntry of otherEntries) {
             const otherOriginalEntryId = otherEntry.getOriginalEntryId();
@@ -379,7 +379,7 @@ class OriginalEntry {
      */
     isMatched(entryType, currencyCode, query = null) {
         return this.netBalance.greaterThan(0)
-            && this.date <= this.#selector.entryEditor.getTransactionForm().getDate()
+            && this.date <= this.#selector.entryEditor.form.getDate()
             && this.#isEntryTypeMatches(entryType)
             && this.#currencyCode === currencyCode
             && this.#isQueryMatches(query);
