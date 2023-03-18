@@ -247,8 +247,8 @@ class PaginationTestCase(unittest.TestCase):
         self.__test_success("page-no=46&page-size=15", range(1, 687),
                             range(676, 687))
 
-    def test_not_needed(self) -> None:
-        """Tests the pagination that is not needed.
+    def test_not_need(self) -> None:
+        """Tests that the data does not need pagination.
 
         :return: None.
         """
