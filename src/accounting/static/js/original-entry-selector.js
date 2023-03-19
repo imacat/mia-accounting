@@ -29,6 +29,12 @@
 class OriginalEntrySelector {
 
     /**
+     * The journal entry editor
+     * @type {JournalEntryEditor}
+     */
+    entryEditor;
+
+    /**
      * The prefix of the HTML ID and class
      * @type {string}
      */
@@ -65,12 +71,6 @@ class OriginalEntrySelector {
     #optionById;
 
     /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
-     */
-    entryEditor;
-
-    /**
      * The currency code
      * @type {string}
      */
@@ -84,8 +84,10 @@ class OriginalEntrySelector {
     /**
      * Constructs an original entry selector.
      *
+     * @param entryEditor {JournalEntryEditor} the journal entry editor
      */
-    constructor() {
+    constructor(entryEditor) {
+        this.entryEditor = entryEditor;
         this.#query = document.getElementById(this.#prefix + "-query");
         this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
         this.#optionList = document.getElementById(this.#prefix + "-option-list");
@@ -174,13 +176,11 @@ class OriginalEntrySelector {
     /**
      * The callback when the original entry selector is shown.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
      * @param originalEntryId {string|null} the ID of the original entry
      */
-    onOpen(entryEditor, originalEntryId = null) {
-        this.entryEditor = entryEditor
-        this.#currencyCode = entryEditor.getCurrencyCode();
-        this.#entryType = entryEditor.entryType;
+    onOpen(originalEntryId = null) {
+        this.#currencyCode = this.entryEditor.getCurrencyCode();
+        this.#entryType = this.entryEditor.entryType;
         for (const option of this.#options) {
             option.setActive(option.id === originalEntryId);
         }

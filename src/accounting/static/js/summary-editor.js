@@ -132,7 +132,7 @@ class SummaryEditor {
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
         this.summary.onchange = () => this.#onSummaryChange();
-        this.#offsetButton.onclick = () => this.#entryEditor.originalEntrySelector.onOpen(this.#entryEditor);
+        this.#offsetButton.onclick = () => this.#entryEditor.originalEntrySelector.onOpen();
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
                 this.#submit();
