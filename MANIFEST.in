@@ -25,6 +25,7 @@ include docs/source/_templates/*
 include tests/*
 exclude tests/test_temp.py
 include tests/test_site/*
+include tests/test_site/static/*
 include tests/test_site/templates/*
 include tests/test_site/translations/*
 include tests/test_site/translations/*/LC_MESSAGES/*
