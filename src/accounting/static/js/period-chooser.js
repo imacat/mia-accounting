@@ -175,7 +175,7 @@ class MonthTab extends TabPlane {
             let start = monthChooser.dataset.start;
             this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
                 restrictions: {
-                    minDate: start,
+                    minDate: new Date(start),
                 },
                 display: {
                     inline: true,
@@ -184,7 +184,7 @@ class MonthTab extends TabPlane {
                         clock: false,
                     },
                 },
-                defaultDate: monthChooser.dataset.default,
+                defaultDate: new Date(monthChooser.dataset.default),
             });
             monthChooser.addEventListener(tempusDominus.Namespace.events.change, (e) => {
                 const date = e.detail.date;
