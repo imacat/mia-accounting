@@ -100,10 +100,11 @@ def init_accounts_command(username: str) -> None:
 
 
 def __is_need_offset(base_code: str) -> bool:
-    """Checks that whether entries in the account need offset.
+    """Checks that whether voucher line items in the account need offset.
 
     :param base_code: The code of the base account.
-    :return: True if entries in the account need offset, or False otherwise.
+    :return: True if voucher line items in the account need offset, or False
+        otherwise.
     """
     # Assets
     if base_code[0] == "1":

@@ -27,14 +27,14 @@ First written: 2023/2/26
       <div class="mb-2 fw-bolder">{{ currency.name }}</div>
 
       <div class="row">
-        {# The debit entries #}
+        {# The debit line items #}
         <div class="col-sm-6 mb-2">
           <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
-            <li class="list-group-item accounting-voucher-entry accounting-voucher-entry-header">{{ A_("Debit") }}</li>
-            {% with entries = currency.debit %}
-              {% include "accounting/voucher/include/detail-entries.html" %}
+            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-header">{{ A_("Debit") }}</li>
+            {% with line_items = currency.debit %}
+              {% include "accounting/voucher/include/detail-line-items.html" %}
             {% endwith %}
-            <li class="list-group-item accounting-voucher-entry accounting-voucher-entry-total">
+            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-total">
               <div class="d-flex justify-content-between">
                 <div>{{ A_("Total") }}</div>
                 <div>{{ currency.debit_total|accounting_format_amount }}</div>
@@ -43,14 +43,14 @@ First written: 2023/2/26
           </ul>
         </div>
 
-        {# The credit entries #}
+        {# The credit line items #}
         <div class="col-sm-6 mb-2">
           <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
-            <li class="list-group-item accounting-voucher-entry accounting-voucher-entry-header">{{ A_("Credit") }}</li>
-            {% with entries = currency.credit %}
-              {% include "accounting/voucher/include/detail-entries.html" %}
+            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-header">{{ A_("Credit") }}</li>
+            {% with line_items = currency.credit %}
+              {% include "accounting/voucher/include/detail-line-items.html" %}
             {% endwith %}
-            <li class="list-group-item accounting-voucher-entry accounting-voucher-entry-total">
+            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-total">
               <div class="d-flex justify-content-between">
                 <div>{{ A_("Total") }}</div>
                 <div>{{ currency.debit_total|accounting_format_amount }}</div>

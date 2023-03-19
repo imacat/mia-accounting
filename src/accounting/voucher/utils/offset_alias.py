@@ -14,20 +14,20 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The SQLAlchemy alias for the offset entries.
+"""The SQLAlchemy alias for the offset items.
 
 """
 import typing as t
 
 import sqlalchemy as sa
 
-from accounting.models import JournalEntry
+from accounting.models import VoucherLineItem
 
 
 def offset_alias() -> sa.Alias:
-    """Returns the SQLAlchemy alias for the offset entries.
+    """Returns the SQLAlchemy alias for the offset items.
 
-    :return: The SQLAlchemy alias for the offset entries.
+    :return: The SQLAlchemy alias for the offset items.
     """
 
     def as_from(model_cls: t.Any) -> sa.FromClause:
@@ -36,4 +36,4 @@ def offset_alias() -> sa.Alias:
     def as_alias(alias: t.Any) -> sa.Alias:
         return alias
 
-    return as_alias(sa.alias(as_from(JournalEntry), name="offset"))
+    return as_alias(sa.alias(as_from(VoucherLineItem), name="offset"))

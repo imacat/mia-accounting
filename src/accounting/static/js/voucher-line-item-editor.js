@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * journal-entry-editor.js: The JavaScript for the journal entry editor
+ * voucher-line-item-editor.js: The JavaScript for the voucher line item editor
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -23,10 +23,10 @@
 "use strict";
 
 /**
- * The journal entry editor.
+ * The voucher line item editor.
  *
  */
-class JournalEntryEditor {
+class VoucherLineItemEditor {
 
     /**
      * The voucher form
@@ -35,7 +35,7 @@ class JournalEntryEditor {
     form;
 
     /**
-     * The journal entry editor
+     * The voucher line item editor
      * @type {HTMLFormElement}
      */
     #element;
@@ -47,46 +47,46 @@ class JournalEntryEditor {
     #modal;
 
     /**
-     * The entry type, either "debit" or "credit"
+     * The side, either "debit" or "credit"
      * @type {string}
      */
-    entryType;
+    side;
 
     /**
      * The prefix of the HTML ID and class
      * @type {string}
      */
-    #prefix = "accounting-entry-editor"
+    #prefix = "accounting-line-item-editor"
 
     /**
-     * The container of the original entry
+     * The container of the original line item
      * @type {HTMLDivElement}
      */
-    #originalEntryContainer;
+    #originalLineItemContainer;
 
     /**
-     * The control of the original entry
+     * The control of the original line item
      * @type {HTMLDivElement}
      */
-    #originalEntryControl;
+    #originalLineItemControl;
 
     /**
-     * The original entry
+     * The original line item
      * @type {HTMLDivElement}
      */
-    #originalEntryText;
+    #originalLineItemText;
 
     /**
-     * The error message of the original entry
+     * The error message of the original line item
      * @type {HTMLDivElement}
      */
-    #originalEntryError;
+    #originalLineItemError;
 
     /**
-     * The delete button of the original entry
+     * The delete button of the original line item
      * @type {HTMLButtonElement}
      */
-    #originalEntryDelete;
+    #originalLineItemDelete;
 
     /**
      * The control of the summary
@@ -137,40 +137,40 @@ class JournalEntryEditor {
     #amountError;
 
     /**
-     * The journal entry to edit
-     * @type {JournalEntrySubForm|null}
+     * The voucher line item to edit
+     * @type {LineItemSubForm|null}
      */
-    entry;
+    lineItem;
 
     /**
-     * The debit or credit entry side sub-form
-     * @type {DebitCreditSideSubForm}
+     * The debit or credit side sub-form
+     * @type {SideSubForm}
      */
-    #side;
+    #sideSubForm;
 
     /**
-     * Whether the journal entry needs offset
+     * Whether the voucher line item needs offset
      * @type {boolean}
      */
     isNeedOffset = false;
 
     /**
-     * The ID of the original entry
+     * The ID of the original line item
      * @type {string|null}
      */
-    originalEntryId = null;
+    originalLineItemId = null;
 
     /**
-     * The date of the original entry
+     * The date of the original line item
      * @type {string|null}
      */
-    originalEntryDate = null;
+    originalLineItemDate = null;
 
     /**
-     * The text of the original entry
+     * The text of the original line item
      * @type {string|null}
      */
-    originalEntryText = null;
+    originalLineItemText = null;
 
     /**
      * The account code
@@ -209,13 +209,13 @@ class JournalEntryEditor {
     #accountSelectors;
 
     /**
-     * The original entry selector
-     * @type {OriginalEntrySelector}
+     * The original line item selector
+     * @type {OriginalLineItemSelector}
      */
-    originalEntrySelector;
+    originalLineItemSelector;
 
     /**
-     * Constructs a new journal entry editor.
+     * Constructs a new voucher line item editor.
      *
      * @param form {VoucherForm} the voucher form
      */
@@ -223,11 +223,11 @@ class JournalEntryEditor {
         this.form = form;
         this.#element = document.getElementById(this.#prefix);
         this.#modal = document.getElementById(this.#prefix + "-modal");
-        this.#originalEntryContainer = document.getElementById(this.#prefix + "-original-entry-container");
-        this.#originalEntryControl = document.getElementById(this.#prefix + "-original-entry-control");
-        this.#originalEntryText = document.getElementById(this.#prefix + "-original-entry");
-        this.#originalEntryError = document.getElementById(this.#prefix + "-original-entry-error");
-        this.#originalEntryDelete = document.getElementById(this.#prefix + "-original-entry-delete");
+        this.#originalLineItemContainer = document.getElementById(this.#prefix + "-original-line-item-container");
+        this.#originalLineItemControl = document.getElementById(this.#prefix + "-original-line-item-control");
+        this.#originalLineItemText = document.getElementById(this.#prefix + "-original-line-item");
+        this.#originalLineItemError = document.getElementById(this.#prefix + "-original-line-item-error");
+        this.#originalLineItemDelete = document.getElementById(this.#prefix + "-original-line-item-delete");
         this.#summaryControl = document.getElementById(this.#prefix + "-summary-control");
         this.#summaryText = document.getElementById(this.#prefix + "-summary");
         this.#summaryError = document.getElementById(this.#prefix + "-summary-error");
@@ -238,19 +238,19 @@ class JournalEntryEditor {
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
         this.#summaryEditors = SummaryEditor.getInstances(this);
         this.#accountSelectors = AccountSelector.getInstances(this);
-        this.originalEntrySelector = new OriginalEntrySelector(this);
-        this.#originalEntryControl.onclick = () => this.originalEntrySelector.onOpen()
-        this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
-        this.#summaryControl.onclick = () => this.#summaryEditors[this.entryType].onOpen();
-        this.#accountControl.onclick = () => this.#accountSelectors[this.entryType].onOpen();
+        this.originalLineItemSelector = new OriginalLineItemSelector(this);
+        this.#originalLineItemControl.onclick = () => this.originalLineItemSelector.onOpen()
+        this.#originalLineItemDelete.onclick = () => this.clearOriginalLineItem();
+        this.#summaryControl.onclick = () => this.#summaryEditors[this.side].onOpen();
+        this.#accountControl.onclick = () => this.#accountSelectors[this.side].onOpen();
         this.#amountInput.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
             if (this.#validate()) {
-                if (this.entry === null) {
-                    this.entry = this.#side.addJournalEntry();
+                if (this.lineItem === null) {
+                    this.lineItem = this.#sideSubForm.addLineItem();
                 }
                 this.amount = this.#amountInput.value;
-                this.entry.save(this);
+                this.lineItem.save(this);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
@@ -258,48 +258,48 @@ class JournalEntryEditor {
     }
 
     /**
-     * Saves the original entry from the original entry selector.
+     * Saves the original line item from the original line item selector.
      *
-     * @param originalEntry {OriginalEntry} the original entry
+     * @param originalLineItem {OriginalLineItem} the original line item
      */
-    saveOriginalEntry(originalEntry) {
+    saveOriginalLineItem(originalLineItem) {
         this.isNeedOffset = false;
-        this.#originalEntryContainer.classList.remove("d-none");
-        this.#originalEntryControl.classList.add("accounting-not-empty");
-        this.originalEntryId = originalEntry.id;
-        this.originalEntryDate = originalEntry.date;
-        this.originalEntryText = originalEntry.text;
-        this.#originalEntryText.innerText = originalEntry.text;
+        this.#originalLineItemContainer.classList.remove("d-none");
+        this.#originalLineItemControl.classList.add("accounting-not-empty");
+        this.originalLineItemId = originalLineItem.id;
+        this.originalLineItemDate = originalLineItem.date;
+        this.originalLineItemText = originalLineItem.text;
+        this.#originalLineItemText.innerText = originalLineItem.text;
         this.#setEnableSummaryAccount(false);
-        if (originalEntry.summary === "") {
+        if (originalLineItem.summary === "") {
             this.#summaryControl.classList.remove("accounting-not-empty");
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
-        this.summary = originalEntry.summary === ""? null: originalEntry.summary;
-        this.#summaryText.innerText = originalEntry.summary;
+        this.summary = originalLineItem.summary === ""? null: originalLineItem.summary;
+        this.#summaryText.innerText = originalLineItem.summary;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.accountCode = originalEntry.accountCode;
-        this.accountText = originalEntry.accountText;
-        this.#accountText.innerText = originalEntry.accountText;
-        this.#amountInput.value = String(originalEntry.netBalance);
-        this.#amountInput.max = String(originalEntry.netBalance);
+        this.accountCode = originalLineItem.accountCode;
+        this.accountText = originalLineItem.accountText;
+        this.#accountText.innerText = originalLineItem.accountText;
+        this.#amountInput.value = String(originalLineItem.netBalance);
+        this.#amountInput.max = String(originalLineItem.netBalance);
         this.#amountInput.min = "0";
         this.#validate();
     }
 
     /**
-     * Clears the original entry.
+     * Clears the original line item.
      *
      */
-    clearOriginalEntry() {
+    clearOriginalLineItem() {
         this.isNeedOffset = false;
-        this.#originalEntryContainer.classList.add("d-none");
-        this.#originalEntryControl.classList.remove("accounting-not-empty");
-        this.originalEntryId = null;
-        this.originalEntryDate = null;
-        this.originalEntryText = null;
-        this.#originalEntryText.innerText = "";
+        this.#originalLineItemContainer.classList.add("d-none");
+        this.#originalLineItemControl.classList.remove("accounting-not-empty");
+        this.originalLineItemId = null;
+        this.originalLineItemDate = null;
+        this.originalLineItemText = null;
+        this.#originalLineItemText.innerText = "";
         this.#setEnableSummaryAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
         this.accountCode = null;
@@ -314,7 +314,7 @@ class JournalEntryEditor {
      * @return {string} the currency code
      */
     getCurrencyCode() {
-        return this.#side.currency.getCurrencyCode();
+        return this.#sideSubForm.currency.getCurrencyCode();
     }
 
     /**
@@ -340,7 +340,7 @@ class JournalEntryEditor {
      * @param summary {string} the summary
      * @param accountCode {string} the account code
      * @param accountText {string} the account text
-     * @param isAccountNeedOffset {boolean} true if the journal entries in the account need offset, or false otherwise
+     * @param isAccountNeedOffset {boolean} true if the line items in the account need offset, or false otherwise
      */
     saveSummaryWithAccount(summary, accountCode, accountText, isAccountNeedOffset) {
         this.isNeedOffset = isAccountNeedOffset;
@@ -370,7 +370,7 @@ class JournalEntryEditor {
      *
      * @param code {string} the account code
      * @param text {string} the account text
-     * @param isNeedOffset {boolean} true if the journal entries in the account need offset or false otherwise
+     * @param isNeedOffset {boolean} true if the line items in the account need offset or false otherwise
      */
     saveAccount(code, text, isNeedOffset) {
         this.isNeedOffset = isNeedOffset;
@@ -388,7 +388,7 @@ class JournalEntryEditor {
      */
     #validate() {
         let isValid = true;
-        isValid = this.#validateOriginalEntry() && isValid;
+        isValid = this.#validateOriginalLineItem() && isValid;
         isValid = this.#validateSummary() && isValid;
         isValid = this.#validateAccount() && isValid;
         isValid = this.#validateAmount() && isValid
@@ -396,14 +396,14 @@ class JournalEntryEditor {
     }
 
     /**
-     * Validates the original entry.
+     * Validates the original line item.
      *
      * @return {boolean} true if valid, or false otherwise
      * @private
      */
-    #validateOriginalEntry() {
-        this.#originalEntryControl.classList.remove("is-invalid");
-        this.#originalEntryError.innerText = "";
+    #validateOriginalLineItem() {
+        this.#originalLineItemControl.classList.remove("is-invalid");
+        this.#originalLineItemError.innerText = "";
         return true;
     }
 
@@ -458,7 +458,7 @@ class JournalEntryEditor {
         if (this.#amountInput.max !== "") {
             if (amount.greaterThan(new Decimal(this.#amountInput.max))) {
                 this.#amountInput.classList.add("is-invalid");
-                this.#amountError.innerText = A_("The amount must not exceed the net balance %(balance)s of the original entry.", {balance: new Decimal(this.#amountInput.max)});
+                this.#amountError.innerText = A_("The amount must not exceed the net balance %(balance)s of the original line item.", {balance: new Decimal(this.#amountInput.max)});
                 return false;
             }
         }
@@ -476,22 +476,22 @@ class JournalEntryEditor {
     }
 
     /**
-     * The callback when adding a new journal entry.
+     * The callback when adding a new voucher line item.
      *
-     * @param side {DebitCreditSideSubForm} the debit or credit side sub-form
+     * @param side {SideSubForm} the debit or credit side sub-form
      */
     onAddNew(side) {
-        this.entry = null;
-        this.#side = side;
-        this.entryType = this.#side.entryType;
+        this.lineItem = null;
+        this.#sideSubForm = side;
+        this.side = this.#sideSubForm.side;
         this.isNeedOffset = false;
-        this.#originalEntryContainer.classList.add("d-none");
-        this.#originalEntryControl.classList.remove("accounting-not-empty");
-        this.#originalEntryControl.classList.remove("is-invalid");
-        this.originalEntryId = null;
-        this.originalEntryDate = null;
-        this.originalEntryText = null;
-        this.#originalEntryText.innerText = "";
+        this.#originalLineItemContainer.classList.add("d-none");
+        this.#originalLineItemControl.classList.remove("accounting-not-empty");
+        this.#originalLineItemControl.classList.remove("is-invalid");
+        this.originalLineItemId = null;
+        this.originalLineItemDate = null;
+        this.originalLineItemText = null;
+        this.#originalLineItemText.innerText = "";
         this.#setEnableSummaryAccount(true);
         this.#summaryControl.classList.remove("accounting-not-empty");
         this.#summaryControl.classList.remove("is-invalid");
@@ -512,46 +512,46 @@ class JournalEntryEditor {
     }
 
     /**
-     * The callback when editing a journal entry.
+     * The callback when editing a voucher line item.
      *
-     * @param entry {JournalEntrySubForm} the journal entry sub-form
+     * @param lineItem {LineItemSubForm} the voucher line item sub-form
      */
-    onEdit(entry) {
-        this.entry = entry;
-        this.#side = entry.side;
-        this.entryType = this.#side.entryType;
-        this.isNeedOffset = entry.isNeedOffset();
-        this.originalEntryId = entry.getOriginalEntryId();
-        this.originalEntryDate = entry.getOriginalEntryDate();
-        this.originalEntryText = entry.getOriginalEntryText();
-        this.#originalEntryText.innerText = this.originalEntryText;
-        if (this.originalEntryId === null) {
-            this.#originalEntryContainer.classList.add("d-none");
-            this.#originalEntryControl.classList.remove("accounting-not-empty");
+    onEdit(lineItem) {
+        this.lineItem = lineItem;
+        this.#sideSubForm = lineItem.sideSubForm;
+        this.side = this.#sideSubForm.side;
+        this.isNeedOffset = lineItem.isNeedOffset();
+        this.originalLineItemId = lineItem.getOriginalLineItemId();
+        this.originalLineItemDate = lineItem.getOriginalLineItemDate();
+        this.originalLineItemText = lineItem.getOriginalLineItemText();
+        this.#originalLineItemText.innerText = this.originalLineItemText;
+        if (this.originalLineItemId === null) {
+            this.#originalLineItemContainer.classList.add("d-none");
+            this.#originalLineItemControl.classList.remove("accounting-not-empty");
         } else {
-            this.#originalEntryContainer.classList.remove("d-none");
-            this.#originalEntryControl.classList.add("accounting-not-empty");
+            this.#originalLineItemContainer.classList.remove("d-none");
+            this.#originalLineItemControl.classList.add("accounting-not-empty");
         }
-        this.#setEnableSummaryAccount(!entry.isMatched && this.originalEntryId === null);
-        this.summary = entry.getSummary();
+        this.#setEnableSummaryAccount(!lineItem.isMatched && this.originalLineItemId === null);
+        this.summary = lineItem.getSummary();
         if (this.summary === null) {
             this.#summaryControl.classList.remove("accounting-not-empty");
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
         this.#summaryText.innerText = this.summary === null? "": this.summary;
-        if (entry.getAccountCode() === null) {
+        if (lineItem.getAccountCode() === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.accountCode = entry.getAccountCode();
-        this.accountText = entry.getAccountText();
+        this.accountCode = lineItem.getAccountCode();
+        this.accountText = lineItem.getAccountText();
         this.#accountText.innerText = this.accountText;
-        this.#amountInput.value = entry.getAmount() === null? "": String(entry.getAmount());
+        this.#amountInput.value = lineItem.getAmount() === null? "": String(lineItem.getAmount());
         const maxAmount = this.#getMaxAmount();
         this.#amountInput.max = maxAmount === null? "": maxAmount;
-        this.#amountInput.min = entry.getAmountMin() === null? "": String(entry.getAmountMin());
+        this.#amountInput.min = lineItem.getAmountMin() === null? "": String(lineItem.getAmountMin());
         this.#validate();
     }
 
@@ -561,10 +561,10 @@ class JournalEntryEditor {
      * @return {Decimal|null} the max amount
      */
     #getMaxAmount() {
-        if (this.originalEntryId === null) {
+        if (this.originalLineItemId === null) {
             return null;
         }
-        return this.originalEntrySelector.getNetBalance(this.entry, this.form, this.originalEntryId);
+        return this.originalLineItemSelector.getNetBalance(this.lineItem, this.form, this.originalLineItemId);
     }
 
     /**
@@ -575,11 +575,11 @@ class JournalEntryEditor {
     #setEnableSummaryAccount(isEnabled) {
         if (isEnabled) {
             this.#summaryControl.dataset.bsToggle = "modal";
-            this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + this.#side.entryType + "-modal";
+            this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + this.#sideSubForm.side + "-modal";
             this.#summaryControl.classList.remove("accounting-disabled");
             this.#summaryControl.classList.add("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "modal";
-            this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#side.entryType + "-modal";
+            this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#sideSubForm.side + "-modal";
             this.#accountControl.classList.remove("accounting-disabled");
             this.#accountControl.classList.add("accounting-clickable");
         } else {

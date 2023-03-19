@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Flask Project
-detail-entries-item: The journal entries in the voucher detail
+detail-line-items-item: The line items in the voucher detail
 
  Copyright (c) 2023 imacat.
 
@@ -20,28 +20,28 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/14
 #}
 {# <ul> For SonarQube not to complain about incorrect HTML #}
-{% for entry in entries %}
-  <li class="list-group-item accounting-voucher-entry">
+{% for line_item in line_items %}
+  <li class="list-group-item accounting-voucher-line-item">
     <div class="d-flex justify-content-between">
       <div>
-        <div class="small">{{ entry.account }}</div>
-        {% if entry.summary is not none %}
-          <div>{{ entry.summary }}</div>
+        <div class="small">{{ line_item.account }}</div>
+        {% if line_item.summary is not none %}
+          <div>{{ line_item.summary }}</div>
         {% endif %}
-        {% if entry.original_entry %}
-          <div class="fst-italic small accounting-original-entry">
-            <a href="{{ url_for("accounting.voucher.detail", voucher=entry.original_entry.voucher)|accounting_append_next }}">
-              {{ A_("Offset %(entry)s", entry=entry.original_entry) }}
+        {% if line_item.original_line_item %}
+          <div class="fst-italic small accounting-original-line-item">
+            <a href="{{ url_for("accounting.voucher.detail", voucher=line_item.original_line_item.voucher)|accounting_append_next }}">
+              {{ A_("Offset %(item)s", item=line_item.original_line_item) }}
             </a>
           </div>
         {% endif %}
-        {% if entry.is_need_offset %}
-          <div class="fst-italic small accounting-offset-entries">
-            {% if entry.offsets %}
+        {% if line_item.is_need_offset %}
+          <div class="fst-italic small accounting-offset-line-items">
+            {% if line_item.offsets %}
               <div class="d-flex justify-content-between">
                 <div>{{ A_("Offsets") }}</div>
                 <ul class="ms-2 ps-0">
-                  {% for offset in entry.offsets %}
+                  {% for offset in line_item.offsets %}
                     <li>
                       <a href="{{ url_for("accounting.voucher.detail", voucher=offset.voucher)|accounting_append_next }}">
                         {{ offset.voucher.date|accounting_format_date }} {{ offset.amount|accounting_format_amount }}
@@ -50,10 +50,10 @@ First written: 2023/3/14
                   {% endfor %}
                 </ul>
               </div>
-              {% if entry.balance %}
+              {% if line_item.balance %}
                 <div class="d-flex justify-content-between">
                   <div>{{ A_("Net balance") }}</div>
-                  <div>{{ entry.balance|accounting_format_amount }}</div>
+                  <div>{{ line_item.balance|accounting_format_amount }}</div>
                 </div>
               {% else %}
                 <div class="d-flex justify-content-between">
@@ -68,7 +68,7 @@ First written: 2023/3/14
           </div>
         {% endif %}
       </div>
-      <div>{{ entry.amount|accounting_format_amount }}</div>
+      <div>{{ line_item.amount|accounting_format_amount }}</div>
     </div>
   </li>
 {% endfor %}

@@ -154,35 +154,36 @@ def get_unchanged_update_form(voucher_id: int, app: Flask, csrf_token: str) \
         currency_prefix: str = f"currency-{currency_index}"
         form[f"{currency_prefix}-no"] = str(currency_no)
         form[f"{currency_prefix}-code"] = currency.code
-        entry_indices_used: set[int]
-        entry_no: int
+        line_item_indices_used: set[int]
+        line_item_no: int
         prefix: str
 
-        entry_indices_used = set()
-        entry_no = 0
-        for entry in currency.debit:
-            entry_index: int = __get_new_index(entry_indices_used)
-            entry_no = entry_no + 3 + randbelow(3)
-            prefix = f"{currency_prefix}-debit-{entry_index}"
-            form[f"{prefix}-eid"] = str(entry.id)
-            form[f"{prefix}-no"] = str(entry_no)
-            form[f"{prefix}-account_code"] = entry.account.code
+        line_item_indices_used = set()
+        line_item_no = 0
+        for line_item in currency.debit:
+            line_item_index: int = __get_new_index(line_item_indices_used)
+            line_item_no = line_item_no + 3 + randbelow(3)
+            prefix = f"{currency_prefix}-debit-{line_item_index}"
+            form[f"{prefix}-eid"] = str(line_item.id)
+            form[f"{prefix}-no"] = str(line_item_no)
+            form[f"{prefix}-account_code"] = line_item.account.code
             form[f"{prefix}-summary"] \
-                = "  " if entry.summary is None else f" {entry.summary} "
-            form[f"{prefix}-amount"] = str(entry.amount)
+                = "  " if line_item.summary is None \
+                else f" {line_item.summary} "
+            form[f"{prefix}-amount"] = str(line_item.amount)
 
-        entry_indices_used = set()
-        entry_no = 0
-        for entry in currency.credit:
-            entry_index: int = __get_new_index(entry_indices_used)
-            entry_no = entry_no + 3 + randbelow(3)
-            prefix = f"{currency_prefix}-credit-{entry_index}"
-            form[f"{prefix}-eid"] = str(entry.id)
-            form[f"{prefix}-no"] = str(entry_no)
-            form[f"{prefix}-account_code"] = entry.account.code
+        line_item_indices_used = set()
+        line_item_no = 0
+        for line_item in currency.credit:
+            line_item_index: int = __get_new_index(line_item_indices_used)
+            line_item_no = line_item_no + 3 + randbelow(3)
+            prefix = f"{currency_prefix}-credit-{line_item_index}"
+            form[f"{prefix}-eid"] = str(line_item.id)
+            form[f"{prefix}-no"] = str(line_item_no)
+            form[f"{prefix}-account_code"] = line_item.account.code
             form[f"{prefix}-summary"] \
-                = "  " if entry.summary is None else f" {entry.summary} "
-            form[f"{prefix}-amount"] = str(entry.amount)
+                = "  " if line_item.summary is None else f" {line_item.summary} "
+            form[f"{prefix}-amount"] = str(line_item.amount)
 
     return form
 
@@ -216,7 +217,7 @@ def get_update_form(voucher_id: int, app: Flask,
     form: dict[str, str] = get_unchanged_update_form(
         voucher_id, app, csrf_token)
 
-    # Mess up the entries in a currency
+    # Mess up the line items in a currency
     currency_prefix: str = __get_currency_prefix(form, "USD")
     if is_debit is None or is_debit:
         form = __mess_up_debit(form, currency_prefix)
@@ -231,7 +232,7 @@ def get_update_form(voucher_id: int, app: Flask,
 
 def __mess_up_debit(form: dict[str, str], currency_prefix: str) \
         -> dict[str, str]:
-    """Mess up the debit journal entries in the form data.
+    """Mess up the debit line items in the form data.
 
     :param form: The form data.
     :param currency_prefix: The key prefix of the currency sub-form.
@@ -246,9 +247,9 @@ def __mess_up_debit(form: dict[str, str], currency_prefix: str) \
            and form[x] == Accounts.OFFICE][0]
     m = re.match(r"^((.+-)\d+-)account_code$", key)
     debit_prefix: str = m.group(2)
-    entry_prefix: str = m.group(1)
-    amount: Decimal = Decimal(form[f"{entry_prefix}amount"])
-    form = {x: form[x] for x in form if not x.startswith(entry_prefix)}
+    line_item_prefix: str = m.group(1)
+    amount: Decimal = Decimal(form[f"{line_item_prefix}amount"])
+    form = {x: form[x] for x in form if not x.startswith(line_item_prefix)}
     # Add a new travel disbursement
     indices: set[int] = set()
     for key in form:
@@ -262,15 +263,15 @@ def __mess_up_debit(form: dict[str, str], currency_prefix: str) \
     form[f"{debit_prefix}{new_index}-amount"] = str(amount)
     form[f"{debit_prefix}{new_index}-account_code"] = Accounts.TRAVEL
     # Swap the cash and the bank order
-    key_cash: str = __get_entry_no_key(form, currency_prefix, Accounts.CASH)
-    key_bank: str = __get_entry_no_key(form, currency_prefix, Accounts.BANK)
+    key_cash: str = __get_line_item_no_key(form, currency_prefix, Accounts.CASH)
+    key_bank: str = __get_line_item_no_key(form, currency_prefix, Accounts.BANK)
     form[key_cash], form[key_bank] = form[key_bank], form[key_cash]
     return form
 
 
 def __mess_up_credit(form: dict[str, str], currency_prefix: str) \
         -> dict[str, str]:
-    """Mess up the credit journal entries in the form data.
+    """Mess up the credit line items in the form data.
 
     :param form: The form data.
     :param currency_prefix: The key prefix of the currency sub-form.
@@ -285,9 +286,9 @@ def __mess_up_credit(form: dict[str, str], currency_prefix: str) \
            and form[x] == Accounts.SALES][0]
     m = re.match(r"^((.+-)\d+-)account_code$", key)
     credit_prefix: str = m.group(2)
-    entry_prefix: str = m.group(1)
-    amount: Decimal = Decimal(form[f"{entry_prefix}amount"])
-    form = {x: form[x] for x in form if not x.startswith(entry_prefix)}
+    line_item_prefix: str = m.group(1)
+    amount: Decimal = Decimal(form[f"{line_item_prefix}amount"])
+    form = {x: form[x] for x in form if not x.startswith(line_item_prefix)}
     # Add a new agency receipt
     indices: set[int] = set()
     for key in form:
@@ -301,8 +302,8 @@ def __mess_up_credit(form: dict[str, str], currency_prefix: str) \
     form[f"{credit_prefix}{new_index}-amount"] = str(amount)
     form[f"{credit_prefix}{new_index}-account_code"] = Accounts.AGENCY
     # Swap the service and the interest order
-    key_srv: str = __get_entry_no_key(form, currency_prefix, Accounts.SERVICE)
-    key_int: str = __get_entry_no_key(form, currency_prefix, Accounts.INTEREST)
+    key_srv: str = __get_line_item_no_key(form, currency_prefix, Accounts.SERVICE)
+    key_int: str = __get_line_item_no_key(form, currency_prefix, Accounts.INTEREST)
     form[key_srv], form[key_int] = form[key_int], form[key_srv]
     return form
 
@@ -361,14 +362,14 @@ def __mess_up_currencies(form: dict[str, str]) -> dict[str, str]:
     return form
 
 
-def __get_entry_no_key(form: dict[str, str], currency_prefix: str,
-                       code: str) -> str:
-    """Returns the key of an entry number in the form data.
+def __get_line_item_no_key(form: dict[str, str], currency_prefix: str,
+                           code: str) -> str:
+    """Returns the key of a line item number in the form data.
 
     :param form: The form data.
     :param currency_prefix: The prefix of the currency.
     :param code: The code of the account.
-    :return: The key of the entry number in the form data.
+    :return: The key of the line item number in the form data.
     """
     key: str = [x for x in form
                 if x.startswith(currency_prefix)
@@ -444,7 +445,7 @@ def set_negative_amount(form: dict[str, str]) -> None:
 
 
 def remove_debit_in_a_currency(form: dict[str, str]) -> None:
-    """Removes credit entries in a currency sub-form.
+    """Removes debit line items in a currency sub-form.
 
     :param form: The form data.
     :return: None.
@@ -457,7 +458,7 @@ def remove_debit_in_a_currency(form: dict[str, str]) -> None:
 
 
 def remove_credit_in_a_currency(form: dict[str, str]) -> None:
-    """Removes credit entries in a currency sub-form.
+    """Removes credit line items in a currency sub-form.
 
     :param form: The form data.
     :return: None.

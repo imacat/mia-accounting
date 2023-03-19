@@ -23,7 +23,7 @@ from flask import abort
 from sqlalchemy.orm import selectinload
 from werkzeug.routing import BaseConverter
 
-from accounting.models import Voucher, JournalEntry
+from accounting.models import Voucher, VoucherLineItem
 from accounting.utils.voucher_types import VoucherType
 
 
@@ -37,11 +37,11 @@ class VoucherConverter(BaseConverter):
         :param value: The voucher ID.
         :return: The corresponding voucher.
         """
-        voucher: Voucher | None = Voucher.query.join(JournalEntry)\
+        voucher: Voucher | None = Voucher.query.join(VoucherLineItem)\
             .filter(Voucher.id == value)\
-            .options(selectinload(Voucher.entries)
-                     .selectinload(JournalEntry.offsets)
-                     .selectinload(JournalEntry.voucher))\
+            .options(selectinload(Voucher.line_items)
+                     .selectinload(VoucherLineItem.offsets)
+                     .selectinload(VoucherLineItem.voucher))\
             .first()
         if voucher is None:
             abort(404)

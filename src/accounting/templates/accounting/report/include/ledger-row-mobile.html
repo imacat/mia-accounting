@@ -20,24 +20,24 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/5
 #}
 <div>
-  {% if entry.date %}
+  {% if line_item.date %}
     <div class="text-muted small">
-      {{ entry.date|accounting_format_date }}
+      {{ line_item.date|accounting_format_date }}
     </div>
   {% endif %}
-  {% if entry.summary %}
-    <div>{{ entry.summary }}</div>
+  {% if line_item.summary %}
+    <div>{{ line_item.summary }}</div>
   {% endif %}
 </div>
 
 <div>
-  {% if entry.debit %}
-    <span class="badge rounded-pill bg-success">+{{ entry.debit|accounting_format_amount }}</span>
+  {% if line_item.debit %}
+    <span class="badge rounded-pill bg-success">+{{ line_item.debit|accounting_format_amount }}</span>
   {% endif %}
-  {% if entry.credit %}
-    <span class="badge rounded-pill bg-warning">-{{ entry.credit|accounting_format_amount }}</span>
+  {% if line_item.credit %}
+    <span class="badge rounded-pill bg-warning">-{{ line_item.credit|accounting_format_amount }}</span>
   {% endif %}
   {% if report.account.is_real %}
-    <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
+    <span class="badge rounded-pill bg-primary">{{ line_item.balance|accounting_format_amount }}</span>
   {% endif %}
 </div>

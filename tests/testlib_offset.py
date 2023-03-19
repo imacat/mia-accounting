@@ -29,63 +29,65 @@ from test_site import db
 from testlib_voucher import Accounts, match_voucher_detail, NEXT_URI
 
 
-class JournalEntryData:
-    """The journal entry data."""
+class VoucherLineItemData:
+    """The voucher line item data."""
 
     def __init__(self, account: str, summary: str, amount: str,
-                 original_entry: JournalEntryData | None = None):
-        """Constructs the journal entry data.
+                 original_line_item: VoucherLineItemData | None = None):
+        """Constructs the voucher line item data.
 
         :param account: The account code.
         :param summary: The summary.
         :param amount: The amount.
-        :param original_entry: The original entry.
+        :param original_line_item: The original voucher line item.
         """
         self.voucher: VoucherData | None = None
         self.id: int = -1
         self.no: int = -1
-        self.original_entry: JournalEntryData | None = original_entry
+        self.original_line_item: VoucherLineItemData | None \
+            = original_line_item
         self.account: str = account
         self.summary: str = summary
         self.amount: Decimal = Decimal(amount)
 
-    def form(self, prefix: str, entry_type: str, index: int, is_update: bool) \
+    def form(self, prefix: str, side: str, index: int, is_update: bool) \
             -> dict[str, str]:
-        """Returns the journal entry as form data.
+        """Returns the line item as form data.
 
         :param prefix: The prefix of the form fields.
-        :param entry_type: The entry type, either "debit" or "credit".
-        :param index: The entry index.
+        :param side: The side, either "debit" or "credit".
+        :param index: The line item index.
         :param is_update: True for an update operation, or False otherwise
         :return: The form data.
         """
-        prefix = f"{prefix}-{entry_type}-{index}"
+        prefix = f"{prefix}-{side}-{index}"
         form: dict[str, str] = {f"{prefix}-account_code": self.account,
                                 f"{prefix}-summary": self.summary,
                                 f"{prefix}-amount": str(self.amount)}
         if is_update and self.id != -1:
             form[f"{prefix}-eid"] = str(self.id)
         form[f"{prefix}-no"] = str(index) if self.no == -1 else str(self.no)
-        if self.original_entry is not None:
-            assert self.original_entry.id != -1
-            form[f"{prefix}-original_entry_id"] = str(self.original_entry.id)
+        if self.original_line_item is not None:
+            assert self.original_line_item.id != -1
+            form[f"{prefix}-original_line_item_id"] \
+                = str(self.original_line_item.id)
         return form
 
 
 class CurrencyData:
     """The voucher currency data."""
 
-    def __init__(self, currency: str, debit: list[JournalEntryData],
-                 credit: list[JournalEntryData]):
+    def __init__(self, currency: str, debit: list[VoucherLineItemData],
+                 credit: list[VoucherLineItemData]):
         """Constructs the voucher currency data.
 
         :param currency: The currency code.
-        :param debit: The debit journal entries.
-        :param credit: The credit journal entries.
+        :param debit: The debit line items.
+        :param credit: The credit line items.
         """
         self.code: str = currency
-        self.debit: list[JournalEntryData] = debit
-        self.credit: list[JournalEntryData] = credit
+        self.debit: list[VoucherLineItemData] = debit
+        self.credit: list[VoucherLineItemData] = credit
 
     def form(self, index: int, is_update: bool) -> dict[str, str]:
         """Returns the currency as form data.
@@ -118,10 +120,10 @@ class VoucherData:
         self.currencies: list[CurrencyData] = currencies
         self.note: str | None = None
         for currency in self.currencies:
-            for entry in currency.debit:
-                entry.voucher = self
-            for entry in currency.credit:
-                entry.voucher = self
+            for line_item in currency.debit:
+                line_item.voucher = self
+            for line_item in currency.credit:
+                line_item.voucher = self
 
     def new_form(self, csrf_token: str) -> dict[str, str]:
         """Returns the voucher as a creation form.
@@ -173,19 +175,19 @@ class TestData:
         self.csrf_token: str = csrf_token
 
         def couple(summary: str, amount: str, debit: str, credit: str) \
-                -> tuple[JournalEntryData, JournalEntryData]:
-            """Returns a couple of debit-credit journal entries.
+                -> tuple[VoucherLineItemData, VoucherLineItemData]:
+            """Returns a couple of debit-credit line items.
 
             :param summary: The summary.
             :param amount: The amount.
             :param debit: The debit account code.
             :param credit: The credit account code.
-            :return: The debit journal entry and credit journal entry.
+            :return: The debit line item and credit line item.
             """
-            return JournalEntryData(debit, summary, amount),\
-                JournalEntryData(credit, summary, amount)
+            return VoucherLineItemData(debit, summary, amount),\
+                VoucherLineItemData(credit, summary, amount)
 
-        # Receivable original entries
+        # Receivable original line items
         self.e_r_or1d, self.e_r_or1c = couple(
             "Accountant", "1200", Accounts.RECEIVABLE, Accounts.SERVICE)
         self.e_r_or2d, self.e_r_or2c = couple(
@@ -195,7 +197,7 @@ class TestData:
         self.e_r_or4d, self.e_r_or4c = couple(
             "Interest", "3.4", Accounts.RECEIVABLE, Accounts.INTEREST)
 
-        # Payable original entries
+        # Payable original line items
         self.e_p_or1d, self.e_p_or1c = couple(
             "Airplane", "2000", Accounts.TRAVEL, Accounts.PAYABLE)
         self.e_p_or2d, self.e_p_or2c = couple(
@@ -224,39 +226,39 @@ class TestData:
         self.__add_voucher(self.v_p_or1)
         self.__add_voucher(self.v_p_or2)
 
-        # Receivable offset entries
+        # Receivable offset items
         self.e_r_of1d, self.e_r_of1c = couple(
             "Accountant", "500", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of1c.original_entry = self.e_r_or1d
+        self.e_r_of1c.original_line_item = self.e_r_or1d
         self.e_r_of2d, self.e_r_of2c = couple(
             "Accountant", "200", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of2c.original_entry = self.e_r_or1d
+        self.e_r_of2c.original_line_item = self.e_r_or1d
         self.e_r_of3d, self.e_r_of3c = couple(
             "Accountant", "100", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of3c.original_entry = self.e_r_or1d
+        self.e_r_of3c.original_line_item = self.e_r_or1d
         self.e_r_of4d, self.e_r_of4c = couple(
             "Toy", "240", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of4c.original_entry = self.e_r_or2d
+        self.e_r_of4c.original_line_item = self.e_r_or2d
         self.e_r_of5d, self.e_r_of5c = couple(
             "Interest", "3.4", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of5c.original_entry = self.e_r_or4d
+        self.e_r_of5c.original_line_item = self.e_r_or4d
 
-        # Payable offset entries
+        # Payable offset items
         self.e_p_of1d, self.e_p_of1c = couple(
             "Airplane", "800", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of1d.original_entry = self.e_p_or1c
+        self.e_p_of1d.original_line_item = self.e_p_or1c
         self.e_p_of2d, self.e_p_of2c = couple(
             "Airplane", "300", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of2d.original_entry = self.e_p_or1c
+        self.e_p_of2d.original_line_item = self.e_p_or1c
         self.e_p_of3d, self.e_p_of3c = couple(
             "Airplane", "100", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of3d.original_entry = self.e_p_or1c
+        self.e_p_of3d.original_line_item = self.e_p_or1c
         self.e_p_of4d, self.e_p_of4c = couple(
             "Phone", "400", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of4d.original_entry = self.e_p_or2c
+        self.e_p_of4d.original_line_item = self.e_p_or2c
         self.e_p_of5d, self.e_p_of5c = couple(
             "Envelop", "0.9", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of5d.original_entry = self.e_p_or4c
+        self.e_p_of5d.original_line_item = self.e_p_or4c
 
         # Offset vouchers
         self.v_r_of1: VoucherData = VoucherData(

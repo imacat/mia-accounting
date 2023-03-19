@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The journal entry sub-forms for the voucher management.
+"""The line item sub-forms for the voucher management.
 
 """
 import re
@@ -30,7 +30,7 @@ from wtforms.validators import DataRequired, Optional
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Account, JournalEntry
+from accounting.models import Account, VoucherLineItem
 from accounting.template_filters import format_amount
 from accounting.utils.cast import be
 from accounting.utils.random_id import new_id
@@ -42,64 +42,67 @@ ACCOUNT_REQUIRED: DataRequired = DataRequired(
 """The validator to check if the account code is empty."""
 
 
-class OriginalEntryExists:
-    """The validator to check if the original entry exists."""
+class OriginalLineItemExists:
+    """The validator to check if the original line item exists."""
 
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        if db.session.get(JournalEntry, field.data) is None:
+        if db.session.get(VoucherLineItem, field.data) is None:
             raise ValidationError(lazy_gettext(
-                "The original entry does not exist."))
+                "The original line item does not exist."))
 
 
-class OriginalEntryOppositeSide:
-    """The validator to check if the original entry is on the opposite side."""
+class OriginalLineItemOppositeSide:
+    """The validator to check if the original line item is on the opposite
+    side."""
 
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        original_entry: JournalEntry | None \
-            = db.session.get(JournalEntry, field.data)
-        if original_entry is None:
+        original_line_item: VoucherLineItem | None \
+            = db.session.get(VoucherLineItem, field.data)
+        if original_line_item is None:
             return
-        if isinstance(form, CreditEntryForm) and original_entry.is_debit:
+        if isinstance(form, CreditLineItemForm) \
+                and original_line_item.is_debit:
             return
-        if isinstance(form, DebitEntryForm) and not original_entry.is_debit:
+        if isinstance(form, DebitLineItemForm) \
+                and not original_line_item.is_debit:
             return
         raise ValidationError(lazy_gettext(
-            "The original entry is on the same side."))
+            "The original line item is on the same side."))
 
 
-class OriginalEntryNeedOffset:
-    """The validator to check if the original entry needs offset."""
-
-    def __call__(self, form: FlaskForm, field: IntegerField) -> None:
-        if field.data is None:
-            return
-        original_entry: JournalEntry | None \
-            = db.session.get(JournalEntry, field.data)
-        if original_entry is None:
-            return
-        if not original_entry.account.is_need_offset:
-            raise ValidationError(lazy_gettext(
-                "The original entry does not need offset."))
-
-
-class OriginalEntryNotOffset:
-    """The validator to check if the original entry is not itself an offset
-    entry."""
+class OriginalLineItemNeedOffset:
+    """The validator to check if the original line item needs offset."""
 
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        original_entry: JournalEntry | None \
-            = db.session.get(JournalEntry, field.data)
-        if original_entry is None:
+        original_line_item: VoucherLineItem | None \
+            = db.session.get(VoucherLineItem, field.data)
+        if original_line_item is None:
             return
-        if original_entry.original_entry_id is not None:
+        if not original_line_item.account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "The original entry cannot be an offset entry."))
+                "The original line item does not need offset."))
+
+
+class OriginalLineItemNotOffset:
+    """The validator to check if the original line item is not itself an
+    offset item."""
+
+    def __call__(self, form: FlaskForm, field: IntegerField) -> None:
+        if field.data is None:
+            return
+        original_line_item: VoucherLineItem | None \
+            = db.session.get(VoucherLineItem, field.data)
+        if original_line_item is None:
+            return
+        if original_line_item.original_line_item_id is not None:
+            raise ValidationError(lazy_gettext(
+                "The original line item cannot be an offset item."))
 
 
 class AccountExists:
@@ -114,7 +117,7 @@ class AccountExists:
 
 
 class IsDebitAccount:
-    """The validator to check if the account is for debit journal entries."""
+    """The validator to check if the account is for debit line items."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None:
@@ -124,11 +127,11 @@ class IsDebitAccount:
                 and not field.data.startswith("3353-"):
             return
         raise ValidationError(lazy_gettext(
-            "This account is not for debit entries."))
+            "This account is not for debit line items."))
 
 
 class IsCreditAccount:
-    """The validator to check if the account is for credit journal entries."""
+    """The validator to check if the account is for credit line items."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None:
@@ -138,73 +141,73 @@ class IsCreditAccount:
                 and not field.data.startswith("3353-"):
             return
         raise ValidationError(lazy_gettext(
-            "This account is not for credit entries."))
+            "This account is not for credit line items."))
 
 
-class SameAccountAsOriginalEntry:
-    """The validator to check if the account is the same as the original
-    entry."""
+class SameAccountAsOriginalLineItem:
+    """The validator to check if the account is the same as the
+    original line item."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
-        assert isinstance(form, JournalEntryForm)
-        if field.data is None or form.original_entry_id.data is None:
+        assert isinstance(form, LineItemForm)
+        if field.data is None or form.original_line_item_id.data is None:
             return
-        original_entry: JournalEntry | None \
-            = db.session.get(JournalEntry, form.original_entry_id.data)
-        if original_entry is None:
+        original_line_item: VoucherLineItem | None \
+            = db.session.get(VoucherLineItem, form.original_line_item_id.data)
+        if original_line_item is None:
             return
-        if field.data != original_entry.account_code:
+        if field.data != original_line_item.account_code:
             raise ValidationError(lazy_gettext(
-                "The account must be the same as the original entry."))
+                "The account must be the same as the original line item."))
 
 
 class KeepAccountWhenHavingOffset:
     """The validator to check if the account is the same when having offset."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
-        assert isinstance(form, JournalEntryForm)
+        assert isinstance(form, LineItemForm)
         if field.data is None or form.eid.data is None:
             return
-        entry: JournalEntry | None = db.session.query(JournalEntry)\
-            .filter(JournalEntry.id == form.eid.data)\
-            .options(selectinload(JournalEntry.offsets)).first()
-        if entry is None or len(entry.offsets) == 0:
+        line_item: VoucherLineItem | None = db.session.query(VoucherLineItem)\
+            .filter(VoucherLineItem.id == form.eid.data)\
+            .options(selectinload(VoucherLineItem.offsets)).first()
+        if line_item is None or len(line_item.offsets) == 0:
             return
-        if field.data != entry.account_code:
+        if field.data != line_item.account_code:
             raise ValidationError(lazy_gettext(
                 "The account must not be changed when there is offset."))
 
 
 class NotStartPayableFromDebit:
-    """The validator to check that a payable journal entry does not start from
+    """The validator to check that a payable line item does not start from
     the debit side."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
-        assert isinstance(form, DebitEntryForm)
+        assert isinstance(form, DebitLineItemForm)
         if field.data is None \
                 or field.data[0] != "2" \
-                or form.original_entry_id.data is not None:
+                or form.original_line_item_id.data is not None:
             return
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A payable entry cannot start from the debit side."))
+                "A payable line item cannot start from the debit side."))
 
 
 class NotStartReceivableFromCredit:
-    """The validator to check that a receivable journal entry does not start
+    """The validator to check that a receivable line item does not start
     from the credit side."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
-        assert isinstance(form, CreditEntryForm)
+        assert isinstance(form, CreditLineItemForm)
         if field.data is None \
                 or field.data[0] != "1" \
-                or form.original_entry_id.data is not None:
+                or form.original_line_item_id.data is not None:
             return
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A receivable entry cannot start from the credit side."))
+                "A receivable line item cannot start from the credit side."))
 
 
 class PositiveAmount:
@@ -218,55 +221,57 @@ class PositiveAmount:
                 "Please fill in a positive amount."))
 
 
-class NotExceedingOriginalEntryNetBalance:
+class NotExceedingOriginalLineItemNetBalance:
     """The validator to check if the amount exceeds the net balance of the
-    original entry."""
+    original line item."""
 
     def __call__(self, form: FlaskForm, field: DecimalField) -> None:
-        assert isinstance(form, JournalEntryForm)
-        if field.data is None or form.original_entry_id.data is None:
+        assert isinstance(form, LineItemForm)
+        if field.data is None or form.original_line_item_id.data is None:
             return
-        original_entry: JournalEntry | None \
-            = db.session.get(JournalEntry, form.original_entry_id.data)
-        if original_entry is None:
+        original_line_item: VoucherLineItem | None \
+            = db.session.get(VoucherLineItem, form.original_line_item_id.data)
+        if original_line_item is None:
             return
-        is_debit: bool = isinstance(form, DebitEntryForm)
-        existing_entry_id: set[int] = set()
+        is_debit: bool = isinstance(form, DebitLineItemForm)
+        existing_line_item_id: set[int] = set()
         if form.voucher_form.obj is not None:
-            existing_entry_id = {x.id for x in form.voucher_form.obj.entries}
+            existing_line_item_id \
+                = {x.id for x in form.voucher_form.obj.line_items}
         offset_total_func: sa.Function = sa.func.sum(sa.case(
-            (be(JournalEntry.is_debit == is_debit), JournalEntry.amount),
-            else_=-JournalEntry.amount))
+            (be(VoucherLineItem.is_debit == is_debit), VoucherLineItem.amount),
+            else_=-VoucherLineItem.amount))
         offset_total_but_form: Decimal | None = db.session.scalar(
             sa.select(offset_total_func)
-            .filter(be(JournalEntry.original_entry_id == original_entry.id),
-                    JournalEntry.id.not_in(existing_entry_id)))
+            .filter(be(VoucherLineItem.original_line_item_id
+                       == original_line_item.id),
+                    VoucherLineItem.id.not_in(existing_line_item_id)))
         if offset_total_but_form is None:
             offset_total_but_form = Decimal("0")
         offset_total_on_form: Decimal = sum(
-            [x.amount.data for x in form.voucher_form.entries
-             if x.original_entry_id.data == original_entry.id
+            [x.amount.data for x in form.voucher_form.line_items
+             if x.original_line_item_id.data == original_line_item.id
              and x.amount != field and x.amount.data is not None])
-        net_balance: Decimal = original_entry.amount - offset_total_but_form \
-            - offset_total_on_form
+        net_balance: Decimal = original_line_item.amount \
+            - offset_total_but_form - offset_total_on_form
         if field.data > net_balance:
             raise ValidationError(lazy_gettext(
                 "The amount must not exceed the net balance %(balance)s of the"
-                " original entry.", balance=format_amount(net_balance)))
+                " original line item.", balance=format_amount(net_balance)))
 
 
 class NotLessThanOffsetTotal:
     """The validator to check if the amount is less than the offset total."""
 
     def __call__(self, form: FlaskForm, field: DecimalField) -> None:
-        assert isinstance(form, JournalEntryForm)
+        assert isinstance(form, LineItemForm)
         if field.data is None or form.eid.data is None:
             return
-        is_debit: bool = isinstance(form, DebitEntryForm)
+        is_debit: bool = isinstance(form, DebitLineItemForm)
         select_offset_total: sa.Select = sa.select(sa.func.sum(sa.case(
-            (JournalEntry.is_debit != is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)))\
-            .filter(be(JournalEntry.original_entry_id == form.eid.data))
+            (VoucherLineItem.is_debit != is_debit, VoucherLineItem.amount),
+            else_=-VoucherLineItem.amount)))\
+            .filter(be(VoucherLineItem.original_line_item_id == form.eid.data))
         offset_total: Decimal | None = db.session.scalar(select_offset_total)
         if offset_total is not None and field.data < offset_total:
             raise ValidationError(lazy_gettext(
@@ -274,21 +279,21 @@ class NotLessThanOffsetTotal:
                 total=format_amount(offset_total)))
 
 
-class JournalEntryForm(FlaskForm):
-    """The base form to create or edit a journal entry."""
+class LineItemForm(FlaskForm):
+    """The base form to create or edit a line item."""
     eid = IntegerField()
-    """The existing journal entry ID."""
+    """The existing line item ID."""
     no = IntegerField()
     """The order in the currency."""
-    original_entry_id = IntegerField()
-    """The Id of the original entry."""
+    original_line_item_id = IntegerField()
+    """The Id of the original line item."""
     account_code = StringField()
     """The account code."""
     amount = DecimalField()
     """The amount."""
 
     def __init__(self, *args, **kwargs):
-        """Constructs a base journal entry form.
+        """Constructs a base line item form.
 
         :param args: The arguments.
         :param kwargs: The keyword arguments.
@@ -312,51 +317,51 @@ class JournalEntryForm(FlaskForm):
         return str(account)
 
     @property
-    def __original_entry(self) -> JournalEntry | None:
-        """Returns the original entry.
+    def __original_line_item(self) -> VoucherLineItem | None:
+        """Returns the original line item.
 
-        :return: The original entry.
+        :return: The original line item.
         """
-        if not hasattr(self, "____original_entry"):
-            def get_entry() -> JournalEntry | None:
-                if self.original_entry_id.data is None:
+        if not hasattr(self, "____original_line_item"):
+            def get_line_item() -> VoucherLineItem | None:
+                if self.original_line_item_id.data is None:
                     return None
-                return db.session.get(JournalEntry,
-                                      self.original_entry_id.data)
-            setattr(self, "____original_entry", get_entry())
-        return getattr(self, "____original_entry")
+                return db.session.get(VoucherLineItem,
+                                      self.original_line_item_id.data)
+            setattr(self, "____original_line_item", get_line_item())
+        return getattr(self, "____original_line_item")
 
     @property
-    def original_entry_date(self) -> date | None:
-        """Returns the text representation of the original entry.
+    def original_line_item_date(self) -> date | None:
+        """Returns the text representation of the original line item.
 
-        :return: The text representation of the original entry.
+        :return: The text representation of the original line item.
         """
-        return None if self.__original_entry is None \
-            else self.__original_entry.voucher.date
+        return None if self.__original_line_item is None \
+            else self.__original_line_item.voucher.date
 
     @property
-    def original_entry_text(self) -> str | None:
-        """Returns the text representation of the original entry.
+    def original_line_item_text(self) -> str | None:
+        """Returns the text representation of the original line item.
 
-        :return: The text representation of the original entry.
+        :return: The text representation of the original line item.
         """
-        return None if self.__original_entry is None \
-            else str(self.__original_entry)
+        return None if self.__original_line_item is None \
+            else str(self.__original_line_item)
 
     @property
     def is_need_offset(self) -> bool:
-        """Returns whether the entry needs offset.
+        """Returns whether the line item needs offset.
 
-        :return: True if the entry needs offset, or False otherwise.
+        :return: True if the line item needs offset, or False otherwise.
         """
         if self.account_code.data is None:
             return False
         if self.account_code.data[0] == "1":
-            if isinstance(self, CreditEntryForm):
+            if isinstance(self, CreditLineItemForm):
                 return False
         elif self.account_code.data[0] == "2":
-            if isinstance(self, DebitEntryForm):
+            if isinstance(self, DebitLineItemForm):
                 return False
         else:
             return False
@@ -364,21 +369,22 @@ class JournalEntryForm(FlaskForm):
         return account is not None and account.is_need_offset
 
     @property
-    def offsets(self) -> list[JournalEntry]:
+    def offsets(self) -> list[VoucherLineItem]:
         """Returns the offsets.
 
         :return: The offsets.
         """
         if not hasattr(self, "__offsets"):
-            def get_offsets() -> list[JournalEntry]:
+            def get_offsets() -> list[VoucherLineItem]:
                 if not self.is_need_offset or self.eid.data is None:
                     return []
-                return JournalEntry.query\
-                    .filter(JournalEntry.original_entry_id == self.eid.data)\
-                    .options(selectinload(JournalEntry.voucher),
-                             selectinload(JournalEntry.account),
-                             selectinload(JournalEntry.offsets)
-                             .selectinload(JournalEntry.voucher)).all()
+                return VoucherLineItem.query\
+                    .filter(VoucherLineItem.original_line_item_id
+                            == self.eid.data)\
+                    .options(selectinload(VoucherLineItem.voucher),
+                             selectinload(VoucherLineItem.account),
+                             selectinload(VoucherLineItem.offsets)
+                             .selectinload(VoucherLineItem.voucher)).all()
             setattr(self, "__offsets", get_offsets())
         return getattr(self, "__offsets")
 
@@ -392,7 +398,7 @@ class JournalEntryForm(FlaskForm):
             def get_offset_total():
                 if not self.is_need_offset or self.eid.data is None:
                     return None
-                is_debit: bool = isinstance(self, DebitEntryForm)
+                is_debit: bool = isinstance(self, DebitLineItemForm)
                 return sum([x.amount if x.is_debit != is_debit else -x.amount
                             for x in self.offsets])
             setattr(self, "__offset_total", get_offset_total())
@@ -422,48 +428,48 @@ class JournalEntryForm(FlaskForm):
         return all_errors
 
 
-class DebitEntryForm(JournalEntryForm):
-    """The form to create or edit a debit journal entry."""
+class DebitLineItemForm(LineItemForm):
+    """The form to create or edit a debit line item."""
     eid = IntegerField()
-    """The existing journal entry ID."""
+    """The existing line item ID."""
     no = IntegerField()
     """The order in the currency."""
-    original_entry_id = IntegerField(
+    original_line_item_id = IntegerField(
         validators=[Optional(),
-                    OriginalEntryExists(),
-                    OriginalEntryOppositeSide(),
-                    OriginalEntryNeedOffset(),
-                    OriginalEntryNotOffset()])
-    """The Id of the original entry."""
+                    OriginalLineItemExists(),
+                    OriginalLineItemOppositeSide(),
+                    OriginalLineItemNeedOffset(),
+                    OriginalLineItemNotOffset()])
+    """The ID of the original line item."""
     account_code = StringField(
         filters=[strip_text],
         validators=[ACCOUNT_REQUIRED,
                     AccountExists(),
                     IsDebitAccount(),
-                    SameAccountAsOriginalEntry(),
+                    SameAccountAsOriginalLineItem(),
                     KeepAccountWhenHavingOffset(),
                     NotStartPayableFromDebit()])
     """The account code."""
-    offset_original_entry_id = IntegerField()
-    """The Id of the original entry."""
+    offset_original_line_item_id = IntegerField()
+    """The ID of the original line item."""
     summary = StringField(filters=[strip_text])
     """The summary."""
     amount = DecimalField(
         validators=[PositiveAmount(),
-                    NotExceedingOriginalEntryNetBalance(),
+                    NotExceedingOriginalLineItemNetBalance(),
                     NotLessThanOffsetTotal()])
     """The amount."""
 
-    def populate_obj(self, obj: JournalEntry) -> None:
-        """Populates the form data into a journal entry object.
+    def populate_obj(self, obj: VoucherLineItem) -> None:
+        """Populates the form data into a line item object.
 
-        :param obj: The journal entry object.
+        :param obj: The line item object.
         :return: None.
         """
         is_new: bool = obj.id is None
         if is_new:
-            obj.id = new_id(JournalEntry)
-        obj.original_entry_id = self.original_entry_id.data
+            obj.id = new_id(VoucherLineItem)
+        obj.original_line_item_id = self.original_line_item_id.data
         obj.account_id = Account.find_by_code(self.account_code.data).id
         obj.summary = self.summary.data
         obj.is_debit = True
@@ -474,25 +480,25 @@ class DebitEntryForm(JournalEntryForm):
             obj.updated_by_id = current_user_pk
 
 
-class CreditEntryForm(JournalEntryForm):
-    """The form to create or edit a credit journal entry."""
+class CreditLineItemForm(LineItemForm):
+    """The form to create or edit a credit line item."""
     eid = IntegerField()
-    """The existing journal entry ID."""
+    """The existing line item ID."""
     no = IntegerField()
     """The order in the currency."""
-    original_entry_id = IntegerField(
+    original_line_item_id = IntegerField(
         validators=[Optional(),
-                    OriginalEntryExists(),
-                    OriginalEntryOppositeSide(),
-                    OriginalEntryNeedOffset(),
-                    OriginalEntryNotOffset()])
-    """The Id of the original entry."""
+                    OriginalLineItemExists(),
+                    OriginalLineItemOppositeSide(),
+                    OriginalLineItemNeedOffset(),
+                    OriginalLineItemNotOffset()])
+    """The ID of the original line item."""
     account_code = StringField(
         filters=[strip_text],
         validators=[ACCOUNT_REQUIRED,
                     AccountExists(),
                     IsCreditAccount(),
-                    SameAccountAsOriginalEntry(),
+                    SameAccountAsOriginalLineItem(),
                     KeepAccountWhenHavingOffset(),
                     NotStartReceivableFromCredit()])
     """The account code."""
@@ -500,20 +506,20 @@ class CreditEntryForm(JournalEntryForm):
     """The summary."""
     amount = DecimalField(
         validators=[PositiveAmount(),
-                    NotExceedingOriginalEntryNetBalance(),
+                    NotExceedingOriginalLineItemNetBalance(),
                     NotLessThanOffsetTotal()])
     """The amount."""
 
-    def populate_obj(self, obj: JournalEntry) -> None:
-        """Populates the form data into a journal entry object.
+    def populate_obj(self, obj: VoucherLineItem) -> None:
+        """Populates the form data into a line item object.
 
-        :param obj: The journal entry object.
+        :param obj: The line item object.
         :return: None.
         """
         is_new: bool = obj.id is None
         if is_new:
-            obj.id = new_id(JournalEntry)
-        obj.original_entry_id = self.original_entry_id.data
+            obj.id = new_id(VoucherLineItem)
+        obj.original_line_item_id = self.original_line_item_id.data
         obj.account_id = Account.find_by_code(self.account_code.data).id
         obj.summary = self.summary.data
         obj.is_debit = False

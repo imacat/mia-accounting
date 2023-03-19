@@ -20,31 +20,31 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/5
 #}
 <div>
-  {% if entry.date or entry.account %}
+  {% if line_item.date or line_item.account %}
     <div class="text-muted small">
-      {% if entry.date %}
-        {{ entry.date|accounting_format_date }}
+      {% if line_item.date %}
+        {{ line_item.date|accounting_format_date }}
       {% endif %}
-      {% if entry.account %}
-        {{ entry.account.title|title }}
+      {% if line_item.account %}
+        {{ line_item.account.title|title }}
       {% endif %}
     </div>
   {% endif %}
-  {% if entry.summary %}
-    <div>{{ entry.summary }}</div>
+  {% if line_item.summary %}
+    <div>{{ line_item.summary }}</div>
   {% endif %}
 </div>
 
 <div class="text-nowrap">
-  {% if entry.income %}
-    <span class="badge rounded-pill bg-success">+{{ entry.income|accounting_format_amount }}</span>
+  {% if line_item.income %}
+    <span class="badge rounded-pill bg-success">+{{ line_item.income|accounting_format_amount }}</span>
   {% endif %}
-  {% if entry.expense %}
-    <span class="badge rounded-pill bg-warning">-{{ entry.expense|accounting_format_amount }}</span>
+  {% if line_item.expense %}
+    <span class="badge rounded-pill bg-warning">-{{ line_item.expense|accounting_format_amount }}</span>
   {% endif %}
-  {% if entry.balance < 0 %}
-    <span class="badge rounded-pill bg-danger">{{ entry.balance|accounting_format_amount }}</span>
+  {% if line_item.balance < 0 %}
+    <span class="badge rounded-pill bg-danger">{{ line_item.balance|accounting_format_amount }}</span>
   {% else %}
-    <span class="badge rounded-pill bg-primary">{{ entry.balance|accounting_format_amount }}</span>
+    <span class="badge rounded-pill bg-primary">{{ line_item.balance|accounting_format_amount }}</span>
   {% endif %}
 </div>

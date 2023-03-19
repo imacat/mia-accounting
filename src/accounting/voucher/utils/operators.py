@@ -78,16 +78,16 @@ class VoucherOperator(ABC):
         """
 
     @property
-    def _entry_template(self) -> str:
-        """Renders and returns the template for the journal entry sub-form.
+    def _line_item_template(self) -> str:
+        """Renders and returns the template for the line item sub-form.
 
-        :return: The template for the journal entry sub-form.
+        :return: The template for the line item sub-form.
         """
         return render_template(
-            "accounting/voucher/include/form-entry-item.html",
+            "accounting/voucher/include/form-line-item.html",
             currency_index="CURRENCY_INDEX",
-            entry_type="ENTRY_TYPE",
-            entry_index="ENTRY_INDEX")
+            side="SIDE",
+            line_item_index="LINE_ITEM_INDEX")
 
 
 class CashReceiptVoucher(VoucherOperator):
@@ -113,7 +113,7 @@ class CashReceiptVoucher(VoucherOperator):
                                form=form,
                                voucher_type=VoucherType.CASH_RECEIPT,
                                currency_template=self.__currency_template,
-                               entry_template=self._entry_template)
+                               line_item_template=self._line_item_template)
 
     def render_detail_template(self, voucher: Voucher) -> str:
         """Renders the template for the detail page.
@@ -135,7 +135,7 @@ class CashReceiptVoucher(VoucherOperator):
         return render_template("accounting/voucher/receipt/edit.html",
                                voucher=voucher, form=form,
                                currency_template=self.__currency_template,
-                               entry_template=self._entry_template)
+                               line_item_template=self._line_item_template)
 
     def is_my_type(self, voucher: Voucher) -> bool:
         """Checks and returns whether the voucher belongs to the type.
@@ -182,7 +182,7 @@ class CashDisbursementVoucher(VoucherOperator):
                                form=form,
                                voucher_type=VoucherType.CASH_DISBURSEMENT,
                                currency_template=self.__currency_template,
-                               entry_template=self._entry_template)
+                               line_item_template=self._line_item_template)
 
     def render_detail_template(self, voucher: Voucher) -> str:
         """Renders the template for the detail page.
@@ -204,7 +204,7 @@ class CashDisbursementVoucher(VoucherOperator):
         return render_template("accounting/voucher/disbursement/edit.html",
                                voucher=voucher, form=form,
                                currency_template=self.__currency_template,
-                               entry_template=self._entry_template)
+                               line_item_template=self._line_item_template)
 
     def is_my_type(self, voucher: Voucher) -> bool:
         """Checks and returns whether the voucher belongs to the type.
@@ -251,7 +251,7 @@ class TransferVoucher(VoucherOperator):
                                form=form,
                                voucher_type=VoucherType.TRANSFER,
                                currency_template=self.__currency_template,
-                               entry_template=self._entry_template)
+                               line_item_template=self._line_item_template)
 
     def render_detail_template(self, voucher: Voucher) -> str:
         """Renders the template for the detail page.
@@ -273,7 +273,7 @@ class TransferVoucher(VoucherOperator):
         return render_template("accounting/voucher/transfer/edit.html",
                                voucher=voucher, form=form,
                                currency_template=self.__currency_template,
-                               entry_template=self._entry_template)
+                               line_item_template=self._line_item_template)
 
     def is_my_type(self, voucher: Voucher) -> bool:
         """Checks and returns whether the voucher belongs to the type.

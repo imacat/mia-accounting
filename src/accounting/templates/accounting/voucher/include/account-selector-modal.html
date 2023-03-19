@@ -19,35 +19,35 @@ account-selector-modal.html: The modal for the account selector
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
-<div id="accounting-account-selector-{{ entry_type }}-modal" class="modal fade accounting-account-selector" data-entry-type="{{ entry_type }}" tabindex="-1" aria-labelledby="accounting-account-selector-{{ entry_type }}-modal-label" aria-hidden="true">
+<div id="accounting-account-selector-{{ side }}-modal" class="modal fade accounting-account-selector" data-side="{{ side }}" tabindex="-1" aria-labelledby="accounting-account-selector-{{ side }}-modal-label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="accounting-account-selector-{{ entry_type }}-modal-label">{{ A_("Select Account") }}</h1>
-        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal" aria-label="{{ A_("Close") }}"></button>
+        <h1 class="modal-title fs-5" id="accounting-account-selector-{{ side }}-modal-label">{{ A_("Select Account") }}</h1>
+        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">
-          <input id="accounting-account-selector-{{ entry_type }}-query" class="form-control form-control-sm" type="search" placeholder=" " required="required">
-          <label class="input-group-text" for="accounting-account-selector-{{ entry_type }}-query">
+          <input id="accounting-account-selector-{{ side }}-query" class="form-control form-control-sm" type="search" placeholder=" " required="required">
+          <label class="input-group-text" for="accounting-account-selector-{{ side }}-query">
             <i class="fa-solid fa-magnifying-glass"></i>
             {{ A_("Search") }}
           </label>
         </div>
 
-        <ul id="accounting-account-selector-{{ entry_type }}-option-list" class="list-group accounting-selector-list">
+        <ul id="accounting-account-selector-{{ side }}-option-list" class="list-group accounting-selector-list">
           {% for account in account_options %}
-            <li id="accounting-account-selector-{{ entry_type }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-account-selector-{{ entry_type }}-option {% if account.is_in_use %} accounting-account-in-use {% endif %} {% if account.is_need_offset %} accounting-account-is-need-offset {% endif %}" data-code="{{ account.code }}" data-content="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">
+            <li id="accounting-account-selector-{{ side }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-account-selector-{{ side }}-option {% if account.is_in_use %} accounting-account-in-use {% endif %} {% if account.is_need_offset %} accounting-account-is-need-offset {% endif %}" data-code="{{ account.code }}" data-content="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
               {{ account }}
             </li>
           {% endfor %}
-          <li id="accounting-account-selector-{{ entry_type }}-more" class="list-group-item accounting-clickable">{{ A_("More…") }}</li>
+          <li id="accounting-account-selector-{{ side }}-more" class="list-group-item accounting-clickable">{{ A_("More…") }}</li>
         </ul>
-        <p id="accounting-account-selector-{{ entry_type }}-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
+        <p id="accounting-account-selector-{{ side }}-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">{{ A_("Cancel") }}</button>
-        <button id="accounting-account-selector-{{ entry_type }}-btn-clear" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">{{ A_("Clear") }}</button>
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">{{ A_("Cancel") }}</button>
+        <button id="accounting-account-selector-{{ side }}-btn-clear" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">{{ A_("Clear") }}</button>
       </div>
     </div>
   </div>

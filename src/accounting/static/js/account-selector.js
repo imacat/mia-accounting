@@ -29,16 +29,16 @@
 class AccountSelector {
 
     /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
+     * The line item editor
+     * @type {VoucherLineItemEditor}
      */
-    #entryEditor;
+    #lineItemEditor;
 
     /**
-     * The entry type
+     * The side, either "debit" or "credit"
      * @type {string}
      */
-    #entryType;
+    #side;
 
     /**
      * The prefix of the HTML ID and class
@@ -85,13 +85,13 @@ class AccountSelector {
     /**
      * Constructs an account selector.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param side {string} the side, either "debit" or "credit"
      */
-    constructor(entryEditor, entryType) {
-        this.#entryEditor = entryEditor
-        this.#entryType = entryType;
-        this.#prefix = "accounting-account-selector-" + entryType;
+    constructor(lineItemEditor, side) {
+        this.#lineItemEditor = lineItemEditor
+        this.#side = side;
+        this.#prefix = "accounting-account-selector-" + side;
         this.#query = document.getElementById(this.#prefix + "-query");
         this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
         this.#optionList = document.getElementById(this.#prefix + "-option-list");
@@ -103,9 +103,9 @@ class AccountSelector {
             this.#more.classList.add("d-none");
             this.#filterOptions();
         };
-        this.#clearButton.onclick = () => this.#entryEditor.clearAccount();
+        this.#clearButton.onclick = () => this.#lineItemEditor.clearAccount();
         for (const option of this.#options) {
-            option.onclick = () => this.#entryEditor.saveAccount(option.dataset.code, option.dataset.content, option.classList.contains("accounting-account-is-need-offset"));
+            option.onclick = () => this.#lineItemEditor.saveAccount(option.dataset.code, option.dataset.content, option.classList.contains("accounting-account-is-need-offset"));
         }
         this.#query.addEventListener("input", () => {
             this.#filterOptions();
@@ -143,9 +143,9 @@ class AccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getCodesUsedInForm() {
-        const inUse = this.#entryEditor.form.getAccountCodesUsed(this.#entryType);
-        if (this.#entryEditor.accountCode !== null) {
-            inUse.push(this.#entryEditor.accountCode);
+        const inUse = this.#lineItemEditor.form.getAccountCodesUsed(this.#side);
+        if (this.#lineItemEditor.accountCode !== null) {
+            inUse.push(this.#lineItemEditor.accountCode);
         }
         return inUse
     }
@@ -190,13 +190,13 @@ class AccountSelector {
         this.#more.classList.remove("d-none");
         this.#filterOptions();
         for (const option of this.#options) {
-            if (option.dataset.code === this.#entryEditor.accountCode) {
+            if (option.dataset.code === this.#lineItemEditor.accountCode) {
                 option.classList.add("active");
             } else {
                 option.classList.remove("active");
             }
         }
-        if (this.#entryEditor.accountCode === null) {
+        if (this.#lineItemEditor.accountCode === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
@@ -210,14 +210,14 @@ class AccountSelector {
     /**
      * Returns the account selector instances.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
      * @return {{debit: AccountSelector, credit: AccountSelector}}
      */
-    static getInstances(entryEditor) {
+    static getInstances(lineItemEditor) {
         const selectors = {}
         const modals = Array.from(document.getElementsByClassName("accounting-account-selector"));
         for (const modal of modals) {
-            selectors[modal.dataset.entryType] = new AccountSelector(entryEditor, modal.dataset.entryType);
+            selectors[modal.dataset.side] = new AccountSelector(lineItemEditor, modal.dataset.side);
         }
         return selectors;
     }

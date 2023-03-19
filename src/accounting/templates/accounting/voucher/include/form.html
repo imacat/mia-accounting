@@ -24,9 +24,9 @@ First written: 2023/2/26
 {% block accounting_scripts %}
   <script src="{{ url_for("accounting.static", filename="js/drag-and-drop-reorder.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/voucher-form.js") }}"></script>
-  <script src="{{ url_for("accounting.static", filename="js/journal-entry-editor.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/voucher-line-item-editor.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/account-selector.js") }}"></script>
-  <script src="{{ url_for("accounting.static", filename="js/original-entry-selector.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/original-line-item-selector.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/summary-editor.js") }}"></script>
 {% endblock %}
 
@@ -39,7 +39,7 @@ First written: 2023/2/26
   </a>
 </div>
 
-<form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post" data-currency-template="{{ currency_template }}" data-entry-template="{{ entry_template }}">
+<form id="accounting-form" action="{% block action_url %}{% endblock %}" method="post" data-currency-template="{{ currency_template }}" data-line-item-template="{{ line_item_template }}">
   {{ form.csrf_token }}
   {% if request.args.next %}
     <input type="hidden" name="next" value="{{ request.args.next }}">
@@ -88,8 +88,8 @@ First written: 2023/2/26
   </div>
 </form>
 
-{% include "accounting/voucher/include/journal-entry-editor-modal.html" %}
+{% include "accounting/voucher/include/voucher-line-item-editor-modal.html" %}
 {% block form_modals %}{% endblock %}
-{% include "accounting/voucher/include/original-entry-selector-modal.html" %}
+{% include "accounting/voucher/include/original-line-item-selector-modal.html" %}
 
 {% endblock %}

@@ -26,7 +26,7 @@ import sqlalchemy as sa
 from flask import request
 
 from accounting import db
-from accounting.models import Currency, JournalEntry
+from accounting.models import Currency, VoucherLineItem
 from accounting.utils.voucher_types import VoucherType
 from .option_link import OptionLink
 from .report_chooser import ReportChooser
@@ -81,8 +81,8 @@ class BasePageParams(ABC):
         :return: The currency options.
         """
         in_use: set[str] = set(db.session.scalars(
-            sa.select(JournalEntry.currency_code)
-            .group_by(JournalEntry.currency_code)).all())
+            sa.select(VoucherLineItem.currency_code)
+            .group_by(VoucherLineItem.currency_code)).all())
         return [OptionLink(str(x), get_url(x), x.code == active_currency.code)
                 for x in Currency.query.filter(Currency.code.in_(in_use))
                 .order_by(Currency.code).all()]

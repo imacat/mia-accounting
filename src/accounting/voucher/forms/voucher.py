@@ -30,18 +30,18 @@ from wtforms.validators import DataRequired, ValidationError
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Voucher, Account, JournalEntry, \
+from accounting.models import Voucher, Account, VoucherLineItem, \
     VoucherCurrency
 from accounting.voucher.utils.account_option import AccountOption
-from accounting.voucher.utils.original_entries import \
-    get_selectable_original_entries
+from accounting.voucher.utils.original_line_items import \
+    get_selectable_original_line_items
 from accounting.voucher.utils.summary_editor import SummaryEditor
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_multiline_text
 from accounting.utils.user import get_current_user_pk
 from .currency import CurrencyForm, CashReceiptCurrencyForm, \
     CashDisbursementCurrencyForm, TransferCurrencyForm
-from .journal_entry import JournalEntryForm, DebitEntryForm, CreditEntryForm
+from .line_item import LineItemForm, DebitLineItemForm, CreditLineItemForm
 from .reorder import sort_vouchers_in
 
 DATE_REQUIRED: DataRequired = DataRequired(
@@ -49,9 +49,9 @@ DATE_REQUIRED: DataRequired = DataRequired(
 """The validator to check if the date is empty."""
 
 
-class NotBeforeOriginalEntries:
-    """The validator to check if the date is not before the original
-    entries."""
+class NotBeforeOriginalLineItems:
+    """The validator to check if the date is not before the
+    original line items."""
 
     def __call__(self, form: FlaskForm, field: DateField) -> None:
         assert isinstance(form, VoucherForm)
@@ -62,11 +62,11 @@ class NotBeforeOriginalEntries:
             return
         if field.data < min_date:
             raise ValidationError(lazy_gettext(
-                "The date cannot be earlier than the original entries."))
+                "The date cannot be earlier than the original line items."))
 
 
-class NotAfterOffsetEntries:
-    """The validator to check if the date is not after the offset entries."""
+class NotAfterOffsetItems:
+    """The validator to check if the date is not after the offset items."""
 
     def __call__(self, form: FlaskForm, field: DateField) -> None:
         assert isinstance(form, VoucherForm)
@@ -77,7 +77,7 @@ class NotAfterOffsetEntries:
             return
         if field.data > max_date:
             raise ValidationError(lazy_gettext(
-                "The date cannot be later than the offset entries."))
+                "The date cannot be later than the offset items."))
 
 
 class NeedSomeCurrencies:
@@ -88,21 +88,21 @@ class NeedSomeCurrencies:
             raise ValidationError(lazy_gettext("Please add some currencies."))
 
 
-class CannotDeleteOriginalEntriesWithOffset:
-    """The validator to check the original entries with offset."""
+class CannotDeleteOriginalLineItemsWithOffset:
+    """The validator to check the original line items with offset."""
 
     def __call__(self, form: FlaskForm, field: FieldList) -> None:
         assert isinstance(form, VoucherForm)
         if form.obj is None:
             return
-        existing_matched_original_entry_id: set[int] \
-            = {x.id for x in form.obj.entries if len(x.offsets) > 0}
-        entry_id_in_form: set[int] \
-            = {x.eid.data for x in form.entries if x.eid.data is not None}
-        for entry_id in existing_matched_original_entry_id:
-            if entry_id not in entry_id_in_form:
+        existing_matched_original_line_item_id: set[int] \
+            = {x.id for x in form.obj.line_items if len(x.offsets) > 0}
+        line_item_id_in_form: set[int] \
+            = {x.eid.data for x in form.line_items if x.eid.data is not None}
+        for line_item_id in existing_matched_original_line_item_id:
+            if line_item_id not in line_item_id_in_form:
                 raise ValidationError(lazy_gettext(
-                    "Journal entries with offset cannot be deleted."))
+                    "Line items with offset cannot be deleted."))
 
 
 class VoucherForm(FlaskForm):
@@ -110,7 +110,7 @@ class VoucherForm(FlaskForm):
     date = DateField()
     """The date."""
     currencies = FieldList(FormField(CurrencyForm))
-    """The journal entries categorized by their currencies."""
+    """The line items categorized by their currencies."""
     note = TextAreaField()
     """The note."""
 
@@ -123,23 +123,23 @@ class VoucherForm(FlaskForm):
         super().__init__(*args, **kwargs)
         self.is_modified: bool = False
         """Whether the voucher is modified during populate_obj()."""
-        self.collector: t.Type[JournalEntryCollector] = JournalEntryCollector
-        """The journal entry collector.  The default is the base abstract
+        self.collector: t.Type[LineItemCollector] = LineItemCollector
+        """The line item collector.  The default is the base abstract
         collector only to provide the correct type.  The subclass forms should
         provide their own collectors."""
         self.obj: Voucher | None = kwargs.get("obj")
         """The voucher, when editing an existing one."""
         self._is_need_payable: bool = False
-        """Whether we need the payable original entries."""
+        """Whether we need the payable original line items."""
         self._is_need_receivable: bool = False
-        """Whether we need the receivable original entries."""
-        self.__original_entry_options: list[JournalEntry] | None = None
-        """The options of the original entries."""
+        """Whether we need the receivable original line items."""
+        self.__original_line_item_options: list[VoucherLineItem] | None = None
+        """The options of the original line items."""
         self.__net_balance_exceeded: dict[int, LazyString] | None = None
-        """The original entries whose net balances were exceeded by the
-        amounts in the journal entry sub-forms."""
-        for entry in self.entries:
-            entry.voucher_form = self
+        """The original line items whose net balances were exceeded by the
+        amounts in the line item sub-forms."""
+        for line_item in self.line_items:
+            line_item.voucher_form = self
 
     def populate_obj(self, obj: Voucher) -> None:
         """Populates the form data into a voucher object.
@@ -154,14 +154,15 @@ class VoucherForm(FlaskForm):
         self.__set_date(obj, self.date.data)
         obj.note = self.note.data
 
-        collector_cls: t.Type[JournalEntryCollector] = self.collector
+        collector_cls: t.Type[LineItemCollector] = self.collector
         collector: collector_cls = collector_cls(self, obj)
         collector.collect()
 
-        to_delete: set[int] = {x.id for x in obj.entries
+        to_delete: set[int] = {x.id for x in obj.line_items
                                if x.id not in collector.to_keep}
         if len(to_delete) > 0:
-            JournalEntry.query.filter(JournalEntry.id.in_(to_delete)).delete()
+            VoucherLineItem.query\
+                .filter(VoucherLineItem.id.in_(to_delete)).delete()
             self.is_modified = True
 
         if is_new or db.session.is_modified(obj):
@@ -173,15 +174,15 @@ class VoucherForm(FlaskForm):
             obj.updated_by_id = current_user_pk
 
     @property
-    def entries(self) -> list[JournalEntryForm]:
-        """Collects and returns the journal entry sub-forms.
+    def line_items(self) -> list[LineItemForm]:
+        """Collects and returns the line item sub-forms.
 
-        :return: The journal entry sub-forms.
+        :return: The line item sub-forms.
         """
-        entries: list[JournalEntryForm] = []
+        line_items: list[LineItemForm] = []
         for currency in self.currencies:
-            entries.extend(currency.entries)
-        return entries
+            line_items.extend(currency.line_items)
+        return line_items
 
     def __set_date(self, obj: Voucher, new_date: dt.date) -> None:
         """Sets the voucher date and number.
@@ -221,9 +222,9 @@ class VoucherForm(FlaskForm):
             = [AccountOption(x) for x in Account.debit()
                if not (x.code[0] == "2" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
-            sa.select(JournalEntry.account_id)
-            .filter(JournalEntry.is_debit)
-            .group_by(JournalEntry.account_id)).all())
+            sa.select(VoucherLineItem.account_id)
+            .filter(VoucherLineItem.is_debit)
+            .group_by(VoucherLineItem.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
         return accounts
@@ -238,9 +239,9 @@ class VoucherForm(FlaskForm):
             = [AccountOption(x) for x in Account.credit()
                if not (x.code[0] == "1" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
-            sa.select(JournalEntry.account_id)
-            .filter(sa.not_(JournalEntry.is_debit))
-            .group_by(JournalEntry.account_id)).all())
+            sa.select(VoucherLineItem.account_id)
+            .filter(sa.not_(VoucherLineItem.is_debit))
+            .group_by(VoucherLineItem.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
         return accounts
@@ -263,16 +264,18 @@ class VoucherForm(FlaskForm):
         return SummaryEditor()
 
     @property
-    def original_entry_options(self) -> list[JournalEntry]:
-        """Returns the selectable original entries.
+    def original_line_item_options(self) -> list[VoucherLineItem]:
+        """Returns the selectable original line items.
 
-        :return: The selectable original entries.
+        :return: The selectable original line items.
         """
-        if self.__original_entry_options is None:
-            self.__original_entry_options = get_selectable_original_entries(
-                {x.eid.data for x in self.entries if x.eid.data is not None},
-                self._is_need_payable, self._is_need_receivable)
-        return self.__original_entry_options
+        if self.__original_line_item_options is None:
+            self.__original_line_item_options \
+                = get_selectable_original_line_items(
+                    {x.eid.data for x in self.line_items
+                     if x.eid.data is not None},
+                    self._is_need_payable, self._is_need_receivable)
+        return self.__original_line_item_options
 
     @property
     def min_date(self) -> dt.date | None:
@@ -280,13 +283,14 @@ class VoucherForm(FlaskForm):
 
         :return: The minimal available date.
         """
-        original_entry_id: set[int] \
-            = {x.original_entry_id.data for x in self.entries
-               if x.original_entry_id.data is not None}
-        if len(original_entry_id) == 0:
+        original_line_item_id: set[int] \
+            = {x.original_line_item_id.data for x in self.line_items
+               if x.original_line_item_id.data is not None}
+        if len(original_line_item_id) == 0:
             return None
         select: sa.Select = sa.select(sa.func.max(Voucher.date))\
-            .join(JournalEntry).filter(JournalEntry.id.in_(original_entry_id))
+            .join(VoucherLineItem)\
+            .filter(VoucherLineItem.id.in_(original_line_item_id))
         return db.session.scalar(select)
 
     @property
@@ -295,11 +299,11 @@ class VoucherForm(FlaskForm):
 
         :return: The maximum available date.
         """
-        entry_id: set[int] = {x.eid.data for x in self.entries
-                              if x.eid.data is not None}
+        line_item_id: set[int] = {x.eid.data for x in self.line_items
+                                  if x.eid.data is not None}
         select: sa.Select = sa.select(sa.func.min(Voucher.date))\
-            .join(JournalEntry)\
-            .filter(JournalEntry.original_entry_id.in_(entry_id))
+            .join(VoucherLineItem)\
+            .filter(VoucherLineItem.original_line_item_id.in_(line_item_id))
         return db.session.scalar(select)
 
 
@@ -307,11 +311,11 @@ T = t.TypeVar("T", bound=VoucherForm)
 """A voucher form variant."""
 
 
-class JournalEntryCollector(t.Generic[T], ABC):
-    """The journal entry collector."""
+class LineItemCollector(t.Generic[T], ABC):
+    """The line item collector."""
 
     def __init__(self, form: T, obj: Voucher):
-        """Constructs the journal entry collector.
+        """Constructs the line item collector.
 
         :param form: The voucher form.
         :param obj: The voucher.
@@ -320,101 +324,103 @@ class JournalEntryCollector(t.Generic[T], ABC):
         """The voucher form."""
         self.__obj: Voucher = obj
         """The voucher object."""
-        self.__entries: list[JournalEntry] = list(obj.entries)
-        """The existing journal entries."""
-        self.__entries_by_id: dict[int, JournalEntry] \
-            = {x.id: x for x in self.__entries}
-        """A dictionary from the entry ID to their entries."""
-        self.__no_by_id: dict[int, int] = {x.id: x.no for x in self.__entries}
-        """A dictionary from the entry number to their entries."""
+        self.__line_items: list[VoucherLineItem] = list(obj.line_items)
+        """The existing line items."""
+        self.__line_items_by_id: dict[int, VoucherLineItem] \
+            = {x.id: x for x in self.__line_items}
+        """A dictionary from the line item ID to their line items."""
+        self.__no_by_id: dict[int, int] \
+            = {x.id: x.no for x in self.__line_items}
+        """A dictionary from the line item number to their line items."""
         self.__currencies: list[VoucherCurrency] = obj.currencies
         """The currencies in the voucher."""
         self._debit_no: int = 1
-        """The number index for the debit entries."""
+        """The number index for the debit line items."""
         self._credit_no: int = 1
-        """The number index for the credit entries."""
+        """The number index for the credit line items."""
         self.to_keep: set[int] = set()
-        """The ID of the existing journal entries to keep."""
+        """The ID of the existing line items to keep."""
 
     @abstractmethod
     def collect(self) -> set[int]:
-        """Collects the journal entries.
+        """Collects the line items.
 
-        :return: The ID of the journal entries to keep.
+        :return: The ID of the line items to keep.
         """
 
-    def _add_entry(self, form: JournalEntryForm, currency_code: str, no: int) \
+    def _add_line_item(self, form: LineItemForm, currency_code: str, no: int) \
             -> None:
-        """Composes a journal entry from the form.
+        """Composes a line item from the form.
 
-        :param form: The journal entry form.
+        :param form: The line item form.
         :param currency_code: The code of the currency.
-        :param no: The number of the entry.
+        :param no: The number of the line item.
         :return: None.
         """
-        entry: JournalEntry | None = self.__entries_by_id.get(form.eid.data)
-        if entry is not None:
-            entry.currency_code = currency_code
-            form.populate_obj(entry)
-            entry.no = no
-            if db.session.is_modified(entry):
+        line_item: VoucherLineItem | None \
+            = self.__line_items_by_id.get(form.eid.data)
+        if line_item is not None:
+            line_item.currency_code = currency_code
+            form.populate_obj(line_item)
+            line_item.no = no
+            if db.session.is_modified(line_item):
                 self.form.is_modified = True
         else:
-            entry = JournalEntry()
-            entry.currency_code = currency_code
-            form.populate_obj(entry)
-            entry.no = no
-            self.__obj.entries.append(entry)
+            line_item = VoucherLineItem()
+            line_item.currency_code = currency_code
+            form.populate_obj(line_item)
+            line_item.no = no
+            self.__obj.line_items.append(line_item)
             self.form.is_modified = True
-        self.to_keep.add(entry.id)
+        self.to_keep.add(line_item.id)
 
-    def _make_cash_entry(self, forms: list[JournalEntryForm], is_debit: bool,
-                         currency_code: str, no: int) -> None:
-        """Composes the cash journal entry at the other side of the cash
+    def _make_cash_line_item(self, forms: list[LineItemForm], is_debit: bool,
+                             currency_code: str, no: int) -> None:
+        """Composes the cash line item at the other side of the cash
         voucher.
 
-        :param forms: The journal entry forms in the same currency.
+        :param forms: The line item forms in the same currency.
         :param is_debit: True for a cash receipt voucher, or False for a
             cash disbursement voucher.
         :param currency_code: The code of the currency.
-        :param no: The number of the entry.
+        :param no: The number of the line item.
         :return: None.
         """
-        candidates: list[JournalEntry] = [x for x in self.__entries
-                                          if x.is_debit == is_debit
-                                          and x.currency_code == currency_code]
-        entry: JournalEntry
+        candidates: list[VoucherLineItem] \
+            = [x for x in self.__line_items
+               if x.is_debit == is_debit and x.currency_code == currency_code]
+        line_item: VoucherLineItem
         if len(candidates) > 0:
             candidates.sort(key=lambda x: x.no)
-            entry = candidates[0]
-            entry.account_id = Account.cash().id
-            entry.summary = None
-            entry.amount = sum([x.amount.data for x in forms])
-            entry.no = no
-            if db.session.is_modified(entry):
+            line_item = candidates[0]
+            line_item.account_id = Account.cash().id
+            line_item.summary = None
+            line_item.amount = sum([x.amount.data for x in forms])
+            line_item.no = no
+            if db.session.is_modified(line_item):
                 self.form.is_modified = True
         else:
-            entry = JournalEntry()
-            entry.id = new_id(JournalEntry)
-            entry.is_debit = is_debit
-            entry.currency_code = currency_code
-            entry.account_id = Account.cash().id
-            entry.summary = None
-            entry.amount = sum([x.amount.data for x in forms])
-            entry.no = no
-            self.__obj.entries.append(entry)
+            line_item = VoucherLineItem()
+            line_item.id = new_id(VoucherLineItem)
+            line_item.is_debit = is_debit
+            line_item.currency_code = currency_code
+            line_item.account_id = Account.cash().id
+            line_item.summary = None
+            line_item.amount = sum([x.amount.data for x in forms])
+            line_item.no = no
+            self.__obj.line_items.append(line_item)
             self.form.is_modified = True
-        self.to_keep.add(entry.id)
+        self.to_keep.add(line_item.id)
 
-    def _sort_entry_forms(self, forms: list[JournalEntryForm]) -> None:
-        """Sorts the journal entry forms.
+    def _sort_line_item_forms(self, forms: list[LineItemForm]) -> None:
+        """Sorts the line item sub-forms.
 
-        :param forms: The journal entry forms.
+        :param forms: The line item sub-forms.
         :return: None.
         """
         missing_no: int = 100 if len(self.__no_by_id) == 0 \
             else max(self.__no_by_id.values()) + 100
-        ord_by_form: dict[JournalEntryForm, int] \
+        ord_by_form: dict[LineItemForm, int] \
             = {forms[i]: i for i in range(len(forms))}
         recv_no: set[int] = {x.no.data for x in forms if x.no.data is not None}
         missing_recv_no: int = 100 if len(recv_no) == 0 else max(recv_no) + 100
@@ -445,42 +451,43 @@ class CashReceiptVoucherForm(VoucherForm):
     """The form to create or edit a cash receipt voucher."""
     date = DateField(
         validators=[DATE_REQUIRED,
-                    NotBeforeOriginalEntries(),
-                    NotAfterOffsetEntries()])
+                    NotBeforeOriginalLineItems(),
+                    NotAfterOffsetItems()])
     """The date."""
     currencies = FieldList(FormField(CashReceiptCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
-    """The journal entries categorized by their currencies."""
+    """The line items categorized by their currencies."""
     note = TextAreaField(filters=[strip_multiline_text])
     """The note."""
     whole_form = BooleanField(
-        validators=[CannotDeleteOriginalEntriesWithOffset()])
+        validators=[CannotDeleteOriginalLineItemsWithOffset()])
     """The pseudo field for the whole form validators."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._is_need_receivable = True
 
-        class Collector(JournalEntryCollector[CashReceiptVoucherForm]):
-            """The journal entry collector for the cash receipt vouchers."""
+        class Collector(LineItemCollector[CashReceiptVoucherForm]):
+            """The line item collector for the cash receipt vouchers."""
 
             def collect(self) -> None:
                 currencies: list[CashReceiptCurrencyForm] \
                     = [x.form for x in self.form.currencies]
                 self._sort_currency_forms(currencies)
                 for currency in currencies:
-                    # The debit cash entry
-                    self._make_cash_entry(list(currency.credit), True,
-                                          currency.code.data, self._debit_no)
+                    # The debit cash line item
+                    self._make_cash_line_item(list(currency.credit), True,
+                                              currency.code.data,
+                                              self._debit_no)
                     self._debit_no = self._debit_no + 1
 
                     # The credit forms
-                    credit_forms: list[CreditEntryForm] \
+                    credit_forms: list[CreditLineItemForm] \
                         = [x.form for x in currency.credit]
-                    self._sort_entry_forms(credit_forms)
+                    self._sort_line_item_forms(credit_forms)
                     for credit_form in credit_forms:
-                        self._add_entry(credit_form, currency.code.data,
-                                        self._credit_no)
+                        self._add_line_item(credit_form, currency.code.data,
+                                            self._credit_no)
                         self._credit_no = self._credit_no + 1
 
         self.collector = Collector
@@ -490,26 +497,25 @@ class CashDisbursementVoucherForm(VoucherForm):
     """The form to create or edit a cash disbursement voucher."""
     date = DateField(
         validators=[DATE_REQUIRED,
-                    NotBeforeOriginalEntries(),
-                    NotAfterOffsetEntries()])
+                    NotBeforeOriginalLineItems(),
+                    NotAfterOffsetItems()])
     """The date."""
     currencies = FieldList(FormField(CashDisbursementCurrencyForm),
                            name="currency",
                            validators=[NeedSomeCurrencies()])
-    """The journal entries categorized by their currencies."""
+    """The line items categorized by their currencies."""
     note = TextAreaField(filters=[strip_multiline_text])
     """The note."""
     whole_form = BooleanField(
-        validators=[CannotDeleteOriginalEntriesWithOffset()])
+        validators=[CannotDeleteOriginalLineItemsWithOffset()])
     """The pseudo field for the whole form validators."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._is_need_payable = True
 
-        class Collector(JournalEntryCollector[CashDisbursementVoucherForm]):
-            """The journal entry collector for the cash disbursement
-            vouchers."""
+        class Collector(LineItemCollector[CashDisbursementVoucherForm]):
+            """The line item collector for the cash disbursement vouchers."""
 
             def collect(self) -> None:
                 currencies: list[CashDisbursementCurrencyForm] \
@@ -517,17 +523,18 @@ class CashDisbursementVoucherForm(VoucherForm):
                 self._sort_currency_forms(currencies)
                 for currency in currencies:
                     # The debit forms
-                    debit_forms: list[DebitEntryForm] \
+                    debit_forms: list[DebitLineItemForm] \
                         = [x.form for x in currency.debit]
-                    self._sort_entry_forms(debit_forms)
+                    self._sort_line_item_forms(debit_forms)
                     for debit_form in debit_forms:
-                        self._add_entry(debit_form, currency.code.data,
-                                        self._debit_no)
+                        self._add_line_item(debit_form, currency.code.data,
+                                            self._debit_no)
                         self._debit_no = self._debit_no + 1
 
                     # The credit forms
-                    self._make_cash_entry(list(currency.debit), False,
-                                          currency.code.data, self._credit_no)
+                    self._make_cash_line_item(list(currency.debit), False,
+                                              currency.code.data,
+                                              self._credit_no)
                     self._credit_no = self._credit_no + 1
 
         self.collector = Collector
@@ -537,16 +544,16 @@ class TransferVoucherForm(VoucherForm):
     """The form to create or edit a transfer voucher."""
     date = DateField(
         validators=[DATE_REQUIRED,
-                    NotBeforeOriginalEntries(),
-                    NotAfterOffsetEntries()])
+                    NotBeforeOriginalLineItems(),
+                    NotAfterOffsetItems()])
     """The date."""
     currencies = FieldList(FormField(TransferCurrencyForm), name="currency",
                            validators=[NeedSomeCurrencies()])
-    """The journal entries categorized by their currencies."""
+    """The line items categorized by their currencies."""
     note = TextAreaField(filters=[strip_multiline_text])
     """The note."""
     whole_form = BooleanField(
-        validators=[CannotDeleteOriginalEntriesWithOffset()])
+        validators=[CannotDeleteOriginalLineItemsWithOffset()])
     """The pseudo field for the whole form validators."""
 
     def __init__(self, *args, **kwargs):
@@ -554,8 +561,8 @@ class TransferVoucherForm(VoucherForm):
         self._is_need_payable = True
         self._is_need_receivable = True
 
-        class Collector(JournalEntryCollector[TransferVoucherForm]):
-            """The journal entry collector for the transfer vouchers."""
+        class Collector(LineItemCollector[TransferVoucherForm]):
+            """The line item collector for the transfer vouchers."""
 
             def collect(self) -> None:
                 currencies: list[TransferCurrencyForm] \
@@ -563,21 +570,21 @@ class TransferVoucherForm(VoucherForm):
                 self._sort_currency_forms(currencies)
                 for currency in currencies:
                     # The debit forms
-                    debit_forms: list[DebitEntryForm] \
+                    debit_forms: list[DebitLineItemForm] \
                         = [x.form for x in currency.debit]
-                    self._sort_entry_forms(debit_forms)
+                    self._sort_line_item_forms(debit_forms)
                     for debit_form in debit_forms:
-                        self._add_entry(debit_form, currency.code.data,
-                                        self._debit_no)
+                        self._add_line_item(debit_form, currency.code.data,
+                                            self._debit_no)
                         self._debit_no = self._debit_no + 1
 
                     # The credit forms
-                    credit_forms: list[CreditEntryForm] \
+                    credit_forms: list[CreditLineItemForm] \
                         = [x.form for x in currency.credit]
-                    self._sort_entry_forms(credit_forms)
+                    self._sort_line_item_forms(credit_forms)
                     for credit_form in credit_forms:
-                        self._add_entry(credit_form, currency.code.data,
-                                        self._credit_no)
+                        self._add_line_item(credit_form, currency.code.data,
+                                            self._credit_no)
                         self._credit_no = self._credit_no + 1
 
         self.collector = Collector

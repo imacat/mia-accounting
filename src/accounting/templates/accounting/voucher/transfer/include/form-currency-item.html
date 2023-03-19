@@ -42,35 +42,35 @@ First written: 2023/2/25
     </div>
 
     <div class="row">
-      {# The debit entries #}
+      {# The debit line items #}
       <div class="col-sm-6 mb-3">
         <div id="accounting-currency-{{ currency_index }}-debit" class="form-control accounting-material-text-field accounting-not-empty {% if debit_errors %} is-invalid {% endif %}">
           <label class="form-label" for="accounting-currency-{{ currency_index }}-debit">{{ A_("Debit") }}</label>
-          <ul id="accounting-currency-{{ currency_index }}-debit-list" class="list-group accounting-entry-list accounting-currency-{{ currency_index }}-entry-list">
-            {% for entry_form in debit_forms %}
+          <ul id="accounting-currency-{{ currency_index }}-debit-list" class="list-group accounting-line-item-list">
+            {% for line_item_form in debit_forms %}
               {% with currency_index = currency_index,
-                      entry_type = "debit",
-                      entry_index = loop.index,
-                      only_one_entry_form = debit_forms|length == 1,
-                      entry_id = entry_form.eid.data,
-                      account_code_data = entry_form.account_code.data|accounting_default,
-                      account_code_error = entry_form.account_code.errors,
-                      account_text = entry_form.account_text,
-                      summary_data = entry_form.summary.data|accounting_default,
-                      summary_errors = entry_form.summary.errors,
-                      original_entry_id_data = entry_form.original_entry_id.data|accounting_default,
-                      original_entry_date = entry_form.original_entry_date|accounting_default,
-                      original_entry_text = entry_form.original_entry_text|accounting_default,
-                      is_need_offset = entry_form.is_need_offset,
-                      offset_entries = entry_form.offsets,
-                      offset_total = entry_form.offset_total|accounting_default,
-                      net_balance_data = entry_form.net_balance,
-                      net_balance_text = entry_form.net_balance|accounting_format_amount,
-                      amount_data = entry_form.amount.data|accounting_voucher_format_amount_input,
-                      amount_errors = entry_form.amount.errors,
-                      amount_text = entry_form.amount.data|accounting_format_amount,
-                      entry_errors = entry_form.all_errors %}
-                {% include "accounting/voucher/include/form-entry-item.html" %}
+                      side = "debit",
+                      line_item_index = loop.index,
+                      only_one_line_item_form = debit_forms|length == 1,
+                      line_item_id = line_item_form.eid.data,
+                      account_code_data = line_item_form.account_code.data|accounting_default,
+                      account_code_error = line_item_form.account_code.errors,
+                      account_text = line_item_form.account_text,
+                      summary_data = line_item_form.summary.data|accounting_default,
+                      summary_errors = line_item_form.summary.errors,
+                      original_line_item_id_data = line_item_form.original_line_item_id.data|accounting_default,
+                      original_line_item_date = line_item_form.original_line_item_date|accounting_default,
+                      original_line_item_text = line_item_form.original_line_item_text|accounting_default,
+                      is_need_offset = line_item_form.is_need_offset,
+                      offset_items = line_item_form.offsets,
+                      offset_total = line_item_form.offset_total|accounting_default,
+                      net_balance_data = line_item_form.net_balance,
+                      net_balance_text = line_item_form.net_balance|accounting_format_amount,
+                      amount_data = line_item_form.amount.data|accounting_voucher_format_amount_input,
+                      amount_errors = line_item_form.amount.errors,
+                      amount_text = line_item_form.amount.data|accounting_format_amount,
+                      line_item_errors = line_item_form.all_errors %}
+                {% include "accounting/voucher/include/form-line-item.html" %}
               {% endwith %}
             {% endfor %}
           </ul>
@@ -81,7 +81,7 @@ First written: 2023/2/25
           </div>
 
           <div>
-            <button id="accounting-currency-{{ currency_index }}-debit-add-entry" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-entry-type="debit" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">
+            <button id="accounting-currency-{{ currency_index }}-debit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-side="debit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
               <i class="fas fa-plus"></i>
               {{ A_("New") }}
             </button>
@@ -90,35 +90,35 @@ First written: 2023/2/25
         <div id="accounting-currency-{{ currency_index }}-debit-error" class="invalid-feedback">{% if debit_errors %}{{ debit_errors[0] }}{% endif %}</div>
       </div>
 
-      {# The credit entries #}
+      {# The credit line items #}
       <div class="col-sm-6 mb-3">
         <div id="accounting-currency-{{ currency_index }}-credit" class="form-control accounting-material-text-field accounting-not-empty {% if credit_errors %} is-invalid {% endif %}">
           <label class="form-label" for="accounting-currency-{{ currency_index }}-credit">{{ A_("Credit") }}</label>
-          <ul id="accounting-currency-{{ currency_index }}-credit-list" class="list-group accounting-entry-list">
-            {% for entry_form in credit_forms %}
+          <ul id="accounting-currency-{{ currency_index }}-credit-list" class="list-group accounting-line-item-list">
+            {% for line_item_form in credit_forms %}
               {% with currency_index = currency_index,
-                      entry_type = "credit",
-                      entry_index = loop.index,
-                      only_one_entry_form = debit_forms|length == 1,
-                      entry_id = entry_form.eid.data,
-                      account_code_data = entry_form.account_code.data|accounting_default,
-                      account_code_error = entry_form.account_code.errors,
-                      account_text = entry_form.account_text,
-                      summary_data = entry_form.summary.data|accounting_default,
-                      summary_errors = entry_form.summary.errors,
-                      original_entry_id_data = entry_form.original_entry_id.data|accounting_default,
-                      original_entry_date = entry_form.original_entry_date|accounting_default,
-                      original_entry_text = entry_form.original_entry_text|accounting_default,
-                      is_need_offset = entry_form.is_need_offset,
-                      offset_entries = entry_form.offsets,
-                      offset_total = entry_form.offset_total|accounting_default("0"),
-                      net_balance_data = entry_form.net_balance,
-                      net_balance_text = entry_form.net_balance|accounting_format_amount,
-                      amount_data = entry_form.amount.data|accounting_voucher_format_amount_input,
-                      amount_errors = entry_form.amount.errors,
-                      amount_text = entry_form.amount.data|accounting_format_amount,
-                      entry_errors = entry_form.all_errors %}
-                {% include "accounting/voucher/include/form-entry-item.html" %}
+                      side = "credit",
+                      line_item_index = loop.index,
+                      only_one_line_item_form = debit_forms|length == 1,
+                      line_item_id = line_item_form.eid.data,
+                      account_code_data = line_item_form.account_code.data|accounting_default,
+                      account_code_error = line_item_form.account_code.errors,
+                      account_text = line_item_form.account_text,
+                      summary_data = line_item_form.summary.data|accounting_default,
+                      summary_errors = line_item_form.summary.errors,
+                      original_line_item_id_data = line_item_form.original_line_item_id.data|accounting_default,
+                      original_line_item_date = line_item_form.original_line_item_date|accounting_default,
+                      original_line_item_text = line_item_form.original_line_item_text|accounting_default,
+                      is_need_offset = line_item_form.is_need_offset,
+                      offset_items = line_item_form.offsets,
+                      offset_total = line_item_form.offset_total|accounting_default("0"),
+                      net_balance_data = line_item_form.net_balance,
+                      net_balance_text = line_item_form.net_balance|accounting_format_amount,
+                      amount_data = line_item_form.amount.data|accounting_voucher_format_amount_input,
+                      amount_errors = line_item_form.amount.errors,
+                      amount_text = line_item_form.amount.data|accounting_format_amount,
+                      line_item_errors = line_item_form.all_errors %}
+                {% include "accounting/voucher/include/form-line-item.html" %}
               {% endwith %}
             {% endfor %}
           </ul>
@@ -129,7 +129,7 @@ First written: 2023/2/25
           </div>
 
           <div>
-            <button id="accounting-currency-{{ currency_index }}-credit-add-entry" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-entry-type="credit" data-bs-toggle="modal" data-bs-target="#accounting-entry-editor-modal">
+            <button id="accounting-currency-{{ currency_index }}-credit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-side="credit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
               <i class="fas fa-plus"></i>
               {{ A_("New") }}
             </button>

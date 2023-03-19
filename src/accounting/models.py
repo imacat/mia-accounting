@@ -115,7 +115,7 @@ class Account(db.Model):
     title_l10n = db.Column("title", db.String, nullable=False)
     """The title."""
     is_need_offset = db.Column(db.Boolean, nullable=False, default=False)
-    """Whether the entries of this account need offset."""
+    """Whether the voucher line items of this account need offset."""
     created_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
     """The time of creation."""
@@ -139,8 +139,8 @@ class Account(db.Model):
     l10n = db.relationship("AccountL10n", back_populates="account",
                            lazy=False)
     """The localized titles."""
-    entries = db.relationship("JournalEntry", back_populates="account")
-    """The journal entries."""
+    line_items = db.relationship("VoucherLineItem", back_populates="account")
+    """The voucher line items."""
 
     CASH_CODE: str = "1111-001"
     """The code of the cash account,"""
@@ -363,8 +363,8 @@ class Currency(db.Model):
     l10n = db.relationship("CurrencyL10n", back_populates="currency",
                            lazy=False)
     """The localized names."""
-    entries = db.relationship("JournalEntry", back_populates="currency")
-    """The journal entries."""
+    line_items = db.relationship("VoucherLineItem", back_populates="currency")
+    """The voucher line items."""
 
     def __str__(self) -> str:
         """Returns the string representation of the currency.
@@ -450,20 +450,20 @@ class CurrencyL10n(db.Model):
 class VoucherCurrency:
     """A currency in a voucher."""
 
-    def __init__(self, code: str, debit: list[JournalEntry],
-                 credit: list[JournalEntry]):
+    def __init__(self, code: str, debit: list[VoucherLineItem],
+                 credit: list[VoucherLineItem]):
         """Constructs the currency in the voucher.
 
         :param code: The currency code.
-        :param debit: The debit entries.
-        :param credit: The credit entries.
+        :param debit: The debit line items.
+        :param credit: The credit line items.
         """
         self.code: str = code
         """The currency code."""
-        self.debit: list[JournalEntry] = debit
-        """The debit entries."""
-        self.credit: list[JournalEntry] = credit
-        """The credit entries."""
+        self.debit: list[VoucherLineItem] = debit
+        """The debit line items."""
+        self.credit: list[VoucherLineItem] = credit
+        """The credit line items."""
 
     @property
     def name(self) -> str:
@@ -475,17 +475,17 @@ class VoucherCurrency:
 
     @property
     def debit_total(self) -> Decimal:
-        """Returns the total amount of the debit journal entries.
+        """Returns the total amount of the debit line items.
 
-        :return: The total amount of the debit journal entries.
+        :return: The total amount of the debit line items.
         """
         return sum([x.amount for x in self.debit])
 
     @property
     def credit_total(self) -> str:
-        """Returns the total amount of the credit journal entries.
+        """Returns the total amount of the credit line items.
 
-        :return: The total amount of the credit journal entries.
+        :return: The total amount of the credit line items.
         """
         return sum([x.amount for x in self.credit])
 
@@ -523,8 +523,8 @@ class Voucher(db.Model):
     """The ID of the updator."""
     updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
     """The updator."""
-    entries = db.relationship("JournalEntry", back_populates="voucher")
-    """The journal entries."""
+    line_items = db.relationship("VoucherLineItem", back_populates="voucher")
+    """The line items."""
 
     def __str__(self) -> str:
         """Returns the string representation of this voucher.
@@ -539,18 +539,19 @@ class Voucher(db.Model):
 
     @property
     def currencies(self) -> list[VoucherCurrency]:
-        """Returns the journal entries categorized by their currencies.
+        """Returns the line items categorized by their currencies.
 
         :return: The currency categories.
         """
-        entries: list[JournalEntry] = sorted(self.entries, key=lambda x: x.no)
+        line_items: list[VoucherLineItem] = sorted(self.line_items,
+                                                   key=lambda x: x.no)
         codes: list[str] = []
-        by_currency: dict[str, list[JournalEntry]] = {}
-        for entry in entries:
-            if entry.currency_code not in by_currency:
-                codes.append(entry.currency_code)
-                by_currency[entry.currency_code] = []
-            by_currency[entry.currency_code].append(entry)
+        by_currency: dict[str, list[VoucherLineItem]] = {}
+        for line_item in line_items:
+            if line_item.currency_code not in by_currency:
+                codes.append(line_item.currency_code)
+                by_currency[line_item.currency_code] = []
+            by_currency[line_item.currency_code].append(line_item)
         return [VoucherCurrency(code=x,
                                 debit=[y for y in by_currency[x]
                                        if y.is_debit],
@@ -593,8 +594,8 @@ class Voucher(db.Model):
         """
         if not hasattr(self, "__can_delete"):
             def has_offset() -> bool:
-                for entry in self.entries:
-                    if len(entry.offsets) > 0:
+                for line_item in self.line_items:
+                    if len(line_item.offsets) > 0:
                         return True
                 return False
             setattr(self, "__can_delete", not has_offset())
@@ -605,50 +606,52 @@ class Voucher(db.Model):
 
         :return: None.
         """
-        JournalEntry.query\
-            .filter(JournalEntry.voucher_id == self.id).delete()
+        VoucherLineItem.query\
+            .filter(VoucherLineItem.voucher_id == self.id).delete()
         db.session.delete(self)
 
 
-class JournalEntry(db.Model):
-    """An accounting journal entry."""
-    __tablename__ = "accounting_journal_entries"
+class VoucherLineItem(db.Model):
+    """A line item in the voucher."""
+    __tablename__ = "accounting_voucher_line_items"
     """The table name."""
     id = db.Column(db.Integer, nullable=False, primary_key=True,
                    autoincrement=False)
-    """The entry ID."""
+    """The line item ID."""
     voucher_id = db.Column(db.Integer,
                            db.ForeignKey(Voucher.id, onupdate="CASCADE",
                                          ondelete="CASCADE"),
                            nullable=False)
     """The voucher ID."""
-    voucher = db.relationship(Voucher, back_populates="entries")
+    voucher = db.relationship(Voucher, back_populates="line_items")
     """The voucher."""
     is_debit = db.Column(db.Boolean, nullable=False)
-    """True for a debit entry, or False for a credit entry."""
+    """True for a debit line item, or False for a credit line item."""
     no = db.Column(db.Integer, nullable=False)
-    """The entry number under the voucher and debit or credit."""
-    original_entry_id = db.Column(db.Integer,
-                                  db.ForeignKey(id, onupdate="CASCADE"),
-                                  nullable=True)
-    """The ID of the original entry."""
-    original_entry = db.relationship("JournalEntry", back_populates="offsets",
-                                     remote_side=id, passive_deletes=True)
-    """The original entry."""
-    offsets = db.relationship("JournalEntry", back_populates="original_entry")
-    """The offset entries."""
+    """The line item number under the voucher and debit or credit."""
+    original_line_item_id = db.Column(db.Integer,
+                                      db.ForeignKey(id, onupdate="CASCADE"),
+                                      nullable=True)
+    """The ID of the original line item."""
+    original_line_item = db.relationship("VoucherLineItem",
+                                         back_populates="offsets",
+                                         remote_side=id, passive_deletes=True)
+    """The original line item."""
+    offsets = db.relationship("VoucherLineItem",
+                              back_populates="original_line_item")
+    """The offset items."""
     currency_code = db.Column(db.String,
                               db.ForeignKey(Currency.code, onupdate="CASCADE"),
                               nullable=False)
     """The currency code."""
-    currency = db.relationship(Currency, back_populates="entries")
+    currency = db.relationship(Currency, back_populates="line_items")
     """The currency."""
     account_id = db.Column(db.Integer,
                            db.ForeignKey(Account.id,
                                          onupdate="CASCADE"),
                            nullable=False)
     """The account ID."""
-    account = db.relationship(Account, back_populates="entries", lazy=False)
+    account = db.relationship(Account, back_populates="line_items", lazy=False)
     """The account."""
     summary = db.Column(db.String, nullable=True)
     """The summary."""
@@ -656,9 +659,9 @@ class JournalEntry(db.Model):
     """The amount."""
 
     def __str__(self) -> str:
-        """Returns the string representation of the journal entry.
+        """Returns the string representation of the line item.
 
-        :return: The string representation of the journal entry.
+        :return: The string representation of the line item.
         """
         if not hasattr(self, "__str"):
             from accounting.template_filters import format_date, format_amount
@@ -672,10 +675,10 @@ class JournalEntry(db.Model):
 
     @property
     def eid(self) -> int | None:
-        """Returns the journal entry ID.  This is the alternative name of the
+        """Returns the line item ID.  This is the alternative name of the
         ID field, to work with WTForms.
 
-        :return: The journal entry ID.
+        :return: The line item ID.
         """
         return self.id
 
@@ -691,15 +694,15 @@ class JournalEntry(db.Model):
     def debit(self) -> Decimal | None:
         """Returns the debit amount.
 
-        :return: The debit amount, or None if this is not a debit entry.
+        :return: The debit amount, or None if this is not a debit line item.
         """
         return self.amount if self.is_debit else None
 
     @property
     def is_need_offset(self) -> bool:
-        """Returns whether the entry needs offset.
+        """Returns whether the line item needs offset.
 
-        :return: True if the entry needs offset, or False otherwise.
+        :return: True if the line item needs offset, or False otherwise.
         """
         if not self.account.is_need_offset:
             return False
@@ -713,7 +716,7 @@ class JournalEntry(db.Model):
     def credit(self) -> Decimal | None:
         """Returns the credit amount.
 
-        :return: The credit amount, or None if this is not a credit entry.
+        :return: The credit amount, or None if this is not a credit line item.
         """
         return None if self.is_debit else self.amount
 

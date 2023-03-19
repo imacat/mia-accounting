@@ -28,11 +28,11 @@ from wtforms.validators import DataRequired
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Currency, JournalEntry
+from accounting.models import Currency, VoucherLineItem
 from accounting.voucher.utils.offset_alias import offset_alias
 from accounting.utils.cast import be
 from accounting.utils.strip_text import strip_text
-from .journal_entry import JournalEntryForm, CreditEntryForm, DebitEntryForm
+from .line_item import LineItemForm, CreditLineItemForm, DebitLineItemForm
 
 CURRENCY_REQUIRED: DataRequired = DataRequired(
     lazy_gettext("Please select the currency."))
@@ -50,26 +50,28 @@ class CurrencyExists:
                 "The currency does not exist."))
 
 
-class SameCurrencyAsOriginalEntries:
-    """The validator to check if the currency is the same as the original
-    entries."""
+class SameCurrencyAsOriginalLineItems:
+    """The validator to check if the currency is the same as the
+    original line items."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         assert isinstance(form, CurrencyForm)
         if field.data is None:
             return
-        original_entry_id: set[int] = {x.original_entry_id.data
-                                       for x in form.entries
-                                       if x.original_entry_id.data is not None}
-        if len(original_entry_id) == 0:
+        original_line_item_id: set[int] \
+            = {x.original_line_item_id.data
+               for x in form.line_items
+               if x.original_line_item_id.data is not None}
+        if len(original_line_item_id) == 0:
             return
-        original_entry_currency_codes: set[str] = set(db.session.scalars(
-            sa.select(JournalEntry.currency_code)
-            .filter(JournalEntry.id.in_(original_entry_id))).all())
-        for currency_code in original_entry_currency_codes:
+        original_line_item_currency_codes: set[str] = set(db.session.scalars(
+            sa.select(VoucherLineItem.currency_code)
+            .filter(VoucherLineItem.id.in_(original_line_item_id))).all())
+        for currency_code in original_line_item_currency_codes:
             if field.data != currency_code:
                 raise ValidationError(lazy_gettext(
-                    "The currency must be the same as the original entry."))
+                    "The currency must be the same as the"
+                    " original line item."))
 
 
 class KeepCurrencyWhenHavingOffset:
@@ -81,31 +83,32 @@ class KeepCurrencyWhenHavingOffset:
         if field.data is None:
             return
         offset: sa.Alias = offset_alias()
-        original_entries: list[JournalEntry] = JournalEntry.query\
-            .join(offset, be(JournalEntry.id == offset.c.original_entry_id),
+        original_line_items: list[VoucherLineItem] = VoucherLineItem.query\
+            .join(offset, be(VoucherLineItem.id
+                             == offset.c.original_line_item_id),
                   isouter=True)\
-            .filter(JournalEntry.id.in_({x.eid.data for x in form.entries
-                                         if x.eid.data is not None}))\
-            .group_by(JournalEntry.id, JournalEntry.currency_code)\
+            .filter(VoucherLineItem.id.in_({x.eid.data for x in form.line_items
+                                            if x.eid.data is not None}))\
+            .group_by(VoucherLineItem.id, VoucherLineItem.currency_code)\
             .having(sa.func.count(offset.c.id) > 0).all()
-        for original_entry in original_entries:
-            if original_entry.currency_code != field.data:
+        for original_line_item in original_line_items:
+            if original_line_item.currency_code != field.data:
                 raise ValidationError(lazy_gettext(
                     "The currency must not be changed when there is offset."))
 
 
-class NeedSomeJournalEntries:
-    """The validator to check if there is any journal entry sub-form."""
+class NeedSomeLineItems:
+    """The validator to check if there is any line item sub-form."""
 
     def __call__(self, form: FlaskForm, field: FieldList) -> None:
         if len(field) == 0:
             raise ValidationError(lazy_gettext(
-                "Please add some journal entries."))
+                "Please add some line items."))
 
 
 class IsBalanced:
     """The validator to check that the total amount of the debit and credit
-    entries are equal."""
+    line items are equal."""
 
     def __call__(self, form: FlaskForm, field: BooleanField) -> None:
         assert isinstance(form, TransferCurrencyForm)
@@ -126,20 +129,20 @@ class CurrencyForm(FlaskForm):
     """The pseudo field for the whole form validators."""
 
     @property
-    def entries(self) -> list[JournalEntryForm]:
-        """Returns the journal entry sub-forms.
+    def line_items(self) -> list[LineItemForm]:
+        """Returns the line item sub-forms.
 
-        :return: The journal entry sub-forms.
+        :return: The line item sub-forms.
         """
-        entry_forms: list[JournalEntryForm] = []
+        line_item_forms: list[LineItemForm] = []
         if isinstance(self, CashReceiptCurrencyForm):
-            entry_forms.extend([x.form for x in self.credit])
+            line_item_forms.extend([x.form for x in self.credit])
         elif isinstance(self, CashDisbursementCurrencyForm):
-            entry_forms.extend([x.form for x in self.debit])
+            line_item_forms.extend([x.form for x in self.debit])
         elif isinstance(self, TransferCurrencyForm):
-            entry_forms.extend([x.form for x in self.debit])
-            entry_forms.extend([x.form for x in self.credit])
-        return entry_forms
+            line_item_forms.extend([x.form for x in self.debit])
+            line_item_forms.extend([x.form for x in self.credit])
+        return line_item_forms
 
     @property
     def is_code_locked(self) -> bool:
@@ -148,16 +151,16 @@ class CurrencyForm(FlaskForm):
         :return: True if the currency code should not be changed, or False
             otherwise
         """
-        entry_forms: list[JournalEntryForm] = self.entries
-        original_entry_id: set[int] \
-            = {x.original_entry_id.data for x in entry_forms
-               if x.original_entry_id.data is not None}
-        if len(original_entry_id) > 0:
+        line_item_forms: list[LineItemForm] = self.line_items
+        original_line_item_id: set[int] \
+            = {x.original_line_item_id.data for x in line_item_forms
+               if x.original_line_item_id.data is not None}
+        if len(original_line_item_id) > 0:
             return True
-        entry_id: set[int] = {x.eid.data for x in entry_forms
-                              if x.eid.data is not None}
-        select: sa.Select = sa.select(sa.func.count(JournalEntry.id))\
-            .filter(JournalEntry.original_entry_id.in_(entry_id))
+        line_item_id: set[int] = {x.eid.data for x in line_item_forms
+                                  if x.eid.data is not None}
+        select: sa.Select = sa.select(sa.func.count(VoucherLineItem.id))\
+            .filter(VoucherLineItem.original_line_item_id.in_(line_item_id))
         return db.session.scalar(select) > 0
 
 
@@ -169,27 +172,27 @@ class CashReceiptCurrencyForm(CurrencyForm):
         filters=[strip_text],
         validators=[CURRENCY_REQUIRED,
                     CurrencyExists(),
-                    SameCurrencyAsOriginalEntries(),
+                    SameCurrencyAsOriginalLineItems(),
                     KeepCurrencyWhenHavingOffset()])
     """The currency code."""
-    credit = FieldList(FormField(CreditEntryForm),
-                       validators=[NeedSomeJournalEntries()])
-    """The credit entries."""
+    credit = FieldList(FormField(CreditLineItemForm),
+                       validators=[NeedSomeLineItems()])
+    """The credit line items."""
     whole_form = BooleanField()
     """The pseudo field for the whole form validators."""
 
     @property
     def credit_total(self) -> Decimal:
-        """Returns the total amount of the credit journal entries.
+        """Returns the total amount of the credit line items.
 
-        :return: The total amount of the credit journal entries.
+        :return: The total amount of the credit line items.
         """
         return sum([x.amount.data for x in self.credit
                     if x.amount.data is not None])
 
     @property
     def credit_errors(self) -> list[str | LazyString]:
-        """Returns the credit journal entry errors, without the errors in their
+        """Returns the credit line item errors, without the errors in their
         sub-forms.
 
         :return:
@@ -206,27 +209,27 @@ class CashDisbursementCurrencyForm(CurrencyForm):
         filters=[strip_text],
         validators=[CURRENCY_REQUIRED,
                     CurrencyExists(),
-                    SameCurrencyAsOriginalEntries(),
+                    SameCurrencyAsOriginalLineItems(),
                     KeepCurrencyWhenHavingOffset()])
     """The currency code."""
-    debit = FieldList(FormField(DebitEntryForm),
-                      validators=[NeedSomeJournalEntries()])
-    """The debit entries."""
+    debit = FieldList(FormField(DebitLineItemForm),
+                      validators=[NeedSomeLineItems()])
+    """The debit line items."""
     whole_form = BooleanField()
     """The pseudo field for the whole form validators."""
 
     @property
     def debit_total(self) -> Decimal:
-        """Returns the total amount of the debit journal entries.
+        """Returns the total amount of the debit line items.
 
-        :return: The total amount of the debit journal entries.
+        :return: The total amount of the debit line items.
         """
         return sum([x.amount.data for x in self.debit
                     if x.amount.data is not None])
 
     @property
     def debit_errors(self) -> list[str | LazyString]:
-        """Returns the debit journal entry errors, without the errors in their
+        """Returns the debit line item errors, without the errors in their
         sub-forms.
 
         :return:
@@ -243,39 +246,39 @@ class TransferCurrencyForm(CurrencyForm):
         filters=[strip_text],
         validators=[CURRENCY_REQUIRED,
                     CurrencyExists(),
-                    SameCurrencyAsOriginalEntries(),
+                    SameCurrencyAsOriginalLineItems(),
                     KeepCurrencyWhenHavingOffset()])
     """The currency code."""
-    debit = FieldList(FormField(DebitEntryForm),
-                      validators=[NeedSomeJournalEntries()])
-    """The debit entries."""
-    credit = FieldList(FormField(CreditEntryForm),
-                       validators=[NeedSomeJournalEntries()])
-    """The credit entries."""
+    debit = FieldList(FormField(DebitLineItemForm),
+                      validators=[NeedSomeLineItems()])
+    """The debit line items."""
+    credit = FieldList(FormField(CreditLineItemForm),
+                       validators=[NeedSomeLineItems()])
+    """The credit line items."""
     whole_form = BooleanField(validators=[IsBalanced()])
     """The pseudo field for the whole form validators."""
 
     @property
     def debit_total(self) -> Decimal:
-        """Returns the total amount of the debit journal entries.
+        """Returns the total amount of the debit line items.
 
-        :return: The total amount of the debit journal entries.
+        :return: The total amount of the debit line items.
         """
         return sum([x.amount.data for x in self.debit
                     if x.amount.data is not None])
 
     @property
     def credit_total(self) -> Decimal:
-        """Returns the total amount of the credit journal entries.
+        """Returns the total amount of the credit line items.
 
-        :return: The total amount of the credit journal entries.
+        :return: The total amount of the credit line items.
         """
         return sum([x.amount.data for x in self.credit
                     if x.amount.data is not None])
 
     @property
     def debit_errors(self) -> list[str | LazyString]:
-        """Returns the debit journal entry errors, without the errors in their
+        """Returns the debit line item errors, without the errors in their
         sub-forms.
 
         :return:
@@ -285,7 +288,7 @@ class TransferCurrencyForm(CurrencyForm):
 
     @property
     def credit_errors(self) -> list[str | LazyString]:
-        """Returns the credit journal entry errors, without the errors in their
+        """Returns the credit line item errors, without the errors in their
         sub-forms.
 
         :return:

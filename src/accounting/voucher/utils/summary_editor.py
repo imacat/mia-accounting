@@ -22,7 +22,7 @@ import typing as t
 import sqlalchemy as sa
 
 from accounting import db
-from accounting.models import Account, JournalEntry
+from accounting.models import Account, VoucherLineItem
 
 
 class SummaryAccount:
@@ -143,16 +143,16 @@ class SummaryType:
         return sorted(self.__tag_dict.values(), key=lambda x: -x.freq)
 
 
-class SummaryEntryType:
-    """A summary type"""
+class SummarySide:
+    """A summary side"""
 
-    def __init__(self, entry_type_id: t.Literal["debit", "credit"]):
-        """Constructs a summary entry type.
+    def __init__(self, side_id: t.Literal["debit", "credit"]):
+        """Constructs a summary side.
 
-        :param entry_type_id: The entry type ID, either "debit" or "credit".
+        :param side_id: The side ID, either "debit" or "credit".
         """
-        self.type: t.Literal["debit", "credit"] = entry_type_id
-        """The entry type."""
+        self.side: t.Literal["debit", "credit"] = side_id
+        """The side."""
         self.general: SummaryType = SummaryType("general")
         """The general tags."""
         self.travel: SummaryType = SummaryType("travel")
@@ -179,7 +179,7 @@ class SummaryEntryType:
     @property
     def accounts(self) -> list[SummaryAccount]:
         """Returns the suggested accounts of all tags in the summary editor in
-        the entry type, in their frequency order.
+        the side, in their frequency order.
 
         :return: The suggested accounts of all tags, in their frequency order.
         """
@@ -202,33 +202,33 @@ class SummaryEditor:
 
     def __init__(self):
         """Constructs the summary editor."""
-        self.debit: SummaryEntryType = SummaryEntryType("debit")
+        self.debit: SummarySide = SummarySide("debit")
         """The debit tags."""
-        self.credit: SummaryEntryType = SummaryEntryType("credit")
+        self.credit: SummarySide = SummarySide("credit")
         """The credit tags."""
-        entry_type: sa.Label = sa.case((JournalEntry.is_debit, "debit"),
-                                       else_="credit").label("entry_type")
+        side: sa.Label = sa.case((VoucherLineItem.is_debit, "debit"),
+                                 else_="credit").label("side")
         tag_type: sa.Label = sa.case(
-            (JournalEntry.summary.like("_%—_%—_%→_%"), "bus"),
-            (sa.or_(JournalEntry.summary.like("_%—_%→_%"),
-                    JournalEntry.summary.like("_%—_%↔_%")), "travel"),
+            (VoucherLineItem.summary.like("_%—_%—_%→_%"), "bus"),
+            (sa.or_(VoucherLineItem.summary.like("_%—_%→_%"),
+                    VoucherLineItem.summary.like("_%—_%↔_%")), "travel"),
             else_="general").label("tag_type")
-        tag: sa.Label = get_prefix(JournalEntry.summary, "—").label("tag")
-        select: sa.Select = sa.Select(entry_type, tag_type, tag,
-                                      JournalEntry.account_id,
+        tag: sa.Label = get_prefix(VoucherLineItem.summary, "—").label("tag")
+        select: sa.Select = sa.Select(side, tag_type, tag,
+                                      VoucherLineItem.account_id,
                                       sa.func.count().label("freq"))\
-            .filter(JournalEntry.summary.is_not(None),
-                    JournalEntry.summary.like("_%—_%"),
-                    JournalEntry.original_entry_id.is_(None))\
-            .group_by(entry_type, tag_type, tag, JournalEntry.account_id)
+            .filter(VoucherLineItem.summary.is_not(None),
+                    VoucherLineItem.summary.like("_%—_%"),
+                    VoucherLineItem.original_line_item_id.is_(None))\
+            .group_by(side, tag_type, tag, VoucherLineItem.account_id)
         result: list[sa.Row] = db.session.execute(select).all()
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query
                .filter(Account.id.in_({x.account_id for x in result})).all()}
-        entry_type_dict: dict[t.Literal["debit", "credit"], SummaryEntryType] \
-            = {x.type: x for x in {self.debit, self.credit}}
+        side_dict: dict[t.Literal["debit", "credit"], SummarySide] \
+            = {x.side: x for x in {self.debit, self.credit}}
         for row in result:
-            entry_type_dict[row.entry_type].add_tag(
+            side_dict[row.side].add_tag(
                 row.tag_type, row.tag, accounts[row.account_id], row.freq)
 
 

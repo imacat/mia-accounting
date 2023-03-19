@@ -39,10 +39,10 @@ class VoucherForm {
     #element;
 
     /**
-     * The template to add a new journal entry
+     * The template to add a new line item
      * @type {string}
      */
-    entryTemplate;
+    lineItemTemplate;
 
     /**
      * The date
@@ -99,10 +99,10 @@ class VoucherForm {
     #noteError;
 
     /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
+     * The line item editor
+     * @type {VoucherLineItemEditor}
      */
-    entryEditor;
+    lineItemEditor;
 
     /**
      * Constructs the voucher form.
@@ -110,7 +110,7 @@ class VoucherForm {
      */
     constructor() {
         this.#element = document.getElementById("accounting-form");
-        this.entryTemplate = this.#element.dataset.entryTemplate;
+        this.lineItemTemplate = this.#element.dataset.lineItemTemplate;
         this.#date = document.getElementById("accounting-date");
         this.#dateError = document.getElementById("accounting-date-error");
         this.#currencyControl = document.getElementById("accounting-currencies");
@@ -121,7 +121,7 @@ class VoucherForm {
         this.#addCurrencyButton = document.getElementById("accounting-add-currency");
         this.#note = document.getElementById("accounting-note");
         this.#noteError = document.getElementById("accounting-note-error");
-        this.entryEditor = new JournalEntryEditor(this);
+        this.lineItemEditor = new VoucherLineItemEditor(this);
 
         this.#addCurrencyButton.onclick = () => {
             const newIndex = 1 + (this.#currencies.length === 0? 0: Math.max(...this.#currencies.map((currency) => currency.index)));
@@ -162,14 +162,14 @@ class VoucherForm {
             this.#currencies[0].deleteButton.classList.add("d-none");
         } else {
             for (const currency of this.#currencies) {
-                let isAnyEntryMatched = false;
-                for (const entry of currency.getEntries()) {
-                    if (entry.isMatched) {
-                        isAnyEntryMatched = true;
+                let isAnyLineItemMatched = false;
+                for (const lineItem of currency.getLineItems()) {
+                    if (lineItem.isMatched) {
+                        isAnyLineItemMatched = true;
                         break;
                     }
                 }
-                if (isAnyEntryMatched) {
+                if (isAnyLineItemMatched) {
                     currency.deleteButton.classList.add("d-none");
                 } else {
                     currency.deleteButton.classList.remove("d-none");
@@ -193,27 +193,27 @@ class VoucherForm {
     }
 
     /**
-     * Returns all the journal entries in the form.
+     * Returns all the line items in the form.
      *
-     * @param entryType {string|null} the entry type, either "debit" or "credit", or null for both
-     * @return {JournalEntrySubForm[]} all the journal entry sub-forms
+     * @param side {string|null} the side, either "debit" or "credit", or null for both
+     * @return {LineItemSubForm[]} all the line item sub-forms
      */
-    getEntries(entryType = null) {
-        const entries = [];
+    getLineItems(side = null) {
+        const lineItems = [];
         for (const currency of this.#currencies) {
-            entries.push(...currency.getEntries(entryType));
+            lineItems.push(...currency.getLineItems(side));
         }
-        return entries;
+        return lineItems;
     }
 
     /**
      * Returns the account codes used in the form.
      *
-     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @param side {string} the side, either "debit" or "credit"
      * @return {string[]} the account codes used in the form
      */
-    getAccountCodesUsed(entryType) {
-        return this.getEntries(entryType).map((entry) => entry.getAccountCode())
+    getAccountCodesUsed(side) {
+        return this.getLineItems(side).map((lineItem) => lineItem.getAccountCode())
             .filter((code) => code !== null);
     }
 
@@ -231,16 +231,16 @@ class VoucherForm {
      *
      */
     updateMinDate() {
-        let lastOriginalEntryDate = null;
-        for (const entry of this.getEntries()) {
-            const date = entry.getOriginalEntryDate();
+        let lastOriginalLineItemDate = null;
+        for (const lineItem of this.getLineItems()) {
+            const date = lineItem.getOriginalLineItemDate();
             if (date !== null) {
-                if (lastOriginalEntryDate === null || lastOriginalEntryDate < date) {
-                    lastOriginalEntryDate = date;
+                if (lastOriginalLineItemDate === null || lastOriginalLineItemDate < date) {
+                    lastOriginalLineItemDate = date;
                 }
             }
         }
-        this.#date.min = lastOriginalEntryDate === null? "": lastOriginalEntryDate;
+        this.#date.min = lastOriginalLineItemDate === null? "": lastOriginalLineItemDate;
         this.#validateDate();
     }
 
@@ -272,7 +272,7 @@ class VoucherForm {
         }
         if (this.#date.value < this.#date.min) {
             this.#date.classList.add("is-invalid");
-            this.#dateError.innerText = A_("The date cannot be earlier than the original entries.");
+            this.#dateError.innerText = A_("The date cannot be earlier than the original line items.");
             return false;
         }
         this.#date.classList.remove("is-invalid");
@@ -407,13 +407,13 @@ class CurrencySubForm {
 
     /**
      * The debit side
-     * @type {DebitCreditSideSubForm|null}
+     * @type {SideSubForm|null}
      */
     #debit;
 
     /**
      * The credit side
-     * @type {DebitCreditSideSubForm|null}
+     * @type {SideSubForm|null}
      */
     #credit;
 
@@ -435,9 +435,9 @@ class CurrencySubForm {
         this.#codeSelect = document.getElementById(this.#prefix + "-code-select");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
         const debitElement = document.getElementById(this.#prefix + "-debit");
-        this.#debit = debitElement === null? null: new DebitCreditSideSubForm(this, debitElement, "debit");
+        this.#debit = debitElement === null? null: new SideSubForm(this, debitElement, "debit");
         const creditElement = document.getElementById(this.#prefix + "-credit");
-        this.#credit = creditElement == null? null: new DebitCreditSideSubForm(this, creditElement, "credit");
+        this.#credit = creditElement == null? null: new SideSubForm(this, creditElement, "credit");
         this.#codeSelect.onchange = () => this.#code.value = this.#codeSelect.value;
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
@@ -455,21 +455,21 @@ class CurrencySubForm {
     }
 
     /**
-     * Returns all the journal entries in the form.
+     * Returns all the line items in the form.
      *
-     * @param entryType {string|null} the entry type, either "debit" or "credit", or null for both
-     * @return {JournalEntrySubForm[]} all the journal entry sub-forms
+     * @param side {string|null} the side, either "debit" or "credit", or null for both
+     * @return {LineItemSubForm[]} all the line item sub-forms
      */
-    getEntries(entryType = null) {
-        const entries = []
-        for (const side of [this.#debit, this.#credit]) {
-            if (side !== null ) {
-                if (entryType === null || side.entryType === entryType) {
-                    entries.push(...side.entries);
+    getLineItems(side = null) {
+        const lineItems = []
+        for (const sideSubForm of [this.#debit, this.#credit]) {
+            if (sideSubForm !== null ) {
+                if (side === null || sideSubForm.side === side) {
+                    lineItems.push(...sideSubForm.lineItems);
                 }
             }
         }
-        return entries;
+        return lineItems;
     }
 
     /**
@@ -478,8 +478,8 @@ class CurrencySubForm {
      */
     updateCodeSelectorStatus() {
         let isEnabled = true;
-        for (const entry of this.getEntries()) {
-            if (entry.getOriginalEntryId() !== null) {
+        for (const lineItem of this.getLineItems()) {
+            if (lineItem.getOriginalLineItemId() !== null) {
                 isEnabled = false;
                 break;
             }
@@ -527,7 +527,7 @@ class CurrencySubForm {
  * The debit or credit side sub-form
  *
  */
-class DebitCreditSideSubForm {
+class SideSubForm {
 
     /**
      * The currency sub-form
@@ -548,10 +548,10 @@ class DebitCreditSideSubForm {
     #currencyIndex;
 
     /**
-     * The entry type, either "debit" or "credit"
+     * The side, either "debit" or "credit"
      * @type {string}
      */
-    entryType;
+    side;
 
     /**
      * The prefix of the HTML ID and class
@@ -566,16 +566,16 @@ class DebitCreditSideSubForm {
     #error;
 
     /**
-     * The journal entry list
+     * The line item list
      * @type {HTMLUListElement}
      */
-    #entryList;
+    #lineItemList;
 
     /**
-     * The journal entry sub-forms
-     * @type {JournalEntrySubForm[]}
+     * The line item sub-forms
+     * @type {LineItemSubForm[]}
      */
-    entries;
+    lineItems;
 
     /**
      * The total
@@ -584,82 +584,82 @@ class DebitCreditSideSubForm {
     #total;
 
     /**
-     * The button to add a new entry
+     * The button to add a new line item
      * @type {HTMLButtonElement}
      */
-    #addEntryButton;
+    #addLineItemButton;
 
     /**
      * Constructs a debit or credit side sub-form
      *
      * @param currency {CurrencySubForm} the currency sub-form
      * @param element {HTMLDivElement} the element
-     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @param side {string} the side, either "debit" or "credit"
      */
-    constructor(currency, element, entryType) {
+    constructor(currency, element, side) {
         this.currency = currency;
         this.#element = element;
         this.#currencyIndex = currency.index;
-        this.entryType = entryType;
-        this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + entryType;
+        this.side = side;
+        this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + side;
         this.#error = document.getElementById(this.#prefix + "-error");
-        this.#entryList = document.getElementById(this.#prefix + "-list");
+        this.#lineItemList = document.getElementById(this.#prefix + "-list");
         // noinspection JSValidateTypes
-        this.entries = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new JournalEntrySubForm(this, element));
+        this.lineItems = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new LineItemSubForm(this, element));
         this.#total = document.getElementById(this.#prefix + "-total");
-        this.#addEntryButton = document.getElementById(this.#prefix + "-add-entry");
-        this.#addEntryButton.onclick = () => this.currency.form.entryEditor.onAddNew(this);
-        this.#resetDeleteJournalEntryButtons();
+        this.#addLineItemButton = document.getElementById(this.#prefix + "-add-line-item");
+        this.#addLineItemButton.onclick = () => this.currency.form.lineItemEditor.onAddNew(this);
+        this.#resetDeleteLineItemButtons();
         this.#initializeDragAndDropReordering();
     }
 
     /**
-     * Adds a new journal entry sub-form
+     * Adds a new line item sub-form
      *
-     * @returns {JournalEntrySubForm} the newly-added journal entry sub-form
+     * @returns {LineItemSubForm} the newly-added line item sub-form
      */
-    addJournalEntry() {
-        const newIndex = 1 + (this.entries.length === 0? 0: Math.max(...this.entries.map((entry) => entry.entryIndex)));
-        const html = this.currency.form.entryTemplate
+    addLineItem() {
+        const newIndex = 1 + (this.lineItems.length === 0? 0: Math.max(...this.lineItems.map((lineItem) => lineItem.lineItemIndex)));
+        const html = this.currency.form.lineItemTemplate
             .replaceAll("CURRENCY_INDEX", escapeHtml(String(this.#currencyIndex)))
-            .replaceAll("ENTRY_TYPE", escapeHtml(this.entryType))
-            .replaceAll("ENTRY_INDEX", escapeHtml(String(newIndex)));
-        this.#entryList.insertAdjacentHTML("beforeend", html);
-        const entry = new JournalEntrySubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
-        this.entries.push(entry);
-        this.#resetDeleteJournalEntryButtons();
+            .replaceAll("SIDE", escapeHtml(this.side))
+            .replaceAll("LINE_ITEM_INDEX", escapeHtml(String(newIndex)));
+        this.#lineItemList.insertAdjacentHTML("beforeend", html);
+        const lineItem = new LineItemSubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
+        this.lineItems.push(lineItem);
+        this.#resetDeleteLineItemButtons();
         this.#initializeDragAndDropReordering();
         this.validate();
-        return entry;
+        return lineItem;
     }
 
     /**
-     * Deletes a journal entry sub-form
+     * Deletes a line item sub-form
      *
-     * @param entry {JournalEntrySubForm}
+     * @param lineItem {LineItemSubForm}
      */
-    deleteJournalEntry(entry) {
-        const index = this.entries.indexOf(entry);
-        this.entries.splice(index, 1);
+    deleteLineItem(lineItem) {
+        const index = this.lineItems.indexOf(lineItem);
+        this.lineItems.splice(index, 1);
         this.updateTotal();
         this.currency.updateCodeSelectorStatus();
         this.currency.form.updateMinDate();
-        this.#resetDeleteJournalEntryButtons();
+        this.#resetDeleteLineItemButtons();
     }
 
     /**
-     * Resets the buttons to delete the journal entry sub-forms
+     * Resets the buttons to delete the line item sub-forms
      *
      */
-    #resetDeleteJournalEntryButtons() {
-        if (this.entries.length === 1) {
-            this.entries[0].deleteButton.classList.add("d-none");
+    #resetDeleteLineItemButtons() {
+        if (this.lineItems.length === 1) {
+            this.lineItems[0].deleteButton.classList.add("d-none");
         } else {
-            for (const entry of this.entries) {
-                if (entry.isMatched) {
-                    entry.deleteButton.classList.add("d-none");
+            for (const lineItem of this.lineItems) {
+                if (lineItem.isMatched) {
+                    lineItem.deleteButton.classList.add("d-none");
                 } else {
-                    entry.deleteButton.classList.remove("d-none");
+                    lineItem.deleteButton.classList.remove("d-none");
                 }
             }
         }
@@ -672,8 +672,8 @@ class DebitCreditSideSubForm {
      */
     getTotal() {
         let total = new Decimal("0");
-        for (const entry of this.entries) {
-            const amount = entry.getAmount();
+        for (const lineItem of this.lineItems) {
+            const amount = lineItem.getAmount();
             if (amount !== null) {
                 total = total.plus(amount);
             }
@@ -695,11 +695,11 @@ class DebitCreditSideSubForm {
      *
      */
     #initializeDragAndDropReordering() {
-        initializeDragAndDropReordering(this.#entryList, () => {
-            const entryId = Array.from(this.#entryList.children).map((entry) => entry.id);
-            this.entries.sort((a, b) => entryId.indexOf(a.element.id) - entryId.indexOf(b.element.id));
-            for (let i = 0; i < this.entries.length; i++) {
-                this.entries[i].no.value = String(i + 1);
+        initializeDragAndDropReordering(this.#lineItemList, () => {
+            const lineItemId = Array.from(this.#lineItemList.children).map((lineItem) => lineItem.id);
+            this.lineItems.sort((a, b) => lineItemId.indexOf(a.element.id) - lineItemId.indexOf(b.element.id));
+            for (let i = 0; i < this.lineItems.length; i++) {
+                this.lineItems[i].no.value = String(i + 1);
             }
         });
     }
@@ -712,8 +712,8 @@ class DebitCreditSideSubForm {
     validate() {
         let isValid = true;
         isValid = this.#validateReal() && isValid;
-        for (const entry of this.entries) {
-            isValid = entry.validate() && isValid;
+        for (const lineItem of this.lineItems) {
+            isValid = lineItem.validate() && isValid;
         }
         return isValid;
     }
@@ -724,9 +724,9 @@ class DebitCreditSideSubForm {
      * @returns {boolean} true if valid, or false otherwise
      */
     #validateReal() {
-        if (this.entries.length === 0) {
+        if (this.lineItems.length === 0) {
             this.#element.classList.add("is-invalid");
-            this.#error.innerText = A_("Please add some journal entries.");
+            this.#error.innerText = A_("Please add some line items.");
             return false;
         }
         this.#element.classList.remove("is-invalid");
@@ -736,16 +736,16 @@ class DebitCreditSideSubForm {
 }
 
 /**
- * The journal entry sub-form.
+ * The line item sub-form.
  *
  */
-class JournalEntrySubForm {
+class LineItemSubForm {
 
     /**
-     * The debit or credit entry side sub-form
-     * @type {DebitCreditSideSubForm}
+     * The debit or credit side sub-form
+     * @type {SideSubForm}
      */
-    side;
+    sideSubForm;
 
     /**
      * The element
@@ -754,19 +754,19 @@ class JournalEntrySubForm {
     element;
 
     /**
-     * The entry type, either "debit" or "credit"
+     * The side, either "debit" or "credit"
      * @type {string}
      */
-    entryType;
+    side;
 
     /**
-     * The entry index
+     * The line item index
      * @type {number}
      */
-    entryIndex;
+    lineItemIndex;
 
     /**
-     * Whether this is an original entry with offsets
+     * Whether this is an original line item with offsets
      * @type {boolean}
      */
     isMatched;
@@ -820,19 +820,19 @@ class JournalEntrySubForm {
     #summaryText;
 
     /**
-     * The ID of the original entry
+     * The ID of the original line item
      * @type {HTMLInputElement}
      */
-    #originalEntryId;
+    #originalLineItemId;
 
     /**
-     * The text of the original entry
+     * The text of the original line item
      * @type {HTMLDivElement}
      */
-    #originalEntryText;
+    #originalLineItemText;
 
     /**
-     * The offset entries
+     * The offset items
      * @type {HTMLInputElement}
      */
     #offsets;
@@ -850,24 +850,24 @@ class JournalEntrySubForm {
     #amountText;
 
     /**
-     * The button to delete journal entry
+     * The button to delete line item
      * @type {HTMLButtonElement}
      */
     deleteButton;
 
     /**
-     * Constructs the journal entry sub-form.
+     * Constructs the line item sub-form.
      *
-     * @param side {DebitCreditSideSubForm} the debit or credit entry side sub-form
+     * @param side {SideSubForm} the debit or credit side sub-form
      * @param element {HTMLLIElement} the element
      */
     constructor(side, element) {
-        this.side = side;
+        this.sideSubForm = side;
         this.element = element;
-        this.entryType = element.dataset.entryType;
-        this.entryIndex = parseInt(element.dataset.entryIndex);
-        this.isMatched = element.classList.contains("accounting-matched-entry");
-        this.#prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.entryType + "-" + this.entryIndex;
+        this.side = element.dataset.side;
+        this.lineItemIndex = parseInt(element.dataset.lineItemIndex);
+        this.isMatched = element.classList.contains("accounting-matched-line-item");
+        this.#prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.side + "-" + this.lineItemIndex;
         this.#control = document.getElementById(this.#prefix + "-control");
         this.#error = document.getElementById(this.#prefix + "-error");
         this.no = document.getElementById(this.#prefix + "-no");
@@ -875,53 +875,53 @@ class JournalEntrySubForm {
         this.#accountText = document.getElementById(this.#prefix + "-account-text");
         this.#summary = document.getElementById(this.#prefix + "-summary");
         this.#summaryText = document.getElementById(this.#prefix + "-summary-text");
-        this.#originalEntryId = document.getElementById(this.#prefix + "-original-entry-id");
-        this.#originalEntryText = document.getElementById(this.#prefix + "-original-entry-text");
+        this.#originalLineItemId = document.getElementById(this.#prefix + "-original-line-item-id");
+        this.#originalLineItemText = document.getElementById(this.#prefix + "-original-line-item-text");
         this.#offsets = document.getElementById(this.#prefix + "-offsets");
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
-        this.#control.onclick = () => this.side.currency.form.entryEditor.onEdit(this);
+        this.#control.onclick = () => this.sideSubForm.currency.form.lineItemEditor.onEdit(this);
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
-            this.side.deleteJournalEntry(this);
+            this.sideSubForm.deleteLineItem(this);
         };
     }
 
     /**
-     * Returns whether the entry is an original entry.
+     * Returns whether the line item needs offset.
      *
-     * @return {boolean} true if the entry is an original entry, or false otherwise
+     * @return {boolean} true if the line item needs offset, or false otherwise
      */
     isNeedOffset() {
         return "isNeedOffset" in this.element.dataset;
     }
 
     /**
-     * Returns the ID of the original entry.
+     * Returns the ID of the original line item.
      *
-     * @return {string|null} the ID of the original entry
+     * @return {string|null} the ID of the original line item
      */
-    getOriginalEntryId() {
-        return this.#originalEntryId.value === ""? null: this.#originalEntryId.value;
+    getOriginalLineItemId() {
+        return this.#originalLineItemId.value === ""? null: this.#originalLineItemId.value;
     }
 
     /**
-     * Returns the date of the original entry.
+     * Returns the date of the original line item.
      *
-     * @return {string|null} the date of the original entry
+     * @return {string|null} the date of the original line item
      */
-    getOriginalEntryDate() {
-        return this.#originalEntryId.dataset.date === ""? null: this.#originalEntryId.dataset.date;
+    getOriginalLineItemDate() {
+        return this.#originalLineItemId.dataset.date === ""? null: this.#originalLineItemId.dataset.date;
     }
 
     /**
-     * Returns the text of the original entry.
+     * Returns the text of the original line item.
      *
-     * @return {string|null} the text of the original entry
+     * @return {string|null} the text of the original line item
      */
-    getOriginalEntryText() {
-        return this.#originalEntryId.dataset.text === ""? null: this.#originalEntryId.dataset.text;
+    getOriginalLineItemText() {
+        return this.#originalLineItemId.dataset.text === ""? null: this.#originalLineItemId.dataset.text;
     }
 
     /**
@@ -991,9 +991,9 @@ class JournalEntrySubForm {
     }
 
     /**
-     * Stores the data into the journal entry sub-form.
+     * Stores the data into the line item sub-form.
      *
-     * @param editor {JournalEntryEditor} the journal entry editor
+     * @param editor {VoucherLineItemEditor} the line item editor
      */
     save(editor) {
         if (editor.isNeedOffset) {
@@ -1001,15 +1001,15 @@ class JournalEntrySubForm {
         } else {
             this.#offsets.classList.add("d-none");
         }
-        this.#originalEntryId.value = editor.originalEntryId === null? "": editor.originalEntryId;
-        this.#originalEntryId.dataset.date = editor.originalEntryDate === null? "": editor.originalEntryDate;
-        this.#originalEntryId.dataset.text = editor.originalEntryText === null? "": editor.originalEntryText;
-        if (editor.originalEntryText === null) {
-            this.#originalEntryText.classList.add("d-none");
-            this.#originalEntryText.innerText = "";
+        this.#originalLineItemId.value = editor.originalLineItemId === null? "": editor.originalLineItemId;
+        this.#originalLineItemId.dataset.date = editor.originalLineItemDate === null? "": editor.originalLineItemDate;
+        this.#originalLineItemId.dataset.text = editor.originalLineItemText === null? "": editor.originalLineItemText;
+        if (editor.originalLineItemText === null) {
+            this.#originalLineItemText.classList.add("d-none");
+            this.#originalLineItemText.innerText = "";
         } else {
-            this.#originalEntryText.classList.remove("d-none");
-            this.#originalEntryText.innerText = A_("Offset %(entry)s", {entry: editor.originalEntryText});
+            this.#originalLineItemText.classList.remove("d-none");
+            this.#originalLineItemText.innerText = A_("Offset %(item)s", {item: editor.originalLineItemText});
         }
         this.#accountCode.value = editor.accountCode === null? "": editor.accountCode;
         this.#accountCode.dataset.text = editor.accountText === null? "": editor.accountText;
@@ -1019,9 +1019,9 @@ class JournalEntrySubForm {
         this.#amount.value = editor.amount;
         this.#amountText.innerText = formatDecimal(new Decimal(editor.amount));
         this.validate();
-        this.side.updateTotal();
-        this.side.currency.updateCodeSelectorStatus();
-        this.side.currency.form.updateMinDate();
+        this.sideSubForm.updateTotal();
+        this.sideSubForm.currency.updateCodeSelectorStatus();
+        this.sideSubForm.currency.form.updateMinDate();
     }
 }
 

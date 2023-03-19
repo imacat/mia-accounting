@@ -29,10 +29,10 @@
 class SummaryEditor {
 
     /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
+     * The line item editor
+     * @type {VoucherLineItemEditor}
      */
-    #entryEditor;
+    #lineItemEditor;
 
     /**
      * The summary editor form
@@ -53,10 +53,10 @@ class SummaryEditor {
     #modal;
 
     /**
-     * The entry type, either "debit" or "credit"
+     * The side, either "debit" or "credit"
      * @type {string}
      */
-    entryType;
+    side;
 
     /**
      * The current tab
@@ -71,7 +71,7 @@ class SummaryEditor {
     summary;
 
     /**
-     * The button to the original entry selector
+     * The button to the original line item selector
      * @type {HTMLButtonElement}
      */
     #offsetButton;
@@ -109,13 +109,13 @@ class SummaryEditor {
     /**
      * Constructs a summary editor.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
-     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param side {string} the side, either "debit" or "credit"
      */
-    constructor(entryEditor, entryType) {
-        this.#entryEditor = entryEditor;
-        this.entryType = entryType;
-        this.prefix = "accounting-summary-editor-" + entryType;
+    constructor(lineItemEditor, side) {
+        this.#lineItemEditor = lineItemEditor;
+        this.side = side;
+        this.prefix = "accounting-summary-editor-" + side;
         this.#form = document.getElementById(this.prefix);
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.summary = document.getElementById(this.prefix + "-summary");
@@ -132,7 +132,7 @@ class SummaryEditor {
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
         this.summary.onchange = () => this.#onSummaryChange();
-        this.#offsetButton.onclick = () => this.#entryEditor.originalEntrySelector.onOpen();
+        this.#offsetButton.onclick = () => this.#lineItemEditor.originalLineItemSelector.onOpen();
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
                 this.#submit();
@@ -215,9 +215,9 @@ class SummaryEditor {
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
         if (this.#selectedAccount !== null) {
-            this.#entryEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
+            this.#lineItemEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
         } else {
-            this.#entryEditor.saveSummary(this.summary.value);
+            this.#lineItemEditor.saveSummary(this.summary.value);
         }
     }
 
@@ -227,7 +227,7 @@ class SummaryEditor {
      */
     onOpen() {
         this.#reset();
-        this.summary.value = this.#entryEditor.summary === null? "": this.#entryEditor.summary;
+        this.summary.value = this.#lineItemEditor.summary === null? "": this.#lineItemEditor.summary;
         this.#onSummaryChange();
     }
 
@@ -246,14 +246,14 @@ class SummaryEditor {
     /**
      * Returns the summary editor instances.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
      * @return {{debit: SummaryEditor, credit: SummaryEditor}}
      */
-    static getInstances(entryEditor) {
+    static getInstances(lineItemEditor) {
         const editors = {}
         const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
         for (const form of forms) {
-            editors[form.dataset.entryType] = new SummaryEditor(entryEditor, form.dataset.entryType);
+            editors[form.dataset.side] = new SummaryEditor(lineItemEditor, form.dataset.side);
         }
         return editors;
     }

@@ -19,10 +19,10 @@ ledger-row-desktop.html: The row in the ledger for the desktop computers
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/8
 #}
-<div>{{ entry.date|accounting_format_date }}</div>
-<div>{{ entry.summary|accounting_default }}</div>
-<div class="accounting-amount">{{ entry.debit|accounting_format_amount|accounting_default }}</div>
-<div class="accounting-amount">{{ entry.credit|accounting_format_amount|accounting_default }}</div>
+<div>{{ line_item.date|accounting_format_date }}</div>
+<div>{{ line_item.summary|accounting_default }}</div>
+<div class="accounting-amount">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
+<div class="accounting-amount">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
 {% if report.account.is_real %}
-  <div class="accounting-amount {% if entry.balance < 0 %} text-danger {% endif %}">{{ entry.balance|accounting_report_format_amount }}</div>
+  <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}">{{ line_item.balance|accounting_report_format_amount }}</div>
 {% endif %}

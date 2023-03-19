@@ -53,7 +53,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                JournalEntry
+                VoucherLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -67,7 +67,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            JournalEntry.query.delete()
+            VoucherLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -231,7 +231,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A receivable entry cannot start from the credit side
+        # A receivable line item cannot start from the credit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -391,7 +391,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A receivable entry cannot start from the credit side
+        # A receivable line item cannot start from the credit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -625,7 +625,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                JournalEntry
+                VoucherLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -639,7 +639,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            JournalEntry.query.delete()
+            VoucherLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -803,7 +803,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A payable entry cannot start from the debit side
+        # A payable line item cannot start from the debit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -966,7 +966,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A payable entry cannot start from the debit side
+        # A payable line item cannot start from the debit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -1204,7 +1204,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                JournalEntry
+                VoucherLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -1218,7 +1218,7 @@ class TransferVoucherTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            JournalEntry.query.delete()
+            VoucherLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -1398,7 +1398,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A receivable entry cannot start from the credit side
+        # A receivable line item cannot start from the credit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -1407,7 +1407,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A payable entry cannot start from the debit side
+        # A payable line item cannot start from the debit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -1597,7 +1597,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A receivable entry cannot start from the credit side
+        # A receivable line item cannot start from the credit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -1606,7 +1606,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A payable entry cannot start from the debit side
+        # A payable line item cannot start from the debit side
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -2056,7 +2056,7 @@ class VoucherReorderTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                JournalEntry
+                VoucherLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -2070,7 +2070,7 @@ class VoucherReorderTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            JournalEntry.query.delete()
+            VoucherLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 

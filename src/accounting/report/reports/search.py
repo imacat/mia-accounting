@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
 from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
-    Voucher, JournalEntry
+    Voucher, VoucherLineItem
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import csv_download
@@ -38,18 +38,18 @@ from accounting.utils.query import parse_query_keywords
 from .journal import get_csv_rows
 
 
-class EntryCollector:
-    """The report entry collector."""
+class LineItemCollector:
+    """The line item collector."""
 
     def __init__(self):
-        """Constructs the report entry collector."""
-        self.entries: list[JournalEntry] = self.__query_entries()
-        """The report entries."""
+        """Constructs the line item collector."""
+        self.line_items: list[VoucherLineItem] = self.__query_line_items()
+        """The line items."""
 
-    def __query_entries(self) -> list[JournalEntry]:
-        """Queries and returns the journal entries.
+    def __query_line_items(self) -> list[VoucherLineItem]:
+        """Queries and returns the line items.
 
-        :return: The journal entries.
+        :return: The line items.
         """
         keywords: list[str] = parse_query_keywords(request.args.get("q"))
         if len(keywords) == 0:
@@ -57,26 +57,26 @@ class EntryCollector:
         conditions: list[sa.BinaryExpression] = []
         for k in keywords:
             sub_conditions: list[sa.BinaryExpression] \
-                = [JournalEntry.summary.contains(k),
-                   JournalEntry.account_id.in_(
+                = [VoucherLineItem.summary.contains(k),
+                   VoucherLineItem.account_id.in_(
                        self.__get_account_condition(k)),
-                   JournalEntry.currency_code.in_(
+                   VoucherLineItem.currency_code.in_(
                        self.__get_currency_condition(k)),
-                   JournalEntry.voucher_id.in_(
+                   VoucherLineItem.voucher_id.in_(
                        self.__get_voucher_condition(k))]
             try:
-                sub_conditions.append(JournalEntry.amount == Decimal(k))
+                sub_conditions.append(VoucherLineItem.amount == Decimal(k))
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return JournalEntry.query.join(Voucher).filter(*conditions)\
+        return VoucherLineItem.query.join(Voucher).filter(*conditions)\
             .order_by(Voucher.date,
                       Voucher.no,
-                      JournalEntry.is_debit,
-                      JournalEntry.no)\
-            .options(selectinload(JournalEntry.account),
-                     selectinload(JournalEntry.currency),
-                     selectinload(JournalEntry.voucher)).all()
+                      VoucherLineItem.is_debit,
+                      VoucherLineItem.no)\
+            .options(selectinload(VoucherLineItem.account),
+                     selectinload(VoucherLineItem.currency),
+                     selectinload(VoucherLineItem.voucher)).all()
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -149,16 +149,16 @@ class EntryCollector:
 class PageParams(BasePageParams):
     """The HTML page parameters."""
 
-    def __init__(self, pagination: Pagination[JournalEntry],
-                 entries: list[JournalEntry]):
+    def __init__(self, pagination: Pagination[VoucherLineItem],
+                 line_items: list[VoucherLineItem]):
         """Constructs the HTML page parameters.
 
-        :param entries: The search result entries.
+        :param line_items: The search result line items.
         """
-        self.pagination: Pagination[JournalEntry] = pagination
+        self.pagination: Pagination[VoucherLineItem] = pagination
         """The pagination."""
-        self.entries: list[JournalEntry] = entries
-        """The entries."""
+        self.line_items: list[VoucherLineItem] = line_items
+        """The line items."""
 
     @property
     def has_data(self) -> bool:
@@ -166,7 +166,7 @@ class PageParams(BasePageParams):
 
         :return: True if there is any data, or False otherwise.
         """
-        return len(self.entries) > 0
+        return len(self.line_items) > 0
 
     @property
     def report_chooser(self) -> ReportChooser:
@@ -182,8 +182,9 @@ class Search(BaseReport):
 
     def __init__(self):
         """Constructs a search."""
-        self.__entries: list[JournalEntry] = EntryCollector().entries
-        """The journal entries."""
+        self.__line_items: list[VoucherLineItem] \
+            = LineItemCollector().line_items
+        """The line items."""
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -191,16 +192,16 @@ class Search(BaseReport):
         :return: The response of the report for download.
         """
         filename: str = "search-{q}.csv".format(q=request.args["q"])
-        return csv_download(filename, get_csv_rows(self.__entries))
+        return csv_download(filename, get_csv_rows(self.__line_items))
 
     def html(self) -> str:
         """Composes and returns the report as HTML.
 
         :return: The report as HTML.
         """
-        pagination: Pagination[JournalEntry] \
-            = Pagination[JournalEntry](self.__entries, is_reversed=True)
+        pagination: Pagination[VoucherLineItem] \
+            = Pagination[VoucherLineItem](self.__line_items, is_reversed=True)
         params: PageParams = PageParams(pagination=pagination,
-                                        entries=pagination.list)
+                                        line_items=pagination.list)
         return render_template("accounting/report/search.html",
                                report=params)

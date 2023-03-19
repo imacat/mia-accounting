@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * original-entry-selector.js: The JavaScript for the original entry selector
+ * original-line-item-selector.js: The JavaScript for the original line item selector
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -23,22 +23,22 @@
 "use strict";
 
 /**
- * The original entry selector.
+ * The original line item selector.
  *
  */
-class OriginalEntrySelector {
+class OriginalLineItemSelector {
 
     /**
-     * The journal entry editor
-     * @type {JournalEntryEditor}
+     * The line item editor
+     * @type {VoucherLineItemEditor}
      */
-    entryEditor;
+    lineItemEditor;
 
     /**
      * The prefix of the HTML ID and class
      * @type {string}
      */
-    #prefix = "accounting-original-entry-selector";
+    #prefix = "accounting-original-line-item-selector";
 
     /**
      * The query input
@@ -60,13 +60,13 @@ class OriginalEntrySelector {
 
     /**
      * The options
-     * @type {OriginalEntry[]}
+     * @type {OriginalLineItem[]}
      */
     #options;
 
     /**
      * The options by their ID
-     * @type {Object.<string, OriginalEntry>}
+     * @type {Object.<string, OriginalLineItem>}
      */
     #optionById;
 
@@ -77,21 +77,21 @@ class OriginalEntrySelector {
     #currencyCode;
 
     /**
-     * The entry
+     * The side, either "credit" or "debit"
      */
-    #entryType;
+    #side;
 
     /**
-     * Constructs an original entry selector.
+     * Constructs an original line item selector.
      *
-     * @param entryEditor {JournalEntryEditor} the journal entry editor
+     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
      */
-    constructor(entryEditor) {
-        this.entryEditor = entryEditor;
+    constructor(lineItemEditor) {
+        this.lineItemEditor = lineItemEditor;
         this.#query = document.getElementById(this.#prefix + "-query");
         this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
         this.#optionList = document.getElementById(this.#prefix + "-option-list");
-        this.#options = Array.from(document.getElementsByClassName(this.#prefix + "-option")).map((element) => new OriginalEntry(this, element));
+        this.#options = Array.from(document.getElementsByClassName(this.#prefix + "-option")).map((element) => new OriginalLineItem(this, element));
         this.#optionById = {};
         for (const option of this.#options) {
             this.#optionById[option.id] = option;
@@ -102,44 +102,44 @@ class OriginalEntrySelector {
     }
 
     /**
-     * Returns the net balance for an original entry.
+     * Returns the net balance for an original line item.
      *
-     * @param currentEntry {JournalEntrySubForm} the journal entry sub-form that is currently editing
+     * @param currentLineItem {LineItemSubForm} the line item sub-form that is currently editing
      * @param form {VoucherForm} the voucher form
-     * @param originalEntryId {string} the ID of the original entry
-     * @return {Decimal} the net balance of the original entry
+     * @param originalLineItemId {string} the ID of the original line item
+     * @return {Decimal} the net balance of the original line item
      */
-    getNetBalance(currentEntry, form, originalEntryId) {
-        const otherEntries = form.getEntries().filter((entry) => entry !== currentEntry);
+    getNetBalance(currentLineItem, form, originalLineItemId) {
+        const otherLineItems = form.getLineItems().filter((lineItem) => lineItem !== currentLineItem);
         let otherOffset = new Decimal(0);
-        for (const otherEntry of otherEntries) {
-            if (otherEntry.getOriginalEntryId() === originalEntryId) {
-                const amount = otherEntry.getAmount();
+        for (const otherLineItem of otherLineItems) {
+            if (otherLineItem.getOriginalLineItemId() === originalLineItemId) {
+                const amount = otherLineItem.getAmount();
                 if (amount !== null) {
                     otherOffset = otherOffset.plus(amount);
                 }
             }
         }
-        return this.#optionById[originalEntryId].bareNetBalance.minus(otherOffset);
+        return this.#optionById[originalLineItemId].bareNetBalance.minus(otherOffset);
     }
 
     /**
-     * Updates the net balances, subtracting the offset amounts on the form but the currently editing journal entry
+     * Updates the net balances, subtracting the offset amounts on the form but the currently editing line item
      *
      */
     #updateNetBalances() {
-        const otherEntries = this.entryEditor.form.getEntries().filter((entry) => entry !== this.entryEditor.entry);
+        const otherLineItems = this.lineItemEditor.form.getLineItems().filter((lineItem) => lineItem !== this.lineItemEditor.lineItem);
         const otherOffsets = {}
-        for (const otherEntry of otherEntries) {
-            const otherOriginalEntryId = otherEntry.getOriginalEntryId();
-            const amount = otherEntry.getAmount();
-            if (otherOriginalEntryId === null || amount === null) {
+        for (const otherLineItem of otherLineItems) {
+            const otherOriginalLineItemId = otherLineItem.getOriginalLineItemId();
+            const amount = otherLineItem.getAmount();
+            if (otherOriginalLineItemId === null || amount === null) {
                 continue;
             }
-            if (!(otherOriginalEntryId in otherOffsets)) {
-                otherOffsets[otherOriginalEntryId] = new Decimal("0");
+            if (!(otherOriginalLineItemId in otherOffsets)) {
+                otherOffsets[otherOriginalLineItemId] = new Decimal("0");
             }
-            otherOffsets[otherOriginalEntryId] = otherOffsets[otherOriginalEntryId].plus(amount);
+            otherOffsets[otherOriginalLineItemId] = otherOffsets[otherOriginalLineItemId].plus(amount);
         }
         for (const option of this.#options) {
             if (option.id in otherOffsets) {
@@ -157,7 +157,7 @@ class OriginalEntrySelector {
     #filterOptions() {
         let hasAnyMatched = false;
         for (const option of this.#options) {
-            if (option.isMatched(this.#entryType, this.#currencyCode, this.#query.value)) {
+            if (option.isMatched(this.#side, this.#currencyCode, this.#query.value)) {
                 option.setShown(true);
                 hasAnyMatched = true;
             } else {
@@ -174,14 +174,14 @@ class OriginalEntrySelector {
     }
 
     /**
-     * The callback when the original entry selector is shown.
+     * The callback when the original line item selector is shown.
      *
      */
     onOpen() {
-        this.#currencyCode = this.entryEditor.getCurrencyCode();
-        this.#entryType = this.entryEditor.entryType;
+        this.#currencyCode = this.lineItemEditor.getCurrencyCode();
+        this.#side = this.lineItemEditor.side;
         for (const option of this.#options) {
-            option.setActive(option.id === this.entryEditor.originalEntryId);
+            option.setActive(option.id === this.lineItemEditor.originalLineItemId);
         }
         this.#query.value = "";
         this.#updateNetBalances();
@@ -190,14 +190,14 @@ class OriginalEntrySelector {
 }
 
 /**
- * An original entry.
+ * An original line item.
  *
  */
-class OriginalEntry {
+class OriginalLineItem {
 
     /**
-     * The original entry selector
-     * @type {OriginalEntrySelector}
+     * The original line item selector
+     * @type {OriginalLineItemSelector}
      */
     #selector;
 
@@ -220,10 +220,10 @@ class OriginalEntry {
     date;
 
     /**
-     * The entry type, either "debit" or "credit"
+     * The side, either "debit" or "credit"
      * @type {string}
      */
-    #entryType;
+    #side;
 
     /**
      * The currency code
@@ -268,7 +268,7 @@ class OriginalEntry {
     netBalanceText;
 
     /**
-     * The text representation of the original entry
+     * The text representation of the original line item
      * @type {string}
      */
     text;
@@ -280,9 +280,9 @@ class OriginalEntry {
     #queryValues;
 
     /**
-     * Constructs an original entry.
+     * Constructs an original line item.
      *
-     * @param selector {OriginalEntrySelector} the original entry selector
+     * @param selector {OriginalLineItemSelector} the original line item selector
      * @param element {HTMLLIElement} the element
      */
     constructor(selector, element) {
@@ -290,17 +290,17 @@ class OriginalEntry {
         this.#element = element;
         this.id = element.dataset.id;
         this.date = element.dataset.date;
-        this.#entryType = element.dataset.entryType;
+        this.#side = element.dataset.side;
         this.#currencyCode = element.dataset.currencyCode;
         this.accountCode = element.dataset.accountCode;
         this.accountText = element.dataset.accountText;
         this.summary = element.dataset.summary;
         this.bareNetBalance = new Decimal(element.dataset.netBalance);
         this.netBalance = this.bareNetBalance;
-        this.netBalanceText = document.getElementById("accounting-original-entry-selector-option-" + this.id + "-net-balance");
+        this.netBalanceText = document.getElementById("accounting-original-line-item-selector-option-" + this.id + "-net-balance");
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
-        this.#element.onclick = () => this.#selector.entryEditor.saveOriginalEntry(this);
+        this.#element.onclick = () => this.#selector.lineItemEditor.saveOriginalLineItem(this);
     }
 
     /**
@@ -335,31 +335,31 @@ class OriginalEntry {
     /**
      * Returns whether the original matches.
      *
-     * @param entryType {string} the entry type, either "debit" or "credit"
+     * @param side {string} the side, either "debit" or "credit"
      * @param currencyCode {string} the currency code
      * @param query {string|null} the query term
      */
-    isMatched(entryType, currencyCode, query = null) {
+    isMatched(side, currencyCode, query = null) {
         return this.netBalance.greaterThan(0)
-            && this.date <= this.#selector.entryEditor.form.getDate()
-            && this.#isEntryTypeMatches(entryType)
+            && this.date <= this.#selector.lineItemEditor.form.getDate()
+            && this.#isSideMatches(side)
             && this.#currencyCode === currencyCode
             && this.#isQueryMatches(query);
     }
 
     /**
-     * Returns whether the original entry matches the entry type.
+     * Returns whether the original line item matches the debit or credit side.
      *
-     * @param entryType {string} the entry type, either "debit" or credit
+     * @param side {string} the side, either "debit" or credit
      * @return {boolean} true if the option matches, or false otherwise
      */
-    #isEntryTypeMatches(entryType) {
-        return (entryType === "debit" && this.#entryType === "credit")
-            || (entryType === "credit" && this.#entryType === "debit");
+    #isSideMatches(side) {
+        return (side === "debit" && this.#side === "credit")
+            || (side === "credit" && this.#side === "debit");
     }
 
     /**
-     * Returns whether the original entry matches the query.
+     * Returns whether the original line item matches the query.
      *
      * @param query {string|null} the query term
      * @return {boolean} true if the option matches, or false otherwise

@@ -25,7 +25,7 @@ from flask import render_template, Response
 from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Voucher, JournalEntry
+from accounting.models import Currency, Account, Voucher, VoucherLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -37,29 +37,29 @@ from accounting.report.utils.urls import journal_url
 from accounting.utils.pagination import Pagination
 
 
-class ReportEntry:
-    """An entry in the report."""
+class ReportLineItem:
+    """A line item in the report."""
 
-    def __init__(self, entry: JournalEntry):
-        """Constructs the entry in the report.
+    def __init__(self, line_item: VoucherLineItem):
+        """Constructs the line item in the report.
 
-        :param entry: The journal entry.
+        :param line_item: The voucher line item.
         """
-        self.entry: JournalEntry = entry
-        """The journal entry."""
-        self.voucher: Voucher = entry.voucher
+        self.line_item: VoucherLineItem = line_item
+        """The voucher line item."""
+        self.voucher: Voucher = line_item.voucher
         """The voucher."""
-        self.currency: Currency = entry.currency
+        self.currency: Currency = line_item.currency
         """The account."""
-        self.account: Account = entry.account
+        self.account: Account = line_item.account
         """The account."""
-        self.summary: str | None = entry.summary
+        self.summary: str | None = line_item.summary
         """The summary."""
-        self.debit: Decimal | None = entry.debit
+        self.debit: Decimal | None = line_item.debit
         """The debit amount."""
-        self.credit: Decimal | None = entry.credit
+        self.credit: Decimal | None = line_item.credit
         """The credit amount."""
-        self.amount: Decimal = entry.amount
+        self.amount: Decimal = line_item.amount
         """The amount."""
 
 
@@ -110,19 +110,19 @@ class PageParams(BasePageParams):
     """The HTML page parameters."""
 
     def __init__(self, period: Period,
-                 pagination: Pagination[JournalEntry],
-                 entries: list[JournalEntry]):
+                 pagination: Pagination[VoucherLineItem],
+                 line_items: list[VoucherLineItem]):
         """Constructs the HTML page parameters.
 
         :param period: The period.
-        :param entries: The journal entries.
+        :param line_items: The line items.
         """
         self.period: Period = period
         """The period."""
-        self.pagination: Pagination[JournalEntry] = pagination
+        self.pagination: Pagination[VoucherLineItem] = pagination
         """The pagination."""
-        self.entries: list[JournalEntry] = entries
-        """The entries."""
+        self.line_items: list[VoucherLineItem] = line_items
+        """The line items."""
         self.period_chooser: PeriodChooser = PeriodChooser(
             lambda x: journal_url(x))
         """The period chooser."""
@@ -133,7 +133,7 @@ class PageParams(BasePageParams):
 
         :return: True if there is any data, or False otherwise.
         """
-        return len(self.entries) > 0
+        return len(self.line_items) > 0
 
     @property
     def report_chooser(self) -> ReportChooser:
@@ -145,10 +145,10 @@ class PageParams(BasePageParams):
                              period=self.period)
 
 
-def get_csv_rows(entries: list[JournalEntry]) -> list[CSVRow]:
-    """Composes and returns the CSV rows from the report entries.
+def get_csv_rows(line_items: list[VoucherLineItem]) -> list[CSVRow]:
+    """Composes and returns the CSV rows from the line items.
 
-    :param entries: The report entries.
+    :param line_items: The line items.
     :return: The CSV rows.
     """
     rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
@@ -158,7 +158,7 @@ def get_csv_rows(entries: list[JournalEntry]) -> list[CSVRow]:
     rows.extend([CSVRow(x.voucher.date, x.currency.code,
                         str(x.account).title(), x.summary,
                         x.debit, x.credit, x.voucher.note)
-                 for x in entries])
+                 for x in line_items])
     return rows
 
 
@@ -172,28 +172,28 @@ class Journal(BaseReport):
         """
         self.__period: Period = period
         """The period."""
-        self.__entries: list[JournalEntry] = self.__query_entries()
-        """The journal entries."""
+        self.__line_items: list[VoucherLineItem] = self.__query_line_items()
+        """The line items."""
 
-    def __query_entries(self) -> list[JournalEntry]:
-        """Queries and returns the journal entries.
+    def __query_line_items(self) -> list[VoucherLineItem]:
+        """Queries and returns the line items.
 
-        :return: The journal entries.
+        :return: The line items.
         """
         conditions: list[sa.BinaryExpression] = []
         if self.__period.start is not None:
             conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Voucher.date <= self.__period.end)
-        return JournalEntry.query.join(Voucher)\
+        return VoucherLineItem.query.join(Voucher)\
             .filter(*conditions)\
             .order_by(Voucher.date,
                       Voucher.no,
-                      JournalEntry.is_debit.desc(),
-                      JournalEntry.no)\
-            .options(selectinload(JournalEntry.account),
-                     selectinload(JournalEntry.currency),
-                     selectinload(JournalEntry.voucher)).all()
+                      VoucherLineItem.is_debit.desc(),
+                      VoucherLineItem.no)\
+            .options(selectinload(VoucherLineItem.account),
+                     selectinload(VoucherLineItem.currency),
+                     selectinload(VoucherLineItem.voucher)).all()
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -201,17 +201,17 @@ class Journal(BaseReport):
         :return: The response of the report for download.
         """
         filename: str = f"journal-{period_spec(self.__period)}.csv"
-        return csv_download(filename, get_csv_rows(self.__entries))
+        return csv_download(filename, get_csv_rows(self.__line_items))
 
     def html(self) -> str:
         """Composes and returns the report as HTML.
 
         :return: The report as HTML.
         """
-        pagination: Pagination[JournalEntry] \
-            = Pagination[JournalEntry](self.__entries, is_reversed=True)
+        pagination: Pagination[VoucherLineItem] \
+            = Pagination[VoucherLineItem](self.__line_items, is_reversed=True)
         params: PageParams = PageParams(period=self.__period,
                                         pagination=pagination,
-                                        entries=pagination.list)
+                                        line_items=pagination.list)
         return render_template("accounting/report/journal.html",
                                report=params)

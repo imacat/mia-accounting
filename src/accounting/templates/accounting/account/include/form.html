@@ -65,7 +65,7 @@ First written: 2023/2/1
   <div id="accounting-is-need-offset-control" class="form-check form-switch mb-3 {% if form.base_code.data[0] not in ["1", "2", "3"] %} d-none {% endif %}">
     <input id="accounting-is-need-offset" class="form-check-input" type="checkbox" name="is_need_offset" value="1" {% if form.is_need_offset.data %} checked="checked" {% endif %}>
     <label class="form-check-label" for="accounting-is-need-offset">
-      {{ A_("The entries in the account need offset.") }}
+      {{ A_("The line items in the account need offset.") }}
     </label>
   </div>
 

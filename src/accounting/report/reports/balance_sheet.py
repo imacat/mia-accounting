@@ -25,7 +25,7 @@ from flask import render_template, Response
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, BaseAccount, Account, Voucher, \
-    JournalEntry
+    VoucherLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -124,13 +124,13 @@ class AccountCollector:
         sub_conditions: list[sa.BinaryExpression] \
             = [Account.base_code.startswith(x) for x in {"1", "2", "3"}]
         conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.__currency.code,
+            = [VoucherLineItem.currency_code == self.__currency.code,
                sa.or_(*sub_conditions)]
         if self.__period.end is not None:
             conditions.append(Voucher.date <= self.__period.end)
         balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount)).label("balance")
+            (VoucherLineItem.is_debit, VoucherLineItem.amount),
+            else_=-VoucherLineItem.amount)).label("balance")
         select_balance: sa.Select \
             = sa.select(Account.id, Account.base_code, Account.no,
                         balance_func)\
@@ -178,7 +178,7 @@ class AccountCollector:
         if self.__period.start is None:
             return None
         conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.__currency.code,
+            = [VoucherLineItem.currency_code == self.__currency.code,
                Voucher.date < self.__period.start]
         return self.__query_balance(conditions)
 
@@ -197,7 +197,7 @@ class AccountCollector:
         :return: The net income or loss for current period.
         """
         conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.__currency.code]
+            = [VoucherLineItem.currency_code == self.__currency.code]
         if self.__period.start is not None:
             conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
@@ -215,8 +215,8 @@ class AccountCollector:
         conditions.extend([sa.not_(Account.base_code.startswith(x))
                            for x in {"1", "2", "3"}])
         balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount))
+            (VoucherLineItem.is_debit, VoucherLineItem.amount),
+            else_=-VoucherLineItem.amount))
         select_balance: sa.Select = sa.select(balance_func)\
             .join(Voucher).join(Account).filter(*conditions)
         return db.session.scalar(select_balance)

@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Voucher, JournalEntry
+from accounting.models import Currency, Account, Voucher, VoucherLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -40,18 +40,18 @@ from accounting.utils.cast import be
 from accounting.utils.pagination import Pagination
 
 
-class ReportEntry:
-    """An entry in the report."""
+class ReportLineItem:
+    """A line item in the report."""
 
-    def __init__(self, entry: JournalEntry | None = None):
-        """Constructs the entry in the report.
+    def __init__(self, line_item: VoucherLineItem | None = None):
+        """Constructs the line item in the report.
 
-        :param entry: The journal entry.
+        :param line_item: The voucher line item.
         """
         self.is_brought_forward: bool = False
-        """Whether this is the brought-forward entry."""
+        """Whether this is the brought-forward line item."""
         self.is_total: bool = False
-        """Whether this is the total entry."""
+        """Whether this is the total line item."""
         self.date: date | None = None
         """The date."""
         self.summary: str | None = None
@@ -65,22 +65,22 @@ class ReportEntry:
         self.note: str | None = None
         """The note."""
         self.url: str | None = None
-        """The URL to the journal entry."""
-        if entry is not None:
-            self.date = entry.voucher.date
-            self.summary = entry.summary
-            self.debit = entry.amount if entry.is_debit else None
-            self.credit = None if entry.is_debit else entry.amount
-            self.note = entry.voucher.note
+        """The URL to the voucher line item."""
+        if line_item is not None:
+            self.date = line_item.voucher.date
+            self.summary = line_item.summary
+            self.debit = line_item.amount if line_item.is_debit else None
+            self.credit = None if line_item.is_debit else line_item.amount
+            self.note = line_item.voucher.note
             self.url = url_for("accounting.voucher.detail",
-                               voucher=entry.voucher)
+                               voucher=line_item.voucher)
 
 
-class EntryCollector:
-    """The report entry collector."""
+class LineItemCollector:
+    """The line item collector."""
 
     def __init__(self, currency: Currency, account: Account, period: Period):
-        """Constructs the report entry collector.
+        """Constructs the line item collector.
 
         :param currency: The currency.
         :param account: The account.
@@ -92,89 +92,90 @@ class EntryCollector:
         """The account."""
         self.__period: Period = period
         """The period"""
-        self.brought_forward: ReportEntry | None
-        """The brought-forward entry."""
-        self.entries: list[ReportEntry]
-        """The report entries."""
-        self.total: ReportEntry | None
-        """The total entry."""
-        self.brought_forward = self.__get_brought_forward_entry()
-        self.entries = self.__query_entries()
-        self.total = self.__get_total_entry()
+        self.brought_forward: ReportLineItem | None
+        """The brought-forward line item."""
+        self.line_items: list[ReportLineItem]
+        """The line items."""
+        self.total: ReportLineItem | None
+        """The total line item."""
+        self.brought_forward = self.__get_brought_forward()
+        self.line_items = self.__query_line_items()
+        self.total = self.__get_total()
         self.__populate_balance()
 
-    def __get_brought_forward_entry(self) -> ReportEntry | None:
-        """Queries, composes and returns the brought-forward entry.
+    def __get_brought_forward(self) -> ReportLineItem | None:
+        """Queries, composes and returns the brought-forward line item.
 
-        :return: The brought-forward entry, or None if the report starts from
-            the beginning.
+        :return: The brought-forward line item, or None if the report starts
+            from the beginning.
         """
         if self.__period.start is None:
             return None
         if self.__account.is_nominal:
             return None
         balance_func: sa.Function = sa.func.sum(sa.case(
-            (JournalEntry.is_debit, JournalEntry.amount),
-            else_=-JournalEntry.amount))
+            (VoucherLineItem.is_debit, VoucherLineItem.amount),
+            else_=-VoucherLineItem.amount))
         select: sa.Select = sa.Select(balance_func).join(Voucher)\
-            .filter(be(JournalEntry.currency_code == self.__currency.code),
-                    be(JournalEntry.account_id == self.__account.id),
+            .filter(be(VoucherLineItem.currency_code == self.__currency.code),
+                    be(VoucherLineItem.account_id == self.__account.id),
                     Voucher.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
-        entry: ReportEntry = ReportEntry()
-        entry.is_brought_forward = True
-        entry.date = self.__period.start
-        entry.summary = gettext("Brought forward")
+        line_item: ReportLineItem = ReportLineItem()
+        line_item.is_brought_forward = True
+        line_item.date = self.__period.start
+        line_item.summary = gettext("Brought forward")
         if balance > 0:
-            entry.debit = balance
+            line_item.debit = balance
         elif balance < 0:
-            entry.credit = -balance
-        entry.balance = balance
-        return entry
+            line_item.credit = -balance
+        line_item.balance = balance
+        return line_item
 
-    def __query_entries(self) -> list[ReportEntry]:
-        """Queries and returns the report entries.
+    def __query_line_items(self) -> list[ReportLineItem]:
+        """Queries and returns the line items.
 
-        :return: The report entries.
+        :return: The line items.
         """
         conditions: list[sa.BinaryExpression] \
-            = [JournalEntry.currency_code == self.__currency.code,
-               JournalEntry.account_id == self.__account.id]
+            = [VoucherLineItem.currency_code == self.__currency.code,
+               VoucherLineItem.account_id == self.__account.id]
         if self.__period.start is not None:
             conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Voucher.date <= self.__period.end)
-        return [ReportEntry(x) for x in JournalEntry.query.join(Voucher)
+        return [ReportLineItem(x) for x in VoucherLineItem.query.join(Voucher)
                 .filter(*conditions)
                 .order_by(Voucher.date,
                           Voucher.no,
-                          JournalEntry.is_debit.desc(),
-                          JournalEntry.no)
-                .options(selectinload(JournalEntry.voucher)).all()]
+                          VoucherLineItem.is_debit.desc(),
+                          VoucherLineItem.no)
+                .options(selectinload(VoucherLineItem.voucher)).all()]
 
-    def __get_total_entry(self) -> ReportEntry | None:
-        """Composes the total entry.
+    def __get_total(self) -> ReportLineItem | None:
+        """Composes the total line item.
 
-        :return: The total entry, or None if there is no data.
+        :return: The total line item, or None if there is no data.
         """
-        if self.brought_forward is None and len(self.entries) == 0:
+        if self.brought_forward is None and len(self.line_items) == 0:
             return None
-        entry: ReportEntry = ReportEntry()
-        entry.is_total = True
-        entry.summary = gettext("Total")
-        entry.debit = sum([x.debit for x in self.entries
-                           if x.debit is not None])
-        entry.credit = sum([x.credit for x in self.entries
-                            if x.credit is not None])
-        entry.balance = entry.debit - entry.credit
+        line_item: ReportLineItem = ReportLineItem()
+        line_item.is_total = True
+        line_item.summary = gettext("Total")
+        line_item.debit = sum([x.debit for x in self.line_items
+                               if x.debit is not None])
+        line_item.credit = sum([x.credit for x in self.line_items
+                                if x.credit is not None])
+        line_item.balance = line_item.debit - line_item.credit
         if self.brought_forward is not None:
-            entry.balance = self.brought_forward.balance + entry.balance
-        return entry
+            line_item.balance \
+                = self.brought_forward.balance + line_item.balance
+        return line_item
 
     def __populate_balance(self) -> None:
-        """Populates the balance of the entries.
+        """Populates the balance of the line items.
 
         :return: None.
         """
@@ -182,12 +183,12 @@ class EntryCollector:
             return None
         balance: Decimal = 0 if self.brought_forward is None \
             else self.brought_forward.balance
-        for entry in self.entries:
-            if entry.debit is not None:
-                balance = balance + entry.debit
-            if entry.credit is not None:
-                balance = balance - entry.credit
-            entry.balance = balance
+        for line_item in self.line_items:
+            if line_item.debit is not None:
+                balance = balance + line_item.debit
+            if line_item.credit is not None:
+                balance = balance - line_item.credit
+            line_item.balance = balance
 
 
 class CSVRow(BaseCSVRow):
@@ -238,19 +239,19 @@ class PageParams(BasePageParams):
                  account: Account,
                  period: Period,
                  has_data: bool,
-                 pagination: Pagination[ReportEntry],
-                 brought_forward: ReportEntry | None,
-                 entries: list[ReportEntry],
-                 total: ReportEntry | None):
+                 pagination: Pagination[ReportLineItem],
+                 brought_forward: ReportLineItem | None,
+                 line_items: list[ReportLineItem],
+                 total: ReportLineItem | None):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
         :param account: The account.
         :param period: The period.
         :param has_data: True if there is any data, or False otherwise.
-        :param brought_forward: The brought-forward entry.
-        :param entries: The report entries.
-        :param total: The total entry.
+        :param brought_forward: The brought-forward line item.
+        :param line_items: The line items.
+        :param total: The total line item.
         """
         self.currency: Currency = currency
         """The currency."""
@@ -260,14 +261,14 @@ class PageParams(BasePageParams):
         """The period."""
         self.__has_data: bool = has_data
         """True if there is any data, or False otherwise."""
-        self.pagination: Pagination[ReportEntry] = pagination
+        self.pagination: Pagination[ReportLineItem] = pagination
         """The pagination."""
-        self.brought_forward: ReportEntry | None = brought_forward
-        """The brought-forward entry."""
-        self.entries: list[ReportEntry] = entries
-        """The entries."""
-        self.total: ReportEntry | None = total
-        """The total entry."""
+        self.brought_forward: ReportLineItem | None = brought_forward
+        """The brought-forward line item."""
+        self.line_items: list[ReportLineItem] = line_items
+        """The line items."""
+        self.total: ReportLineItem | None = total
+        """The total line item."""
         self.period_chooser: PeriodChooser = PeriodChooser(
             lambda x: ledger_url(currency, account, x))
         """The period chooser."""
@@ -306,9 +307,9 @@ class PageParams(BasePageParams):
 
         :return: The account options.
         """
-        in_use: sa.Select = sa.Select(JournalEntry.account_id)\
-            .filter(be(JournalEntry.currency_code == self.currency.code))\
-            .group_by(JournalEntry.account_id)
+        in_use: sa.Select = sa.Select(VoucherLineItem.account_id)\
+            .filter(be(VoucherLineItem.currency_code == self.currency.code))\
+            .group_by(VoucherLineItem.account_id)
         return [OptionLink(str(x), ledger_url(self.currency, x, self.period),
                            x.id == self.account.id)
                 for x in Account.query.filter(Account.id.in_(in_use))
@@ -331,14 +332,15 @@ class Ledger(BaseReport):
         """The account."""
         self.__period: Period = period
         """The period."""
-        collector: EntryCollector = EntryCollector(
+        collector: LineItemCollector = LineItemCollector(
             self.__currency, self.__account, self.__period)
-        self.__brought_forward: ReportEntry | None = collector.brought_forward
-        """The brought-forward entry."""
-        self.__entries: list[ReportEntry] = collector.entries
-        """The report entries."""
-        self.__total: ReportEntry | None = collector.total
-        """The total entry."""
+        self.__brought_forward: ReportLineItem | None \
+            = collector.brought_forward
+        """The brought-forward line item."""
+        self.__line_items: list[ReportLineItem] = collector.line_items
+        """The line items."""
+        self.__total: ReportLineItem | None = collector.total
+        """The total line item."""
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -367,7 +369,7 @@ class Ledger(BaseReport):
                                None))
         rows.extend([CSVRow(x.date, x.summary,
                             x.debit, x.credit, x.balance, x.note)
-                     for x in self.__entries])
+                     for x in self.__line_items])
         if self.__total is not None:
             rows.append(CSVRow(gettext("Total"), None,
                                self.__total.debit, self.__total.credit,
@@ -379,31 +381,31 @@ class Ledger(BaseReport):
 
         :return: The report as HTML.
         """
-        all_entries: list[ReportEntry] = []
+        all_line_items: list[ReportLineItem] = []
         if self.__brought_forward is not None:
-            all_entries.append(self.__brought_forward)
-        all_entries.extend(self.__entries)
+            all_line_items.append(self.__brought_forward)
+        all_line_items.extend(self.__line_items)
         if self.__total is not None:
-            all_entries.append(self.__total)
-        pagination: Pagination[ReportEntry] \
-            = Pagination[ReportEntry](all_entries, is_reversed=True)
-        page_entries: list[ReportEntry] = pagination.list
-        has_data: bool = len(page_entries) > 0
-        brought_forward: ReportEntry | None = None
-        if len(page_entries) > 0 and page_entries[0].is_brought_forward:
-            brought_forward = page_entries[0]
-            page_entries = page_entries[1:]
-        total: ReportEntry | None = None
-        if len(page_entries) > 0 and page_entries[-1].is_total:
-            total = page_entries[-1]
-            page_entries = page_entries[:-1]
+            all_line_items.append(self.__total)
+        pagination: Pagination[ReportLineItem] \
+            = Pagination[ReportLineItem](all_line_items, is_reversed=True)
+        page_line_items: list[ReportLineItem] = pagination.list
+        has_data: bool = len(page_line_items) > 0
+        brought_forward: ReportLineItem | None = None
+        if len(page_line_items) > 0 and page_line_items[0].is_brought_forward:
+            brought_forward = page_line_items[0]
+            page_line_items = page_line_items[1:]
+        total: ReportLineItem | None = None
+        if len(page_line_items) > 0 and page_line_items[-1].is_total:
+            total = page_line_items[-1]
+            page_line_items = page_line_items[:-1]
         params: PageParams = PageParams(currency=self.__currency,
                                         account=self.__account,
                                         period=self.__period,
                                         has_data=has_data,
                                         pagination=pagination,
                                         brought_forward=brought_forward,
-                                        entries=page_entries,
+                                        line_items=page_line_items,
                                         total=total)
         return render_template("accounting/report/ledger.html",
                                report=params)
