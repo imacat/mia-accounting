@@ -239,7 +239,7 @@ class JournalEntryEditor {
         this.#summaryEditors = SummaryEditor.getInstances(this);
         this.#accountSelectors = AccountSelector.getInstances(this);
         this.originalEntrySelector = new OriginalEntrySelector(this);
-        this.#originalEntryControl.onclick = () => this.originalEntrySelector.onOpen(this.originalEntryId)
+        this.#originalEntryControl.onclick = () => this.originalEntrySelector.onOpen()
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
         this.#summaryControl.onclick = () => this.#summaryEditors[this.entryType].onOpen();
         this.#accountControl.onclick = () => this.#accountSelectors[this.entryType].onOpen();

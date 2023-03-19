@@ -176,13 +176,12 @@ class OriginalEntrySelector {
     /**
      * The callback when the original entry selector is shown.
      *
-     * @param originalEntryId {string|null} the ID of the original entry
      */
-    onOpen(originalEntryId = null) {
+    onOpen() {
         this.#currencyCode = this.entryEditor.getCurrencyCode();
         this.#entryType = this.entryEditor.entryType;
         for (const option of this.#options) {
-            option.setActive(option.id === originalEntryId);
+            option.setActive(option.id === this.entryEditor.originalEntryId);
         }
         this.#query.value = "";
         this.#updateNetBalances();
