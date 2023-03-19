@@ -323,4 +323,3 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-1-account_code": Accounts.BANK,
              "currency-0-credit-1-summary": " Lunch—Pizza  ",
              "currency-0-credit-1-amount": "5.49"}]
-
