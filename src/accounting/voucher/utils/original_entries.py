@@ -20,13 +20,10 @@
 from decimal import Decimal
 
 import sqlalchemy as sa
-from flask_babel import LazyString
 from sqlalchemy.orm import selectinload
 
 from accounting import db
-from accounting.locale import lazy_gettext
 from accounting.models import Account, Voucher, JournalEntry
-from accounting.voucher.forms.journal_entry import JournalEntryForm
 from accounting.utils.cast import be
 from .offset_alias import offset_alias
 
