@@ -74,7 +74,7 @@ class JournalEntryEditor {
      * The original entry
      * @type {HTMLDivElement}
      */
-    #originalEntry;
+    #originalEntryText;
 
     /**
      * The error message of the original entry
@@ -98,7 +98,7 @@ class JournalEntryEditor {
      * The summary
      * @type {HTMLDivElement}
      */
-    #summary;
+    #summaryText;
 
     /**
      * The error message of the summary
@@ -116,7 +116,7 @@ class JournalEntryEditor {
      * The account
      * @type {HTMLDivElement}
      */
-    #account;
+    #accountText;
 
     /**
      * The error message of the account
@@ -128,7 +128,7 @@ class JournalEntryEditor {
      * The amount
      * @type {HTMLInputElement}
      */
-    #amount;
+    #amountInput;
 
     /**
      * The error message of the amount
@@ -225,16 +225,16 @@ class JournalEntryEditor {
         this.#modal = document.getElementById(this.#prefix + "-modal");
         this.#originalEntryContainer = document.getElementById(this.#prefix + "-original-entry-container");
         this.#originalEntryControl = document.getElementById(this.#prefix + "-original-entry-control");
-        this.#originalEntry = document.getElementById(this.#prefix + "-original-entry");
+        this.#originalEntryText = document.getElementById(this.#prefix + "-original-entry");
         this.#originalEntryError = document.getElementById(this.#prefix + "-original-entry-error");
         this.#originalEntryDelete = document.getElementById(this.#prefix + "-original-entry-delete");
         this.#summaryControl = document.getElementById(this.#prefix + "-summary-control");
-        this.#summary = document.getElementById(this.#prefix + "-summary");
+        this.#summaryText = document.getElementById(this.#prefix + "-summary");
         this.#summaryError = document.getElementById(this.#prefix + "-summary-error");
         this.#accountControl = document.getElementById(this.#prefix + "-account-control");
-        this.#account = document.getElementById(this.#prefix + "-account");
+        this.#accountText = document.getElementById(this.#prefix + "-account");
         this.#accountError = document.getElementById(this.#prefix + "-account-error")
-        this.#amount = document.getElementById(this.#prefix + "-amount");
+        this.#amountInput = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
         this.#summaryEditors = SummaryEditor.getInstances(this);
         this.#accountSelectors = AccountSelector.getInstances(this);
@@ -243,13 +243,13 @@ class JournalEntryEditor {
         this.#originalEntryDelete.onclick = () => this.clearOriginalEntry();
         this.#summaryControl.onclick = () => this.#summaryEditors[this.entryType].onOpen();
         this.#accountControl.onclick = () => this.#accountSelectors[this.entryType].onOpen();
-        this.#amount.onchange = () => this.#validateAmount();
+        this.#amountInput.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
             if (this.#validate()) {
                 if (this.entry === null) {
                     this.entry = this.#side.addJournalEntry();
                 }
-                this.amount = this.#amount.value;
+                this.amount = this.#amountInput.value;
                 this.entry.save(this);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
@@ -269,7 +269,7 @@ class JournalEntryEditor {
         this.originalEntryId = originalEntry.id;
         this.originalEntryDate = originalEntry.date;
         this.originalEntryText = originalEntry.text;
-        this.#originalEntry.innerText = originalEntry.text;
+        this.#originalEntryText.innerText = originalEntry.text;
         this.#setEnableSummaryAccount(false);
         if (originalEntry.summary === "") {
             this.#summaryControl.classList.remove("accounting-not-empty");
@@ -277,14 +277,14 @@ class JournalEntryEditor {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
         this.summary = originalEntry.summary === ""? null: originalEntry.summary;
-        this.#summary.innerText = originalEntry.summary;
+        this.#summaryText.innerText = originalEntry.summary;
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = originalEntry.accountCode;
         this.accountText = originalEntry.accountText;
-        this.#account.innerText = originalEntry.accountText;
-        this.#amount.value = String(originalEntry.netBalance);
-        this.#amount.max = String(originalEntry.netBalance);
-        this.#amount.min = "0";
+        this.#accountText.innerText = originalEntry.accountText;
+        this.#amountInput.value = String(originalEntry.netBalance);
+        this.#amountInput.max = String(originalEntry.netBalance);
+        this.#amountInput.min = "0";
         this.#validate();
     }
 
@@ -299,13 +299,13 @@ class JournalEntryEditor {
         this.originalEntryId = null;
         this.originalEntryDate = null;
         this.originalEntryText = null;
-        this.#originalEntry.innerText = "";
+        this.#originalEntryText.innerText = "";
         this.#setEnableSummaryAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
         this.accountCode = null;
         this.accountText = null;
-        this.#account.innerText = "";
-        this.#amount.max = "";
+        this.#accountText.innerText = "";
+        this.#amountInput.max = "";
     }
 
     /**
@@ -329,7 +329,7 @@ class JournalEntryEditor {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
         this.summary = summary === ""? null: summary;
-        this.#summary.innerText = summary;
+        this.#summaryText.innerText = summary;
         this.#validateSummary();
         bootstrap.Modal.getOrCreateInstance(this.#modal).show();
     }
@@ -347,7 +347,7 @@ class JournalEntryEditor {
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = accountCode;
         this.accountText = accountText;
-        this.#account.innerText = accountText;
+        this.#accountText.innerText = accountText;
         this.#validateAccount();
         this.saveSummary(summary)
     }
@@ -361,7 +361,7 @@ class JournalEntryEditor {
         this.#accountControl.classList.remove("accounting-not-empty");
         this.accountCode = null;
         this.accountText = null;
-        this.#account.innerText = "";
+        this.#accountText.innerText = "";
         this.#validateAccount();
     }
 
@@ -377,7 +377,7 @@ class JournalEntryEditor {
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = code;
         this.accountText = text;
-        this.#account.innerText = text;
+        this.#accountText.innerText = text;
         this.#validateAccount();
     }
 
@@ -414,7 +414,7 @@ class JournalEntryEditor {
      * @private
      */
     #validateSummary() {
-        this.#summary.classList.remove("is-invalid");
+        this.#summaryText.classList.remove("is-invalid");
         this.#summaryError.innerText = "";
         return true;
     }
@@ -442,35 +442,35 @@ class JournalEntryEditor {
      * @private
      */
     #validateAmount() {
-        this.#amount.value = this.#amount.value.trim();
-        this.#amount.classList.remove("is-invalid");
-        if (this.#amount.value === "") {
-            this.#amount.classList.add("is-invalid");
+        this.#amountInput.value = this.#amountInput.value.trim();
+        this.#amountInput.classList.remove("is-invalid");
+        if (this.#amountInput.value === "") {
+            this.#amountInput.classList.add("is-invalid");
             this.#amountError.innerText = A_("Please fill in the amount.");
             return false;
         }
-        const amount =new Decimal(this.#amount.value);
+        const amount =new Decimal(this.#amountInput.value);
         if (amount.lessThanOrEqualTo(0)) {
-            this.#amount.classList.add("is-invalid");
+            this.#amountInput.classList.add("is-invalid");
             this.#amountError.innerText = A_("Please fill in a positive amount.");
             return false;
         }
-        if (this.#amount.max !== "") {
-            if (amount.greaterThan(new Decimal(this.#amount.max))) {
-                this.#amount.classList.add("is-invalid");
-                this.#amountError.innerText = A_("The amount must not exceed the net balance %(balance)s of the original entry.", {balance: new Decimal(this.#amount.max)});
+        if (this.#amountInput.max !== "") {
+            if (amount.greaterThan(new Decimal(this.#amountInput.max))) {
+                this.#amountInput.classList.add("is-invalid");
+                this.#amountError.innerText = A_("The amount must not exceed the net balance %(balance)s of the original entry.", {balance: new Decimal(this.#amountInput.max)});
                 return false;
             }
         }
-        if (this.#amount.min !== "") {
-            const min = new Decimal(this.#amount.min);
+        if (this.#amountInput.min !== "") {
+            const min = new Decimal(this.#amountInput.min);
             if (amount.lessThan(min)) {
-                this.#amount.classList.add("is-invalid");
+                this.#amountInput.classList.add("is-invalid");
                 this.#amountError.innerText = A_("The amount must not be less than the offset total %(total)s.", {total: formatDecimal(min)});
                 return false;
             }
         }
-        this.#amount.classList.remove("is-invalid");
+        this.#amountInput.classList.remove("is-invalid");
         this.#amountError.innerText = "";
         return true;
     }
@@ -491,23 +491,23 @@ class JournalEntryEditor {
         this.originalEntryId = null;
         this.originalEntryDate = null;
         this.originalEntryText = null;
-        this.#originalEntry.innerText = "";
+        this.#originalEntryText.innerText = "";
         this.#setEnableSummaryAccount(true);
         this.#summaryControl.classList.remove("accounting-not-empty");
         this.#summaryControl.classList.remove("is-invalid");
         this.summary = null;
-        this.#summary.innerText = ""
+        this.#summaryText.innerText = ""
         this.#summaryError.innerText = ""
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
         this.accountCode = null;
         this.accountText = null;
-        this.#account.innerText = "";
+        this.#accountText.innerText = "";
         this.#accountError.innerText = "";
-        this.#amount.value = "";
-        this.#amount.max = "";
-        this.#amount.min = "0";
-        this.#amount.classList.remove("is-invalid");
+        this.#amountInput.value = "";
+        this.#amountInput.max = "";
+        this.#amountInput.min = "0";
+        this.#amountInput.classList.remove("is-invalid");
         this.#amountError.innerText = "";
     }
 
@@ -524,7 +524,7 @@ class JournalEntryEditor {
         this.originalEntryId = entry.getOriginalEntryId();
         this.originalEntryDate = entry.getOriginalEntryDate();
         this.originalEntryText = entry.getOriginalEntryText();
-        this.#originalEntry.innerText = this.originalEntryText;
+        this.#originalEntryText.innerText = this.originalEntryText;
         if (this.originalEntryId === null) {
             this.#originalEntryContainer.classList.add("d-none");
             this.#originalEntryControl.classList.remove("accounting-not-empty");
@@ -539,7 +539,7 @@ class JournalEntryEditor {
         } else {
             this.#summaryControl.classList.add("accounting-not-empty");
         }
-        this.#summary.innerText = this.summary === null? "": this.summary;
+        this.#summaryText.innerText = this.summary === null? "": this.summary;
         if (entry.getAccountCode() === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
@@ -547,11 +547,11 @@ class JournalEntryEditor {
         }
         this.accountCode = entry.getAccountCode();
         this.accountText = entry.getAccountText();
-        this.#account.innerText = this.accountText;
-        this.#amount.value = entry.getAmount() === null? "": String(entry.getAmount());
+        this.#accountText.innerText = this.accountText;
+        this.#amountInput.value = entry.getAmount() === null? "": String(entry.getAmount());
         const maxAmount = this.#getMaxAmount();
-        this.#amount.max = maxAmount === null? "": maxAmount;
-        this.#amount.min = entry.getAmountMin() === null? "": String(entry.getAmountMin());
+        this.#amountInput.max = maxAmount === null? "": maxAmount;
+        this.#amountInput.min = entry.getAmountMin() === null? "": String(entry.getAmountMin());
         this.#validate();
     }
 
