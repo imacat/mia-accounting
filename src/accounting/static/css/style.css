@@ -149,7 +149,7 @@
     overflow-y: scroll;
 }
 
-/** The transaction management */
+/** The voucher management */
 .accounting-currency-control {
     background-color: transparent;
 }
@@ -169,14 +169,14 @@
 .accounting-list-group-hover .list-group-item:hover {
     background-color: #ececec;
 }
-.accounting-transaction-entry {
+.accounting-voucher-entry {
     border: none;
 }
-.accounting-transaction-entry-header {
+.accounting-voucher-entry-header {
     font-weight: bolder;
     border-bottom: thick double slategray;
 }
-.list-group-item.accounting-transaction-entry-total {
+.list-group-item.accounting-voucher-entry-total {
     font-weight: bolder;
     border-top: thick double slategray;
 }

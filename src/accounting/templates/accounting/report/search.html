@@ -35,7 +35,7 @@ First written: 2023/3/8
   {% endwith %}
 </div>
 
-{% include "accounting/report/include/add-txn-material-fab.html" %}
+{% include "accounting/report/include/add-voucher-material-fab.html" %}
 
 {% include "accounting/report/include/search-modal.html" %}
 
@@ -57,8 +57,8 @@ First written: 2023/3/8
     </div>
     <div class="accounting-report-table-body">
       {% for entry in report.entries %}
-        <a class="accounting-report-table-row" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
-          <div>{{ entry.transaction.date|accounting_format_date }}</div>
+        <a class="accounting-report-table-row" href="{{ url_for("accounting.voucher.detail", voucher=entry.voucher)|accounting_append_next }}">
+          <div>{{ entry.voucher.date|accounting_format_date }}</div>
           <div>{{ entry.currency.name }}</div>
           <div>
             <span class="d-none d-md-inline">{{ entry.account.code }}</span>
@@ -74,11 +74,11 @@ First written: 2023/3/8
 
   <div class="list-group d-md-none">
   {% for entry in report.entries %}
-    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.transaction.detail", txn=entry.transaction)|accounting_append_next }}">
+    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.voucher.detail", voucher=entry.voucher)|accounting_append_next }}">
       <div class="d-flex justify-content-between">
         <div {% if not entry.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>
           <div class="text-muted small">
-            {{ entry.transaction.date|accounting_format_date }}
+            {{ entry.voucher.date|accounting_format_date }}
             {{ entry.account.title|title }}
             {% if entry.currency.code != accounting_default_currency_code() %}
               <span class="badge rounded-pill bg-info">{{ entry.currency.code }}</span>

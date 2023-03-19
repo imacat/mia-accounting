@@ -447,12 +447,12 @@ class CurrencyL10n(db.Model):
     """The localized name."""
 
 
-class TransactionCurrency:
-    """A currency in a transaction."""
+class VoucherCurrency:
+    """A currency in a voucher."""
 
     def __init__(self, code: str, debit: list[JournalEntry],
                  credit: list[JournalEntry]):
-        """Constructs the currency in the transaction.
+        """Constructs the currency in the voucher.
 
         :param code: The currency code.
         :param debit: The debit entries.
@@ -490,13 +490,13 @@ class TransactionCurrency:
         return sum([x.amount for x in self.credit])
 
 
-class Transaction(db.Model):
-    """A transaction."""
-    __tablename__ = "accounting_transactions"
+class Voucher(db.Model):
+    """A voucher."""
+    __tablename__ = "accounting_vouchers"
     """The table name."""
     id = db.Column(db.Integer, nullable=False, primary_key=True,
                    autoincrement=False)
-    """The transaction ID."""
+    """The voucher ID."""
     date = db.Column(db.Date, nullable=False)
     """The date."""
     no = db.Column(db.Integer, nullable=False, default=text("1"))
@@ -523,22 +523,22 @@ class Transaction(db.Model):
     """The ID of the updator."""
     updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
     """The updator."""
-    entries = db.relationship("JournalEntry", back_populates="transaction")
+    entries = db.relationship("JournalEntry", back_populates="voucher")
     """The journal entries."""
 
     def __str__(self) -> str:
-        """Returns the string representation of this transaction.
+        """Returns the string representation of this voucher.
 
-        :return: The string representation of this transaction.
+        :return: The string representation of this voucher.
         """
-        if self.is_cash_expense:
-            return gettext("Cash Expense Transaction#%(id)s", id=self.id)
-        if self.is_cash_income:
-            return gettext("Cash Income Transaction#%(id)s", id=self.id)
-        return gettext("Transfer Transaction#%(id)s", id=self.id)
+        if self.is_cash_disbursement:
+            return gettext("Cash Disbursement Voucher#%(id)s", id=self.id)
+        if self.is_cash_receipt:
+            return gettext("Cash Receipt Voucher#%(id)s", id=self.id)
+        return gettext("Transfer Voucher#%(id)s", id=self.id)
 
     @property
-    def currencies(self) -> list[TransactionCurrency]:
+    def currencies(self) -> list[VoucherCurrency]:
         """Returns the journal entries categorized by their currencies.
 
         :return: The currency categories.
@@ -551,18 +551,18 @@ class Transaction(db.Model):
                 codes.append(entry.currency_code)
                 by_currency[entry.currency_code] = []
             by_currency[entry.currency_code].append(entry)
-        return [TransactionCurrency(code=x,
-                                    debit=[y for y in by_currency[x]
-                                           if y.is_debit],
-                                    credit=[y for y in by_currency[x]
-                                            if not y.is_debit])
+        return [VoucherCurrency(code=x,
+                                debit=[y for y in by_currency[x]
+                                       if y.is_debit],
+                                credit=[y for y in by_currency[x]
+                                        if not y.is_debit])
                 for x in codes]
 
     @property
-    def is_cash_income(self) -> bool:
-        """Returns whether this is a cash income transaction.
+    def is_cash_receipt(self) -> bool:
+        """Returns whether this is a cash receipt voucher.
 
-        :return: True if this is a cash income transaction, or False otherwise.
+        :return: True if this is a cash receipt voucher, or False otherwise.
         """
         for currency in self.currencies:
             if len(currency.debit) > 1:
@@ -572,10 +572,10 @@ class Transaction(db.Model):
         return True
 
     @property
-    def is_cash_expense(self) -> bool:
-        """Returns whether this is a cash expense transaction.
+    def is_cash_disbursement(self) -> bool:
+        """Returns whether this is a cash disbursement voucher.
 
-        :return: True if this is a cash expense transaction, or False
+        :return: True if this is a cash disbursement voucher, or False
             otherwise.
         """
         for currency in self.currencies:
@@ -587,9 +587,9 @@ class Transaction(db.Model):
 
     @property
     def can_delete(self) -> bool:
-        """Returns whether the transaction can be deleted.
+        """Returns whether the voucher can be deleted.
 
-        :return: True if the transaction can be deleted, or False otherwise.
+        :return: True if the voucher can be deleted, or False otherwise.
         """
         if not hasattr(self, "__can_delete"):
             def has_offset() -> bool:
@@ -601,12 +601,12 @@ class Transaction(db.Model):
         return getattr(self, "__can_delete")
 
     def delete(self) -> None:
-        """Deletes the transaction.
+        """Deletes the voucher.
 
         :return: None.
         """
         JournalEntry.query\
-            .filter(JournalEntry.transaction_id == self.id).delete()
+            .filter(JournalEntry.voucher_id == self.id).delete()
         db.session.delete(self)
 
 
@@ -617,18 +617,17 @@ class JournalEntry(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True,
                    autoincrement=False)
     """The entry ID."""
-    transaction_id = db.Column(db.Integer,
-                               db.ForeignKey(Transaction.id,
-                                             onupdate="CASCADE",
-                                             ondelete="CASCADE"),
-                               nullable=False)
-    """The transaction ID."""
-    transaction = db.relationship(Transaction, back_populates="entries")
-    """The transaction."""
+    voucher_id = db.Column(db.Integer,
+                           db.ForeignKey(Voucher.id, onupdate="CASCADE",
+                                         ondelete="CASCADE"),
+                           nullable=False)
+    """The voucher ID."""
+    voucher = db.relationship(Voucher, back_populates="entries")
+    """The voucher."""
     is_debit = db.Column(db.Boolean, nullable=False)
     """True for a debit entry, or False for a credit entry."""
     no = db.Column(db.Integer, nullable=False)
-    """The entry number under the transaction and debit or credit."""
+    """The entry number under the voucher and debit or credit."""
     original_entry_id = db.Column(db.Integer,
                                   db.ForeignKey(id, onupdate="CASCADE"),
                                   nullable=True)
@@ -665,7 +664,7 @@ class JournalEntry(db.Model):
             from accounting.template_filters import format_date, format_amount
             setattr(self, "__str",
                     gettext("%(date)s %(summary)s %(amount)s",
-                            date=format_date(self.transaction.date),
+                            date=format_date(self.voucher.date),
                             summary="" if self.summary is None
                             else self.summary,
                             amount=format_amount(self.amount)))
@@ -750,12 +749,13 @@ class JournalEntry(db.Model):
             frac: Decimal = (value - whole).normalize()
             return str(whole) + str(abs(frac))[1:]
 
-        txn_day: date = self.transaction.date
+        voucher_day: date = self.voucher.date
         summary: str = "" if self.summary is None else self.summary
         return ([summary],
-                [str(txn_day.year),
-                 "{}/{}".format(txn_day.year, txn_day.month),
-                 "{}/{}".format(txn_day.month, txn_day.day),
-                 "{}/{}/{}".format(txn_day.year, txn_day.month, txn_day.day),
+                [str(voucher_day.year),
+                 "{}/{}".format(voucher_day.year, voucher_day.month),
+                 "{}/{}".format(voucher_day.month, voucher_day.day),
+                 "{}/{}/{}".format(voucher_day.year, voucher_day.month,
+                                   voucher_day.day),
                  format_amount(self.amount),
                  format_amount(self.net_balance)])

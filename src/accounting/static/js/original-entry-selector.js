@@ -105,7 +105,7 @@ class OriginalEntrySelector {
      * Returns the net balance for an original entry.
      *
      * @param currentEntry {JournalEntrySubForm} the journal entry sub-form that is currently editing
-     * @param form {TransactionForm} the transaction form
+     * @param form {VoucherForm} the voucher form
      * @param originalEntryId {string} the ID of the original entry
      * @return {Decimal} the net balance of the original entry
      */

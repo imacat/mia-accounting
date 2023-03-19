@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.models import Currency, Account, Voucher, JournalEntry
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -70,14 +70,14 @@ class ReportEntry:
         self.url: str | None = None
         """The URL to the journal entry."""
         if entry is not None:
-            self.date = entry.transaction.date
+            self.date = entry.voucher.date
             self.account = entry.account
             self.summary = entry.summary
             self.income = None if entry.is_debit else entry.amount
             self.expense = entry.amount if entry.is_debit else None
-            self.note = entry.transaction.note
-            self.url = url_for("accounting.transaction.detail",
-                               txn=entry.transaction)
+            self.note = entry.voucher.note
+            self.url = url_for("accounting.voucher.detail",
+                               voucher=entry.voucher)
 
 
 class EntryCollector:
@@ -120,10 +120,10 @@ class EntryCollector:
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount))
         select: sa.Select = sa.Select(balance_func)\
-            .join(Transaction).join(Account)\
+            .join(Voucher).join(Account)\
             .filter(be(JournalEntry.currency_code == self.__currency.code),
                     self.__account_condition,
-                    Transaction.date < self.__period.start)
+                    Voucher.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
@@ -148,23 +148,23 @@ class EntryCollector:
             = [JournalEntry.currency_code == self.__currency.code,
                self.__account_condition]
         if self.__period.start is not None:
-            conditions.append(Transaction.date >= self.__period.start)
+            conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Transaction.date <= self.__period.end)
-        txn_with_account: sa.Select = sa.Select(Transaction.id).\
+            conditions.append(Voucher.date <= self.__period.end)
+        voucher_with_account: sa.Select = sa.Select(Voucher.id).\
             join(JournalEntry).join(Account).filter(*conditions)
 
         return [ReportEntry(x)
-                for x in JournalEntry.query.join(Transaction).join(Account)
-                .filter(JournalEntry.transaction_id.in_(txn_with_account),
+                for x in JournalEntry.query.join(Voucher).join(Account)
+                .filter(JournalEntry.voucher_id.in_(voucher_with_account),
                         JournalEntry.currency_code == self.__currency.code,
                         sa.not_(self.__account_condition))
-                .order_by(Transaction.date,
-                          Transaction.no,
+                .order_by(Voucher.date,
+                          Voucher.no,
                           JournalEntry.is_debit,
                           JournalEntry.no)
                 .options(selectinload(JournalEntry.account),
-                         selectinload(JournalEntry.transaction))]
+                         selectinload(JournalEntry.voucher))]
 
     @property
     def __account_condition(self) -> sa.BinaryExpression:
@@ -212,7 +212,7 @@ class EntryCollector:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, txn_date: date | str | None,
+    def __init__(self, voucher_date: date | str | None,
                  account: str | None,
                  summary: str | None,
                  income: str | Decimal | None,
@@ -221,7 +221,7 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param txn_date: The transaction date.
+        :param voucher_date: The voucher date.
         :param account: The account.
         :param summary: The summary.
         :param income: The income.
@@ -229,7 +229,7 @@ class CSVRow(BaseCSVRow):
         :param balance: The balance.
         :param note: The note.
         """
-        self.date: date | str | None = txn_date
+        self.date: date | str | None = voucher_date
         """The date."""
         self.account: str | None = account
         """The account."""

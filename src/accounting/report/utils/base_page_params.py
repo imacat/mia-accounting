@@ -27,7 +27,7 @@ from flask import request
 
 from accounting import db
 from accounting.models import Currency, JournalEntry
-from accounting.utils.txn_types import TransactionType
+from accounting.utils.voucher_types import VoucherType
 from .option_link import OptionLink
 from .report_chooser import ReportChooser
 
@@ -52,12 +52,12 @@ class BasePageParams(ABC):
         """
 
     @property
-    def txn_types(self) -> t.Type[TransactionType]:
-        """Returns the transaction types.
+    def voucher_types(self) -> t.Type[VoucherType]:
+        """Returns the voucher types.
 
-        :return: The transaction types.
+        :return: The voucher types.
         """
-        return TransactionType
+        return VoucherType
 
     @property
     def csv_uri(self) -> str:

@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
 from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
-    Transaction, JournalEntry
+    Voucher, JournalEntry
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import csv_download
@@ -62,21 +62,21 @@ class EntryCollector:
                        self.__get_account_condition(k)),
                    JournalEntry.currency_code.in_(
                        self.__get_currency_condition(k)),
-                   JournalEntry.transaction_id.in_(
-                       self.__get_transaction_condition(k))]
+                   JournalEntry.voucher_id.in_(
+                       self.__get_voucher_condition(k))]
             try:
                 sub_conditions.append(JournalEntry.amount == Decimal(k))
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return JournalEntry.query.join(Transaction).filter(*conditions)\
-            .order_by(Transaction.date,
-                      Transaction.no,
+        return JournalEntry.query.join(Voucher).filter(*conditions)\
+            .order_by(Voucher.date,
+                      Voucher.no,
                       JournalEntry.is_debit,
                       JournalEntry.no)\
             .options(selectinload(JournalEntry.account),
                      selectinload(JournalEntry.currency),
-                     selectinload(JournalEntry.transaction)).all()
+                     selectinload(JournalEntry.voucher)).all()
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -115,35 +115,35 @@ class EntryCollector:
                    Currency.code.in_(select_l10n)))
 
     @staticmethod
-    def __get_transaction_condition(k: str) -> sa.Select:
-        """Composes and returns the condition to filter the transaction.
+    def __get_voucher_condition(k: str) -> sa.Select:
+        """Composes and returns the condition to filter the voucher.
 
         :param k: The keyword.
-        :return: The condition to filter the transaction.
+        :return: The condition to filter the voucher.
         """
-        conditions: list[sa.BinaryExpression] = [Transaction.note.contains(k)]
-        txn_date: datetime
+        conditions: list[sa.BinaryExpression] = [Voucher.note.contains(k)]
+        voucher_date: datetime
         try:
-            txn_date = datetime.strptime(k, "%Y")
+            voucher_date = datetime.strptime(k, "%Y")
             conditions.append(
-                be(sa.extract("year", Transaction.date) == txn_date.year))
+                be(sa.extract("year", Voucher.date) == voucher_date.year))
         except ValueError:
             pass
         try:
-            txn_date = datetime.strptime(k, "%Y/%m")
+            voucher_date = datetime.strptime(k, "%Y/%m")
             conditions.append(sa.and_(
-                sa.extract("year", Transaction.date) == txn_date.year,
-                sa.extract("month", Transaction.date) == txn_date.month))
+                sa.extract("year", Voucher.date) == voucher_date.year,
+                sa.extract("month", Voucher.date) == voucher_date.month))
         except ValueError:
             pass
         try:
-            txn_date = datetime.strptime(f"2000/{k}", "%Y/%m/%d")
+            voucher_date = datetime.strptime(f"2000/{k}", "%Y/%m/%d")
             conditions.append(sa.and_(
-                sa.extract("month", Transaction.date) == txn_date.month,
-                sa.extract("day", Transaction.date) == txn_date.day))
+                sa.extract("month", Voucher.date) == voucher_date.month,
+                sa.extract("day", Voucher.date) == voucher_date.day))
         except ValueError:
             pass
-        return sa.select(Transaction.id).filter(sa.or_(*conditions))
+        return sa.select(Voucher.id).filter(sa.or_(*conditions))
 
 
 class PageParams(BasePageParams):

@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.models import Currency, Account, Voucher, JournalEntry
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -67,13 +67,13 @@ class ReportEntry:
         self.url: str | None = None
         """The URL to the journal entry."""
         if entry is not None:
-            self.date = entry.transaction.date
+            self.date = entry.voucher.date
             self.summary = entry.summary
             self.debit = entry.amount if entry.is_debit else None
             self.credit = None if entry.is_debit else entry.amount
-            self.note = entry.transaction.note
-            self.url = url_for("accounting.transaction.detail",
-                               txn=entry.transaction)
+            self.note = entry.voucher.note
+            self.url = url_for("accounting.voucher.detail",
+                               voucher=entry.voucher)
 
 
 class EntryCollector:
@@ -116,10 +116,10 @@ class EntryCollector:
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount))
-        select: sa.Select = sa.Select(balance_func).join(Transaction)\
+        select: sa.Select = sa.Select(balance_func).join(Voucher)\
             .filter(be(JournalEntry.currency_code == self.__currency.code),
                     be(JournalEntry.account_id == self.__account.id),
-                    Transaction.date < self.__period.start)
+                    Voucher.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
@@ -143,16 +143,16 @@ class EntryCollector:
             = [JournalEntry.currency_code == self.__currency.code,
                JournalEntry.account_id == self.__account.id]
         if self.__period.start is not None:
-            conditions.append(Transaction.date >= self.__period.start)
+            conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Transaction.date <= self.__period.end)
-        return [ReportEntry(x) for x in JournalEntry.query.join(Transaction)
+            conditions.append(Voucher.date <= self.__period.end)
+        return [ReportEntry(x) for x in JournalEntry.query.join(Voucher)
                 .filter(*conditions)
-                .order_by(Transaction.date,
-                          Transaction.no,
+                .order_by(Voucher.date,
+                          Voucher.no,
                           JournalEntry.is_debit.desc(),
                           JournalEntry.no)
-                .options(selectinload(JournalEntry.transaction)).all()]
+                .options(selectinload(JournalEntry.voucher)).all()]
 
     def __get_total_entry(self) -> ReportEntry | None:
         """Composes the total entry.
@@ -193,7 +193,7 @@ class EntryCollector:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, txn_date: date | str | None,
+    def __init__(self, voucher_date: date | str | None,
                  summary: str | None,
                  debit: str | Decimal | None,
                  credit: str | Decimal | None,
@@ -201,14 +201,14 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param txn_date: The transaction date.
+        :param voucher_date: The voucher date.
         :param summary: The summary.
         :param debit: The debit amount.
         :param credit: The credit amount.
         :param balance: The balance.
         :param note: The note.
         """
-        self.date: date | str | None = txn_date
+        self.date: date | str | None = voucher_date
         """The date."""
         self.summary: str | None = summary
         """The summary."""

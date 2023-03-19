@@ -1,0 +1,83 @@
+{#
+The Mia! Accounting Flask Project
+order.html: The order of the vouchers in a same day
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/26
+#}
+{% extends "accounting/base.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/drag-and-drop-reorder.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/voucher-order.js") }}"></script>
+{% endblock %}
+
+{% block header %}{% block title %}{{ A_("Vouchers on %(date)s", date=date) }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="btn-group mb-3">
+  <a class="btn btn-primary" href="{{ url_for("accounting.report.default")|accounting_or_next }}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    {{ A_("Back") }}
+  </a>
+</div>
+
+{% if list|length > 1 and accounting_can_edit() %}
+  <form action="{{ url_for("accounting.voucher.sort", voucher_date=date) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if request.args.next %}
+      <input type="hidden" name="next" value="{{ request.args.next }}">
+    {% endif %}
+    <ul id="accounting-order-list" class="list-group mb-3">
+      {% for item in list %}
+        <li class="list-group-item d-flex justify-content-between" data-id="{{ item.id }}">
+          <input id="accounting-order-{{ item.id }}-no" type="hidden" name="{{ item.id }}-no" value="{{ loop.index }}">
+          <div>
+            {{ item }}
+          </div>
+          <i class="fa-solid fa-bars"></i>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="d-none d-md-block">
+      <button class="btn btn-primary" type="submit">
+        <i class="fa-solid fa-floppy-disk"></i>
+        {{ A_("Save") }}
+      </button>
+    </div>
+
+    <div class="d-md-none accounting-material-fab">
+      <button class="btn btn-primary" type="submit">
+        <i class="fa-solid fa-floppy-disk"></i>
+      </button>
+    </div>
+  </form>
+{% elif list %}
+  <ul class="list-group mb-3">
+    {% for item in list %}
+      <li class="list-group-item">
+        {{ item }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
+
+{% endblock %}

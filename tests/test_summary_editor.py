@@ -25,7 +25,7 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from testlib import create_test_app, get_client
-from testlib_txn import Accounts, NEXT_URI, add_txn
+from testlib_voucher import Accounts, NEXT_URI, add_voucher
 
 
 class SummeryEditorTestCase(unittest.TestCase):
@@ -41,7 +41,7 @@ class SummeryEditorTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.models import BaseAccount, Transaction, \
+            from accounting.models import BaseAccount, Voucher, \
                 JournalEntry
             result: Result
             result = runner.invoke(args="init-db")
@@ -55,7 +55,7 @@ class SummeryEditorTestCase(unittest.TestCase):
             result = runner.invoke(args=["accounting-init-accounts",
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
-            Transaction.query.delete()
+            Voucher.query.delete()
             JournalEntry.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
@@ -65,9 +65,9 @@ class SummeryEditorTestCase(unittest.TestCase):
 
         :return: None.
         """
-        from accounting.transaction.utils.summary_editor import SummaryEditor
+        from accounting.voucher.utils.summary_editor import SummaryEditor
         for form in get_form_data(self.csrf_token):
-            add_txn(self.client, form)
+            add_voucher(self.client, form)
         with self.app.app_context():
             editor: SummaryEditor = SummaryEditor()
 
@@ -159,22 +159,22 @@ class SummeryEditorTestCase(unittest.TestCase):
 
 
 def get_form_data(csrf_token: str) -> list[dict[str, str]]:
-    """Returns the form data for multiple transaction forms.
+    """Returns the form data for multiple voucher forms.
 
     :param csrf_token: The CSRF token.
     :return: A list of the form data.
     """
-    txn_date: str = date.today().isoformat()
+    voucher_date: str = date.today().isoformat()
     return [{"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-credit-0-account_code": Accounts.SERVICE,
              "currency-0-credit-0-summary": " Salary ",
              "currency-0-credit-0-amount": "2500"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.MEAL,
              "currency-0-debit-0-summary": " Lunch—Fish ",
@@ -196,7 +196,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-2-amount": "4.25"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.MEAL,
              "currency-0-debit-0-summary": " Lunch—Salad ",
@@ -212,7 +212,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-1-amount": "8.28"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.MEAL,
              "currency-0-debit-0-summary": " Lunch—Pizza  ",
@@ -228,14 +228,14 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-1-amount": "7.47"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.TRAVEL,
              "currency-0-debit-0-summary": " Airplane—Lake City↔Hill Town ",
              "currency-0-debit-0-amount": "800"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.TRAVEL,
              "currency-0-debit-0-summary": " Bus—323—Downtown→Museum ",
@@ -263,7 +263,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-3-amount": "4.4"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.TRAVEL,
              "currency-0-debit-0-summary": " Taxi—Museum→Office ",
@@ -309,7 +309,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-6-amount": "5.5"},
             {"csrf_token": csrf_token,
              "next": NEXT_URI,
-             "date": txn_date,
+             "date": voucher_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.PETTY_CASH,
              "currency-0-debit-0-summary": " Dinner—Steak  ",

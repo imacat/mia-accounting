@@ -24,7 +24,7 @@ from flask import Response, render_template
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.models import Currency, Account, Voucher, JournalEntry
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -180,14 +180,14 @@ class TrialBalance(BaseReport):
         conditions: list[sa.BinaryExpression] \
             = [JournalEntry.currency_code == self.__currency.code]
         if self.__period.start is not None:
-            conditions.append(Transaction.date >= self.__period.start)
+            conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Transaction.date <= self.__period.end)
+            conditions.append(Voucher.date <= self.__period.end)
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntry.is_debit, JournalEntry.amount),
             else_=-JournalEntry.amount)).label("balance")
         select_balances: sa.Select = sa.select(Account.id, balance_func)\
-            .join(Transaction).join(Account)\
+            .join(Voucher).join(Account)\
             .filter(*conditions)\
             .group_by(Account.id)\
             .order_by(Account.base_code, Account.no)

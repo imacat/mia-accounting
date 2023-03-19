@@ -26,7 +26,7 @@ import httpx
 from flask import Flask
 
 from test_site import db
-from testlib_txn import Accounts, match_txn_detail, NEXT_URI
+from testlib_voucher import Accounts, match_voucher_detail, NEXT_URI
 
 
 class JournalEntryData:
@@ -41,7 +41,7 @@ class JournalEntryData:
         :param amount: The amount.
         :param original_entry: The original entry.
         """
-        self.txn: TransactionData | None = None
+        self.voucher: VoucherData | None = None
         self.id: int = -1
         self.no: int = -1
         self.original_entry: JournalEntryData | None = original_entry
@@ -73,11 +73,11 @@ class JournalEntryData:
 
 
 class CurrencyData:
-    """The transaction currency data."""
+    """The voucher currency data."""
 
     def __init__(self, currency: str, debit: list[JournalEntryData],
                  credit: list[JournalEntryData]):
-        """Constructs the transaction currency data.
+        """Constructs the voucher currency data.
 
         :param currency: The currency code.
         :param debit: The debit journal entries.
@@ -104,14 +104,14 @@ class CurrencyData:
         return form
 
 
-class TransactionData:
-    """The transaction data."""
+class VoucherData:
+    """The voucher data."""
 
     def __init__(self, days: int, currencies: list[CurrencyData]):
-        """Constructs a transaction.
+        """Constructs a voucher.
 
         :param days: The number of days before today.
-        :param currencies: The transaction currency data.
+        :param currencies: The voucher currency data.
         """
         self.id: int = -1
         self.days: int = days
@@ -119,38 +119,38 @@ class TransactionData:
         self.note: str | None = None
         for currency in self.currencies:
             for entry in currency.debit:
-                entry.txn = self
+                entry.voucher = self
             for entry in currency.credit:
-                entry.txn = self
+                entry.voucher = self
 
     def new_form(self, csrf_token: str) -> dict[str, str]:
-        """Returns the transaction as a form.
+        """Returns the voucher as a creation form.
 
         :param csrf_token: The CSRF token.
-        :return: The transaction as a form.
+        :return: The voucher as a creation form.
         """
         return self.__form(csrf_token, is_update=False)
 
     def update_form(self, csrf_token: str) -> dict[str, str]:
-        """Returns the transaction as a form.
+        """Returns the voucher as a update form.
 
         :param csrf_token: The CSRF token.
-        :return: The transaction as a form.
+        :return: The voucher as a update form.
         """
         return self.__form(csrf_token, is_update=True)
 
     def __form(self, csrf_token: str, is_update: bool = False) \
             -> dict[str, str]:
-        """Returns the transaction as a form.
+        """Returns the voucher as a form.
 
         :param csrf_token: The CSRF token.
         :param is_update: True for an update operation, or False otherwise
-        :return: The transaction as a form.
+        :return: The voucher as a form.
         """
-        txn_date: date = date.today() - timedelta(days=self.days)
+        voucher_date: date = date.today() - timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
                                 "next": NEXT_URI,
-                                "date": txn_date.isoformat()}
+                                "date": voucher_date.isoformat()}
         for i in range(len(self.currencies)):
             form.update(self.currencies[i].form(i + 1, is_update))
         if self.note is not None:
@@ -205,24 +205,24 @@ class TestData:
         self.e_p_or4d, self.e_p_or4c = couple(
             "Envelop", "0.9", Accounts.OFFICE, Accounts.PAYABLE)
 
-        # Original transactions
-        self.t_r_or1: TransactionData = TransactionData(
+        # Original vouchers
+        self.v_r_or1: VoucherData = VoucherData(
             50, [CurrencyData("USD", [self.e_r_or1d, self.e_r_or4d],
                               [self.e_r_or1c, self.e_r_or4c])])
-        self.t_r_or2: TransactionData = TransactionData(
+        self.v_r_or2: VoucherData = VoucherData(
             30, [CurrencyData("USD", [self.e_r_or2d, self.e_r_or3d],
                               [self.e_r_or2c, self.e_r_or3c])])
-        self.t_p_or1: TransactionData = TransactionData(
+        self.v_p_or1: VoucherData = VoucherData(
             40, [CurrencyData("USD", [self.e_p_or1d, self.e_p_or4d],
                               [self.e_p_or1c, self.e_p_or4c])])
-        self.t_p_or2: TransactionData = TransactionData(
+        self.v_p_or2: VoucherData = VoucherData(
             20, [CurrencyData("USD", [self.e_p_or2d, self.e_p_or3d],
                               [self.e_p_or2c, self.e_p_or3c])])
 
-        self.__add_txn(self.t_r_or1)
-        self.__add_txn(self.t_r_or2)
-        self.__add_txn(self.t_p_or1)
-        self.__add_txn(self.t_p_or2)
+        self.__add_voucher(self.v_r_or1)
+        self.__add_voucher(self.v_r_or2)
+        self.__add_voucher(self.v_p_or1)
+        self.__add_voucher(self.v_p_or2)
 
         # Receivable offset entries
         self.e_r_of1d, self.e_r_of1c = couple(
@@ -258,52 +258,52 @@ class TestData:
             "Envelop", "0.9", Accounts.PAYABLE, Accounts.CASH)
         self.e_p_of5d.original_entry = self.e_p_or4c
 
-        # Offset transactions
-        self.t_r_of1: TransactionData = TransactionData(
+        # Offset vouchers
+        self.v_r_of1: VoucherData = VoucherData(
             25, [CurrencyData("USD", [self.e_r_of1d], [self.e_r_of1c])])
-        self.t_r_of2: TransactionData = TransactionData(
+        self.v_r_of2: VoucherData = VoucherData(
             20, [CurrencyData("USD",
                               [self.e_r_of2d, self.e_r_of3d, self.e_r_of4d],
                               [self.e_r_of2c, self.e_r_of3c, self.e_r_of4c])])
-        self.t_r_of3: TransactionData = TransactionData(
+        self.v_r_of3: VoucherData = VoucherData(
             15, [CurrencyData("USD", [self.e_r_of5d], [self.e_r_of5c])])
-        self.t_p_of1: TransactionData = TransactionData(
+        self.v_p_of1: VoucherData = VoucherData(
             15, [CurrencyData("USD", [self.e_p_of1d], [self.e_p_of1c])])
-        self.t_p_of2: TransactionData = TransactionData(
+        self.v_p_of2: VoucherData = VoucherData(
             10, [CurrencyData("USD",
                               [self.e_p_of2d, self.e_p_of3d, self.e_p_of4d],
                               [self.e_p_of2c, self.e_p_of3c, self.e_p_of4c])])
-        self.t_p_of3: TransactionData = TransactionData(
+        self.v_p_of3: VoucherData = VoucherData(
             5, [CurrencyData("USD", [self.e_p_of5d], [self.e_p_of5c])])
 
-        self.__add_txn(self.t_r_of1)
-        self.__add_txn(self.t_r_of2)
-        self.__add_txn(self.t_r_of3)
-        self.__add_txn(self.t_p_of1)
-        self.__add_txn(self.t_p_of2)
-        self.__add_txn(self.t_p_of3)
+        self.__add_voucher(self.v_r_of1)
+        self.__add_voucher(self.v_r_of2)
+        self.__add_voucher(self.v_r_of3)
+        self.__add_voucher(self.v_p_of1)
+        self.__add_voucher(self.v_p_of2)
+        self.__add_voucher(self.v_p_of3)
 
-    def __add_txn(self, txn_data: TransactionData) -> None:
-        """Adds a transaction.
+    def __add_voucher(self, voucher_data: VoucherData) -> None:
+        """Adds a voucher.
 
-        :param txn_data: The transaction data.
+        :param voucher_data: The voucher data.
         :return: None.
         """
-        from accounting.models import Transaction
-        store_uri: str = "/accounting/transactions/store/transfer"
+        from accounting.models import Voucher
+        store_uri: str = "/accounting/vouchers/store/transfer"
 
         response: httpx.Response = self.client.post(
-            store_uri, data=txn_data.new_form(self.csrf_token))
+            store_uri, data=voucher_data.new_form(self.csrf_token))
         assert response.status_code == 302
-        txn_id: int = match_txn_detail(response.headers["Location"])
-        txn_data.id = txn_id
+        voucher_id: int = match_voucher_detail(response.headers["Location"])
+        voucher_data.id = voucher_id
         with self.app.app_context():
-            txn: Transaction | None = db.session.get(Transaction, txn_id)
-            assert txn is not None
-            for i in range(len(txn.currencies)):
-                for j in range(len(txn.currencies[i].debit)):
-                    txn_data.currencies[i].debit[j].id \
-                        = txn.currencies[i].debit[j].id
-                for j in range(len(txn.currencies[i].credit)):
-                    txn_data.currencies[i].credit[j].id \
-                        = txn.currencies[i].credit[j].id
+            voucher: Voucher | None = db.session.get(Voucher, voucher_id)
+            assert voucher is not None
+            for i in range(len(voucher.currencies)):
+                for j in range(len(voucher.currencies[i].debit)):
+                    voucher_data.currencies[i].debit[j].id \
+                        = voucher.currencies[i].debit[j].id
+                for j in range(len(voucher.currencies[i].credit)):
+                    voucher_data.currencies[i].credit[j].id \
+                        = voucher.currencies[i].credit[j].id

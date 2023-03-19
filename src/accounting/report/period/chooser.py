@@ -23,7 +23,7 @@ This file is largely taken from the NanoParma ERP project, first written in
 import typing as t
 from datetime import date
 
-from accounting.models import Transaction
+from accounting.models import Voucher
 from .period import Period
 from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
     LastYear, Today, Yesterday, AllTime, TemplatePeriod, YearPeriod
@@ -61,8 +61,8 @@ class PeriodChooser:
         self.url_template: str = get_url(TemplatePeriod())
         """The URL template."""
 
-        first: Transaction | None \
-            = Transaction.query.order_by(Transaction.date).first()
+        first: Voucher | None \
+            = Voucher.query.order_by(Voucher.date).first()
         start: date | None = None if first is None else first.date
 
         # Attributes

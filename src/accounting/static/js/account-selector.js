@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * transaction-transfer-form.js: The JavaScript for the transfer transaction form
+ * account-selector.js: The JavaScript for the account selector
  */
 
 /*  Copyright (c) 2023 imacat.

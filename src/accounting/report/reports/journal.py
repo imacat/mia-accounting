@@ -25,7 +25,7 @@ from flask import render_template, Response
 from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Transaction, JournalEntry
+from accounting.models import Currency, Account, Voucher, JournalEntry
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -47,8 +47,8 @@ class ReportEntry:
         """
         self.entry: JournalEntry = entry
         """The journal entry."""
-        self.transaction: Transaction = entry.transaction
-        """The transaction."""
+        self.voucher: Voucher = entry.voucher
+        """The voucher."""
         self.currency: Currency = entry.currency
         """The account."""
         self.account: Account = entry.account
@@ -66,7 +66,7 @@ class ReportEntry:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, txn_date: str | date,
+    def __init__(self, voucher_date: str | date,
                  currency: str,
                  account: str,
                  summary: str | None,
@@ -75,13 +75,13 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param txn_date: The transaction date.
+        :param voucher_date: The voucher date.
         :param summary: The summary.
         :param debit: The debit amount.
         :param credit: The credit amount.
         :param note: The note.
         """
-        self.date: str | date = txn_date
+        self.date: str | date = voucher_date
         """The date."""
         self.currency: str = currency
         """The currency."""
@@ -155,9 +155,9 @@ def get_csv_rows(entries: list[JournalEntry]) -> list[CSVRow]:
                                  gettext("Account"), gettext("Summary"),
                                  gettext("Debit"), gettext("Credit"),
                                  gettext("Note"))]
-    rows.extend([CSVRow(x.transaction.date, x.currency.code,
+    rows.extend([CSVRow(x.voucher.date, x.currency.code,
                         str(x.account).title(), x.summary,
-                        x.debit, x.credit, x.transaction.note)
+                        x.debit, x.credit, x.voucher.note)
                  for x in entries])
     return rows
 
@@ -182,18 +182,18 @@ class Journal(BaseReport):
         """
         conditions: list[sa.BinaryExpression] = []
         if self.__period.start is not None:
-            conditions.append(Transaction.date >= self.__period.start)
+            conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Transaction.date <= self.__period.end)
-        return JournalEntry.query.join(Transaction)\
+            conditions.append(Voucher.date <= self.__period.end)
+        return JournalEntry.query.join(Voucher)\
             .filter(*conditions)\
-            .order_by(Transaction.date,
-                      Transaction.no,
+            .order_by(Voucher.date,
+                      Voucher.no,
                       JournalEntry.is_debit.desc(),
                       JournalEntry.no)\
             .options(selectinload(JournalEntry.account),
                      selectinload(JournalEntry.currency),
-                     selectinload(JournalEntry.transaction)).all()
+                     selectinload(JournalEntry.voucher)).all()
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
