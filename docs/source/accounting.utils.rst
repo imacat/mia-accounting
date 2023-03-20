@@ -20,6 +20,14 @@ accounting.utils.flash\_errors module
    :undoc-members:
    :show-inheritance:
 
+accounting.utils.journal\_entry\_types module
+---------------------------------------------
+
+.. automodule:: accounting.utils.journal_entry_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.utils.next\_uri module
 ---------------------------------
 
@@ -64,14 +72,6 @@ accounting.utils.strip\_text module
 -----------------------------------
 
 .. automodule:: accounting.utils.strip_text
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.utils.txn\_types module
-----------------------------------
-
-.. automodule:: accounting.utils.txn_types
    :members:
    :undoc-members:
    :show-inheritance:
