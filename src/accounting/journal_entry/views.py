@@ -93,7 +93,7 @@ def add_journal_entry(journal_entry_type: JournalEntryType) -> redirect:
     form.populate_obj(journal_entry)
     db.session.add(journal_entry)
     db.session.commit()
-    flash(s(lazy_gettext("The journal entry is added successfully")),
+    flash(s(lazy_gettext("The journal entry is added successfully.")),
           "success")
     return redirect(inherit_next(__get_detail_uri(journal_entry)))
 
