@@ -452,8 +452,6 @@ class DebitLineItemForm(LineItemForm):
                     KeepAccountWhenHavingOffset(),
                     NotStartPayableFromDebit()])
     """The account code."""
-    offset_original_line_item_id = IntegerField()
-    """The ID of the original line item."""
     description = StringField(filters=[strip_text])
     """The description."""
     amount = DecimalField(
