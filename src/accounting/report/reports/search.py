@@ -57,7 +57,7 @@ class LineItemCollector:
         conditions: list[sa.BinaryExpression] = []
         for k in keywords:
             sub_conditions: list[sa.BinaryExpression] \
-                = [JournalEntryLineItem.description.contains(k),
+                = [JournalEntryLineItem.description.icontains(k),
                    JournalEntryLineItem.account_id.in_(
                        self.__get_account_condition(k)),
                    JournalEntryLineItem.currency_code.in_(
@@ -92,10 +92,10 @@ class LineItemCollector:
                              sa.func.char_length(sa.cast(Account.no,
                                                          sa.String)) + 1)
         select_l10n: sa.Select = sa.select(AccountL10n.account_id)\
-            .filter(AccountL10n.title.contains(k))
+            .filter(AccountL10n.title.icontains(k))
         conditions: list[sa.BinaryExpression] \
             = [Account.base_code.contains(k),
-               Account.title_l10n.contains(k),
+               Account.title_l10n.icontains(k),
                code.contains(k),
                Account.id.in_(select_l10n)]
         if k in gettext("Needs Offset"):
@@ -110,10 +110,10 @@ class LineItemCollector:
         :return: The condition to filter the currency.
         """
         select_l10n: sa.Select = sa.select(CurrencyL10n.currency_code)\
-            .filter(CurrencyL10n.name.contains(k))
+            .filter(CurrencyL10n.name.icontains(k))
         return sa.select(Currency.code).filter(
-            sa.or_(Currency.code.contains(k),
-                   Currency.name_l10n.contains(k),
+            sa.or_(Currency.code.icontains(k),
+                   Currency.name_l10n.icontains(k),
                    Currency.code.in_(select_l10n)))
 
     @staticmethod
@@ -123,7 +123,8 @@ class LineItemCollector:
         :param k: The keyword.
         :return: The condition to filter the journal entry.
         """
-        conditions: list[sa.BinaryExpression] = [JournalEntry.note.contains(k)]
+        conditions: list[sa.BinaryExpression] \
+            = [JournalEntry.note.icontains(k)]
         journal_entry_date: datetime
         try:
             journal_entry_date = datetime.strptime(k, "%Y")

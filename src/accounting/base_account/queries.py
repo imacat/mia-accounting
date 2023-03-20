@@ -35,10 +35,10 @@ def get_base_account_query() -> list[BaseAccount]:
     conditions: list[sa.BinaryExpression] = []
     for k in keywords:
         l10n: list[BaseAccountL10n] = BaseAccountL10n.query\
-            .filter(BaseAccountL10n.title.contains(k)).all()
+            .filter(BaseAccountL10n.title.icontains(k)).all()
         l10n_matches: set[str] = {x.account_code for x in l10n}
         conditions.append(sa.or_(BaseAccount.code.contains(k),
-                                 BaseAccount.title_l10n.contains(k),
+                                 BaseAccount.title_l10n.icontains(k),
                                  BaseAccount.code.in_(l10n_matches)))
     return BaseAccount.query.filter(*conditions)\
         .order_by(BaseAccount.code).all()

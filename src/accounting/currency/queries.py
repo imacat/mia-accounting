@@ -35,10 +35,10 @@ def get_currency_query() -> list[Currency]:
     conditions: list[sa.BinaryExpression] = []
     for k in keywords:
         l10n: list[CurrencyL10n] = CurrencyL10n.query\
-            .filter(CurrencyL10n.name.contains(k)).all()
+            .filter(CurrencyL10n.name.icontains(k)).all()
         l10n_matches: set[str] = {x.account_code for x in l10n}
-        conditions.append(sa.or_(Currency.code.contains(k),
-                                 Currency.name_l10n.contains(k),
+        conditions.append(sa.or_(Currency.code.icontains(k),
+                                 Currency.name_l10n.icontains(k),
                                  Currency.code.in_(l10n_matches)))
     return Currency.query.filter(*conditions)\
         .order_by(Currency.code).all()

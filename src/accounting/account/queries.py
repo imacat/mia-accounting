@@ -40,11 +40,11 @@ def get_account_query() -> list[Account]:
     conditions: list[sa.BinaryExpression] = []
     for k in keywords:
         l10n: list[AccountL10n] = AccountL10n.query\
-            .filter(AccountL10n.title.contains(k)).all()
+            .filter(AccountL10n.title.icontains(k)).all()
         l10n_matches: set[str] = {x.account_id for x in l10n}
         sub_conditions: list[sa.BinaryExpression] \
             = [Account.base_code.contains(k),
-               Account.title_l10n.contains(k),
+               Account.title_l10n.icontains(k),
                code.contains(k),
                Account.id.in_(l10n_matches)]
         if k in gettext("Needs Offset"):
