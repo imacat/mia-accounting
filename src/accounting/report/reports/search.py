@@ -98,7 +98,7 @@ class LineItemCollector:
                Account.title_l10n.contains(k),
                code.contains(k),
                Account.id.in_(select_l10n)]
-        if k in gettext("Need offset"):
+        if k in gettext("Needs Offset"):
             conditions.append(Account.is_need_offset)
         return sa.select(Account.id).filter(sa.or_(*conditions))
 

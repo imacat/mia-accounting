@@ -59,7 +59,7 @@ First written: 2023/1/30
     <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.account.detail", account=item)|accounting_append_next }}">
       {{ item }}
       {% if item.is_need_offset %}
-        <span class="badge rounded-pill bg-info">{{ A_("Need offset") }}</span>
+        <span class="badge rounded-pill bg-info">{{ A_("Needs Offset") }}</span>
       {% endif %}
     </a>
   {% endfor %}
