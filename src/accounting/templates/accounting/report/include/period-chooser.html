@@ -55,14 +55,14 @@ First written: 2023/3/4
         <div id="accounting-period-chooser-month-page" {% if report.period.is_type_month %} aria-current="page" {% else %} class="d-none" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-month-tab">
           <div>
             <a class="btn {% if report.period.is_this_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.this_month_url }}">
-              {{ A_("This month") }}
+              {{ A_("This Month") }}
             </a>
             {% if report.period_chooser.has_last_month %}
               <a class="btn {% if report.period.is_last_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.last_month_url }}">
-                {{ A_("Last month") }}
+                {{ A_("Last Month") }}
               </a>
               <a class="btn {% if report.period.is_since_last_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.since_last_month_url }}">
-                {{ A_("Since last month") }}
+                {{ A_("Since Last Month") }}
               </a>
             {% endif %}
           </div>
@@ -74,11 +74,11 @@ First written: 2023/3/4
         {# The year periods #}
         <div id="accounting-period-chooser-year-page" {% if report.period.is_a_year %} aria-current="page" {% else %} class="d-none" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-year-tab">
           <a class="btn {% if report.period.is_this_year %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.this_year_url }}">
-            {{ A_("This year") }}
+            {{ A_("This Year") }}
           </a>
           {% if report.period_chooser.has_last_year %}
             <a class="btn {% if report.period.is_last_year %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.last_year_url }}">
-              {{ A_("Last year") }}
+              {{ A_("Last Year") }}
             </a>
           {% endif %}
           {% if report.period_chooser.available_years %}

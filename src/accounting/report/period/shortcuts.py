@@ -35,7 +35,7 @@ class ThisMonth(Period):
 
     def _set_properties(self) -> None:
         self.spec = "this-month"
-        self.desc = gettext("This month")
+        self.desc = gettext("This Month")
         self.is_a_month = True
         self.is_type_month = True
 
@@ -55,7 +55,7 @@ class LastMonth(Period):
 
     def _set_properties(self) -> None:
         self.spec = "last-month"
-        self.desc = gettext("Last month")
+        self.desc = gettext("Last Month")
         self.is_a_month = True
         self.is_type_month = True
 
@@ -75,7 +75,7 @@ class SinceLastMonth(Period):
 
     def _set_properties(self) -> None:
         self.spec = "since-last-month"
-        self.desc = gettext("Since last month")
+        self.desc = gettext("Since Last Month")
         self.is_type_month = True
 
 
@@ -90,7 +90,7 @@ class ThisYear(Period):
 
     def _set_properties(self) -> None:
         self.spec = "this-year"
-        self.desc = gettext("This year")
+        self.desc = gettext("This Year")
         self.is_a_year = True
 
 
@@ -105,7 +105,7 @@ class LastYear(Period):
 
     def _set_properties(self) -> None:
         self.spec = "last-year"
-        self.desc = gettext("Last year")
+        self.desc = gettext("Last Year")
         self.is_a_year = True
 
 
