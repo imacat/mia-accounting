@@ -166,7 +166,7 @@ class AccountSelector {
             }
             const queryValues = JSON.parse(option.dataset.queryValues);
             for (const queryValue of queryValues) {
-                if (queryValue.includes(query.value)) {
+                if (queryValue.toLowerCase().includes(query.value.toLowerCase())) {
                     return true;
                 }
             }

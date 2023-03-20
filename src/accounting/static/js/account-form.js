@@ -310,7 +310,7 @@ class BaseAccountSelector {
                 const queryValues = JSON.parse(option.dataset.queryValues);
                 let isMatched = false;
                 for (const queryValue of queryValues) {
-                    if (queryValue.includes(this.#query.value)) {
+                    if (queryValue.toLowerCase().includes(this.#query.value.toLowerCase())) {
                         isMatched = true;
                         break;
                     }
