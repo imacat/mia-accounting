@@ -21,7 +21,7 @@ import typing as t
 
 import sqlalchemy as sa
 
-from accounting.models import VoucherLineItem
+from accounting.models import JournalEntryLineItem
 
 
 def offset_alias() -> sa.Alias:
@@ -36,4 +36,4 @@ def offset_alias() -> sa.Alias:
     def as_alias(alias: t.Any) -> sa.Alias:
         return alias
 
-    return as_alias(sa.alias(as_from(VoucherLineItem), name="offset"))
+    return as_alias(sa.alias(as_from(JournalEntryLineItem), name="offset"))

@@ -30,7 +30,7 @@ class DescriptionEditor {
 
     /**
      * The line item editor
-     * @type {VoucherLineItemEditor}
+     * @type {JournalEntryLineItemEditor}
      */
     #lineItemEditor;
 
@@ -109,7 +109,7 @@ class DescriptionEditor {
     /**
      * Constructs a description editor.
      *
-     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
@@ -246,7 +246,7 @@ class DescriptionEditor {
     /**
      * Returns the description editor instances.
      *
-     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      * @return {{debit: DescriptionEditor, credit: DescriptionEditor}}
      */
     static getInstances(lineItemEditor) {

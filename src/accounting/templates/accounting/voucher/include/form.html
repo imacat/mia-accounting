@@ -24,7 +24,7 @@ First written: 2023/2/26
 {% block accounting_scripts %}
   <script src="{{ url_for("accounting.static", filename="js/drag-and-drop-reorder.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/voucher-form.js") }}"></script>
-  <script src="{{ url_for("accounting.static", filename="js/voucher-line-item-editor.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/journal-entry-line-item-editor.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/account-selector.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/original-line-item-selector.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/description-editor.js") }}"></script>
@@ -88,7 +88,7 @@ First written: 2023/2/26
   </div>
 </form>
 
-{% include "accounting/voucher/include/voucher-line-item-editor-modal.html" %}
+{% include "accounting/voucher/include/journal-entry-line-item-editor-modal.html" %}
 {% block form_modals %}{% endblock %}
 {% include "accounting/voucher/include/original-line-item-selector-modal.html" %}
 

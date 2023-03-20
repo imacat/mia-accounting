@@ -30,7 +30,7 @@ from wtforms.validators import DataRequired, Optional
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Account, VoucherLineItem
+from accounting.models import Account, JournalEntryLineItem
 from accounting.template_filters import format_amount
 from accounting.utils.cast import be
 from accounting.utils.random_id import new_id
@@ -48,7 +48,7 @@ class OriginalLineItemExists:
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        if db.session.get(VoucherLineItem, field.data) is None:
+        if db.session.get(JournalEntryLineItem, field.data) is None:
             raise ValidationError(lazy_gettext(
                 "The original line item does not exist."))
 
@@ -60,8 +60,8 @@ class OriginalLineItemOppositeDebitCredit:
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        original_line_item: VoucherLineItem | None \
-            = db.session.get(VoucherLineItem, field.data)
+        original_line_item: JournalEntryLineItem | None \
+            = db.session.get(JournalEntryLineItem, field.data)
         if original_line_item is None:
             return
         if isinstance(form, CreditLineItemForm) \
@@ -80,8 +80,8 @@ class OriginalLineItemNeedOffset:
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        original_line_item: VoucherLineItem | None \
-            = db.session.get(VoucherLineItem, field.data)
+        original_line_item: JournalEntryLineItem | None \
+            = db.session.get(JournalEntryLineItem, field.data)
         if original_line_item is None:
             return
         if not original_line_item.account.is_need_offset:
@@ -96,8 +96,8 @@ class OriginalLineItemNotOffset:
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
             return
-        original_line_item: VoucherLineItem | None \
-            = db.session.get(VoucherLineItem, field.data)
+        original_line_item: JournalEntryLineItem | None \
+            = db.session.get(JournalEntryLineItem, field.data)
         if original_line_item is None:
             return
         if original_line_item.original_line_item_id is not None:
@@ -152,8 +152,9 @@ class SameAccountAsOriginalLineItem:
         assert isinstance(form, LineItemForm)
         if field.data is None or form.original_line_item_id.data is None:
             return
-        original_line_item: VoucherLineItem | None \
-            = db.session.get(VoucherLineItem, form.original_line_item_id.data)
+        original_line_item: JournalEntryLineItem | None \
+            = db.session.get(JournalEntryLineItem,
+                             form.original_line_item_id.data)
         if original_line_item is None:
             return
         if field.data != original_line_item.account_code:
@@ -168,9 +169,10 @@ class KeepAccountWhenHavingOffset:
         assert isinstance(form, LineItemForm)
         if field.data is None or form.eid.data is None:
             return
-        line_item: VoucherLineItem | None = db.session.query(VoucherLineItem)\
-            .filter(VoucherLineItem.id == form.eid.data)\
-            .options(selectinload(VoucherLineItem.offsets)).first()
+        line_item: JournalEntryLineItem | None = db.session\
+            .query(JournalEntryLineItem)\
+            .filter(JournalEntryLineItem.id == form.eid.data)\
+            .options(selectinload(JournalEntryLineItem.offsets)).first()
         if line_item is None or len(line_item.offsets) == 0:
             return
         if field.data != line_item.account_code:
@@ -229,8 +231,9 @@ class NotExceedingOriginalLineItemNetBalance:
         assert isinstance(form, LineItemForm)
         if field.data is None or form.original_line_item_id.data is None:
             return
-        original_line_item: VoucherLineItem | None \
-            = db.session.get(VoucherLineItem, form.original_line_item_id.data)
+        original_line_item: JournalEntryLineItem | None \
+            = db.session.get(JournalEntryLineItem,
+                             form.original_line_item_id.data)
         if original_line_item is None:
             return
         is_debit: bool = isinstance(form, DebitLineItemForm)
@@ -239,13 +242,14 @@ class NotExceedingOriginalLineItemNetBalance:
             existing_line_item_id \
                 = {x.id for x in form.voucher_form.obj.line_items}
         offset_total_func: sa.Function = sa.func.sum(sa.case(
-            (be(VoucherLineItem.is_debit == is_debit), VoucherLineItem.amount),
-            else_=-VoucherLineItem.amount))
+            (be(JournalEntryLineItem.is_debit == is_debit),
+             JournalEntryLineItem.amount),
+            else_=-JournalEntryLineItem.amount))
         offset_total_but_form: Decimal | None = db.session.scalar(
             sa.select(offset_total_func)
-            .filter(be(VoucherLineItem.original_line_item_id
+            .filter(be(JournalEntryLineItem.original_line_item_id
                        == original_line_item.id),
-                    VoucherLineItem.id.not_in(existing_line_item_id)))
+                    JournalEntryLineItem.id.not_in(existing_line_item_id)))
         if offset_total_but_form is None:
             offset_total_but_form = Decimal("0")
         offset_total_on_form: Decimal = sum(
@@ -269,9 +273,11 @@ class NotLessThanOffsetTotal:
             return
         is_debit: bool = isinstance(form, DebitLineItemForm)
         select_offset_total: sa.Select = sa.select(sa.func.sum(sa.case(
-            (VoucherLineItem.is_debit != is_debit, VoucherLineItem.amount),
-            else_=-VoucherLineItem.amount)))\
-            .filter(be(VoucherLineItem.original_line_item_id == form.eid.data))
+            (JournalEntryLineItem.is_debit != is_debit,
+             JournalEntryLineItem.amount),
+            else_=-JournalEntryLineItem.amount)))\
+            .filter(be(JournalEntryLineItem.original_line_item_id
+                       == form.eid.data))
         offset_total: Decimal | None = db.session.scalar(select_offset_total)
         if offset_total is not None and field.data < offset_total:
             raise ValidationError(lazy_gettext(
@@ -319,16 +325,16 @@ class LineItemForm(FlaskForm):
         return str(account)
 
     @property
-    def __original_line_item(self) -> VoucherLineItem | None:
+    def __original_line_item(self) -> JournalEntryLineItem | None:
         """Returns the original line item.
 
         :return: The original line item.
         """
         if not hasattr(self, "____original_line_item"):
-            def get_line_item() -> VoucherLineItem | None:
+            def get_line_item() -> JournalEntryLineItem | None:
                 if self.original_line_item_id.data is None:
                     return None
-                return db.session.get(VoucherLineItem,
+                return db.session.get(JournalEntryLineItem,
                                       self.original_line_item_id.data)
             setattr(self, "____original_line_item", get_line_item())
         return getattr(self, "____original_line_item")
@@ -371,22 +377,22 @@ class LineItemForm(FlaskForm):
         return account is not None and account.is_need_offset
 
     @property
-    def offsets(self) -> list[VoucherLineItem]:
+    def offsets(self) -> list[JournalEntryLineItem]:
         """Returns the offsets.
 
         :return: The offsets.
         """
         if not hasattr(self, "__offsets"):
-            def get_offsets() -> list[VoucherLineItem]:
+            def get_offsets() -> list[JournalEntryLineItem]:
                 if not self.is_need_offset or self.eid.data is None:
                     return []
-                return VoucherLineItem.query\
-                    .filter(VoucherLineItem.original_line_item_id
+                return JournalEntryLineItem.query\
+                    .filter(JournalEntryLineItem.original_line_item_id
                             == self.eid.data)\
-                    .options(selectinload(VoucherLineItem.voucher),
-                             selectinload(VoucherLineItem.account),
-                             selectinload(VoucherLineItem.offsets)
-                             .selectinload(VoucherLineItem.voucher)).all()
+                    .options(selectinload(JournalEntryLineItem.voucher),
+                             selectinload(JournalEntryLineItem.account),
+                             selectinload(JournalEntryLineItem.offsets)
+                             .selectinload(JournalEntryLineItem.voucher)).all()
             setattr(self, "__offsets", get_offsets())
         return getattr(self, "__offsets")
 
@@ -460,7 +466,7 @@ class DebitLineItemForm(LineItemForm):
                     NotLessThanOffsetTotal()])
     """The amount."""
 
-    def populate_obj(self, obj: VoucherLineItem) -> None:
+    def populate_obj(self, obj: JournalEntryLineItem) -> None:
         """Populates the form data into a line item object.
 
         :param obj: The line item object.
@@ -468,7 +474,7 @@ class DebitLineItemForm(LineItemForm):
         """
         is_new: bool = obj.id is None
         if is_new:
-            obj.id = new_id(VoucherLineItem)
+            obj.id = new_id(JournalEntryLineItem)
         obj.original_line_item_id = self.original_line_item_id.data
         obj.account_id = Account.find_by_code(self.account_code.data).id
         obj.description = self.description.data
@@ -510,7 +516,7 @@ class CreditLineItemForm(LineItemForm):
                     NotLessThanOffsetTotal()])
     """The amount."""
 
-    def populate_obj(self, obj: VoucherLineItem) -> None:
+    def populate_obj(self, obj: JournalEntryLineItem) -> None:
         """Populates the form data into a line item object.
 
         :param obj: The line item object.
@@ -518,7 +524,7 @@ class CreditLineItemForm(LineItemForm):
         """
         is_new: bool = obj.id is None
         if is_new:
-            obj.id = new_id(VoucherLineItem)
+            obj.id = new_id(JournalEntryLineItem)
         obj.original_line_item_id = self.original_line_item_id.data
         obj.account_id = Account.find_by_code(self.account_code.data).id
         obj.description = self.description.data

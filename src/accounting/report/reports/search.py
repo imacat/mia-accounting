@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
 from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
-    Voucher, VoucherLineItem
+    Voucher, JournalEntryLineItem
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import csv_download
@@ -43,10 +43,10 @@ class LineItemCollector:
 
     def __init__(self):
         """Constructs the line item collector."""
-        self.line_items: list[VoucherLineItem] = self.__query_line_items()
+        self.line_items: list[JournalEntryLineItem] = self.__query_line_items()
         """The line items."""
 
-    def __query_line_items(self) -> list[VoucherLineItem]:
+    def __query_line_items(self) -> list[JournalEntryLineItem]:
         """Queries and returns the line items.
 
         :return: The line items.
@@ -57,26 +57,27 @@ class LineItemCollector:
         conditions: list[sa.BinaryExpression] = []
         for k in keywords:
             sub_conditions: list[sa.BinaryExpression] \
-                = [VoucherLineItem.description.contains(k),
-                   VoucherLineItem.account_id.in_(
+                = [JournalEntryLineItem.description.contains(k),
+                   JournalEntryLineItem.account_id.in_(
                        self.__get_account_condition(k)),
-                   VoucherLineItem.currency_code.in_(
+                   JournalEntryLineItem.currency_code.in_(
                        self.__get_currency_condition(k)),
-                   VoucherLineItem.voucher_id.in_(
+                   JournalEntryLineItem.voucher_id.in_(
                        self.__get_voucher_condition(k))]
             try:
-                sub_conditions.append(VoucherLineItem.amount == Decimal(k))
+                sub_conditions.append(
+                    JournalEntryLineItem.amount == Decimal(k))
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return VoucherLineItem.query.join(Voucher).filter(*conditions)\
+        return JournalEntryLineItem.query.join(Voucher).filter(*conditions)\
             .order_by(Voucher.date,
                       Voucher.no,
-                      VoucherLineItem.is_debit,
-                      VoucherLineItem.no)\
-            .options(selectinload(VoucherLineItem.account),
-                     selectinload(VoucherLineItem.currency),
-                     selectinload(VoucherLineItem.voucher)).all()
+                      JournalEntryLineItem.is_debit,
+                      JournalEntryLineItem.no)\
+            .options(selectinload(JournalEntryLineItem.account),
+                     selectinload(JournalEntryLineItem.currency),
+                     selectinload(JournalEntryLineItem.voucher)).all()
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -149,15 +150,15 @@ class LineItemCollector:
 class PageParams(BasePageParams):
     """The HTML page parameters."""
 
-    def __init__(self, pagination: Pagination[VoucherLineItem],
-                 line_items: list[VoucherLineItem]):
+    def __init__(self, pagination: Pagination[JournalEntryLineItem],
+                 line_items: list[JournalEntryLineItem]):
         """Constructs the HTML page parameters.
 
         :param line_items: The search result line items.
         """
-        self.pagination: Pagination[VoucherLineItem] = pagination
+        self.pagination: Pagination[JournalEntryLineItem] = pagination
         """The pagination."""
-        self.line_items: list[VoucherLineItem] = line_items
+        self.line_items: list[JournalEntryLineItem] = line_items
         """The line items."""
 
     @property
@@ -182,7 +183,7 @@ class Search(BaseReport):
 
     def __init__(self):
         """Constructs a search."""
-        self.__line_items: list[VoucherLineItem] \
+        self.__line_items: list[JournalEntryLineItem] \
             = LineItemCollector().line_items
         """The line items."""
 
@@ -199,8 +200,9 @@ class Search(BaseReport):
 
         :return: The report as HTML.
         """
-        pagination: Pagination[VoucherLineItem] \
-            = Pagination[VoucherLineItem](self.__line_items, is_reversed=True)
+        pagination: Pagination[JournalEntryLineItem] \
+            = Pagination[JournalEntryLineItem](self.__line_items,
+                                               is_reversed=True)
         params: PageParams = PageParams(pagination=pagination,
                                         line_items=pagination.list)
         return render_template("accounting/report/search.html",

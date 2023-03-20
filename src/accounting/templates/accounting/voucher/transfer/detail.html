@@ -30,11 +30,11 @@ First written: 2023/2/26
         {# The debit line items #}
         <div class="col-sm-6 mb-2">
           <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
-            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-header">{{ A_("Debit") }}</li>
+            <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-header">{{ A_("Debit") }}</li>
             {% with line_items = currency.debit %}
               {% include "accounting/voucher/include/detail-line-items.html" %}
             {% endwith %}
-            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-total">
+            <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-total">
               <div class="d-flex justify-content-between">
                 <div>{{ A_("Total") }}</div>
                 <div>{{ currency.debit_total|accounting_format_amount }}</div>
@@ -46,11 +46,11 @@ First written: 2023/2/26
         {# The credit line items #}
         <div class="col-sm-6 mb-2">
           <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
-            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-header">{{ A_("Credit") }}</li>
+            <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-header">{{ A_("Credit") }}</li>
             {% with line_items = currency.credit %}
               {% include "accounting/voucher/include/detail-line-items.html" %}
             {% endwith %}
-            <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-total">
+            <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-total">
               <div class="d-flex justify-content-between">
                 <div>{{ A_("Total") }}</div>
                 <div>{{ currency.debit_total|accounting_format_amount }}</div>

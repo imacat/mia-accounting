@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Voucher, VoucherLineItem
+from accounting.models import Currency, Account, Voucher, JournalEntryLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -44,10 +44,10 @@ from accounting.utils.pagination import Pagination
 class ReportLineItem:
     """A line item in the report."""
 
-    def __init__(self, line_item: VoucherLineItem | None = None):
+    def __init__(self, line_item: JournalEntryLineItem | None = None):
         """Constructs the line item in the report.
 
-        :param line_item: The voucher line item.
+        :param line_item: The journal entry line item.
         """
         self.is_brought_forward: bool = False
         """Whether this is the brought-forward line item."""
@@ -68,7 +68,7 @@ class ReportLineItem:
         self.note: str | None = None
         """The note."""
         self.url: str | None = None
-        """The URL to the voucher line item."""
+        """The URL to the journal entry line item."""
         if line_item is not None:
             self.date = line_item.voucher.date
             self.account = line_item.account
@@ -117,11 +117,12 @@ class LineItemCollector:
         if self.__period.start is None:
             return None
         balance_func: sa.Function = sa.func.sum(sa.case(
-            (VoucherLineItem.is_debit, VoucherLineItem.amount),
-            else_=-VoucherLineItem.amount))
+            (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
+            else_=-JournalEntryLineItem.amount))
         select: sa.Select = sa.Select(balance_func)\
             .join(Voucher).join(Account)\
-            .filter(be(VoucherLineItem.currency_code == self.__currency.code),
+            .filter(be(JournalEntryLineItem.currency_code
+                       == self.__currency.code),
                     self.__account_condition,
                     Voucher.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
@@ -145,26 +146,28 @@ class LineItemCollector:
         :return: The line items.
         """
         conditions: list[sa.BinaryExpression] \
-            = [VoucherLineItem.currency_code == self.__currency.code,
+            = [JournalEntryLineItem.currency_code == self.__currency.code,
                self.__account_condition]
         if self.__period.start is not None:
             conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Voucher.date <= self.__period.end)
         voucher_with_account: sa.Select = sa.Select(Voucher.id).\
-            join(VoucherLineItem).join(Account).filter(*conditions)
+            join(JournalEntryLineItem).join(Account).filter(*conditions)
 
         return [ReportLineItem(x)
-                for x in VoucherLineItem.query.join(Voucher).join(Account)
-                .filter(VoucherLineItem.voucher_id.in_(voucher_with_account),
-                        VoucherLineItem.currency_code == self.__currency.code,
+                for x in JournalEntryLineItem.query.join(Voucher).join(Account)
+                .filter(JournalEntryLineItem.voucher_id
+                        .in_(voucher_with_account),
+                        JournalEntryLineItem.currency_code
+                        == self.__currency.code,
                         sa.not_(self.__account_condition))
                 .order_by(Voucher.date,
                           Voucher.no,
-                          VoucherLineItem.is_debit,
-                          VoucherLineItem.no)
-                .options(selectinload(VoucherLineItem.account),
-                         selectinload(VoucherLineItem.voucher))]
+                          JournalEntryLineItem.is_debit,
+                          JournalEntryLineItem.no)
+                .options(selectinload(JournalEntryLineItem.account),
+                         selectinload(JournalEntryLineItem.voucher))]
 
     @property
     def __account_condition(self) -> sa.BinaryExpression:
@@ -343,14 +346,15 @@ class PageParams(BasePageParams):
                           income_expenses_url(self.currency, current_al,
                                               self.period),
                           self.account.id == 0)]
-        in_use: sa.Select = sa.Select(VoucherLineItem.account_id)\
+        in_use: sa.Select = sa.Select(JournalEntryLineItem.account_id)\
             .join(Account)\
-            .filter(be(VoucherLineItem.currency_code == self.currency.code),
+            .filter(be(JournalEntryLineItem.currency_code
+                       == self.currency.code),
                     sa.or_(Account.base_code.startswith("11"),
                            Account.base_code.startswith("12"),
                            Account.base_code.startswith("21"),
                            Account.base_code.startswith("22")))\
-            .group_by(VoucherLineItem.account_id)
+            .group_by(JournalEntryLineItem.account_id)
         options.extend([OptionLink(str(x),
                                    income_expenses_url(
                                        self.currency,

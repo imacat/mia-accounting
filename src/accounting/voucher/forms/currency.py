@@ -28,7 +28,7 @@ from wtforms.validators import DataRequired
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Currency, VoucherLineItem
+from accounting.models import Currency, JournalEntryLineItem
 from accounting.voucher.utils.offset_alias import offset_alias
 from accounting.utils.cast import be
 from accounting.utils.strip_text import strip_text
@@ -65,8 +65,8 @@ class SameCurrencyAsOriginalLineItems:
         if len(original_line_item_id) == 0:
             return
         original_line_item_currency_codes: set[str] = set(db.session.scalars(
-            sa.select(VoucherLineItem.currency_code)
-            .filter(VoucherLineItem.id.in_(original_line_item_id))).all())
+            sa.select(JournalEntryLineItem.currency_code)
+            .filter(JournalEntryLineItem.id.in_(original_line_item_id))).all())
         for currency_code in original_line_item_currency_codes:
             if field.data != currency_code:
                 raise ValidationError(lazy_gettext(
@@ -83,13 +83,16 @@ class KeepCurrencyWhenHavingOffset:
         if field.data is None:
             return
         offset: sa.Alias = offset_alias()
-        original_line_items: list[VoucherLineItem] = VoucherLineItem.query\
-            .join(offset, be(VoucherLineItem.id
+        original_line_items: list[JournalEntryLineItem]\
+            = JournalEntryLineItem.query\
+            .join(offset, be(JournalEntryLineItem.id
                              == offset.c.original_line_item_id),
                   isouter=True)\
-            .filter(VoucherLineItem.id.in_({x.eid.data for x in form.line_items
-                                            if x.eid.data is not None}))\
-            .group_by(VoucherLineItem.id, VoucherLineItem.currency_code)\
+            .filter(JournalEntryLineItem.id
+                    .in_({x.eid.data for x in form.line_items
+                          if x.eid.data is not None}))\
+            .group_by(JournalEntryLineItem.id,
+                      JournalEntryLineItem.currency_code)\
             .having(sa.func.count(offset.c.id) > 0).all()
         for original_line_item in original_line_items:
             if original_line_item.currency_code != field.data:
@@ -159,8 +162,9 @@ class CurrencyForm(FlaskForm):
             return True
         line_item_id: set[int] = {x.eid.data for x in line_item_forms
                                   if x.eid.data is not None}
-        select: sa.Select = sa.select(sa.func.count(VoucherLineItem.id))\
-            .filter(VoucherLineItem.original_line_item_id.in_(line_item_id))
+        select: sa.Select = sa.select(sa.func.count(JournalEntryLineItem.id))\
+            .filter(JournalEntryLineItem.original_line_item_id
+                    .in_(line_item_id))
         return db.session.scalar(select) > 0
 
 

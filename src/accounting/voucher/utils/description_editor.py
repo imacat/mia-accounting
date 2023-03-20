@@ -22,7 +22,7 @@ import typing as t
 import sqlalchemy as sa
 
 from accounting import db
-from accounting.models import Account, VoucherLineItem
+from accounting.models import Account, JournalEntryLineItem
 
 
 class DescriptionAccount:
@@ -206,22 +206,25 @@ class DescriptionEditor:
         """The debit tags."""
         self.credit: DescriptionDebitCredit = DescriptionDebitCredit("credit")
         """The credit tags."""
-        debit_credit: sa.Label = sa.case((VoucherLineItem.is_debit, "debit"),
-                                         else_="credit").label("debit_credit")
+        debit_credit: sa.Label = sa.case(
+            (JournalEntryLineItem.is_debit, "debit"),
+            else_="credit").label("debit_credit")
         tag_type: sa.Label = sa.case(
-            (VoucherLineItem.description.like("_%—_%—_%→_%"), "bus"),
-            (sa.or_(VoucherLineItem.description.like("_%—_%→_%"),
-                    VoucherLineItem.description.like("_%—_%↔_%")), "travel"),
+            (JournalEntryLineItem.description.like("_%—_%—_%→_%"), "bus"),
+            (sa.or_(JournalEntryLineItem.description.like("_%—_%→_%"),
+                    JournalEntryLineItem.description.like("_%—_%↔_%")),
+             "travel"),
             else_="general").label("tag_type")
-        tag: sa.Label = get_prefix(VoucherLineItem.description, "—")\
+        tag: sa.Label = get_prefix(JournalEntryLineItem.description, "—")\
             .label("tag")
         select: sa.Select = sa.Select(debit_credit, tag_type, tag,
-                                      VoucherLineItem.account_id,
+                                      JournalEntryLineItem.account_id,
                                       sa.func.count().label("freq"))\
-            .filter(VoucherLineItem.description.is_not(None),
-                    VoucherLineItem.description.like("_%—_%"),
-                    VoucherLineItem.original_line_item_id.is_(None))\
-            .group_by(debit_credit, tag_type, tag, VoucherLineItem.account_id)
+            .filter(JournalEntryLineItem.description.is_not(None),
+                    JournalEntryLineItem.description.like("_%—_%"),
+                    JournalEntryLineItem.original_line_item_id.is_(None))\
+            .group_by(debit_credit, tag_type, tag,
+                      JournalEntryLineItem.account_id)
         result: list[sa.Row] = db.session.execute(select).all()
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query

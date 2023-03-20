@@ -115,7 +115,7 @@ class Account(db.Model):
     title_l10n = db.Column("title", db.String, nullable=False)
     """The title."""
     is_need_offset = db.Column(db.Boolean, nullable=False, default=False)
-    """Whether the voucher line items of this account need offset."""
+    """Whether the journal entry line items of this account need offset."""
     created_at = db.Column(db.DateTime(timezone=True), nullable=False,
                            server_default=db.func.now())
     """The time of creation."""
@@ -139,8 +139,9 @@ class Account(db.Model):
     l10n = db.relationship("AccountL10n", back_populates="account",
                            lazy=False)
     """The localized titles."""
-    line_items = db.relationship("VoucherLineItem", back_populates="account")
-    """The voucher line items."""
+    line_items = db.relationship("JournalEntryLineItem",
+                                 back_populates="account")
+    """The journal entry line items."""
 
     CASH_CODE: str = "1111-001"
     """The code of the cash account,"""
@@ -363,8 +364,9 @@ class Currency(db.Model):
     l10n = db.relationship("CurrencyL10n", back_populates="currency",
                            lazy=False)
     """The localized names."""
-    line_items = db.relationship("VoucherLineItem", back_populates="currency")
-    """The voucher line items."""
+    line_items = db.relationship("JournalEntryLineItem",
+                                 back_populates="currency")
+    """The journal entry line items."""
 
     def __str__(self) -> str:
         """Returns the string representation of the currency.
@@ -450,8 +452,8 @@ class CurrencyL10n(db.Model):
 class VoucherCurrency:
     """A currency in a voucher."""
 
-    def __init__(self, code: str, debit: list[VoucherLineItem],
-                 credit: list[VoucherLineItem]):
+    def __init__(self, code: str, debit: list[JournalEntryLineItem],
+                 credit: list[JournalEntryLineItem]):
         """Constructs the currency in the voucher.
 
         :param code: The currency code.
@@ -460,9 +462,9 @@ class VoucherCurrency:
         """
         self.code: str = code
         """The currency code."""
-        self.debit: list[VoucherLineItem] = debit
+        self.debit: list[JournalEntryLineItem] = debit
         """The debit line items."""
-        self.credit: list[VoucherLineItem] = credit
+        self.credit: list[JournalEntryLineItem] = credit
         """The credit line items."""
 
     @property
@@ -523,7 +525,8 @@ class Voucher(db.Model):
     """The ID of the updator."""
     updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
     """The updator."""
-    line_items = db.relationship("VoucherLineItem", back_populates="voucher")
+    line_items = db.relationship("JournalEntryLineItem",
+                                 back_populates="voucher")
     """The line items."""
 
     def __str__(self) -> str:
@@ -543,10 +546,10 @@ class Voucher(db.Model):
 
         :return: The currency categories.
         """
-        line_items: list[VoucherLineItem] = sorted(self.line_items,
-                                                   key=lambda x: x.no)
+        line_items: list[JournalEntryLineItem] = sorted(self.line_items,
+                                                        key=lambda x: x.no)
         codes: list[str] = []
-        by_currency: dict[str, list[VoucherLineItem]] = {}
+        by_currency: dict[str, list[JournalEntryLineItem]] = {}
         for line_item in line_items:
             if line_item.currency_code not in by_currency:
                 codes.append(line_item.currency_code)
@@ -606,14 +609,14 @@ class Voucher(db.Model):
 
         :return: None.
         """
-        VoucherLineItem.query\
-            .filter(VoucherLineItem.voucher_id == self.id).delete()
+        JournalEntryLineItem.query\
+            .filter(JournalEntryLineItem.voucher_id == self.id).delete()
         db.session.delete(self)
 
 
-class VoucherLineItem(db.Model):
-    """A line item in the voucher."""
-    __tablename__ = "accounting_voucher_line_items"
+class JournalEntryLineItem(db.Model):
+    """A line item in the journal entry."""
+    __tablename__ = "accounting_journal_entry_line_items"
     """The table name."""
     id = db.Column(db.Integer, nullable=False, primary_key=True,
                    autoincrement=False)
@@ -633,11 +636,11 @@ class VoucherLineItem(db.Model):
                                       db.ForeignKey(id, onupdate="CASCADE"),
                                       nullable=True)
     """The ID of the original line item."""
-    original_line_item = db.relationship("VoucherLineItem",
+    original_line_item = db.relationship("JournalEntryLineItem",
                                          back_populates="offsets",
                                          remote_side=id, passive_deletes=True)
     """The original line item."""
-    offsets = db.relationship("VoucherLineItem",
+    offsets = db.relationship("JournalEntryLineItem",
                               back_populates="original_line_item")
     """The offset items."""
     currency_code = db.Column(db.String,

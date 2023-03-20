@@ -27,7 +27,7 @@ from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import create_test_app, get_client
-from testlib_offset import TestData, VoucherLineItemData, VoucherData, \
+from testlib_offset import TestData, JournalEntryLineItemData, VoucherData, \
     CurrencyData
 from testlib_voucher import Accounts, match_voucher_detail
 
@@ -49,7 +49,7 @@ class OffsetTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                VoucherLineItem
+                JournalEntryLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -63,7 +63,7 @@ class OffsetTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            VoucherLineItem.query.delete()
+            JournalEntryLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
         self.data: TestData = TestData(self.app, self.client, self.csrf_token)
@@ -84,15 +84,15 @@ class OffsetTestCase(unittest.TestCase):
             self.data.e_r_or3d.voucher.days, [CurrencyData(
                 "USD",
                 [],
-                [VoucherLineItemData(Accounts.RECEIVABLE,
-                                     self.data.e_r_or1d.description, "300",
-                                     original_line_item=self.data.e_r_or1d),
-                 VoucherLineItemData(Accounts.RECEIVABLE,
-                                     self.data.e_r_or1d.description, "100",
-                                     original_line_item=self.data.e_r_or1d),
-                 VoucherLineItemData(Accounts.RECEIVABLE,
-                                     self.data.e_r_or3d.description, "100",
-                                     original_line_item=self.data.e_r_or3d)])])
+                [JournalEntryLineItemData(Accounts.RECEIVABLE,
+                                          self.data.e_r_or1d.description, "300",
+                                          original_line_item=self.data.e_r_or1d),
+                 JournalEntryLineItemData(Accounts.RECEIVABLE,
+                                          self.data.e_r_or1d.description, "100",
+                                          original_line_item=self.data.e_r_or1d),
+                 JournalEntryLineItemData(Accounts.RECEIVABLE,
+                                          self.data.e_r_or3d.description, "100",
+                                          original_line_item=self.data.e_r_or3d)])])
 
         # Non-existing original line item ID
         form = voucher_data.new_form(self.csrf_token)
@@ -399,15 +399,15 @@ class OffsetTestCase(unittest.TestCase):
         voucher_data: VoucherData = VoucherData(
             self.data.e_p_or3c.voucher.days, [CurrencyData(
                 "USD",
-                [VoucherLineItemData(Accounts.PAYABLE,
-                                     self.data.e_p_or1c.description, "500",
-                                     original_line_item=self.data.e_p_or1c),
-                 VoucherLineItemData(Accounts.PAYABLE,
-                                     self.data.e_p_or1c.description, "300",
-                                     original_line_item=self.data.e_p_or1c),
-                 VoucherLineItemData(Accounts.PAYABLE,
-                                     self.data.e_p_or3c.description, "120",
-                                     original_line_item=self.data.e_p_or3c)],
+                [JournalEntryLineItemData(Accounts.PAYABLE,
+                                          self.data.e_p_or1c.description, "500",
+                                          original_line_item=self.data.e_p_or1c),
+                 JournalEntryLineItemData(Accounts.PAYABLE,
+                                          self.data.e_p_or1c.description, "300",
+                                          original_line_item=self.data.e_p_or1c),
+                 JournalEntryLineItemData(Accounts.PAYABLE,
+                                          self.data.e_p_or3c.description, "120",
+                                          original_line_item=self.data.e_p_or3c)],
                 [])])
 
         # Non-existing original line item ID

@@ -30,7 +30,7 @@ class OriginalLineItemSelector {
 
     /**
      * The line item editor
-     * @type {VoucherLineItemEditor}
+     * @type {JournalEntryLineItemEditor}
      */
     lineItemEditor;
 
@@ -84,7 +84,7 @@ class OriginalLineItemSelector {
     /**
      * Constructs an original line item selector.
      *
-     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      */
     constructor(lineItemEditor) {
         this.lineItemEditor = lineItemEditor;

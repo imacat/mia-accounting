@@ -25,7 +25,7 @@ from flask import render_template, Response
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Currency, BaseAccount, Account, Voucher, \
-    VoucherLineItem
+    JournalEntryLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -256,15 +256,15 @@ class IncomeStatement(BaseReport):
         sub_conditions: list[sa.BinaryExpression] \
             = [Account.base_code.startswith(str(x)) for x in range(4, 10)]
         conditions: list[sa.BinaryExpression] \
-            = [VoucherLineItem.currency_code == self.__currency.code,
+            = [JournalEntryLineItem.currency_code == self.__currency.code,
                sa.or_(*sub_conditions)]
         if self.__period.start is not None:
             conditions.append(Voucher.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(Voucher.date <= self.__period.end)
         balance_func: sa.Function = sa.func.sum(sa.case(
-            (VoucherLineItem.is_debit, -VoucherLineItem.amount),
-            else_=VoucherLineItem.amount)).label("balance")
+            (JournalEntryLineItem.is_debit, -JournalEntryLineItem.amount),
+            else_=JournalEntryLineItem.amount)).label("balance")
         select_balances: sa.Select = sa.select(Account.id, balance_func)\
             .join(Voucher).join(Account)\
             .filter(*conditions)\

@@ -34,11 +34,11 @@ First written: 2023/2/26
       <div class="mb-2 fw-bolder">{{ currency.name }}</div>
 
       <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
-        <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-header">{{ A_("Content") }}</li>
+        <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-header">{{ A_("Content") }}</li>
         {% with line_items = currency.credit %}
           {% include "accounting/voucher/include/detail-line-items.html" %}
         {% endwith %}
-        <li class="list-group-item accounting-voucher-line-item accounting-voucher-line-item-total">
+        <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-total">
           <div class="d-flex justify-content-between">
             <div>{{ A_("Total") }}</div>
             <div>{{ currency.debit_total|accounting_format_amount }}</div>

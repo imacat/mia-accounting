@@ -82,7 +82,7 @@ class AccountForm(FlaskForm):
     """The title."""
     is_need_offset = BooleanField(
         validators=[NoOffsetNominalAccount()])
-    """Whether the the voucher line items of this account need offset."""
+    """Whether the the journal entry line items of this account need offset."""
 
     def populate_obj(self, obj: Account) -> None:
         """Populates the form data into an account object.

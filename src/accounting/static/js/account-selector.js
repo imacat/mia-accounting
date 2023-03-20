@@ -30,7 +30,7 @@ class AccountSelector {
 
     /**
      * The line item editor
-     * @type {VoucherLineItemEditor}
+     * @type {JournalEntryLineItemEditor}
      */
     #lineItemEditor;
 
@@ -85,7 +85,7 @@ class AccountSelector {
     /**
      * Constructs an account selector.
      *
-     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
@@ -210,7 +210,7 @@ class AccountSelector {
     /**
      * Returns the account selector instances.
      *
-     * @param lineItemEditor {VoucherLineItemEditor} the line item editor
+     * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      * @return {{debit: AccountSelector, credit: AccountSelector}}
      */
     static getInstances(lineItemEditor) {

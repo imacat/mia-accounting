@@ -30,7 +30,7 @@ from wtforms.validators import DataRequired, ValidationError
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Voucher, Account, VoucherLineItem, \
+from accounting.models import Voucher, Account, JournalEntryLineItem, \
     VoucherCurrency
 from accounting.voucher.utils.account_option import AccountOption
 from accounting.voucher.utils.original_line_items import \
@@ -133,7 +133,8 @@ class VoucherForm(FlaskForm):
         """Whether we need the payable original line items."""
         self._is_need_receivable: bool = False
         """Whether we need the receivable original line items."""
-        self.__original_line_item_options: list[VoucherLineItem] | None = None
+        self.__original_line_item_options: list[JournalEntryLineItem] | None \
+            = None
         """The options of the original line items."""
         self.__net_balance_exceeded: dict[int, LazyString] | None = None
         """The original line items whose net balances were exceeded by the
@@ -161,8 +162,8 @@ class VoucherForm(FlaskForm):
         to_delete: set[int] = {x.id for x in obj.line_items
                                if x.id not in collector.to_keep}
         if len(to_delete) > 0:
-            VoucherLineItem.query\
-                .filter(VoucherLineItem.id.in_(to_delete)).delete()
+            JournalEntryLineItem.query\
+                .filter(JournalEntryLineItem.id.in_(to_delete)).delete()
             self.is_modified = True
 
         if is_new or db.session.is_modified(obj):
@@ -222,9 +223,9 @@ class VoucherForm(FlaskForm):
             = [AccountOption(x) for x in Account.debit()
                if not (x.code[0] == "2" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
-            sa.select(VoucherLineItem.account_id)
-            .filter(VoucherLineItem.is_debit)
-            .group_by(VoucherLineItem.account_id)).all())
+            sa.select(JournalEntryLineItem.account_id)
+            .filter(JournalEntryLineItem.is_debit)
+            .group_by(JournalEntryLineItem.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
         return accounts
@@ -239,9 +240,9 @@ class VoucherForm(FlaskForm):
             = [AccountOption(x) for x in Account.credit()
                if not (x.code[0] == "1" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
-            sa.select(VoucherLineItem.account_id)
-            .filter(sa.not_(VoucherLineItem.is_debit))
-            .group_by(VoucherLineItem.account_id)).all())
+            sa.select(JournalEntryLineItem.account_id)
+            .filter(sa.not_(JournalEntryLineItem.is_debit))
+            .group_by(JournalEntryLineItem.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
         return accounts
@@ -264,7 +265,7 @@ class VoucherForm(FlaskForm):
         return DescriptionEditor()
 
     @property
-    def original_line_item_options(self) -> list[VoucherLineItem]:
+    def original_line_item_options(self) -> list[JournalEntryLineItem]:
         """Returns the selectable original line items.
 
         :return: The selectable original line items.
@@ -289,8 +290,8 @@ class VoucherForm(FlaskForm):
         if len(original_line_item_id) == 0:
             return None
         select: sa.Select = sa.select(sa.func.max(Voucher.date))\
-            .join(VoucherLineItem)\
-            .filter(VoucherLineItem.id.in_(original_line_item_id))
+            .join(JournalEntryLineItem)\
+            .filter(JournalEntryLineItem.id.in_(original_line_item_id))
         return db.session.scalar(select)
 
     @property
@@ -302,8 +303,9 @@ class VoucherForm(FlaskForm):
         line_item_id: set[int] = {x.eid.data for x in self.line_items
                                   if x.eid.data is not None}
         select: sa.Select = sa.select(sa.func.min(Voucher.date))\
-            .join(VoucherLineItem)\
-            .filter(VoucherLineItem.original_line_item_id.in_(line_item_id))
+            .join(JournalEntryLineItem)\
+            .filter(JournalEntryLineItem.original_line_item_id
+                    .in_(line_item_id))
         return db.session.scalar(select)
 
 
@@ -324,9 +326,9 @@ class LineItemCollector(t.Generic[T], ABC):
         """The voucher form."""
         self.__obj: Voucher = obj
         """The voucher object."""
-        self.__line_items: list[VoucherLineItem] = list(obj.line_items)
+        self.__line_items: list[JournalEntryLineItem] = list(obj.line_items)
         """The existing line items."""
-        self.__line_items_by_id: dict[int, VoucherLineItem] \
+        self.__line_items_by_id: dict[int, JournalEntryLineItem] \
             = {x.id: x for x in self.__line_items}
         """A dictionary from the line item ID to their line items."""
         self.__no_by_id: dict[int, int] \
@@ -357,7 +359,7 @@ class LineItemCollector(t.Generic[T], ABC):
         :param no: The number of the line item.
         :return: None.
         """
-        line_item: VoucherLineItem | None \
+        line_item: JournalEntryLineItem | None \
             = self.__line_items_by_id.get(form.eid.data)
         if line_item is not None:
             line_item.currency_code = currency_code
@@ -366,7 +368,7 @@ class LineItemCollector(t.Generic[T], ABC):
             if db.session.is_modified(line_item):
                 self.form.is_modified = True
         else:
-            line_item = VoucherLineItem()
+            line_item = JournalEntryLineItem()
             line_item.currency_code = currency_code
             form.populate_obj(line_item)
             line_item.no = no
@@ -386,10 +388,10 @@ class LineItemCollector(t.Generic[T], ABC):
         :param no: The number of the line item.
         :return: None.
         """
-        candidates: list[VoucherLineItem] \
+        candidates: list[JournalEntryLineItem] \
             = [x for x in self.__line_items
                if x.is_debit == is_debit and x.currency_code == currency_code]
-        line_item: VoucherLineItem
+        line_item: JournalEntryLineItem
         if len(candidates) > 0:
             candidates.sort(key=lambda x: x.no)
             line_item = candidates[0]
@@ -400,8 +402,8 @@ class LineItemCollector(t.Generic[T], ABC):
             if db.session.is_modified(line_item):
                 self.form.is_modified = True
         else:
-            line_item = VoucherLineItem()
-            line_item.id = new_id(VoucherLineItem)
+            line_item = JournalEntryLineItem()
+            line_item.id = new_id(JournalEntryLineItem)
             line_item.is_debit = is_debit
             line_item.currency_code = currency_code
             line_item.account_id = Account.cash().id

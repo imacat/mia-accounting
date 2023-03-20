@@ -100,7 +100,7 @@ class VoucherForm {
 
     /**
      * The line item editor
-     * @type {VoucherLineItemEditor}
+     * @type {JournalEntryLineItemEditor}
      */
     lineItemEditor;
 
@@ -121,7 +121,7 @@ class VoucherForm {
         this.#addCurrencyButton = document.getElementById("accounting-add-currency");
         this.#note = document.getElementById("accounting-note");
         this.#noteError = document.getElementById("accounting-note-error");
-        this.lineItemEditor = new VoucherLineItemEditor(this);
+        this.lineItemEditor = new JournalEntryLineItemEditor(this);
 
         this.#addCurrencyButton.onclick = () => {
             const newIndex = 1 + (this.#currencies.length === 0? 0: Math.max(...this.#currencies.map((currency) => currency.index)));
@@ -993,7 +993,7 @@ class LineItemSubForm {
     /**
      * Stores the data into the line item sub-form.
      *
-     * @param editor {VoucherLineItemEditor} the line item editor
+     * @param editor {JournalEntryLineItemEditor} the line item editor
      */
     save(editor) {
         if (editor.isNeedOffset) {

@@ -166,14 +166,14 @@
 .accounting-list-group-hover .list-group-item:hover {
     background-color: #ececec;
 }
-.accounting-voucher-line-item {
+.accounting-journal-entry-line-item {
     border: none;
 }
-.accounting-voucher-line-item-header {
+.accounting-journal-entry-line-item-header {
     font-weight: bolder;
     border-bottom: thick double slategray;
 }
-.list-group-item.accounting-voucher-line-item-total {
+.list-group-item.accounting-journal-entry-line-item-total {
     font-weight: bolder;
     border-top: thick double slategray;
 }

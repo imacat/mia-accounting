@@ -29,22 +29,22 @@ from test_site import db
 from testlib_voucher import Accounts, match_voucher_detail, NEXT_URI
 
 
-class VoucherLineItemData:
-    """The voucher line item data."""
+class JournalEntryLineItemData:
+    """The journal entry line item data."""
 
     def __init__(self, account: str, description: str, amount: str,
-                 original_line_item: VoucherLineItemData | None = None):
-        """Constructs the voucher line item data.
+                 original_line_item: JournalEntryLineItemData | None = None):
+        """Constructs the journal entry line item data.
 
         :param account: The account code.
         :param description: The description.
         :param amount: The amount.
-        :param original_line_item: The original voucher line item.
+        :param original_line_item: The original journal entry line item.
         """
         self.voucher: VoucherData | None = None
         self.id: int = -1
         self.no: int = -1
-        self.original_line_item: VoucherLineItemData | None \
+        self.original_line_item: JournalEntryLineItemData | None \
             = original_line_item
         self.account: str = account
         self.description: str = description
@@ -77,8 +77,8 @@ class VoucherLineItemData:
 class CurrencyData:
     """The voucher currency data."""
 
-    def __init__(self, currency: str, debit: list[VoucherLineItemData],
-                 credit: list[VoucherLineItemData]):
+    def __init__(self, currency: str, debit: list[JournalEntryLineItemData],
+                 credit: list[JournalEntryLineItemData]):
         """Constructs the voucher currency data.
 
         :param currency: The currency code.
@@ -86,8 +86,8 @@ class CurrencyData:
         :param credit: The credit line items.
         """
         self.code: str = currency
-        self.debit: list[VoucherLineItemData] = debit
-        self.credit: list[VoucherLineItemData] = credit
+        self.debit: list[JournalEntryLineItemData] = debit
+        self.credit: list[JournalEntryLineItemData] = credit
 
     def form(self, index: int, is_update: bool) -> dict[str, str]:
         """Returns the currency as form data.
@@ -175,7 +175,7 @@ class TestData:
         self.csrf_token: str = csrf_token
 
         def couple(description: str, amount: str, debit: str, credit: str) \
-                -> tuple[VoucherLineItemData, VoucherLineItemData]:
+                -> tuple[JournalEntryLineItemData, JournalEntryLineItemData]:
             """Returns a couple of debit-credit line items.
 
             :param description: The description.
@@ -184,8 +184,8 @@ class TestData:
             :param credit: The credit account code.
             :return: The debit line item and credit line item.
             """
-            return VoucherLineItemData(debit, description, amount),\
-                VoucherLineItemData(credit, description, amount)
+            return JournalEntryLineItemData(debit, description, amount),\
+                JournalEntryLineItemData(credit, description, amount)
 
         # Receivable original line items
         self.e_r_or1d, self.e_r_or1c = couple(

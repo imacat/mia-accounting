@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * voucher-line-item-editor.js: The JavaScript for the voucher line item editor
+ * journal-entry-line-item-editor.js: The JavaScript for the journal entry line item editor
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -23,10 +23,10 @@
 "use strict";
 
 /**
- * The voucher line item editor.
+ * The journal entry line item editor.
  *
  */
-class VoucherLineItemEditor {
+class JournalEntryLineItemEditor {
 
     /**
      * The voucher form
@@ -35,7 +35,7 @@ class VoucherLineItemEditor {
     form;
 
     /**
-     * The voucher line item editor
+     * The journal entry line item editor
      * @type {HTMLFormElement}
      */
     #element;
@@ -137,7 +137,7 @@ class VoucherLineItemEditor {
     #amountError;
 
     /**
-     * The voucher line item to edit
+     * The journal entry line item to edit
      * @type {LineItemSubForm|null}
      */
     lineItem;
@@ -149,7 +149,7 @@ class VoucherLineItemEditor {
     #debitCreditSubForm;
 
     /**
-     * Whether the voucher line item needs offset
+     * Whether the journal entry line item needs offset
      * @type {boolean}
      */
     isNeedOffset = false;
@@ -215,7 +215,7 @@ class VoucherLineItemEditor {
     originalLineItemSelector;
 
     /**
-     * Constructs a new voucher line item editor.
+     * Constructs a new journal entry line item editor.
      *
      * @param form {VoucherForm} the voucher form
      */
@@ -476,7 +476,7 @@ class VoucherLineItemEditor {
     }
 
     /**
-     * The callback when adding a new voucher line item.
+     * The callback when adding a new journal entry line item.
      *
      * @param debitCredit {DebitCreditSubForm} the debit or credit sub-form
      */
@@ -512,9 +512,9 @@ class VoucherLineItemEditor {
     }
 
     /**
-     * The callback when editing a voucher line item.
+     * The callback when editing a journal entry line item.
      *
-     * @param lineItem {LineItemSubForm} the voucher line item sub-form
+     * @param lineItem {LineItemSubForm} the journal entry line item sub-form
      */
     onEdit(lineItem) {
         this.lineItem = lineItem;

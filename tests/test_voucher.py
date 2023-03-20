@@ -53,7 +53,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                VoucherLineItem
+                JournalEntryLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -67,7 +67,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            VoucherLineItem.query.delete()
+            JournalEntryLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -625,7 +625,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                VoucherLineItem
+                JournalEntryLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -639,7 +639,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            VoucherLineItem.query.delete()
+            JournalEntryLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -1204,7 +1204,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                VoucherLineItem
+                JournalEntryLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -1218,7 +1218,7 @@ class TransferVoucherTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            VoucherLineItem.query.delete()
+            JournalEntryLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -2056,7 +2056,7 @@ class VoucherReorderTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import BaseAccount, Voucher, \
-                VoucherLineItem
+                JournalEntryLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
@@ -2070,7 +2070,7 @@ class VoucherReorderTestCase(unittest.TestCase):
                                          "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             Voucher.query.delete()
-            VoucherLineItem.query.delete()
+            JournalEntryLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
