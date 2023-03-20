@@ -289,6 +289,8 @@ class LineItemForm(FlaskForm):
     """The Id of the original line item."""
     account_code = StringField()
     """The account code."""
+    description = StringField()
+    """The description."""
     amount = DecimalField()
     """The amount."""
 

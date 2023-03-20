@@ -52,24 +52,7 @@ First written: 2023/2/25
                       side = "debit",
                       line_item_index = loop.index,
                       only_one_line_item_form = debit_forms|length == 1,
-                      line_item_id = line_item_form.form.eid.data,
-                      account_code_data = line_item_form.form.account_code.data|accounting_default,
-                      account_code_error = line_item_form.form.account_code.errors,
-                      account_text = line_item_form.form.account_text,
-                      description_data = line_item_form.form.description.data|accounting_default,
-                      description_errors = line_item_form.form.description.errors,
-                      original_line_item_id_data = line_item_form.form.original_line_item_id.data|accounting_default,
-                      original_line_item_date = line_item_form.form.original_line_item_date|accounting_default,
-                      original_line_item_text = line_item_form.form.original_line_item_text|accounting_default,
-                      is_need_offset = line_item_form.form.is_need_offset,
-                      offset_items = line_item_form.form.offsets,
-                      offset_total = line_item_form.form.offset_total|accounting_default,
-                      net_balance_data = line_item_form.form.net_balance,
-                      net_balance_text = line_item_form.form.net_balance|accounting_format_amount,
-                      amount_data = line_item_form.form.amount.data|accounting_voucher_format_amount_input,
-                      amount_errors = line_item_form.form.amount.errors,
-                      amount_text = line_item_form.form.amount.data|accounting_format_amount,
-                      line_item_errors = line_item_form.form.all_errors %}
+                      form = line_item_form.form %}
                 {% include "accounting/voucher/include/form-line-item.html" %}
               {% endwith %}
             {% endfor %}
@@ -100,24 +83,7 @@ First written: 2023/2/25
                       side = "credit",
                       line_item_index = loop.index,
                       only_one_line_item_form = debit_forms|length == 1,
-                      line_item_id = line_item_form.form.eid.data,
-                      account_code_data = line_item_form.form.account_code.data|accounting_default,
-                      account_code_error = line_item_form.form.account_code.errors,
-                      account_text = line_item_form.form.account_text,
-                      description_data = line_item_form.form.description.data|accounting_default,
-                      description_errors = line_item_form.form.description.errors,
-                      original_line_item_id_data = line_item_form.form.original_line_item_id.data|accounting_default,
-                      original_line_item_date = line_item_form.form.original_line_item_date|accounting_default,
-                      original_line_item_text = line_item_form.form.original_line_item_text|accounting_default,
-                      is_need_offset = line_item_form.form.is_need_offset,
-                      offset_items = line_item_form.form.offsets,
-                      offset_total = line_item_form.form.offset_total|accounting_default("0"),
-                      net_balance_data = line_item_form.form.net_balance,
-                      net_balance_text = line_item_form.form.net_balance|accounting_format_amount,
-                      amount_data = line_item_form.form.amount.data|accounting_voucher_format_amount_input,
-                      amount_errors = line_item_form.form.amount.errors,
-                      amount_text = line_item_form.form.amount.data|accounting_format_amount,
-                      line_item_errors = line_item_form.form.all_errors %}
+                      form = line_item_form.form %}
                 {% include "accounting/voucher/include/form-line-item.html" %}
               {% endwith %}
             {% endfor %}

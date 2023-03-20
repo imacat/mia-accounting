@@ -28,6 +28,7 @@ from accounting.template_globals import default_currency_code
 from accounting.utils.voucher_types import VoucherType
 from accounting.voucher.forms import VoucherForm, CashReceiptVoucherForm, \
     CashDisbursementVoucherForm, TransferVoucherForm
+from accounting.voucher.forms.line_item import LineItemForm
 
 
 class VoucherOperator(ABC):
@@ -87,7 +88,8 @@ class VoucherOperator(ABC):
             "accounting/voucher/include/form-line-item.html",
             currency_index="CURRENCY_INDEX",
             side="SIDE",
-            line_item_index="LINE_ITEM_INDEX")
+            line_item_index="LINE_ITEM_INDEX",
+            form=LineItemForm())
 
 
 class CashReceiptVoucher(VoucherOperator):
