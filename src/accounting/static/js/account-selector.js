@@ -35,10 +35,10 @@ class AccountSelector {
     #lineItemEditor;
 
     /**
-     * The side, either "debit" or "credit"
+     * Either "debit" or "credit"
      * @type {string}
      */
-    #side;
+    #debitCredit;
 
     /**
      * The prefix of the HTML ID and class
@@ -86,12 +86,12 @@ class AccountSelector {
      * Constructs an account selector.
      *
      * @param lineItemEditor {VoucherLineItemEditor} the line item editor
-     * @param side {string} the side, either "debit" or "credit"
+     * @param debitCredit {string} either "debit" or "credit"
      */
-    constructor(lineItemEditor, side) {
+    constructor(lineItemEditor, debitCredit) {
         this.#lineItemEditor = lineItemEditor
-        this.#side = side;
-        this.#prefix = "accounting-account-selector-" + side;
+        this.#debitCredit = debitCredit;
+        this.#prefix = "accounting-account-selector-" + debitCredit;
         this.#query = document.getElementById(this.#prefix + "-query");
         this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
         this.#optionList = document.getElementById(this.#prefix + "-option-list");
@@ -143,7 +143,7 @@ class AccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getCodesUsedInForm() {
-        const inUse = this.#lineItemEditor.form.getAccountCodesUsed(this.#side);
+        const inUse = this.#lineItemEditor.form.getAccountCodesUsed(this.#debitCredit);
         if (this.#lineItemEditor.accountCode !== null) {
             inUse.push(this.#lineItemEditor.accountCode);
         }
@@ -217,7 +217,7 @@ class AccountSelector {
         const selectors = {}
         const modals = Array.from(document.getElementsByClassName("accounting-account-selector"));
         for (const modal of modals) {
-            selectors[modal.dataset.side] = new AccountSelector(lineItemEditor, modal.dataset.side);
+            selectors[modal.dataset.debitCredit] = new AccountSelector(lineItemEditor, modal.dataset.debitCredit);
         }
         return selectors;
     }

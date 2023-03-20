@@ -53,9 +53,9 @@ class OriginalLineItemExists:
                 "The original line item does not exist."))
 
 
-class OriginalLineItemOppositeSide:
+class OriginalLineItemOppositeDebitCredit:
     """The validator to check if the original line item is on the opposite
-    side."""
+    debit or credit."""
 
     def __call__(self, form: FlaskForm, field: IntegerField) -> None:
         if field.data is None:
@@ -71,7 +71,7 @@ class OriginalLineItemOppositeSide:
                 and not original_line_item.is_debit:
             return
         raise ValidationError(lazy_gettext(
-            "The original line item is on the same side."))
+            "The original line item is on the same debit or credit."))
 
 
 class OriginalLineItemNeedOffset:
@@ -180,7 +180,7 @@ class KeepAccountWhenHavingOffset:
 
 class NotStartPayableFromDebit:
     """The validator to check that a payable line item does not start from
-    the debit side."""
+    debit."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         assert isinstance(form, DebitLineItemForm)
@@ -191,12 +191,12 @@ class NotStartPayableFromDebit:
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A payable line item cannot start from the debit side."))
+                "A payable line item cannot start from debit."))
 
 
 class NotStartReceivableFromCredit:
     """The validator to check that a receivable line item does not start
-    from the credit side."""
+    from credit."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         assert isinstance(form, CreditLineItemForm)
@@ -207,7 +207,7 @@ class NotStartReceivableFromCredit:
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A receivable line item cannot start from the credit side."))
+                "A receivable line item cannot start from credit."))
 
 
 class PositiveAmount:
@@ -439,7 +439,7 @@ class DebitLineItemForm(LineItemForm):
     original_line_item_id = IntegerField(
         validators=[Optional(),
                     OriginalLineItemExists(),
-                    OriginalLineItemOppositeSide(),
+                    OriginalLineItemOppositeDebitCredit(),
                     OriginalLineItemNeedOffset(),
                     OriginalLineItemNotOffset()])
     """The ID of the original line item."""
@@ -489,7 +489,7 @@ class CreditLineItemForm(LineItemForm):
     original_line_item_id = IntegerField(
         validators=[Optional(),
                     OriginalLineItemExists(),
-                    OriginalLineItemOppositeSide(),
+                    OriginalLineItemOppositeDebitCredit(),
                     OriginalLineItemNeedOffset(),
                     OriginalLineItemNotOffset()])
     """The ID of the original line item."""

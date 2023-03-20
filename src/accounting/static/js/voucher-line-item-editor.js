@@ -47,10 +47,10 @@ class VoucherLineItemEditor {
     #modal;
 
     /**
-     * The side, either "debit" or "credit"
+     * Either "debit" or "credit"
      * @type {string}
      */
-    side;
+    debitCredit;
 
     /**
      * The prefix of the HTML ID and class
@@ -143,10 +143,10 @@ class VoucherLineItemEditor {
     lineItem;
 
     /**
-     * The debit or credit side sub-form
-     * @type {SideSubForm}
+     * The debit or credit sub-form
+     * @type {DebitCreditSubForm}
      */
-    #sideSubForm;
+    #debitCreditSubForm;
 
     /**
      * Whether the voucher line item needs offset
@@ -241,13 +241,13 @@ class VoucherLineItemEditor {
         this.originalLineItemSelector = new OriginalLineItemSelector(this);
         this.#originalLineItemControl.onclick = () => this.originalLineItemSelector.onOpen()
         this.#originalLineItemDelete.onclick = () => this.clearOriginalLineItem();
-        this.#descriptionControl.onclick = () => this.#descriptionEditors[this.side].onOpen();
-        this.#accountControl.onclick = () => this.#accountSelectors[this.side].onOpen();
+        this.#descriptionControl.onclick = () => this.#descriptionEditors[this.debitCredit].onOpen();
+        this.#accountControl.onclick = () => this.#accountSelectors[this.debitCredit].onOpen();
         this.#amountInput.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
             if (this.#validate()) {
                 if (this.lineItem === null) {
-                    this.lineItem = this.#sideSubForm.addLineItem();
+                    this.lineItem = this.#debitCreditSubForm.addLineItem();
                 }
                 this.amount = this.#amountInput.value;
                 this.lineItem.save(this);
@@ -314,7 +314,7 @@ class VoucherLineItemEditor {
      * @return {string} the currency code
      */
     getCurrencyCode() {
-        return this.#sideSubForm.currency.getCurrencyCode();
+        return this.#debitCreditSubForm.currency.getCurrencyCode();
     }
 
     /**
@@ -478,12 +478,12 @@ class VoucherLineItemEditor {
     /**
      * The callback when adding a new voucher line item.
      *
-     * @param side {SideSubForm} the debit or credit side sub-form
+     * @param debitCredit {DebitCreditSubForm} the debit or credit sub-form
      */
-    onAddNew(side) {
+    onAddNew(debitCredit) {
         this.lineItem = null;
-        this.#sideSubForm = side;
-        this.side = this.#sideSubForm.side;
+        this.#debitCreditSubForm = debitCredit;
+        this.debitCredit = this.#debitCreditSubForm.debitCredit;
         this.isNeedOffset = false;
         this.#originalLineItemContainer.classList.add("d-none");
         this.#originalLineItemControl.classList.remove("accounting-not-empty");
@@ -518,8 +518,8 @@ class VoucherLineItemEditor {
      */
     onEdit(lineItem) {
         this.lineItem = lineItem;
-        this.#sideSubForm = lineItem.sideSubForm;
-        this.side = this.#sideSubForm.side;
+        this.#debitCreditSubForm = lineItem.debitCreditSubForm;
+        this.debitCredit = this.#debitCreditSubForm.debitCredit;
         this.isNeedOffset = lineItem.isNeedOffset();
         this.originalLineItemId = lineItem.getOriginalLineItemId();
         this.originalLineItemDate = lineItem.getOriginalLineItemDate();
@@ -575,11 +575,11 @@ class VoucherLineItemEditor {
     #setEnableDescriptionAccount(isEnabled) {
         if (isEnabled) {
             this.#descriptionControl.dataset.bsToggle = "modal";
-            this.#descriptionControl.dataset.bsTarget = "#accounting-description-editor-" + this.#sideSubForm.side + "-modal";
+            this.#descriptionControl.dataset.bsTarget = "#accounting-description-editor-" + this.#debitCreditSubForm.debitCredit + "-modal";
             this.#descriptionControl.classList.remove("accounting-disabled");
             this.#descriptionControl.classList.add("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "modal";
-            this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#sideSubForm.side + "-modal";
+            this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#debitCreditSubForm.debitCredit + "-modal";
             this.#accountControl.classList.remove("accounting-disabled");
             this.#accountControl.classList.add("accounting-clickable");
         } else {

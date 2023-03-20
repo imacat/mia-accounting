@@ -50,17 +50,17 @@ class VoucherLineItemData:
         self.description: str = description
         self.amount: Decimal = Decimal(amount)
 
-    def form(self, prefix: str, side: str, index: int, is_update: bool) \
-            -> dict[str, str]:
+    def form(self, prefix: str, debit_credit: str, index: int,
+             is_update: bool) -> dict[str, str]:
         """Returns the line item as form data.
 
         :param prefix: The prefix of the form fields.
-        :param side: The side, either "debit" or "credit".
+        :param debit_credit: Either "debit" or "credit".
         :param index: The line item index.
         :param is_update: True for an update operation, or False otherwise
         :return: The form data.
         """
-        prefix = f"{prefix}-{side}-{index}"
+        prefix = f"{prefix}-{debit_credit}-{index}"
         form: dict[str, str] = {f"{prefix}-account_code": self.account,
                                 f"{prefix}-description": self.description,
                                 f"{prefix}-amount": str(self.amount)}

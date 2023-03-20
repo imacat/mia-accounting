@@ -231,7 +231,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A receivable line item cannot start from the credit side
+        # A receivable line item cannot start from credit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -391,7 +391,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A receivable line item cannot start from the credit side
+        # A receivable line item cannot start from credit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -803,7 +803,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A payable line item cannot start from the debit side
+        # A payable line item cannot start from debit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -966,7 +966,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A payable line item cannot start from the debit side
+        # A payable line item cannot start from debit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -1398,7 +1398,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A receivable line item cannot start from the credit side
+        # A receivable line item cannot start from credit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -1407,7 +1407,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # A payable line item cannot start from the debit side
+        # A payable line item cannot start from debit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
@@ -1597,7 +1597,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A receivable line item cannot start from the credit side
+        # A receivable line item cannot start from credit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
@@ -1606,7 +1606,7 @@ class TransferVoucherTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # A payable line item cannot start from the debit side
+        # A payable line item cannot start from debit
         form = self.__get_add_form()
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]

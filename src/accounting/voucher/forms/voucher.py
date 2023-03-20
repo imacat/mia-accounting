@@ -376,7 +376,7 @@ class LineItemCollector(t.Generic[T], ABC):
 
     def _make_cash_line_item(self, forms: list[LineItemForm], is_debit: bool,
                              currency_code: str, no: int) -> None:
-        """Composes the cash line item at the other side of the cash
+        """Composes the cash line item at the other debit or credit of the cash
         voucher.
 
         :param forms: The line item forms in the same currency.

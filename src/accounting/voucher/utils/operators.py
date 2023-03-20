@@ -87,7 +87,7 @@ class VoucherOperator(ABC):
         return render_template(
             "accounting/voucher/include/form-line-item.html",
             currency_index="CURRENCY_INDEX",
-            side="SIDE",
+            debit_credit="DEBIT_CREDIT",
             line_item_index="LINE_ITEM_INDEX",
             form=LineItemForm())
 

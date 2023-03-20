@@ -195,13 +195,13 @@ class VoucherForm {
     /**
      * Returns all the line items in the form.
      *
-     * @param side {string|null} the side, either "debit" or "credit", or null for both
+     * @param debitCredit {string|null} Either "debit" or "credit", or null for both
      * @return {LineItemSubForm[]} all the line item sub-forms
      */
-    getLineItems(side = null) {
+    getLineItems(debitCredit = null) {
         const lineItems = [];
         for (const currency of this.#currencies) {
-            lineItems.push(...currency.getLineItems(side));
+            lineItems.push(...currency.getLineItems(debitCredit));
         }
         return lineItems;
     }
@@ -209,11 +209,11 @@ class VoucherForm {
     /**
      * Returns the account codes used in the form.
      *
-     * @param side {string} the side, either "debit" or "credit"
+     * @param debitCredit {string} either "debit" or "credit"
      * @return {string[]} the account codes used in the form
      */
-    getAccountCodesUsed(side) {
-        return this.getLineItems(side).map((lineItem) => lineItem.getAccountCode())
+    getAccountCodesUsed(debitCredit) {
+        return this.getLineItems(debitCredit).map((lineItem) => lineItem.getAccountCode())
             .filter((code) => code !== null);
     }
 
@@ -406,14 +406,14 @@ class CurrencySubForm {
     deleteButton;
 
     /**
-     * The debit side
-     * @type {SideSubForm|null}
+     * The debit sub-form
+     * @type {DebitCreditSubForm|null}
      */
     #debit;
 
     /**
-     * The credit side
-     * @type {SideSubForm|null}
+     * The credit sub-form
+     * @type {DebitCreditSubForm|null}
      */
     #credit;
 
@@ -435,9 +435,9 @@ class CurrencySubForm {
         this.#codeSelect = document.getElementById(this.#prefix + "-code-select");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
         const debitElement = document.getElementById(this.#prefix + "-debit");
-        this.#debit = debitElement === null? null: new SideSubForm(this, debitElement, "debit");
+        this.#debit = debitElement === null? null: new DebitCreditSubForm(this, debitElement, "debit");
         const creditElement = document.getElementById(this.#prefix + "-credit");
-        this.#credit = creditElement == null? null: new SideSubForm(this, creditElement, "credit");
+        this.#credit = creditElement == null? null: new DebitCreditSubForm(this, creditElement, "credit");
         this.#codeSelect.onchange = () => this.#code.value = this.#codeSelect.value;
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
@@ -457,15 +457,15 @@ class CurrencySubForm {
     /**
      * Returns all the line items in the form.
      *
-     * @param side {string|null} the side, either "debit" or "credit", or null for both
+     * @param debitCredit {string|null} either "debit" or "credit", or null for both
      * @return {LineItemSubForm[]} all the line item sub-forms
      */
-    getLineItems(side = null) {
+    getLineItems(debitCredit = null) {
         const lineItems = []
-        for (const sideSubForm of [this.#debit, this.#credit]) {
-            if (sideSubForm !== null ) {
-                if (side === null || sideSubForm.side === side) {
-                    lineItems.push(...sideSubForm.lineItems);
+        for (const debitCreditSubForm of [this.#debit, this.#credit]) {
+            if (debitCreditSubForm !== null ) {
+                if (debitCredit === null || debitCreditSubForm.debitCredit === debitCredit) {
+                    lineItems.push(...debitCreditSubForm.lineItems);
                 }
             }
         }
@@ -524,10 +524,10 @@ class CurrencySubForm {
 }
 
 /**
- * The debit or credit side sub-form
+ * The debit or credit sub-form
  *
  */
-class SideSubForm {
+class DebitCreditSubForm {
 
     /**
      * The currency sub-form
@@ -548,10 +548,10 @@ class SideSubForm {
     #currencyIndex;
 
     /**
-     * The side, either "debit" or "credit"
+     * Either "debit" or "credit"
      * @type {string}
      */
-    side;
+    debitCredit;
 
     /**
      * The prefix of the HTML ID and class
@@ -590,18 +590,18 @@ class SideSubForm {
     #addLineItemButton;
 
     /**
-     * Constructs a debit or credit side sub-form
+     * Constructs a debit or credit sub-form
      *
      * @param currency {CurrencySubForm} the currency sub-form
      * @param element {HTMLDivElement} the element
-     * @param side {string} the side, either "debit" or "credit"
+     * @param debitCredit {string} either "debit" or "credit"
      */
-    constructor(currency, element, side) {
+    constructor(currency, element, debitCredit) {
         this.currency = currency;
         this.#element = element;
         this.#currencyIndex = currency.index;
-        this.side = side;
-        this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + side;
+        this.debitCredit = debitCredit;
+        this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + debitCredit;
         this.#error = document.getElementById(this.#prefix + "-error");
         this.#lineItemList = document.getElementById(this.#prefix + "-list");
         // noinspection JSValidateTypes
@@ -622,7 +622,7 @@ class SideSubForm {
         const newIndex = 1 + (this.lineItems.length === 0? 0: Math.max(...this.lineItems.map((lineItem) => lineItem.lineItemIndex)));
         const html = this.currency.form.lineItemTemplate
             .replaceAll("CURRENCY_INDEX", escapeHtml(String(this.#currencyIndex)))
-            .replaceAll("SIDE", escapeHtml(this.side))
+            .replaceAll("DEBIT_CREDIT", escapeHtml(this.debitCredit))
             .replaceAll("LINE_ITEM_INDEX", escapeHtml(String(newIndex)));
         this.#lineItemList.insertAdjacentHTML("beforeend", html);
         const lineItem = new LineItemSubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
@@ -742,10 +742,10 @@ class SideSubForm {
 class LineItemSubForm {
 
     /**
-     * The debit or credit side sub-form
-     * @type {SideSubForm}
+     * The debit or credit sub-form
+     * @type {DebitCreditSubForm}
      */
-    sideSubForm;
+    debitCreditSubForm;
 
     /**
      * The element
@@ -754,10 +754,10 @@ class LineItemSubForm {
     element;
 
     /**
-     * The side, either "debit" or "credit"
+     * Either "debit" or "credit"
      * @type {string}
      */
-    side;
+    debitCredit;
 
     /**
      * The line item index
@@ -858,16 +858,16 @@ class LineItemSubForm {
     /**
      * Constructs the line item sub-form.
      *
-     * @param side {SideSubForm} the debit or credit side sub-form
+     * @param debitCredit {DebitCreditSubForm} the debit or credit sub-form
      * @param element {HTMLLIElement} the element
      */
-    constructor(side, element) {
-        this.sideSubForm = side;
+    constructor(debitCredit, element) {
+        this.debitCreditSubForm = debitCredit;
         this.element = element;
-        this.side = element.dataset.side;
+        this.debitCredit = element.dataset.debitCredit;
         this.lineItemIndex = parseInt(element.dataset.lineItemIndex);
         this.isMatched = element.classList.contains("accounting-matched-line-item");
-        this.#prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.side + "-" + this.lineItemIndex;
+        this.#prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + this.lineItemIndex;
         this.#control = document.getElementById(this.#prefix + "-control");
         this.#error = document.getElementById(this.#prefix + "-error");
         this.no = document.getElementById(this.#prefix + "-no");
@@ -881,10 +881,10 @@ class LineItemSubForm {
         this.#amount = document.getElementById(this.#prefix + "-amount");
         this.#amountText = document.getElementById(this.#prefix + "-amount-text");
         this.deleteButton = document.getElementById(this.#prefix + "-delete");
-        this.#control.onclick = () => this.sideSubForm.currency.form.lineItemEditor.onEdit(this);
+        this.#control.onclick = () => this.debitCreditSubForm.currency.form.lineItemEditor.onEdit(this);
         this.deleteButton.onclick = () => {
             this.element.parentElement.removeChild(this.element);
-            this.sideSubForm.deleteLineItem(this);
+            this.debitCreditSubForm.deleteLineItem(this);
         };
     }
 
@@ -1019,9 +1019,9 @@ class LineItemSubForm {
         this.#amount.value = editor.amount;
         this.#amountText.innerText = formatDecimal(new Decimal(editor.amount));
         this.validate();
-        this.sideSubForm.updateTotal();
-        this.sideSubForm.currency.updateCodeSelectorStatus();
-        this.sideSubForm.currency.form.updateMinDate();
+        this.debitCreditSubForm.updateTotal();
+        this.debitCreditSubForm.currency.updateCodeSelectorStatus();
+        this.debitCreditSubForm.currency.form.updateMinDate();
     }
 }
 

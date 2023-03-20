@@ -101,7 +101,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # The same side
+        # The same debit or credit
         form = voucher_data.new_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
             = self.data.e_p_or1c.id
@@ -210,7 +210,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # The same side
+        # The same debit or credit
         form = voucher_data.update_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
             = self.data.e_p_or1c.id
@@ -417,7 +417,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
-        # The same side
+        # The same debit or credit
         form = voucher_data.new_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
             = self.data.e_r_or1d.id
@@ -524,7 +524,7 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
-        # The same side
+        # The same debit or credit
         form = voucher_data.update_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
             = self.data.e_r_or1d.id

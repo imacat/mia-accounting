@@ -143,16 +143,16 @@ class DescriptionType:
         return sorted(self.__tag_dict.values(), key=lambda x: -x.freq)
 
 
-class DescriptionSide:
-    """A description side"""
+class DescriptionDebitCredit:
+    """The description on debit or credit."""
 
-    def __init__(self, side_id: t.Literal["debit", "credit"]):
-        """Constructs a description side.
+    def __init__(self, debit_credit: t.Literal["debit", "credit"]):
+        """Constructs the description on debit or credit.
 
-        :param side_id: The side ID, either "debit" or "credit".
+        :param debit_credit: Either "debit" or "credit".
         """
-        self.side: t.Literal["debit", "credit"] = side_id
-        """The side."""
+        self.debit_credit: t.Literal["debit", "credit"] = debit_credit
+        """Either debit or credit."""
         self.general: DescriptionType = DescriptionType("general")
         """The general tags."""
         self.travel: DescriptionType = DescriptionType("travel")
@@ -179,7 +179,7 @@ class DescriptionSide:
     @property
     def accounts(self) -> list[DescriptionAccount]:
         """Returns the suggested accounts of all tags in the description editor
-        in the side, in their frequency order.
+        in debit or credit, in their frequency order.
 
         :return: The suggested accounts of all tags, in their frequency order.
         """
@@ -202,12 +202,12 @@ class DescriptionEditor:
 
     def __init__(self):
         """Constructs the description editor."""
-        self.debit: DescriptionSide = DescriptionSide("debit")
+        self.debit: DescriptionDebitCredit = DescriptionDebitCredit("debit")
         """The debit tags."""
-        self.credit: DescriptionSide = DescriptionSide("credit")
+        self.credit: DescriptionDebitCredit = DescriptionDebitCredit("credit")
         """The credit tags."""
-        side: sa.Label = sa.case((VoucherLineItem.is_debit, "debit"),
-                                 else_="credit").label("side")
+        debit_credit: sa.Label = sa.case((VoucherLineItem.is_debit, "debit"),
+                                         else_="credit").label("debit_credit")
         tag_type: sa.Label = sa.case(
             (VoucherLineItem.description.like("_%—_%—_%→_%"), "bus"),
             (sa.or_(VoucherLineItem.description.like("_%—_%→_%"),
@@ -215,21 +215,22 @@ class DescriptionEditor:
             else_="general").label("tag_type")
         tag: sa.Label = get_prefix(VoucherLineItem.description, "—")\
             .label("tag")
-        select: sa.Select = sa.Select(side, tag_type, tag,
+        select: sa.Select = sa.Select(debit_credit, tag_type, tag,
                                       VoucherLineItem.account_id,
                                       sa.func.count().label("freq"))\
             .filter(VoucherLineItem.description.is_not(None),
                     VoucherLineItem.description.like("_%—_%"),
                     VoucherLineItem.original_line_item_id.is_(None))\
-            .group_by(side, tag_type, tag, VoucherLineItem.account_id)
+            .group_by(debit_credit, tag_type, tag, VoucherLineItem.account_id)
         result: list[sa.Row] = db.session.execute(select).all()
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query
                .filter(Account.id.in_({x.account_id for x in result})).all()}
-        side_dict: dict[t.Literal["debit", "credit"], DescriptionSide] \
-            = {x.side: x for x in {self.debit, self.credit}}
+        debit_credit_dict: dict[t.Literal["debit", "credit"],
+                                DescriptionDebitCredit] \
+            = {x.debit_credit: x for x in {self.debit, self.credit}}
         for row in result:
-            side_dict[row.side].add_tag(
+            debit_credit_dict[row.debit_credit].add_tag(
                 row.tag_type, row.tag, accounts[row.account_id], row.freq)
 
 

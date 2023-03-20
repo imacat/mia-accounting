@@ -53,10 +53,10 @@ class DescriptionEditor {
     #modal;
 
     /**
-     * The side, either "debit" or "credit"
+     * Either "debit" or "credit"
      * @type {string}
      */
-    side;
+    debitCredit;
 
     /**
      * The current tab
@@ -110,12 +110,12 @@ class DescriptionEditor {
      * Constructs a description editor.
      *
      * @param lineItemEditor {VoucherLineItemEditor} the line item editor
-     * @param side {string} the side, either "debit" or "credit"
+     * @param debitCredit {string} either "debit" or "credit"
      */
-    constructor(lineItemEditor, side) {
+    constructor(lineItemEditor, debitCredit) {
         this.#lineItemEditor = lineItemEditor;
-        this.side = side;
-        this.prefix = "accounting-description-editor-" + side;
+        this.debitCredit = debitCredit;
+        this.prefix = "accounting-description-editor-" + debitCredit;
         this.#form = document.getElementById(this.prefix);
         this.#modal = document.getElementById(this.prefix + "-modal");
         this.description = document.getElementById(this.prefix + "-description");
@@ -253,7 +253,7 @@ class DescriptionEditor {
         const editors = {}
         const forms = Array.from(document.getElementsByClassName("accounting-description-editor"));
         for (const form of forms) {
-            editors[form.dataset.side] = new DescriptionEditor(lineItemEditor, form.dataset.side);
+            editors[form.dataset.debitCredit] = new DescriptionEditor(lineItemEditor, form.dataset.debitCredit);
         }
         return editors;
     }

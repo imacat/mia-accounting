@@ -50,7 +50,7 @@ First written: 2023/2/25
   {% with description_editor = form.description_editor.debit %}
     {% include "accounting/voucher/include/description-editor-modal.html" %}
   {% endwith %}
-  {% with side = "debit",
+  {% with debit_credit = "debit",
           account_options = form.debit_account_options %}
     {% include "accounting/voucher/include/account-selector-modal.html" %}
   {% endwith %}

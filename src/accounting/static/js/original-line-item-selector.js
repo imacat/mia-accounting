@@ -77,9 +77,9 @@ class OriginalLineItemSelector {
     #currencyCode;
 
     /**
-     * The side, either "credit" or "debit"
+     * Either "credit" or "debit"
      */
-    #side;
+    #debitCredit;
 
     /**
      * Constructs an original line item selector.
@@ -157,7 +157,7 @@ class OriginalLineItemSelector {
     #filterOptions() {
         let hasAnyMatched = false;
         for (const option of this.#options) {
-            if (option.isMatched(this.#side, this.#currencyCode, this.#query.value)) {
+            if (option.isMatched(this.#debitCredit, this.#currencyCode, this.#query.value)) {
                 option.setShown(true);
                 hasAnyMatched = true;
             } else {
@@ -179,7 +179,7 @@ class OriginalLineItemSelector {
      */
     onOpen() {
         this.#currencyCode = this.lineItemEditor.getCurrencyCode();
-        this.#side = this.lineItemEditor.side;
+        this.#debitCredit = this.lineItemEditor.debitCredit;
         for (const option of this.#options) {
             option.setActive(option.id === this.lineItemEditor.originalLineItemId);
         }
@@ -220,10 +220,10 @@ class OriginalLineItem {
     date;
 
     /**
-     * The side, either "debit" or "credit"
+     * Either "debit" or "credit"
      * @type {string}
      */
-    #side;
+    #debitCredit;
 
     /**
      * The currency code
@@ -290,7 +290,7 @@ class OriginalLineItem {
         this.#element = element;
         this.id = element.dataset.id;
         this.date = element.dataset.date;
-        this.#side = element.dataset.side;
+        this.#debitCredit = element.dataset.debitCredit;
         this.#currencyCode = element.dataset.currencyCode;
         this.accountCode = element.dataset.accountCode;
         this.accountText = element.dataset.accountText;
@@ -335,27 +335,27 @@ class OriginalLineItem {
     /**
      * Returns whether the original matches.
      *
-     * @param side {string} the side, either "debit" or "credit"
+     * @param debitCredit {string} either "debit" or "credit"
      * @param currencyCode {string} the currency code
      * @param query {string|null} the query term
      */
-    isMatched(side, currencyCode, query = null) {
+    isMatched(debitCredit, currencyCode, query = null) {
         return this.netBalance.greaterThan(0)
             && this.date <= this.#selector.lineItemEditor.form.getDate()
-            && this.#isSideMatches(side)
+            && this.#isDebitCreditMatches(debitCredit)
             && this.#currencyCode === currencyCode
             && this.#isQueryMatches(query);
     }
 
     /**
-     * Returns whether the original line item matches the debit or credit side.
+     * Returns whether the original line item matches the debit or credit.
      *
-     * @param side {string} the side, either "debit" or credit
+     * @param debitCredit {string} either "debit" or credit
      * @return {boolean} true if the option matches, or false otherwise
      */
-    #isSideMatches(side) {
-        return (side === "debit" && this.#side === "credit")
-            || (side === "credit" && this.#side === "debit");
+    #isDebitCreditMatches(debitCredit) {
+        return (debitCredit === "debit" && this.#debitCredit === "credit")
+            || (debitCredit === "credit" && this.#debitCredit === "debit");
     }
 
     /**

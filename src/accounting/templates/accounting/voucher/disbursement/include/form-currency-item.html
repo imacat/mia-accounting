@@ -47,7 +47,7 @@ First written: 2023/2/25
         <ul id="accounting-currency-{{ currency_index }}-debit-list" class="list-group accounting-line-item-list">
           {% for line_item_form in debit_forms %}
             {% with currency_index = currency_index,
-                    side = "debit",
+                    debit_credit = "debit",
                     line_item_index = loop.index,
                     only_one_line_item_form = debit_forms|length == 1,
                     form = line_item_form.form %}
@@ -62,7 +62,7 @@ First written: 2023/2/25
         </div>
 
         <div>
-          <button id="accounting-currency-{{ currency_index }}-debit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-side="debit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
+          <button id="accounting-currency-{{ currency_index }}-debit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="debit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
             <i class="fas fa-plus"></i>
             {{ A_("New") }}
           </button>
