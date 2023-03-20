@@ -29,8 +29,8 @@
 class JournalEntryLineItemEditor {
 
     /**
-     * The voucher form
-     * @type {VoucherForm}
+     * The journal entry form
+     * @type {JournalEntryForm}
      */
     form;
 
@@ -217,7 +217,7 @@ class JournalEntryLineItemEditor {
     /**
      * Constructs a new journal entry line item editor.
      *
-     * @param form {VoucherForm} the voucher form
+     * @param form {JournalEntryForm} the journal entry form
      */
     constructor(form) {
         this.form = form;

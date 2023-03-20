@@ -27,17 +27,17 @@ First written: 2023/3/8
     </button>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item" href="{{ url_for("accounting.voucher.create", voucher_type=report.voucher_types.CASH_DISBURSEMENT)|accounting_append_next }}">
+        <a class="dropdown-item" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_DISBURSEMENT)|accounting_append_next }}">
           {{ A_("Cash Expense") }}
         </a>
       </li>
       <li>
-        <a class="dropdown-item" href="{{ url_for("accounting.voucher.create", voucher_type=report.voucher_types.CASH_RECEIPT)|accounting_append_next }}">
+        <a class="dropdown-item" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_RECEIPT)|accounting_append_next }}">
           {{ A_("Cash Income") }}
         </a>
       </li>
       <li>
-        <a class="dropdown-item" href="{{ url_for("accounting.voucher.create", voucher_type=report.voucher_types.TRANSFER)|accounting_append_next }}">
+        <a class="dropdown-item" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.TRANSFER)|accounting_append_next }}">
           {{ A_("Transfer") }}
         </a>
       </li>

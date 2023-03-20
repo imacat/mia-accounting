@@ -80,8 +80,8 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     from . import currency
     currency.init_app(app, bp)
 
-    from . import voucher
-    voucher.init_app(app, bp)
+    from . import journal_entry
+    journal_entry.init_app(app, bp)
 
     from . import report
     report.init_app(app, bp)

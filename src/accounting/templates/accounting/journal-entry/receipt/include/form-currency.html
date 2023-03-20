@@ -1,0 +1,75 @@
+{#
+The Mia! Accounting Flask Project
+form-currency.html: The currency sub-form in the cash receipt journal entry form
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/25
+#}
+<div id="accounting-currency-{{ currency_index }}" class="mb-3 accounting-currency" data-index="{{ currency_index }}">
+  <input id="accounting-currency-{{ currency_index }}-no" type="hidden" name="currency-{{ currency_index }}-no" value="{{ currency_index }}">
+  <input id="accounting-currency-{{ currency_index }}-code" type="hidden" name="currency-{{ currency_index }}-code" value="{{ currency_code_data }}">
+  <div id="accounting-currency-{{ currency_index }}-control" class="form-control accounting-currency-control {% if currency_errors %} is-invalid {% endif %}">
+    <div class="d-flex justify-content-between mt-2 mb-3">
+      <div class="form-floating accounting-currency-content">
+        <select id="accounting-currency-{{ currency_index }}-code-select" class="form-select {% if currency_code_errors %} is-invalid {% endif %}" name="currency-{{ currency_index }}-code" {% if currency_code_is_locked %} disabled="disabled" {% endif %}>
+          {% for currency in accounting_currency_options() %}
+            <option value="{{ currency.code }}" {% if currency.code == currency_code_data %} selected="selected" {% endif %}>{{ currency }}</option>
+          {% endfor %}
+        </select>
+        <label class="form-label" for="accounting-currency-{{ currency_index }}-code-select">{{ A_("Currency") }}</label>
+        <div id="accounting-currency-{{ currency_index }}-code-error" class="invalid-feedback">{% if currency_code_errors %}{{ currency_code_errors[0] }}{% endif %}</div>
+      </div>
+
+      <div>
+        <button id="accounting-currency-{{ currency_index }}-delete" class="btn btn-danger rounded-circle {% if only_one_currency_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}">
+          <i class="fas fa-minus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div id="accounting-currency-{{ currency_index }}-credit" class="form-control accounting-material-text-field accounting-not-empty {% if credit_errors %} is-invalid {% endif %}">
+        <label class="form-label" for="accounting-currency-{{ currency_index }}-credit">{{ A_("Content") }}</label>
+        <ul id="accounting-currency-{{ currency_index }}-credit-list" class="list-group accounting-line-item-list">
+          {% for line_item_form in credit_forms %}
+            {% with currency_index = currency_index,
+                    debit_credit = "credit",
+                    line_item_index = loop.index,
+                    only_one_line_item_form = credit_forms|length == 1,
+                    form = line_item_form.form %}
+              {% include "accounting/journal-entry/include/form-line-item.html" %}
+            {% endwith %}
+          {% endfor %}
+        </ul>
+
+        <div class="d-flex justify-content-between mb-2">
+          <div>{{ A_("Total") }}</div>
+          <div><span id="accounting-currency-{{ currency_index }}-credit-total" class="badge rounded-pill bg-primary">{{ credit_total }}</span></div>
+        </div>
+
+        <div>
+          <button id="accounting-currency-{{ currency_index }}-credit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="credit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
+            <i class="fas fa-plus"></i>
+            {{ A_("New") }}
+          </button>
+        </div>
+      </div>
+      <div id="accounting-currency-{{ currency_index }}-credit-error" class="invalid-feedback">{% if credit_errors %}{{ credit_errors[0] }}{% endif %}</div>
+    </div>
+  </div>
+  <div id="accounting-currency-{{ currency_index }}-error" class="invalid-feedback">{% if currency_errors %}{{ currency_errors[0] }}{% endif %}</div>
+</div>

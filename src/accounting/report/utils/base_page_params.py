@@ -27,7 +27,7 @@ from flask import request
 
 from accounting import db
 from accounting.models import Currency, JournalEntryLineItem
-from accounting.utils.voucher_types import VoucherType
+from accounting.utils.journal_entry_types import JournalEntryType
 from .option_link import OptionLink
 from .report_chooser import ReportChooser
 
@@ -52,12 +52,12 @@ class BasePageParams(ABC):
         """
 
     @property
-    def voucher_types(self) -> t.Type[VoucherType]:
-        """Returns the voucher types.
+    def journal_entry_types(self) -> t.Type[JournalEntryType]:
+        """Returns the journal entry types.
 
-        :return: The voucher types.
+        :return: The journal entry types.
         """
-        return VoucherType
+        return JournalEntryType
 
     @property
     def csv_uri(self) -> str:

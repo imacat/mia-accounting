@@ -36,7 +36,7 @@ First written: 2023/3/4
   {% endwith %}
 </div>
 
-{% include "accounting/report/include/add-voucher-material-fab.html" %}
+{% include "accounting/report/include/add-journal-entry-material-fab.html" %}
 
 {% include "accounting/report/include/period-chooser.html" %}
 
@@ -60,8 +60,8 @@ First written: 2023/3/4
     </div>
     <div class="accounting-report-table-body">
       {% for line_item in report.line_items %}
-        <a class="accounting-report-table-row" href="{{ url_for("accounting.voucher.detail", voucher=line_item.voucher)|accounting_append_next }}">
-          <div>{{ line_item.voucher.date|accounting_format_date }}</div>
+        <a class="accounting-report-table-row" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
+          <div>{{ line_item.journal_entry.date|accounting_format_date }}</div>
           <div>{{ line_item.currency.name }}</div>
           <div>
             <span class="d-none d-md-inline">{{ line_item.account.code }}</span>
@@ -77,11 +77,11 @@ First written: 2023/3/4
 
   <div class="list-group d-md-none">
   {% for line_item in report.line_items %}
-    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.voucher.detail", voucher=line_item.voucher)|accounting_append_next }}">
+    <a class="list-group-item list-group-item-action" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
       <div class="d-flex justify-content-between">
         <div {% if not line_item.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>
           <div class="text-muted small">
-            {{ line_item.voucher.date|accounting_format_date }}
+            {{ line_item.journal_entry.date|accounting_format_date }}
             {{ line_item.account.title|title }}
             {% if line_item.currency.code != accounting_default_currency_code() %}
               <span class="badge rounded-pill bg-info">{{ line_item.currency.code }}</span>

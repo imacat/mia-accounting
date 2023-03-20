@@ -105,7 +105,7 @@ class OriginalLineItemSelector {
      * Returns the net balance for an original line item.
      *
      * @param currentLineItem {LineItemSubForm} the line item sub-form that is currently editing
-     * @param form {VoucherForm} the voucher form
+     * @param form {JournalEntryForm} the journal entry form
      * @param originalLineItemId {string} the ID of the original line item
      * @return {Decimal} the net balance of the original line item
      */

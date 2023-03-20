@@ -26,7 +26,8 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Voucher, JournalEntryLineItem
+from accounting.models import Currency, Account, JournalEntry, \
+    JournalEntryLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -67,13 +68,13 @@ class ReportLineItem:
         self.url: str | None = None
         """The URL to the journal entry line item."""
         if line_item is not None:
-            self.date = line_item.voucher.date
+            self.date = line_item.journal_entry.date
             self.description = line_item.description
             self.debit = line_item.amount if line_item.is_debit else None
             self.credit = None if line_item.is_debit else line_item.amount
-            self.note = line_item.voucher.note
-            self.url = url_for("accounting.voucher.detail",
-                               voucher=line_item.voucher)
+            self.note = line_item.journal_entry.note
+            self.url = url_for("accounting.journal-entry.detail",
+                               journal_entry=line_item.journal_entry)
 
 
 class LineItemCollector:
@@ -116,12 +117,12 @@ class LineItemCollector:
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
-        select: sa.Select = sa.Select(balance_func).join(Voucher)\
+        select: sa.Select = sa.Select(balance_func).join(JournalEntry)\
             .filter(be(JournalEntryLineItem.currency_code
                        == self.__currency.code),
                     be(JournalEntryLineItem.account_id
                        == self.__account.id),
-                    Voucher.date < self.__period.start)
+                    JournalEntry.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
@@ -145,17 +146,18 @@ class LineItemCollector:
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                JournalEntryLineItem.account_id == self.__account.id]
         if self.__period.start is not None:
-            conditions.append(Voucher.date >= self.__period.start)
+            conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Voucher.date <= self.__period.end)
+            conditions.append(JournalEntry.date <= self.__period.end)
         return [ReportLineItem(x) for x in JournalEntryLineItem.query
-                .join(Voucher)
+                .join(JournalEntry)
                 .filter(*conditions)
-                .order_by(Voucher.date,
-                          Voucher.no,
+                .order_by(JournalEntry.date,
+                          JournalEntry.no,
                           JournalEntryLineItem.is_debit.desc(),
                           JournalEntryLineItem.no)
-                .options(selectinload(JournalEntryLineItem.voucher)).all()]
+                .options(selectinload(JournalEntryLineItem.journal_entry))
+                .all()]
 
     def __get_total(self) -> ReportLineItem | None:
         """Composes the total line item.
@@ -197,7 +199,7 @@ class LineItemCollector:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, voucher_date: date | str | None,
+    def __init__(self, journal_entry_date: date | str | None,
                  description: str | None,
                  debit: str | Decimal | None,
                  credit: str | Decimal | None,
@@ -205,14 +207,14 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param voucher_date: The voucher date.
+        :param journal_entry_date: The journal entry date.
         :param description: The description.
         :param debit: The debit amount.
         :param credit: The credit amount.
         :param balance: The balance.
         :param note: The note.
         """
-        self.date: date | str | None = voucher_date
+        self.date: date | str | None = journal_entry_date
         """The date."""
         self.description: str | None = description
         """The description."""

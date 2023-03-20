@@ -26,7 +26,8 @@ import httpx
 from flask import Flask
 
 from test_site import db
-from testlib_voucher import Accounts, match_voucher_detail, NEXT_URI
+from testlib_journal_entry import Accounts, match_journal_entry_detail, \
+    NEXT_URI
 
 
 class JournalEntryLineItemData:
@@ -41,7 +42,7 @@ class JournalEntryLineItemData:
         :param amount: The amount.
         :param original_line_item: The original journal entry line item.
         """
-        self.voucher: VoucherData | None = None
+        self.journal_entry: JournalEntryData | None = None
         self.id: int = -1
         self.no: int = -1
         self.original_line_item: JournalEntryLineItemData | None \
@@ -75,11 +76,11 @@ class JournalEntryLineItemData:
 
 
 class CurrencyData:
-    """The voucher currency data."""
+    """The journal entry currency data."""
 
     def __init__(self, currency: str, debit: list[JournalEntryLineItemData],
                  credit: list[JournalEntryLineItemData]):
-        """Constructs the voucher currency data.
+        """Constructs the journal entry currency data.
 
         :param currency: The currency code.
         :param debit: The debit line items.
@@ -106,14 +107,14 @@ class CurrencyData:
         return form
 
 
-class VoucherData:
-    """The voucher data."""
+class JournalEntryData:
+    """The journal entry data."""
 
     def __init__(self, days: int, currencies: list[CurrencyData]):
-        """Constructs a voucher.
+        """Constructs a journal entry.
 
         :param days: The number of days before today.
-        :param currencies: The voucher currency data.
+        :param currencies: The journal entry currency data.
         """
         self.id: int = -1
         self.days: int = days
@@ -121,38 +122,38 @@ class VoucherData:
         self.note: str | None = None
         for currency in self.currencies:
             for line_item in currency.debit:
-                line_item.voucher = self
+                line_item.journal_entry = self
             for line_item in currency.credit:
-                line_item.voucher = self
+                line_item.journal_entry = self
 
     def new_form(self, csrf_token: str) -> dict[str, str]:
-        """Returns the voucher as a creation form.
+        """Returns the journal entry as a creation form.
 
         :param csrf_token: The CSRF token.
-        :return: The voucher as a creation form.
+        :return: The journal entry as a creation form.
         """
         return self.__form(csrf_token, is_update=False)
 
     def update_form(self, csrf_token: str) -> dict[str, str]:
-        """Returns the voucher as a update form.
+        """Returns the journal entry as an update form.
 
         :param csrf_token: The CSRF token.
-        :return: The voucher as a update form.
+        :return: The journal entry as an update form.
         """
         return self.__form(csrf_token, is_update=True)
 
     def __form(self, csrf_token: str, is_update: bool = False) \
             -> dict[str, str]:
-        """Returns the voucher as a form.
+        """Returns the journal entry as a form.
 
         :param csrf_token: The CSRF token.
         :param is_update: True for an update operation, or False otherwise
-        :return: The voucher as a form.
+        :return: The journal entry as a form.
         """
-        voucher_date: date = date.today() - timedelta(days=self.days)
+        journal_entry_date: date = date.today() - timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
                                 "next": NEXT_URI,
-                                "date": voucher_date.isoformat()}
+                                "date": journal_entry_date.isoformat()}
         for i in range(len(self.currencies)):
             form.update(self.currencies[i].form(i + 1, is_update))
         if self.note is not None:
@@ -207,24 +208,24 @@ class TestData:
         self.e_p_or4d, self.e_p_or4c = couple(
             "Envelop", "0.9", Accounts.OFFICE, Accounts.PAYABLE)
 
-        # Original vouchers
-        self.v_r_or1: VoucherData = VoucherData(
+        # Original journal entries
+        self.v_r_or1: JournalEntryData = JournalEntryData(
             50, [CurrencyData("USD", [self.e_r_or1d, self.e_r_or4d],
                               [self.e_r_or1c, self.e_r_or4c])])
-        self.v_r_or2: VoucherData = VoucherData(
+        self.v_r_or2: JournalEntryData = JournalEntryData(
             30, [CurrencyData("USD", [self.e_r_or2d, self.e_r_or3d],
                               [self.e_r_or2c, self.e_r_or3c])])
-        self.v_p_or1: VoucherData = VoucherData(
+        self.v_p_or1: JournalEntryData = JournalEntryData(
             40, [CurrencyData("USD", [self.e_p_or1d, self.e_p_or4d],
                               [self.e_p_or1c, self.e_p_or4c])])
-        self.v_p_or2: VoucherData = VoucherData(
+        self.v_p_or2: JournalEntryData = JournalEntryData(
             20, [CurrencyData("USD", [self.e_p_or2d, self.e_p_or3d],
                               [self.e_p_or2c, self.e_p_or3c])])
 
-        self.__add_voucher(self.v_r_or1)
-        self.__add_voucher(self.v_r_or2)
-        self.__add_voucher(self.v_p_or1)
-        self.__add_voucher(self.v_p_or2)
+        self.__add_journal_entry(self.v_r_or1)
+        self.__add_journal_entry(self.v_r_or2)
+        self.__add_journal_entry(self.v_p_or1)
+        self.__add_journal_entry(self.v_p_or2)
 
         # Receivable offset items
         self.e_r_of1d, self.e_r_of1c = couple(
@@ -260,52 +261,55 @@ class TestData:
             "Envelop", "0.9", Accounts.PAYABLE, Accounts.CASH)
         self.e_p_of5d.original_line_item = self.e_p_or4c
 
-        # Offset vouchers
-        self.v_r_of1: VoucherData = VoucherData(
+        # Offset journal entries
+        self.v_r_of1: JournalEntryData = JournalEntryData(
             25, [CurrencyData("USD", [self.e_r_of1d], [self.e_r_of1c])])
-        self.v_r_of2: VoucherData = VoucherData(
+        self.v_r_of2: JournalEntryData = JournalEntryData(
             20, [CurrencyData("USD",
                               [self.e_r_of2d, self.e_r_of3d, self.e_r_of4d],
                               [self.e_r_of2c, self.e_r_of3c, self.e_r_of4c])])
-        self.v_r_of3: VoucherData = VoucherData(
+        self.v_r_of3: JournalEntryData = JournalEntryData(
             15, [CurrencyData("USD", [self.e_r_of5d], [self.e_r_of5c])])
-        self.v_p_of1: VoucherData = VoucherData(
+        self.v_p_of1: JournalEntryData = JournalEntryData(
             15, [CurrencyData("USD", [self.e_p_of1d], [self.e_p_of1c])])
-        self.v_p_of2: VoucherData = VoucherData(
+        self.v_p_of2: JournalEntryData = JournalEntryData(
             10, [CurrencyData("USD",
                               [self.e_p_of2d, self.e_p_of3d, self.e_p_of4d],
                               [self.e_p_of2c, self.e_p_of3c, self.e_p_of4c])])
-        self.v_p_of3: VoucherData = VoucherData(
+        self.v_p_of3: JournalEntryData = JournalEntryData(
             5, [CurrencyData("USD", [self.e_p_of5d], [self.e_p_of5c])])
 
-        self.__add_voucher(self.v_r_of1)
-        self.__add_voucher(self.v_r_of2)
-        self.__add_voucher(self.v_r_of3)
-        self.__add_voucher(self.v_p_of1)
-        self.__add_voucher(self.v_p_of2)
-        self.__add_voucher(self.v_p_of3)
+        self.__add_journal_entry(self.v_r_of1)
+        self.__add_journal_entry(self.v_r_of2)
+        self.__add_journal_entry(self.v_r_of3)
+        self.__add_journal_entry(self.v_p_of1)
+        self.__add_journal_entry(self.v_p_of2)
+        self.__add_journal_entry(self.v_p_of3)
 
-    def __add_voucher(self, voucher_data: VoucherData) -> None:
-        """Adds a voucher.
+    def __add_journal_entry(self, journal_entry_data: JournalEntryData) \
+            -> None:
+        """Adds a journal entry.
 
-        :param voucher_data: The voucher data.
+        :param journal_entry_data: The journal entry data.
         :return: None.
         """
-        from accounting.models import Voucher
-        store_uri: str = "/accounting/vouchers/store/transfer"
+        from accounting.models import JournalEntry
+        store_uri: str = "/accounting/journal-entries/store/transfer"
 
         response: httpx.Response = self.client.post(
-            store_uri, data=voucher_data.new_form(self.csrf_token))
+            store_uri, data=journal_entry_data.new_form(self.csrf_token))
         assert response.status_code == 302
-        voucher_id: int = match_voucher_detail(response.headers["Location"])
-        voucher_data.id = voucher_id
+        journal_entry_id: int \
+            = match_journal_entry_detail(response.headers["Location"])
+        journal_entry_data.id = journal_entry_id
         with self.app.app_context():
-            voucher: Voucher | None = db.session.get(Voucher, voucher_id)
-            assert voucher is not None
-            for i in range(len(voucher.currencies)):
-                for j in range(len(voucher.currencies[i].debit)):
-                    voucher_data.currencies[i].debit[j].id \
-                        = voucher.currencies[i].debit[j].id
-                for j in range(len(voucher.currencies[i].credit)):
-                    voucher_data.currencies[i].credit[j].id \
-                        = voucher.currencies[i].credit[j].id
+            journal_entry: JournalEntry | None \
+                = db.session.get(JournalEntry, journal_entry_id)
+            assert journal_entry is not None
+            for i in range(len(journal_entry.currencies)):
+                for j in range(len(journal_entry.currencies[i].debit)):
+                    journal_entry_data.currencies[i].debit[j].id \
+                        = journal_entry.currencies[i].debit[j].id
+                for j in range(len(journal_entry.currencies[i].credit)):
+                    journal_entry_data.currencies[i].credit[j].id \
+                        = journal_entry.currencies[i].credit[j].id

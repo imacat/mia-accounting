@@ -25,7 +25,8 @@ from flask import render_template, Response
 from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Voucher, JournalEntryLineItem
+from accounting.models import Currency, Account, JournalEntry, \
+    JournalEntryLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -47,8 +48,8 @@ class ReportLineItem:
         """
         self.line_item: JournalEntryLineItem = line_item
         """The journal entry line item."""
-        self.voucher: Voucher = line_item.voucher
-        """The voucher."""
+        self.journal_entry: JournalEntry = line_item.journal_entry
+        """The journal entry."""
         self.currency: Currency = line_item.currency
         """The account."""
         self.account: Account = line_item.account
@@ -66,7 +67,7 @@ class ReportLineItem:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, voucher_date: str | date,
+    def __init__(self, journal_entry_date: str | date,
                  currency: str,
                  account: str,
                  description: str | None,
@@ -75,13 +76,13 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param voucher_date: The voucher date.
+        :param journal_entry_date: The journal entry date.
         :param description: The description.
         :param debit: The debit amount.
         :param credit: The credit amount.
         :param note: The note.
         """
-        self.date: str | date = voucher_date
+        self.date: str | date = journal_entry_date
         """The date."""
         self.currency: str = currency
         """The currency."""
@@ -155,9 +156,9 @@ def get_csv_rows(line_items: list[JournalEntryLineItem]) -> list[CSVRow]:
                                  gettext("Account"), gettext("Description"),
                                  gettext("Debit"), gettext("Credit"),
                                  gettext("Note"))]
-    rows.extend([CSVRow(x.voucher.date, x.currency.code,
+    rows.extend([CSVRow(x.journal_entry.date, x.currency.code,
                         str(x.account).title(), x.description,
-                        x.debit, x.credit, x.voucher.note)
+                        x.debit, x.credit, x.journal_entry.note)
                  for x in line_items])
     return rows
 
@@ -183,18 +184,18 @@ class Journal(BaseReport):
         """
         conditions: list[sa.BinaryExpression] = []
         if self.__period.start is not None:
-            conditions.append(Voucher.date >= self.__period.start)
+            conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Voucher.date <= self.__period.end)
-        return JournalEntryLineItem.query.join(Voucher)\
+            conditions.append(JournalEntry.date <= self.__period.end)
+        return JournalEntryLineItem.query.join(JournalEntry)\
             .filter(*conditions)\
-            .order_by(Voucher.date,
-                      Voucher.no,
+            .order_by(JournalEntry.date,
+                      JournalEntry.no,
                       JournalEntryLineItem.is_debit.desc(),
                       JournalEntryLineItem.no)\
             .options(selectinload(JournalEntryLineItem.account),
                      selectinload(JournalEntryLineItem.currency),
-                     selectinload(JournalEntryLineItem.voucher)).all()
+                     selectinload(JournalEntryLineItem.journal_entry)).all()
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.

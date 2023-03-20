@@ -26,7 +26,7 @@ from sqlalchemy.orm import selectinload
 
 from accounting.locale import gettext
 from accounting.models import Currency, CurrencyL10n, Account, AccountL10n, \
-    Voucher, JournalEntryLineItem
+    JournalEntry, JournalEntryLineItem
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import csv_download
@@ -62,22 +62,23 @@ class LineItemCollector:
                        self.__get_account_condition(k)),
                    JournalEntryLineItem.currency_code.in_(
                        self.__get_currency_condition(k)),
-                   JournalEntryLineItem.voucher_id.in_(
-                       self.__get_voucher_condition(k))]
+                   JournalEntryLineItem.journal_entry_id.in_(
+                       self.__get_journal_entry_condition(k))]
             try:
                 sub_conditions.append(
                     JournalEntryLineItem.amount == Decimal(k))
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return JournalEntryLineItem.query.join(Voucher).filter(*conditions)\
-            .order_by(Voucher.date,
-                      Voucher.no,
+        return JournalEntryLineItem.query.join(JournalEntry)\
+            .filter(*conditions)\
+            .order_by(JournalEntry.date,
+                      JournalEntry.no,
                       JournalEntryLineItem.is_debit,
                       JournalEntryLineItem.no)\
             .options(selectinload(JournalEntryLineItem.account),
                      selectinload(JournalEntryLineItem.currency),
-                     selectinload(JournalEntryLineItem.voucher)).all()
+                     selectinload(JournalEntryLineItem.journal_entry)).all()
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -116,35 +117,40 @@ class LineItemCollector:
                    Currency.code.in_(select_l10n)))
 
     @staticmethod
-    def __get_voucher_condition(k: str) -> sa.Select:
-        """Composes and returns the condition to filter the voucher.
+    def __get_journal_entry_condition(k: str) -> sa.Select:
+        """Composes and returns the condition to filter the journal entry.
 
         :param k: The keyword.
-        :return: The condition to filter the voucher.
+        :return: The condition to filter the journal entry.
         """
-        conditions: list[sa.BinaryExpression] = [Voucher.note.contains(k)]
-        voucher_date: datetime
+        conditions: list[sa.BinaryExpression] = [JournalEntry.note.contains(k)]
+        journal_entry_date: datetime
         try:
-            voucher_date = datetime.strptime(k, "%Y")
+            journal_entry_date = datetime.strptime(k, "%Y")
             conditions.append(
-                be(sa.extract("year", Voucher.date) == voucher_date.year))
+                be(sa.extract("year", JournalEntry.date)
+                   == journal_entry_date.year))
         except ValueError:
             pass
         try:
-            voucher_date = datetime.strptime(k, "%Y/%m")
+            journal_entry_date = datetime.strptime(k, "%Y/%m")
             conditions.append(sa.and_(
-                sa.extract("year", Voucher.date) == voucher_date.year,
-                sa.extract("month", Voucher.date) == voucher_date.month))
+                sa.extract("year", JournalEntry.date)
+                == journal_entry_date.year,
+                sa.extract("month", JournalEntry.date)
+                == journal_entry_date.month))
         except ValueError:
             pass
         try:
-            voucher_date = datetime.strptime(f"2000/{k}", "%Y/%m/%d")
+            journal_entry_date = datetime.strptime(f"2000/{k}", "%Y/%m/%d")
             conditions.append(sa.and_(
-                sa.extract("month", Voucher.date) == voucher_date.month,
-                sa.extract("day", Voucher.date) == voucher_date.day))
+                sa.extract("month", JournalEntry.date)
+                == journal_entry_date.month,
+                sa.extract("day", JournalEntry.date)
+                == journal_entry_date.day))
         except ValueError:
             pass
-        return sa.select(Voucher.id).filter(sa.or_(*conditions))
+        return sa.select(JournalEntry.id).filter(sa.or_(*conditions))
 
 
 class PageParams(BasePageParams):

@@ -26,7 +26,8 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, Account, Voucher, JournalEntryLineItem
+from accounting.models import Currency, Account, JournalEntry, \
+    JournalEntryLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
@@ -70,14 +71,14 @@ class ReportLineItem:
         self.url: str | None = None
         """The URL to the journal entry line item."""
         if line_item is not None:
-            self.date = line_item.voucher.date
+            self.date = line_item.journal_entry.date
             self.account = line_item.account
             self.description = line_item.description
             self.income = None if line_item.is_debit else line_item.amount
             self.expense = line_item.amount if line_item.is_debit else None
-            self.note = line_item.voucher.note
-            self.url = url_for("accounting.voucher.detail",
-                               voucher=line_item.voucher)
+            self.note = line_item.journal_entry.note
+            self.url = url_for("accounting.journal-entry.detail",
+                               journal_entry=line_item.journal_entry)
 
 
 class LineItemCollector:
@@ -120,11 +121,11 @@ class LineItemCollector:
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
         select: sa.Select = sa.Select(balance_func)\
-            .join(Voucher).join(Account)\
+            .join(JournalEntry).join(Account)\
             .filter(be(JournalEntryLineItem.currency_code
                        == self.__currency.code),
                     self.__account_condition,
-                    Voucher.date < self.__period.start)
+                    JournalEntry.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
@@ -149,25 +150,26 @@ class LineItemCollector:
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                self.__account_condition]
         if self.__period.start is not None:
-            conditions.append(Voucher.date >= self.__period.start)
+            conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Voucher.date <= self.__period.end)
-        voucher_with_account: sa.Select = sa.Select(Voucher.id).\
+            conditions.append(JournalEntry.date <= self.__period.end)
+        journal_entry_with_account: sa.Select = sa.Select(JournalEntry.id).\
             join(JournalEntryLineItem).join(Account).filter(*conditions)
 
         return [ReportLineItem(x)
-                for x in JournalEntryLineItem.query.join(Voucher).join(Account)
-                .filter(JournalEntryLineItem.voucher_id
-                        .in_(voucher_with_account),
+                for x in JournalEntryLineItem.query
+                .join(JournalEntry).join(Account)
+                .filter(JournalEntryLineItem.journal_entry_id
+                        .in_(journal_entry_with_account),
                         JournalEntryLineItem.currency_code
                         == self.__currency.code,
                         sa.not_(self.__account_condition))
-                .order_by(Voucher.date,
-                          Voucher.no,
+                .order_by(JournalEntry.date,
+                          JournalEntry.no,
                           JournalEntryLineItem.is_debit,
                           JournalEntryLineItem.no)
                 .options(selectinload(JournalEntryLineItem.account),
-                         selectinload(JournalEntryLineItem.voucher))]
+                         selectinload(JournalEntryLineItem.journal_entry))]
 
     @property
     def __account_condition(self) -> sa.BinaryExpression:
@@ -216,7 +218,7 @@ class LineItemCollector:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, voucher_date: date | str | None,
+    def __init__(self, journal_entry_date: date | str | None,
                  account: str | None,
                  description: str | None,
                  income: str | Decimal | None,
@@ -225,7 +227,7 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param voucher_date: The voucher date.
+        :param journal_entry_date: The journal entry date.
         :param account: The account.
         :param description: The description.
         :param income: The income.
@@ -233,7 +235,7 @@ class CSVRow(BaseCSVRow):
         :param balance: The balance.
         :param note: The note.
         """
-        self.date: date | str | None = voucher_date
+        self.date: date | str | None = journal_entry_date
         """The date."""
         self.account: str | None = account
         """The account."""

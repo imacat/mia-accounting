@@ -1,0 +1,50 @@
+{#
+The Mia! Accounting Flask Project
+detail.html: The cash disbursement journal entry detail
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/2/26
+#}
+{% extends "accounting/journal-entry/include/detail.html" %}
+
+{% block to_transfer %}
+  <a class="btn btn-primary" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_journal_entry_to_transfer|accounting_inherit_next }}">
+    <i class="fa-solid fa-bars-staggered"></i>
+    {{ A_("To Transfer") }}
+  </a>
+{% endblock %}
+
+{% block journal_entry_currencies %}
+  {% for currency in obj.currencies %}
+    <div class="mb-3">
+      <div class="mb-2 fw-bolder">{{ currency.name }}</div>
+
+      <ul class="list-group accounting-list-group-stripped accounting-list-group-hover">
+        <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-header">{{ A_("Content") }}</li>
+        {% with line_items = currency.debit %}
+          {% include "accounting/journal-entry/include/detail-line-items.html" %}
+        {% endwith %}
+        <li class="list-group-item accounting-journal-entry-line-item accounting-journal-entry-line-item-total">
+          <div class="d-flex justify-content-between">
+            <div>{{ A_("Total") }}</div>
+            <div>{{ currency.debit_total|accounting_format_amount }}</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  {% endfor %}
+{% endblock %}

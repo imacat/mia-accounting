@@ -24,7 +24,7 @@ from flask import render_template, Response
 
 from accounting import db
 from accounting.locale import gettext
-from accounting.models import Currency, BaseAccount, Account, Voucher, \
+from accounting.models import Currency, BaseAccount, Account, JournalEntry, \
     JournalEntryLineItem
 from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
@@ -127,14 +127,14 @@ class AccountCollector:
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                sa.or_(*sub_conditions)]
         if self.__period.end is not None:
-            conditions.append(Voucher.date <= self.__period.end)
+            conditions.append(JournalEntry.date <= self.__period.end)
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount)).label("balance")
         select_balance: sa.Select \
             = sa.select(Account.id, Account.base_code, Account.no,
                         balance_func)\
-            .join(Voucher).join(Account)\
+            .join(JournalEntry).join(Account)\
             .filter(*conditions)\
             .group_by(Account.id, Account.base_code, Account.no)\
             .order_by(Account.base_code, Account.no)
@@ -179,7 +179,7 @@ class AccountCollector:
             return None
         conditions: list[sa.BinaryExpression] \
             = [JournalEntryLineItem.currency_code == self.__currency.code,
-               Voucher.date < self.__period.start]
+               JournalEntry.date < self.__period.start]
         return self.__query_balance(conditions)
 
     def __add_current_period(self) -> None:
@@ -199,9 +199,9 @@ class AccountCollector:
         conditions: list[sa.BinaryExpression] \
             = [JournalEntryLineItem.currency_code == self.__currency.code]
         if self.__period.start is not None:
-            conditions.append(Voucher.date >= self.__period.start)
+            conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:
-            conditions.append(Voucher.date <= self.__period.end)
+            conditions.append(JournalEntry.date <= self.__period.end)
         return self.__query_balance(conditions)
 
     @staticmethod
@@ -218,7 +218,7 @@ class AccountCollector:
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
         select_balance: sa.Select = sa.select(balance_func)\
-            .join(Voucher).join(Account).filter(*conditions)
+            .join(JournalEntry).join(Account).filter(*conditions)
         return db.session.scalar(select_balance)
 
     def __add_owner_s_equity(self, code: str, amount: Decimal | None,
