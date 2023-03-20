@@ -89,7 +89,7 @@ def add_currency() -> redirect:
     form.populate_obj(currency)
     db.session.add(currency)
     db.session.commit()
-    flash(s(lazy_gettext("The currency is added successfully")), "success")
+    flash(s(lazy_gettext("The currency is added successfully.")), "success")
     return redirect(inherit_next(__get_detail_uri(currency)))
 
 
