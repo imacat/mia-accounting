@@ -166,7 +166,7 @@ def get_unchanged_update_form(journal_entry_id: int, app: Flask,
             line_item_index: int = __get_new_index(line_item_indices_used)
             line_item_no = line_item_no + 3 + randbelow(3)
             prefix = f"{currency_prefix}-debit-{line_item_index}"
-            form[f"{prefix}-eid"] = str(line_item.id)
+            form[f"{prefix}-id"] = str(line_item.id)
             form[f"{prefix}-no"] = str(line_item_no)
             form[f"{prefix}-account_code"] = line_item.account.code
             form[f"{prefix}-description"] \
@@ -180,7 +180,7 @@ def get_unchanged_update_form(journal_entry_id: int, app: Flask,
             line_item_index: int = __get_new_index(line_item_indices_used)
             line_item_no = line_item_no + 3 + randbelow(3)
             prefix = f"{currency_prefix}-credit-{line_item_index}"
-            form[f"{prefix}-eid"] = str(line_item.id)
+            form[f"{prefix}-id"] = str(line_item.id)
             form[f"{prefix}-no"] = str(line_item_no)
             form[f"{prefix}-account_code"] = line_item.account.code
             form[f"{prefix}-description"] \

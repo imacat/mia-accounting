@@ -167,11 +167,11 @@ class KeepAccountWhenHavingOffset:
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         assert isinstance(form, LineItemForm)
-        if field.data is None or form.eid.data is None:
+        if field.data is None or form.id.data is None:
             return
         line_item: JournalEntryLineItem | None = db.session\
             .query(JournalEntryLineItem)\
-            .filter(JournalEntryLineItem.id == form.eid.data)\
+            .filter(JournalEntryLineItem.id == form.id.data)\
             .options(selectinload(JournalEntryLineItem.offsets)).first()
         if line_item is None or len(line_item.offsets) == 0:
             return
@@ -269,7 +269,7 @@ class NotLessThanOffsetTotal:
 
     def __call__(self, form: FlaskForm, field: DecimalField) -> None:
         assert isinstance(form, LineItemForm)
-        if field.data is None or form.eid.data is None:
+        if field.data is None or form.id.data is None:
             return
         is_debit: bool = isinstance(form, DebitLineItemForm)
         select_offset_total: sa.Select = sa.select(sa.func.sum(sa.case(
@@ -277,7 +277,7 @@ class NotLessThanOffsetTotal:
              JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount)))\
             .filter(be(JournalEntryLineItem.original_line_item_id
-                       == form.eid.data))
+                       == form.id.data))
         offset_total: Decimal | None = db.session.scalar(select_offset_total)
         if offset_total is not None and field.data < offset_total:
             raise ValidationError(lazy_gettext(
@@ -287,7 +287,7 @@ class NotLessThanOffsetTotal:
 
 class LineItemForm(FlaskForm):
     """The base form to create or edit a line item."""
-    eid = IntegerField()
+    id = IntegerField()
     """The existing line item ID."""
     no = IntegerField()
     """The order in the currency."""
@@ -384,11 +384,11 @@ class LineItemForm(FlaskForm):
         """
         if not hasattr(self, "__offsets"):
             def get_offsets() -> list[JournalEntryLineItem]:
-                if not self.is_need_offset or self.eid.data is None:
+                if not self.is_need_offset or self.id.data is None:
                     return []
                 return JournalEntryLineItem.query\
                     .filter(JournalEntryLineItem.original_line_item_id
-                            == self.eid.data)\
+                            == self.id.data)\
                     .options(selectinload(JournalEntryLineItem.journal_entry),
                              selectinload(JournalEntryLineItem.account),
                              selectinload(JournalEntryLineItem.offsets)
@@ -405,7 +405,7 @@ class LineItemForm(FlaskForm):
         """
         if not hasattr(self, "__offset_total"):
             def get_offset_total():
-                if not self.is_need_offset or self.eid.data is None:
+                if not self.is_need_offset or self.id.data is None:
                     return None
                 is_debit: bool = isinstance(self, DebitLineItemForm)
                 return sum([x.amount if x.is_debit != is_debit else -x.amount
@@ -419,7 +419,7 @@ class LineItemForm(FlaskForm):
 
         :return: The net balance.
         """
-        if not self.is_need_offset or self.eid.data is None \
+        if not self.is_need_offset or self.id.data is None \
                 or self.amount.data is None:
             return None
         return self.amount.data - self.offset_total
@@ -439,7 +439,7 @@ class LineItemForm(FlaskForm):
 
 class DebitLineItemForm(LineItemForm):
     """The form to create or edit a debit line item."""
-    eid = IntegerField()
+    id = IntegerField()
     """The existing line item ID."""
     no = IntegerField()
     """The order in the currency."""
@@ -489,7 +489,7 @@ class DebitLineItemForm(LineItemForm):
 
 class CreditLineItemForm(LineItemForm):
     """The form to create or edit a credit line item."""
-    eid = IntegerField()
+    id = IntegerField()
     """The existing line item ID."""
     no = IntegerField()
     """The order in the currency."""

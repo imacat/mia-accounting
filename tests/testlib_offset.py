@@ -66,7 +66,7 @@ class JournalEntryLineItemData:
                                 f"{prefix}-description": self.description,
                                 f"{prefix}-amount": str(self.amount)}
         if is_update and self.id != -1:
-            form[f"{prefix}-eid"] = str(self.id)
+            form[f"{prefix}-id"] = str(self.id)
         form[f"{prefix}-no"] = str(index) if self.no == -1 else str(self.no)
         if self.original_line_item is not None:
             assert self.original_line_item.id != -1

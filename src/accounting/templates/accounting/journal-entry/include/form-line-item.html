@@ -21,8 +21,8 @@ First written: 2023/2/25
 #}
 {# <ul> For SonarQube not to complain about incorrect HTML #}
 <li id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}" class="list-group-item list-group-item-action d-flex justify-content-between accounting-currency-{{ currency_index }}-{{ debit_credit }} {% if form.offsets %} accounting-matched-line-item {% endif %}" data-currency-index="{{ currency_index }}" data-debit-credit="{{ debit_credit }}" data-line-item-index="{{ line_item_index }}" {% if form.is_need_offset %} data-is-need-offset="true" {% endif %}>
-  {% if form.eid.data %}
-    <input type="hidden" name="currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-eid" value="{{ form.eid.data }}">
+  {% if form.id.data %}
+    <input type="hidden" name="currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-id" value="{{ form.id.data }}">
   {% endif %}
   <input id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-no" type="hidden" name="currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-no" value="{{ line_item_index }}">
   <input id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-original-line-item-id" class="accounting-original-line-item-id" type="hidden" name="currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-original_line_item_id" value="{{ form.original_line_item_id.data|accounting_default }}" data-date="{{ form.original_line_item_date|accounting_default }}" data-text="{{ form.original_line_item_text|accounting_default }}">

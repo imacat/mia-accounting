@@ -369,7 +369,7 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not deleting matched original line items
         form = journal_entry_data.update_form(self.csrf_token)
-        del form["currency-1-debit-1-eid"]
+        del form["currency-1-debit-1-id"]
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -697,7 +697,7 @@ class OffsetTestCase(unittest.TestCase):
 
         # Not deleting matched original line items
         form = journal_entry_data.update_form(self.csrf_token)
-        del form["currency-1-credit-1-eid"]
+        del form["currency-1-credit-1-id"]
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)

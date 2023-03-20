@@ -98,7 +98,7 @@ class CannotDeleteOriginalLineItemsWithOffset:
         existing_matched_original_line_item_id: set[int] \
             = {x.id for x in form.obj.line_items if len(x.offsets) > 0}
         line_item_id_in_form: set[int] \
-            = {x.eid.data for x in form.line_items if x.eid.data is not None}
+            = {x.id.data for x in form.line_items if x.id.data is not None}
         for line_item_id in existing_matched_original_line_item_id:
             if line_item_id not in line_item_id_in_form:
                 raise ValidationError(lazy_gettext(
@@ -273,8 +273,8 @@ class JournalEntryForm(FlaskForm):
         if self.__original_line_item_options is None:
             self.__original_line_item_options \
                 = get_selectable_original_line_items(
-                    {x.eid.data for x in self.line_items
-                     if x.eid.data is not None},
+                    {x.id.data for x in self.line_items
+                     if x.id.data is not None},
                     self._is_need_payable, self._is_need_receivable)
         return self.__original_line_item_options
 
@@ -300,8 +300,8 @@ class JournalEntryForm(FlaskForm):
 
         :return: The maximum available date.
         """
-        line_item_id: set[int] = {x.eid.data for x in self.line_items
-                                  if x.eid.data is not None}
+        line_item_id: set[int] = {x.id.data for x in self.line_items
+                                  if x.id.data is not None}
         select: sa.Select = sa.select(sa.func.min(JournalEntry.date))\
             .join(JournalEntryLineItem)\
             .filter(JournalEntryLineItem.original_line_item_id
@@ -360,7 +360,7 @@ class LineItemCollector(t.Generic[T], ABC):
         :return: None.
         """
         line_item: JournalEntryLineItem | None \
-            = self.__line_items_by_id.get(form.eid.data)
+            = self.__line_items_by_id.get(form.id.data)
         if line_item is not None:
             line_item.currency_code = currency_code
             form.populate_obj(line_item)
@@ -427,8 +427,8 @@ class LineItemCollector(t.Generic[T], ABC):
         recv_no: set[int] = {x.no.data for x in forms if x.no.data is not None}
         missing_recv_no: int = 100 if len(recv_no) == 0 else max(recv_no) + 100
         forms.sort(key=lambda x: (x.no.data or missing_recv_no,
-                                  missing_no if x.eid.data is None else
-                                  self.__no_by_id.get(x.eid.data, missing_no),
+                                  missing_no if x.id.data is None else
+                                  self.__no_by_id.get(x.id.data, missing_no),
                                   ord_by_form.get(x)))
 
     def _sort_currency_forms(self, forms: list[CurrencyForm]) -> None:

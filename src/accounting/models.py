@@ -680,15 +680,6 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__str")
 
     @property
-    def eid(self) -> int | None:
-        """Returns the line item ID.  This is the alternative name of the
-        ID field, to work with WTForms.
-
-        :return: The line item ID.
-        """
-        return self.id
-
-    @property
     def account_code(self) -> str:
         """Returns the account code.
 

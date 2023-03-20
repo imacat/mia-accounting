@@ -89,8 +89,8 @@ class KeepCurrencyWhenHavingOffset:
                              == offset.c.original_line_item_id),
                   isouter=True)\
             .filter(JournalEntryLineItem.id
-                    .in_({x.eid.data for x in form.line_items
-                          if x.eid.data is not None}))\
+                    .in_({x.id.data for x in form.line_items
+                          if x.id.data is not None}))\
             .group_by(JournalEntryLineItem.id,
                       JournalEntryLineItem.currency_code)\
             .having(sa.func.count(offset.c.id) > 0).all()
@@ -160,8 +160,8 @@ class CurrencyForm(FlaskForm):
                if x.original_line_item_id.data is not None}
         if len(original_line_item_id) > 0:
             return True
-        line_item_id: set[int] = {x.eid.data for x in line_item_forms
-                                  if x.eid.data is not None}
+        line_item_id: set[int] = {x.id.data for x in line_item_forms
+                                  if x.id.data is not None}
         select: sa.Select = sa.select(sa.func.count(JournalEntryLineItem.id))\
             .filter(JournalEntryLineItem.original_line_item_id
                     .in_(line_item_id))
