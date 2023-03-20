@@ -83,7 +83,7 @@ First written: 2023/1/31
 {% endif %}
 
 <div class="accounting-card col-sm-6">
-  <div class="accounting-card-title">{{ obj.title }}</div>
+  <div class="accounting-card-title">{{ obj.title|title }}</div>
   <div class="accounting-card-code">{{ obj.code }}</div>
   {% if obj.is_need_offset %}
     <div>
