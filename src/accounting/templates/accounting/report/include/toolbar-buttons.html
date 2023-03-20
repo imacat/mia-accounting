@@ -28,12 +28,12 @@ First written: 2023/3/8
     <ul class="dropdown-menu">
       <li>
         <a class="dropdown-item" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_DISBURSEMENT)|accounting_append_next }}">
-          {{ A_("Cash Expense") }}
+          {{ A_("Cash Disbursement") }}
         </a>
       </li>
       <li>
         <a class="dropdown-item" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_RECEIPT)|accounting_append_next }}">
-          {{ A_("Cash Income") }}
+          {{ A_("Cash Receipt") }}
         </a>
       </li>
       <li>
