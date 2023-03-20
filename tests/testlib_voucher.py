@@ -68,58 +68,58 @@ def get_add_form(csrf_token: str) -> dict[str, str]:
             "currency-0-code": "USD",
             "currency-0-debit-0-no": "16",
             "currency-0-debit-0-account_code": Accounts.CASH,
-            "currency-0-debit-0-summary": " ",
+            "currency-0-debit-0-description": " ",
             "currency-0-debit-0-amount": " 495.26 ",
             "currency-0-debit-6-no": "2",
             "currency-0-debit-6-account_code": Accounts.BANK,
-            "currency-0-debit-6-summary": " Deposit ",
+            "currency-0-debit-6-description": " Deposit ",
             "currency-0-debit-6-amount": "6000",
             "currency-0-debit-12-no": "2",
             "currency-0-debit-12-account_code": Accounts.OFFICE,
-            "currency-0-debit-12-summary": " Pens ",
+            "currency-0-debit-12-description": " Pens ",
             "currency-0-debit-12-amount": "4.99",
             "currency-0-credit-2-no": "6",
             "currency-0-credit-2-account_code": Accounts.SERVICE,
-            "currency-0-credit-2-summary": " ",
+            "currency-0-credit-2-description": " ",
             "currency-0-credit-2-amount": "5500",
             "currency-0-credit-7-account_code": Accounts.SALES,
-            "currency-0-credit-7-summary": " ",
+            "currency-0-credit-7-description": " ",
             "currency-0-credit-7-amount": "950",
             "currency-0-credit-27-account_code": Accounts.INTEREST,
-            "currency-0-credit-27-summary": " ",
+            "currency-0-credit-27-description": " ",
             "currency-0-credit-27-amount": "50.25",
             "currency-3-no": "2",
             "currency-3-code": "JPY",
             "currency-3-debit-2-no": "2",
             "currency-3-debit-2-account_code": Accounts.CASH,
-            "currency-3-debit-2-summary": " ",
+            "currency-3-debit-2-description": " ",
             "currency-3-debit-2-amount": "15000",
             "currency-3-debit-9-no": "5",
             "currency-3-debit-9-account_code": Accounts.BANK,
-            "currency-3-debit-9-summary": " Deposit ",
+            "currency-3-debit-9-description": " Deposit ",
             "currency-3-debit-9-amount": "95000",
             "currency-3-credit-3-account_code": Accounts.AGENCY,
-            "currency-3-credit-3-summary": " Realtor ",
+            "currency-3-credit-3-description": " Realtor ",
             "currency-3-credit-3-amount": "65000",
             "currency-3-credit-5-no": "4",
             "currency-3-credit-5-account_code": Accounts.DONATION,
-            "currency-3-credit-5-summary": " Donation ",
+            "currency-3-credit-5-description": " Donation ",
             "currency-3-credit-5-amount": "45000",
             "currency-16-code": "TWD",
             "currency-16-debit-2-no": "2",
             "currency-16-debit-2-account_code": Accounts.CASH,
-            "currency-16-debit-2-summary": " ",
+            "currency-16-debit-2-description": " ",
             "currency-16-debit-2-amount": "10000",
             "currency-16-debit-9-no": "2",
             "currency-16-debit-9-account_code": Accounts.TRAVEL,
-            "currency-16-debit-9-summary": " Gas ",
+            "currency-16-debit-9-description": " Gas ",
             "currency-16-debit-9-amount": "30000",
             "currency-16-credit-6-no": "6",
             "currency-16-credit-6-account_code": Accounts.RENT,
-            "currency-16-credit-6-summary": " Rent ",
+            "currency-16-credit-6-description": " Rent ",
             "currency-16-credit-6-amount": "35000",
             "currency-16-credit-9-account_code": Accounts.DONATION,
-            "currency-16-credit-9-summary": " Donation ",
+            "currency-16-credit-9-description": " Donation ",
             "currency-16-credit-9-amount": "5000",
             "note": f"\n \n\n  \n{NON_EMPTY_NOTE}  \n  \n\n  "}
 
@@ -167,9 +167,9 @@ def get_unchanged_update_form(voucher_id: int, app: Flask, csrf_token: str) \
             form[f"{prefix}-eid"] = str(line_item.id)
             form[f"{prefix}-no"] = str(line_item_no)
             form[f"{prefix}-account_code"] = line_item.account.code
-            form[f"{prefix}-summary"] \
-                = "  " if line_item.summary is None \
-                else f" {line_item.summary} "
+            form[f"{prefix}-description"] \
+                = "  " if line_item.description is None \
+                else f" {line_item.description} "
             form[f"{prefix}-amount"] = str(line_item.amount)
 
         line_item_indices_used = set()
@@ -181,8 +181,8 @@ def get_unchanged_update_form(voucher_id: int, app: Flask, csrf_token: str) \
             form[f"{prefix}-eid"] = str(line_item.id)
             form[f"{prefix}-no"] = str(line_item_no)
             form[f"{prefix}-account_code"] = line_item.account.code
-            form[f"{prefix}-summary"] \
-                = "  " if line_item.summary is None else f" {line_item.summary} "
+            form[f"{prefix}-description"] \
+                = "  " if line_item.description is None else f" {line_item.description} "
             form[f"{prefix}-amount"] = str(line_item.amount)
 
     return form
@@ -335,19 +335,19 @@ def __mess_up_currencies(form: dict[str, str]) -> dict[str, str]:
         f"{prefix}no": str(1 + randbelow(min_no - 1)),
         f"{prefix}debit-0-no": "6",
         f"{prefix}debit-0-account_code": Accounts.OFFICE,
-        f"{prefix}debit-0-summary": " Envelop ",
+        f"{prefix}debit-0-description": " Envelop ",
         f"{prefix}debit-0-amount": "5.45",
         f"{prefix}debit-14-no": "6",
         f"{prefix}debit-14-account_code": Accounts.CASH,
-        f"{prefix}debit-14-summary": "  ",
+        f"{prefix}debit-14-description": "  ",
         f"{prefix}debit-14-amount": "14.55",
         f"{prefix}credit-16-no": "7",
         f"{prefix}credit-16-account_code": Accounts.RENT,
-        f"{prefix}credit-16-summary": " Bike ",
+        f"{prefix}credit-16-description": " Bike ",
         f"{prefix}credit-16-amount": "19.5",
         f"{prefix}credit-22-no": "5",
         f"{prefix}credit-22-account_code": Accounts.DONATION,
-        f"{prefix}credit-22-summary": " Artist ",
+        f"{prefix}credit-22-description": " Artist ",
         f"{prefix}credit-22-amount": "0.5",
     })
     # Swap the USD and TWD order

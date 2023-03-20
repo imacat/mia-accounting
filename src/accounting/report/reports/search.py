@@ -57,7 +57,7 @@ class LineItemCollector:
         conditions: list[sa.BinaryExpression] = []
         for k in keywords:
             sub_conditions: list[sa.BinaryExpression] \
-                = [VoucherLineItem.summary.contains(k),
+                = [VoucherLineItem.description.contains(k),
                    VoucherLineItem.account_id.in_(
                        self.__get_account_condition(k)),
                    VoucherLineItem.currency_code.in_(

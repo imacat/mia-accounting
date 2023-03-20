@@ -85,13 +85,13 @@ class OffsetTestCase(unittest.TestCase):
                 "USD",
                 [],
                 [VoucherLineItemData(Accounts.RECEIVABLE,
-                                     self.data.e_r_or1d.summary, "300",
+                                     self.data.e_r_or1d.description, "300",
                                      original_line_item=self.data.e_r_or1d),
                  VoucherLineItemData(Accounts.RECEIVABLE,
-                                     self.data.e_r_or1d.summary, "100",
+                                     self.data.e_r_or1d.description, "100",
                                      original_line_item=self.data.e_r_or1d),
                  VoucherLineItemData(Accounts.RECEIVABLE,
-                                     self.data.e_r_or3d.summary, "100",
+                                     self.data.e_r_or3d.description, "100",
                                      original_line_item=self.data.e_r_or3d)])])
 
         # Non-existing original line item ID
@@ -400,13 +400,13 @@ class OffsetTestCase(unittest.TestCase):
             self.data.e_p_or3c.voucher.days, [CurrencyData(
                 "USD",
                 [VoucherLineItemData(Accounts.PAYABLE,
-                                     self.data.e_p_or1c.summary, "500",
+                                     self.data.e_p_or1c.description, "500",
                                      original_line_item=self.data.e_p_or1c),
                  VoucherLineItemData(Accounts.PAYABLE,
-                                     self.data.e_p_or1c.summary, "300",
+                                     self.data.e_p_or1c.description, "300",
                                      original_line_item=self.data.e_p_or1c),
                  VoucherLineItemData(Accounts.PAYABLE,
-                                     self.data.e_p_or3c.summary, "120",
+                                     self.data.e_p_or3c.description, "120",
                                      original_line_item=self.data.e_p_or3c)],
                 [])])
 

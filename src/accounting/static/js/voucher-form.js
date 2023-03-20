@@ -808,16 +808,16 @@ class LineItemSubForm {
     #accountText;
 
     /**
-     * The summary
+     * The description
      * @type {HTMLInputElement}
      */
-    #summary;
+    #description;
 
     /**
-     * The text display of the summary
+     * The text display of the description
      * @type {HTMLDivElement}
      */
-    #summaryText;
+    #descriptionText;
 
     /**
      * The ID of the original line item
@@ -873,8 +873,8 @@ class LineItemSubForm {
         this.no = document.getElementById(this.#prefix + "-no");
         this.#accountCode = document.getElementById(this.#prefix + "-account-code");
         this.#accountText = document.getElementById(this.#prefix + "-account-text");
-        this.#summary = document.getElementById(this.#prefix + "-summary");
-        this.#summaryText = document.getElementById(this.#prefix + "-summary-text");
+        this.#description = document.getElementById(this.#prefix + "-description");
+        this.#descriptionText = document.getElementById(this.#prefix + "-description-text");
         this.#originalLineItemId = document.getElementById(this.#prefix + "-original-line-item-id");
         this.#originalLineItemText = document.getElementById(this.#prefix + "-original-line-item-text");
         this.#offsets = document.getElementById(this.#prefix + "-offsets");
@@ -925,12 +925,12 @@ class LineItemSubForm {
     }
 
     /**
-     * Returns the summary.
+     * Returns the description.
      *
-     * @return {string|null} the summary
+     * @return {string|null} the description
      */
-    getSummary() {
-        return this.#summary.value === ""? null: this.#summary.value;
+    getDescription() {
+        return this.#description.value === ""? null: this.#description.value;
     }
 
     /**
@@ -1014,8 +1014,8 @@ class LineItemSubForm {
         this.#accountCode.value = editor.accountCode === null? "": editor.accountCode;
         this.#accountCode.dataset.text = editor.accountText === null? "": editor.accountText;
         this.#accountText.innerText = editor.accountText === null? "": editor.accountText;
-        this.#summary.value = editor.summary === null? "": editor.summary;
-        this.#summaryText.innerText = editor.summary === null? "": editor.summary;
+        this.#description.value = editor.description === null? "": editor.description;
+        this.#descriptionText.innerText = editor.description === null? "": editor.description;
         this.#amount.value = editor.amount;
         this.#amountText.innerText = formatDecimal(new Decimal(editor.amount));
         this.validate();

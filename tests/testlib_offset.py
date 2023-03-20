@@ -32,12 +32,12 @@ from testlib_voucher import Accounts, match_voucher_detail, NEXT_URI
 class VoucherLineItemData:
     """The voucher line item data."""
 
-    def __init__(self, account: str, summary: str, amount: str,
+    def __init__(self, account: str, description: str, amount: str,
                  original_line_item: VoucherLineItemData | None = None):
         """Constructs the voucher line item data.
 
         :param account: The account code.
-        :param summary: The summary.
+        :param description: The description.
         :param amount: The amount.
         :param original_line_item: The original voucher line item.
         """
@@ -47,7 +47,7 @@ class VoucherLineItemData:
         self.original_line_item: VoucherLineItemData | None \
             = original_line_item
         self.account: str = account
-        self.summary: str = summary
+        self.description: str = description
         self.amount: Decimal = Decimal(amount)
 
     def form(self, prefix: str, side: str, index: int, is_update: bool) \
@@ -62,7 +62,7 @@ class VoucherLineItemData:
         """
         prefix = f"{prefix}-{side}-{index}"
         form: dict[str, str] = {f"{prefix}-account_code": self.account,
-                                f"{prefix}-summary": self.summary,
+                                f"{prefix}-description": self.description,
                                 f"{prefix}-amount": str(self.amount)}
         if is_update and self.id != -1:
             form[f"{prefix}-eid"] = str(self.id)
@@ -174,18 +174,18 @@ class TestData:
         self.client: httpx.Client = client
         self.csrf_token: str = csrf_token
 
-        def couple(summary: str, amount: str, debit: str, credit: str) \
+        def couple(description: str, amount: str, debit: str, credit: str) \
                 -> tuple[VoucherLineItemData, VoucherLineItemData]:
             """Returns a couple of debit-credit line items.
 
-            :param summary: The summary.
+            :param description: The description.
             :param amount: The amount.
             :param debit: The debit account code.
             :param credit: The credit account code.
             :return: The debit line item and credit line item.
             """
-            return VoucherLineItemData(debit, summary, amount),\
-                VoucherLineItemData(credit, summary, amount)
+            return VoucherLineItemData(debit, description, amount),\
+                VoucherLineItemData(credit, description, amount)
 
         # Receivable original line items
         self.e_r_or1d, self.e_r_or1c = couple(

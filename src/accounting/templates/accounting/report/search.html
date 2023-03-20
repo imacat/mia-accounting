@@ -50,7 +50,7 @@ First written: 2023/3/8
         <div>{{ A_("Date") }}</div>
         <div>{{ A_("Currency") }}</div>
         <div>{{ A_("Account") }}</div>
-        <div>{{ A_("Summary") }}</div>
+        <div>{{ A_("Description") }}</div>
         <div class="accounting-amount">{{ A_("Debit") }}</div>
         <div class="accounting-amount">{{ A_("Credit") }}</div>
       </div>
@@ -64,7 +64,7 @@ First written: 2023/3/8
             <span class="d-none d-md-inline">{{ line_item.account.code }}</span>
             {{ line_item.account.title|title }}
           </div>
-          <div>{{ line_item.summary|accounting_default }}</div>
+          <div>{{ line_item.description|accounting_default }}</div>
           <div class="accounting-amount">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
           <div class="accounting-amount">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
         </a>
@@ -84,8 +84,8 @@ First written: 2023/3/8
               <span class="badge rounded-pill bg-info">{{ line_item.currency.code }}</span>
             {% endif %}
           </div>
-          {% if line_item.summary is not none %}
-            <div>{{ line_item.summary }}</div>
+          {% if line_item.description is not none %}
+            <div>{{ line_item.description }}</div>
           {% endif %}
         </div>
 

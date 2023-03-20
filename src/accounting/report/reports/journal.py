@@ -53,8 +53,8 @@ class ReportLineItem:
         """The account."""
         self.account: Account = line_item.account
         """The account."""
-        self.summary: str | None = line_item.summary
-        """The summary."""
+        self.description: str | None = line_item.description
+        """The description."""
         self.debit: Decimal | None = line_item.debit
         """The debit amount."""
         self.credit: Decimal | None = line_item.credit
@@ -69,14 +69,14 @@ class CSVRow(BaseCSVRow):
     def __init__(self, voucher_date: str | date,
                  currency: str,
                  account: str,
-                 summary: str | None,
+                 description: str | None,
                  debit: str | Decimal | None,
                  credit: str | Decimal | None,
                  note: str | None):
         """Constructs a row in the CSV.
 
         :param voucher_date: The voucher date.
-        :param summary: The summary.
+        :param description: The description.
         :param debit: The debit amount.
         :param credit: The credit amount.
         :param note: The note.
@@ -87,8 +87,8 @@ class CSVRow(BaseCSVRow):
         """The currency."""
         self.account: str = account
         """The account."""
-        self.summary: str | None = summary
-        """The summary."""
+        self.description: str | None = description
+        """The description."""
         self.debit: str | Decimal | None = debit
         """The debit amount."""
         self.credit: str | Decimal | None = credit
@@ -102,7 +102,7 @@ class CSVRow(BaseCSVRow):
 
         :return: The values of the row.
         """
-        return [self.date, self.currency, self.account, self.summary,
+        return [self.date, self.currency, self.account, self.description,
                 self.debit, self.credit, self.note]
 
 
@@ -152,11 +152,11 @@ def get_csv_rows(line_items: list[VoucherLineItem]) -> list[CSVRow]:
     :return: The CSV rows.
     """
     rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
-                                 gettext("Account"), gettext("Summary"),
+                                 gettext("Account"), gettext("Description"),
                                  gettext("Debit"), gettext("Credit"),
                                  gettext("Note"))]
     rows.extend([CSVRow(x.voucher.date, x.currency.code,
-                        str(x.account).title(), x.summary,
+                        str(x.account).title(), x.description,
                         x.debit, x.credit, x.voucher.note)
                  for x in line_items])
     return rows

@@ -54,8 +54,8 @@ class ReportLineItem:
         """Whether this is the total line item."""
         self.date: date | None = None
         """The date."""
-        self.summary: str | None = None
-        """The summary."""
+        self.description: str | None = None
+        """The description."""
         self.debit: Decimal | None = None
         """The debit amount."""
         self.credit: Decimal | None = None
@@ -68,7 +68,7 @@ class ReportLineItem:
         """The URL to the voucher line item."""
         if line_item is not None:
             self.date = line_item.voucher.date
-            self.summary = line_item.summary
+            self.description = line_item.description
             self.debit = line_item.amount if line_item.is_debit else None
             self.credit = None if line_item.is_debit else line_item.amount
             self.note = line_item.voucher.note
@@ -126,7 +126,7 @@ class LineItemCollector:
         line_item: ReportLineItem = ReportLineItem()
         line_item.is_brought_forward = True
         line_item.date = self.__period.start
-        line_item.summary = gettext("Brought forward")
+        line_item.description = gettext("Brought forward")
         if balance > 0:
             line_item.debit = balance
         elif balance < 0:
@@ -163,7 +163,7 @@ class LineItemCollector:
             return None
         line_item: ReportLineItem = ReportLineItem()
         line_item.is_total = True
-        line_item.summary = gettext("Total")
+        line_item.description = gettext("Total")
         line_item.debit = sum([x.debit for x in self.line_items
                                if x.debit is not None])
         line_item.credit = sum([x.credit for x in self.line_items
@@ -195,7 +195,7 @@ class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
     def __init__(self, voucher_date: date | str | None,
-                 summary: str | None,
+                 description: str | None,
                  debit: str | Decimal | None,
                  credit: str | Decimal | None,
                  balance: str | Decimal | None,
@@ -203,7 +203,7 @@ class CSVRow(BaseCSVRow):
         """Constructs a row in the CSV.
 
         :param voucher_date: The voucher date.
-        :param summary: The summary.
+        :param description: The description.
         :param debit: The debit amount.
         :param credit: The credit amount.
         :param balance: The balance.
@@ -211,8 +211,8 @@ class CSVRow(BaseCSVRow):
         """
         self.date: date | str | None = voucher_date
         """The date."""
-        self.summary: str | None = summary
-        """The summary."""
+        self.description: str | None = description
+        """The description."""
         self.debit: str | Decimal | None = debit
         """The debit amount."""
         self.credit: str | Decimal | None = credit
@@ -228,7 +228,7 @@ class CSVRow(BaseCSVRow):
 
         :return: The values of the row.
         """
-        return [self.date, self.summary,
+        return [self.date, self.description,
                 self.debit, self.credit, self.balance, self.note]
 
 
@@ -357,17 +357,17 @@ class Ledger(BaseReport):
 
         :return: The CSV rows.
         """
-        rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Summary"),
+        rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Description"),
                                      gettext("Debit"), gettext("Credit"),
                                      gettext("Balance"), gettext("Note"))]
         if self.__brought_forward is not None:
             rows.append(CSVRow(self.__brought_forward.date,
-                               self.__brought_forward.summary,
+                               self.__brought_forward.description,
                                self.__brought_forward.debit,
                                self.__brought_forward.credit,
                                self.__brought_forward.balance,
                                None))
-        rows.extend([CSVRow(x.date, x.summary,
+        rows.extend([CSVRow(x.date, x.description,
                             x.debit, x.credit, x.balance, x.note)
                      for x in self.__line_items])
         if self.__total is not None:

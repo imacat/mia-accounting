@@ -452,8 +452,8 @@ class DebitLineItemForm(LineItemForm):
     """The account code."""
     offset_original_line_item_id = IntegerField()
     """The ID of the original line item."""
-    summary = StringField(filters=[strip_text])
-    """The summary."""
+    description = StringField(filters=[strip_text])
+    """The description."""
     amount = DecimalField(
         validators=[PositiveAmount(),
                     NotExceedingOriginalLineItemNetBalance(),
@@ -471,7 +471,7 @@ class DebitLineItemForm(LineItemForm):
             obj.id = new_id(VoucherLineItem)
         obj.original_line_item_id = self.original_line_item_id.data
         obj.account_id = Account.find_by_code(self.account_code.data).id
-        obj.summary = self.summary.data
+        obj.description = self.description.data
         obj.is_debit = True
         obj.amount = self.amount.data
         if is_new:
@@ -502,8 +502,8 @@ class CreditLineItemForm(LineItemForm):
                     KeepAccountWhenHavingOffset(),
                     NotStartReceivableFromCredit()])
     """The account code."""
-    summary = StringField(filters=[strip_text])
-    """The summary."""
+    description = StringField(filters=[strip_text])
+    """The description."""
     amount = DecimalField(
         validators=[PositiveAmount(),
                     NotExceedingOriginalLineItemNetBalance(),
@@ -521,7 +521,7 @@ class CreditLineItemForm(LineItemForm):
             obj.id = new_id(VoucherLineItem)
         obj.original_line_item_id = self.original_line_item_id.data
         obj.account_id = Account.find_by_code(self.account_code.data).id
-        obj.summary = self.summary.data
+        obj.description = self.description.data
         obj.is_debit = False
         obj.amount = self.amount.data
         if is_new:

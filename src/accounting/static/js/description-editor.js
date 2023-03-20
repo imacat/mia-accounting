@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * summary-editor.js: The JavaScript for the summary editor
+ * description-editor.js: The JavaScript for the description editor
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -23,10 +23,10 @@
 "use strict";
 
 /**
- * A summary editor.
+ * A description editor.
  *
  */
-class SummaryEditor {
+class DescriptionEditor {
 
     /**
      * The line item editor
@@ -35,7 +35,7 @@ class SummaryEditor {
     #lineItemEditor;
 
     /**
-     * The summary editor form
+     * The description editor form
      * @type {HTMLFormElement}
      */
     #form;
@@ -47,7 +47,7 @@ class SummaryEditor {
     prefix;
 
     /**
-     * The modal of the summary editor
+     * The modal of the description editor
      * @type {HTMLDivElement}
      */
     #modal;
@@ -65,10 +65,10 @@ class SummaryEditor {
     currentTab;
 
     /**
-     * The summary input
+     * The description input
      * @type {HTMLInputElement}
      */
-    summary;
+    description;
 
     /**
      * The button to the original line item selector
@@ -107,7 +107,7 @@ class SummaryEditor {
     tabPlanes = {};
 
     /**
-     * Constructs a summary editor.
+     * Constructs a description editor.
      *
      * @param lineItemEditor {VoucherLineItemEditor} the line item editor
      * @param side {string} the side, either "debit" or "credit"
@@ -115,10 +115,10 @@ class SummaryEditor {
     constructor(lineItemEditor, side) {
         this.#lineItemEditor = lineItemEditor;
         this.side = side;
-        this.prefix = "accounting-summary-editor-" + side;
+        this.prefix = "accounting-description-editor-" + side;
         this.#form = document.getElementById(this.prefix);
         this.#modal = document.getElementById(this.prefix + "-modal");
-        this.summary = document.getElementById(this.prefix + "-summary");
+        this.description = document.getElementById(this.prefix + "-description");
         this.#offsetButton = document.getElementById(this.prefix + "-offset");
         this.number = document.getElementById(this.prefix + "-annotation-number");
         this.note = document.getElementById(this.prefix + "-annotation-note");
@@ -131,7 +131,7 @@ class SummaryEditor {
         }
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
-        this.summary.onchange = () => this.#onSummaryChange();
+        this.description.onchange = () => this.#onDescriptionChange();
         this.#offsetButton.onclick = () => this.#lineItemEditor.originalLineItemSelector.onOpen();
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
@@ -142,11 +142,11 @@ class SummaryEditor {
     }
 
     /**
-     * The callback when the summary input is changed.
+     * The callback when the description input is changed.
      *
      */
-    #onSummaryChange() {
-        this.summary.value = this.summary.value.trim();
+    #onDescriptionChange() {
+        this.description.value = this.description.value.trim();
         for (const tabPlane of [this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
                 break;
@@ -209,34 +209,34 @@ class SummaryEditor {
     }
 
     /**
-     * Submits the summary.
+     * Submits the description.
      *
      */
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
         if (this.#selectedAccount !== null) {
-            this.#lineItemEditor.saveSummaryWithAccount(this.summary.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
+            this.#lineItemEditor.saveDescriptionWithAccount(this.description.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
         } else {
-            this.#lineItemEditor.saveSummary(this.summary.value);
+            this.#lineItemEditor.saveDescription(this.description.value);
         }
     }
 
     /**
-     * The callback when the summary editor is shown.
+     * The callback when the description editor is shown.
      *
      */
     onOpen() {
         this.#reset();
-        this.summary.value = this.#lineItemEditor.summary === null? "": this.#lineItemEditor.summary;
-        this.#onSummaryChange();
+        this.description.value = this.#lineItemEditor.description === null? "": this.#lineItemEditor.description;
+        this.#onDescriptionChange();
     }
 
     /**
-     * Resets the summary editor.
+     * Resets the description editor.
      *
      */
     #reset() {
-        this.summary.value = "";
+        this.description.value = "";
         for (const tabPlane of Object.values(this.tabPlanes)) {
             tabPlane.reset();
         }
@@ -244,16 +244,16 @@ class SummaryEditor {
     }
 
     /**
-     * Returns the summary editor instances.
+     * Returns the description editor instances.
      *
      * @param lineItemEditor {VoucherLineItemEditor} the line item editor
-     * @return {{debit: SummaryEditor, credit: SummaryEditor}}
+     * @return {{debit: DescriptionEditor, credit: DescriptionEditor}}
      */
     static getInstances(lineItemEditor) {
         const editors = {}
-        const forms = Array.from(document.getElementsByClassName("accounting-summary-editor"));
+        const forms = Array.from(document.getElementsByClassName("accounting-description-editor"));
         for (const form of forms) {
-            editors[form.dataset.side] = new SummaryEditor(lineItemEditor, form.dataset.side);
+            editors[form.dataset.side] = new DescriptionEditor(lineItemEditor, form.dataset.side);
         }
         return editors;
     }
@@ -268,8 +268,8 @@ class SummaryEditor {
 class TabPlane {
 
     /**
-     * The parent summary editor
-     * @type {SummaryEditor}
+     * The parent description editor
+     * @type {DescriptionEditor}
      */
     editor;
 
@@ -294,7 +294,7 @@ class TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param editor {SummaryEditor} the parent summary editor
+     * @param editor {DescriptionEditor} the parent description editor
      */
     constructor(editor) {
         this.editor = editor;
@@ -320,9 +320,9 @@ class TabPlane {
     reset() { throw new Error("Method not implemented."); }
 
     /**
-     * Populates the tab plane with the summary input.
+     * Populates the tab plane with the description input.
      *
-     * @return {boolean} true if the summary input matches this tab, or false otherwise
+     * @return {boolean} true if the description input matches this tab, or false otherwise
      * @abstract
      */
     populate() { throw new Error("Method not implemented."); }
@@ -383,7 +383,7 @@ class TagTabPlane extends TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param editor {SummaryEditor} the parent summary editor
+     * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
@@ -395,7 +395,7 @@ class TagTabPlane extends TabPlane {
         this.initializeTagButtons();
         this.tag.onchange = () => {
             this.onTagChange();
-            this.updateSummary();
+            this.updateDescription();
         };
     }
 
@@ -424,11 +424,11 @@ class TagTabPlane extends TabPlane {
     }
 
     /**
-     * Updates the summary according to the input in the tab plane.
+     * Updates the description according to the input in the tab plane.
      *
      * @abstract
      */
-    updateSummary() { throw new Error("Method not implemented."); }
+    updateDescription() { throw new Error("Method not implemented."); }
 
     /**
      * Switches to the tab plane.
@@ -461,7 +461,7 @@ class TagTabPlane extends TabPlane {
                 tagButton.classList.add("btn-primary");
                 this.tag.value = tagButton.dataset.value;
                 this.editor.filterSuggestedAccounts(tagButton);
-                this.updateSummary();
+                this.updateDescription();
             };
         }
     }
@@ -532,28 +532,28 @@ class GeneralTagTab extends TagTabPlane {
     };
 
     /**
-     * Updates the summary according to the input in the tab plane.
+     * Updates the description according to the input in the tab plane.
      *
      * @override
      */
-    updateSummary() {
-        const pos = this.editor.summary.value.indexOf("—");
+    updateDescription() {
+        const pos = this.editor.description.value.indexOf("—");
         const prefix = this.tag.value === ""? "": this.tag.value + "—";
         if (pos === -1) {
-            this.editor.summary.value = prefix + this.editor.summary.value;
+            this.editor.description.value = prefix + this.editor.description.value;
         } else {
-            this.editor.summary.value = prefix + this.editor.summary.value.substring(pos + 1);
+            this.editor.description.value = prefix + this.editor.description.value.substring(pos + 1);
         }
     }
 
     /**
-     * Populates the tab plane with the summary input.
+     * Populates the tab plane with the description input.
      *
-     * @return {boolean} true if the summary input matches this tab, or false otherwise
+     * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—/);
+        const found = this.editor.description.value.match(/^([^—]+)—/);
         if (found === null) {
             return false;
         }
@@ -622,7 +622,7 @@ class GeneralTripTab extends TagTabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param editor {SummaryEditor} the parent summary editor
+     * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
@@ -635,7 +635,7 @@ class GeneralTripTab extends TagTabPlane {
         this.#directionButtons = Array.from(document.getElementsByClassName(this.prefix + "-direction"));
         this.#from.onchange = () => {
             this.#from.value = this.#from.value.trim();
-            this.updateSummary();
+            this.updateDescription();
             this.validateFrom();
         };
         for (const directionButton of this.#directionButtons) {
@@ -646,12 +646,12 @@ class GeneralTripTab extends TagTabPlane {
                 }
                 directionButton.classList.remove("btn-outline-primary");
                 directionButton.classList.add("btn-primary");
-                this.updateSummary();
+                this.updateDescription();
             };
         }
         this.#to.onchange = () => {
             this.#to.value = this.#to.value.trim();
-            this.updateSummary();
+            this.updateDescription();
             this.validateTo();
         };
     }
@@ -667,11 +667,11 @@ class GeneralTripTab extends TagTabPlane {
     };
 
     /**
-     * Updates the summary according to the input in the tab plane.
+     * Updates the description according to the input in the tab plane.
      *
      * @override
      */
-    updateSummary() {
+    updateDescription() {
         let direction;
         for (const directionButton of this.#directionButtons) {
             if (directionButton.classList.contains("btn-primary")) {
@@ -679,7 +679,7 @@ class GeneralTripTab extends TagTabPlane {
                 break;
             }
         }
-        this.editor.summary.value = this.tag.value + "—" + this.#from.value + direction + this.#to.value;
+        this.editor.description.value = this.tag.value + "—" + this.#from.value + direction + this.#to.value;
     }
 
     /**
@@ -707,13 +707,13 @@ class GeneralTripTab extends TagTabPlane {
     }
 
     /**
-     * Populates the tab plane with the summary input.
+     * Populates the tab plane with the description input.
      *
-     * @return {boolean} true if the summary input matches this tab, or false otherwise
+     * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
+        const found = this.editor.description.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -834,7 +834,7 @@ class BusTripTab extends TagTabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param editor {SummaryEditor} the parent summary editor
+     * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
@@ -847,17 +847,17 @@ class BusTripTab extends TagTabPlane {
         this.#toError = document.getElementById(this.prefix + "-to-error")
         this.#route.onchange = () => {
             this.#route.value = this.#route.value.trim();
-            this.updateSummary();
+            this.updateDescription();
             this.validateRoute();
         };
         this.#from.onchange = () => {
             this.#from.value = this.#from.value.trim();
-            this.updateSummary();
+            this.updateDescription();
             this.validateFrom();
         };
         this.#to.onchange = () => {
             this.#to.value = this.#to.value.trim();
-            this.updateSummary();
+            this.updateDescription();
             this.validateTo();
         };
     }
@@ -873,12 +873,12 @@ class BusTripTab extends TagTabPlane {
     };
 
     /**
-     * Updates the summary according to the input in the tab plane.
+     * Updates the description according to the input in the tab plane.
      *
      * @override
      */
-    updateSummary() {
-        this.editor.summary.value = this.tag.value + "—" + this.#route.value + "—" + this.#from.value + "→" + this.#to.value;
+    updateDescription() {
+        this.editor.description.value = this.tag.value + "—" + this.#route.value + "—" + this.#from.value + "→" + this.#to.value;
     }
 
     /**
@@ -900,13 +900,13 @@ class BusTripTab extends TagTabPlane {
     }
 
     /**
-     * Populates the tab plane with the summary input.
+     * Populates the tab plane with the description input.
      *
-     * @return {boolean} true if the summary input matches this tab, or false otherwise
+     * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
+        const found = this.editor.description.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -1001,7 +1001,7 @@ class RegularPaymentTab extends TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param editor {SummaryEditor} the parent summary editor
+     * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
@@ -1033,9 +1033,9 @@ class RegularPaymentTab extends TabPlane {
     }
 
     /**
-     * Populates the tab plane with the summary input.
+     * Populates the tab plane with the description input.
      *
-     * @return {boolean} true if the summary input matches this tab, or false otherwise
+     * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
      */
     populate() {
@@ -1063,15 +1063,15 @@ class AnnotationTab extends TabPlane {
     /**
      * Constructs a tab plane.
      *
-     * @param editor {SummaryEditor} the parent summary editor
+     * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
         super(editor);
-        this.editor.number.onchange = () => this.updateSummary();
+        this.editor.number.onchange = () => this.updateDescription();
         this.editor.note.onchange = () => {
             this.editor.note.value = this.editor.note.value.trim();
-            this.updateSummary();
+            this.updateDescription();
         };
     }
 
@@ -1086,20 +1086,20 @@ class AnnotationTab extends TabPlane {
     };
 
     /**
-     * Updates the summary according to the input in the tab plane.
+     * Updates the description according to the input in the tab plane.
      *
      * @override
      */
-    updateSummary() {
-        const found = this.editor.summary.value.match(/^(.*?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
+    updateDescription() {
+        const found = this.editor.description.value.match(/^(.*?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found !== null) {
-            this.editor.summary.value = found[1];
+            this.editor.description.value = found[1];
         }
         if (parseInt(this.editor.number.value) > 1) {
-            this.editor.summary.value = this.editor.summary.value + "×" + this.editor.number.value;
+            this.editor.description.value = this.editor.description.value + "×" + this.editor.number.value;
         }
         if (this.editor.note.value !== "") {
-            this.editor.summary.value = this.editor.summary.value + "(" + this.editor.note.value + ")";
+            this.editor.description.value = this.editor.description.value + "(" + this.editor.note.value + ")";
         }
     }
 
@@ -1114,25 +1114,25 @@ class AnnotationTab extends TabPlane {
     }
 
     /**
-     * Populates the tab plane with the summary input.
+     * Populates the tab plane with the description input.
      *
-     * @return {boolean} true if the summary input matches this tab, or false otherwise
+     * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
      */
     populate() {
-        const found = this.editor.summary.value.match(/^(.*?)(?:[*×](\d+))?(?:\(([^()]+)\))?$/);
-        this.editor.summary.value = found[1];
+        const found = this.editor.description.value.match(/^(.*?)(?:[*×](\d+))?(?:\(([^()]+)\))?$/);
+        this.editor.description.value = found[1];
         if (found[2] === undefined || parseInt(found[2]) === 1) {
             this.editor.number.value = "";
         } else {
             this.editor.number.value = found[2];
-            this.editor.summary.value = this.editor.summary.value + "×" + this.editor.number.value;
+            this.editor.description.value = this.editor.description.value + "×" + this.editor.number.value;
         }
         if (found[3] === undefined) {
             this.editor.note.value = "";
         } else {
             this.editor.note.value = found[3];
-            this.editor.summary.value = this.editor.summary.value + "(" + this.editor.note.value + ")";
+            this.editor.description.value = this.editor.description.value + "(" + this.editor.note.value + ")";
         }
         return true;
     }

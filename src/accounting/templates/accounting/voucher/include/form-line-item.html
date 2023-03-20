@@ -27,13 +27,13 @@ First written: 2023/2/25
   <input id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-no" type="hidden" name="currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-no" value="{{ line_item_index }}">
   <input id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-original-line-item-id" class="accounting-original-line-item-id" type="hidden" name="currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-original_line_item_id" value="{{ original_line_item_id_data }}" data-date="{{ original_line_item_date }}" data-text="{{ original_line_item_text }}">
   <input id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-account-code" type="hidden" name="currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-account_code" value="{{ account_code_data }}" data-text="{{ account_text }}">
-  <input id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-summary" type="hidden" name="currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-summary" value="{{ summary_data }}">
+  <input id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-description" type="hidden" name="currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-description" value="{{ description_data }}">
   <input id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-amount" type="hidden" name="currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-amount" value="{{ amount_data }}" data-min="{{ offset_total }}">
   <div class="accounting-line-item-content">
     <div id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-control" class="form-control clickable d-flex justify-content-between {% if line_item_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
       <div>
         <div id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-account-text" class="small">{{ account_text }}</div>
-        <div id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-summary-text">{{ summary_data }}</div>
+        <div id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-description-text">{{ description_data }}</div>
         <div id="accounting-currency-{{ currency_index }}-{{ side }}-{{ line_item_index }}-original-line-item-text" class="fst-italic small accounting-original-line-item {% if not original_line_item_text %} d-none {% endif %}">
           {% if original_line_item_text %}{{ A_("Offset %(item)s", item=original_line_item_text) }}{% endif %}
         </div>

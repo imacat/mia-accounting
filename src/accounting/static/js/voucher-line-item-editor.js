@@ -89,22 +89,22 @@ class VoucherLineItemEditor {
     #originalLineItemDelete;
 
     /**
-     * The control of the summary
+     * The control of the description
      * @type {HTMLDivElement}
      */
-    #summaryControl;
+    #descriptionControl;
 
     /**
-     * The summary
+     * The description
      * @type {HTMLDivElement}
      */
-    #summaryText;
+    #descriptionText;
 
     /**
-     * The error message of the summary
+     * The error message of the description
      * @type {HTMLDivElement}
      */
-    #summaryError;
+    #descriptionError;
 
     /**
      * The control of the account
@@ -185,10 +185,10 @@ class VoucherLineItemEditor {
     accountText = null;
 
     /**
-     * The summary
+     * The description
      * @type {string|null}
      */
-    summary = null;
+    description = null;
 
     /**
      * The amount
@@ -197,10 +197,10 @@ class VoucherLineItemEditor {
     amount = "";
 
     /**
-     * The summary editors
-     * @type {{debit: SummaryEditor, credit: SummaryEditor}}
+     * The description editors
+     * @type {{debit: DescriptionEditor, credit: DescriptionEditor}}
      */
-    #summaryEditors;
+    #descriptionEditors;
 
     /**
      * The account selectors
@@ -228,20 +228,20 @@ class VoucherLineItemEditor {
         this.#originalLineItemText = document.getElementById(this.#prefix + "-original-line-item");
         this.#originalLineItemError = document.getElementById(this.#prefix + "-original-line-item-error");
         this.#originalLineItemDelete = document.getElementById(this.#prefix + "-original-line-item-delete");
-        this.#summaryControl = document.getElementById(this.#prefix + "-summary-control");
-        this.#summaryText = document.getElementById(this.#prefix + "-summary");
-        this.#summaryError = document.getElementById(this.#prefix + "-summary-error");
+        this.#descriptionControl = document.getElementById(this.#prefix + "-description-control");
+        this.#descriptionText = document.getElementById(this.#prefix + "-description");
+        this.#descriptionError = document.getElementById(this.#prefix + "-description-error");
         this.#accountControl = document.getElementById(this.#prefix + "-account-control");
         this.#accountText = document.getElementById(this.#prefix + "-account");
         this.#accountError = document.getElementById(this.#prefix + "-account-error")
         this.#amountInput = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
-        this.#summaryEditors = SummaryEditor.getInstances(this);
+        this.#descriptionEditors = DescriptionEditor.getInstances(this);
         this.#accountSelectors = AccountSelector.getInstances(this);
         this.originalLineItemSelector = new OriginalLineItemSelector(this);
         this.#originalLineItemControl.onclick = () => this.originalLineItemSelector.onOpen()
         this.#originalLineItemDelete.onclick = () => this.clearOriginalLineItem();
-        this.#summaryControl.onclick = () => this.#summaryEditors[this.side].onOpen();
+        this.#descriptionControl.onclick = () => this.#descriptionEditors[this.side].onOpen();
         this.#accountControl.onclick = () => this.#accountSelectors[this.side].onOpen();
         this.#amountInput.onchange = () => this.#validateAmount();
         this.#element.onsubmit = () => {
@@ -270,14 +270,14 @@ class VoucherLineItemEditor {
         this.originalLineItemDate = originalLineItem.date;
         this.originalLineItemText = originalLineItem.text;
         this.#originalLineItemText.innerText = originalLineItem.text;
-        this.#setEnableSummaryAccount(false);
-        if (originalLineItem.summary === "") {
-            this.#summaryControl.classList.remove("accounting-not-empty");
+        this.#setEnableDescriptionAccount(false);
+        if (originalLineItem.description === "") {
+            this.#descriptionControl.classList.remove("accounting-not-empty");
         } else {
-            this.#summaryControl.classList.add("accounting-not-empty");
+            this.#descriptionControl.classList.add("accounting-not-empty");
         }
-        this.summary = originalLineItem.summary === ""? null: originalLineItem.summary;
-        this.#summaryText.innerText = originalLineItem.summary;
+        this.description = originalLineItem.description === ""? null: originalLineItem.description;
+        this.#descriptionText.innerText = originalLineItem.description;
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = originalLineItem.accountCode;
         this.accountText = originalLineItem.accountText;
@@ -300,7 +300,7 @@ class VoucherLineItemEditor {
         this.originalLineItemDate = null;
         this.originalLineItemText = null;
         this.#originalLineItemText.innerText = "";
-        this.#setEnableSummaryAccount(true);
+        this.#setEnableDescriptionAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
         this.accountCode = null;
         this.accountText = null;
@@ -318,38 +318,38 @@ class VoucherLineItemEditor {
     }
 
     /**
-     * Saves the summary from the summary editor.
+     * Saves the description from the description editor.
      *
-     * @param summary {string} the summary
+     * @param description {string} the description
      */
-    saveSummary(summary) {
-        if (summary === "") {
-            this.#summaryControl.classList.remove("accounting-not-empty");
+    saveDescription(description) {
+        if (description === "") {
+            this.#descriptionControl.classList.remove("accounting-not-empty");
         } else {
-            this.#summaryControl.classList.add("accounting-not-empty");
+            this.#descriptionControl.classList.add("accounting-not-empty");
         }
-        this.summary = summary === ""? null: summary;
-        this.#summaryText.innerText = summary;
-        this.#validateSummary();
+        this.description = description === ""? null: description;
+        this.#descriptionText.innerText = description;
+        this.#validateDescription();
         bootstrap.Modal.getOrCreateInstance(this.#modal).show();
     }
 
     /**
-     * Saves the summary with the suggested account from the summary editor.
+     * Saves the description with the suggested account from the description editor.
      *
-     * @param summary {string} the summary
+     * @param description {string} the description
      * @param accountCode {string} the account code
      * @param accountText {string} the account text
      * @param isAccountNeedOffset {boolean} true if the line items in the account need offset, or false otherwise
      */
-    saveSummaryWithAccount(summary, accountCode, accountText, isAccountNeedOffset) {
+    saveDescriptionWithAccount(description, accountCode, accountText, isAccountNeedOffset) {
         this.isNeedOffset = isAccountNeedOffset;
         this.#accountControl.classList.add("accounting-not-empty");
         this.accountCode = accountCode;
         this.accountText = accountText;
         this.#accountText.innerText = accountText;
         this.#validateAccount();
-        this.saveSummary(summary)
+        this.saveDescription(description)
     }
 
     /**
@@ -389,7 +389,7 @@ class VoucherLineItemEditor {
     #validate() {
         let isValid = true;
         isValid = this.#validateOriginalLineItem() && isValid;
-        isValid = this.#validateSummary() && isValid;
+        isValid = this.#validateDescription() && isValid;
         isValid = this.#validateAccount() && isValid;
         isValid = this.#validateAmount() && isValid
         return isValid;
@@ -408,14 +408,14 @@ class VoucherLineItemEditor {
     }
 
     /**
-     * Validates the summary.
+     * Validates the description.
      *
      * @return {boolean} true if valid, or false otherwise
      * @private
      */
-    #validateSummary() {
-        this.#summaryText.classList.remove("is-invalid");
-        this.#summaryError.innerText = "";
+    #validateDescription() {
+        this.#descriptionText.classList.remove("is-invalid");
+        this.#descriptionError.innerText = "";
         return true;
     }
 
@@ -492,12 +492,12 @@ class VoucherLineItemEditor {
         this.originalLineItemDate = null;
         this.originalLineItemText = null;
         this.#originalLineItemText.innerText = "";
-        this.#setEnableSummaryAccount(true);
-        this.#summaryControl.classList.remove("accounting-not-empty");
-        this.#summaryControl.classList.remove("is-invalid");
-        this.summary = null;
-        this.#summaryText.innerText = ""
-        this.#summaryError.innerText = ""
+        this.#setEnableDescriptionAccount(true);
+        this.#descriptionControl.classList.remove("accounting-not-empty");
+        this.#descriptionControl.classList.remove("is-invalid");
+        this.description = null;
+        this.#descriptionText.innerText = ""
+        this.#descriptionError.innerText = ""
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
         this.accountCode = null;
@@ -532,14 +532,14 @@ class VoucherLineItemEditor {
             this.#originalLineItemContainer.classList.remove("d-none");
             this.#originalLineItemControl.classList.add("accounting-not-empty");
         }
-        this.#setEnableSummaryAccount(!lineItem.isMatched && this.originalLineItemId === null);
-        this.summary = lineItem.getSummary();
-        if (this.summary === null) {
-            this.#summaryControl.classList.remove("accounting-not-empty");
+        this.#setEnableDescriptionAccount(!lineItem.isMatched && this.originalLineItemId === null);
+        this.description = lineItem.getDescription();
+        if (this.description === null) {
+            this.#descriptionControl.classList.remove("accounting-not-empty");
         } else {
-            this.#summaryControl.classList.add("accounting-not-empty");
+            this.#descriptionControl.classList.add("accounting-not-empty");
         }
-        this.#summaryText.innerText = this.summary === null? "": this.summary;
+        this.#descriptionText.innerText = this.description === null? "": this.description;
         if (lineItem.getAccountCode() === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
@@ -568,25 +568,25 @@ class VoucherLineItemEditor {
     }
 
     /**
-     * Sets the enable status of the summary and account.
+     * Sets the enable status of the description and account.
      *
      * @param isEnabled {boolean} true to enable, or false otherwise
      */
-    #setEnableSummaryAccount(isEnabled) {
+    #setEnableDescriptionAccount(isEnabled) {
         if (isEnabled) {
-            this.#summaryControl.dataset.bsToggle = "modal";
-            this.#summaryControl.dataset.bsTarget = "#accounting-summary-editor-" + this.#sideSubForm.side + "-modal";
-            this.#summaryControl.classList.remove("accounting-disabled");
-            this.#summaryControl.classList.add("accounting-clickable");
+            this.#descriptionControl.dataset.bsToggle = "modal";
+            this.#descriptionControl.dataset.bsTarget = "#accounting-description-editor-" + this.#sideSubForm.side + "-modal";
+            this.#descriptionControl.classList.remove("accounting-disabled");
+            this.#descriptionControl.classList.add("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "modal";
             this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#sideSubForm.side + "-modal";
             this.#accountControl.classList.remove("accounting-disabled");
             this.#accountControl.classList.add("accounting-clickable");
         } else {
-            this.#summaryControl.dataset.bsToggle = "";
-            this.#summaryControl.dataset.bsTarget = "";
-            this.#summaryControl.classList.add("accounting-disabled");
-            this.#summaryControl.classList.remove("accounting-clickable");
+            this.#descriptionControl.dataset.bsToggle = "";
+            this.#descriptionControl.dataset.bsTarget = "";
+            this.#descriptionControl.classList.add("accounting-disabled");
+            this.#descriptionControl.classList.remove("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "";
             this.#accountControl.dataset.bsTarget = "";
             this.#accountControl.classList.add("accounting-disabled");

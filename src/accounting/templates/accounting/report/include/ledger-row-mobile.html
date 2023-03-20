@@ -25,8 +25,8 @@ First written: 2023/3/5
       {{ line_item.date|accounting_format_date }}
     </div>
   {% endif %}
-  {% if line_item.summary %}
-    <div>{{ line_item.summary }}</div>
+  {% if line_item.description %}
+    <div>{{ line_item.description }}</div>
   {% endif %}
 </div>
 

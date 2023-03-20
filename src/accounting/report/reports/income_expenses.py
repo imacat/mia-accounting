@@ -57,8 +57,8 @@ class ReportLineItem:
         """The date."""
         self.account: Account | None = None
         """The account."""
-        self.summary: str | None = None
-        """The summary."""
+        self.description: str | None = None
+        """The description."""
         self.income: Decimal | None = None
         """The income amount."""
         self.expense: Decimal | None = None
@@ -72,7 +72,7 @@ class ReportLineItem:
         if line_item is not None:
             self.date = line_item.voucher.date
             self.account = line_item.account
-            self.summary = line_item.summary
+            self.description = line_item.description
             self.income = None if line_item.is_debit else line_item.amount
             self.expense = line_item.amount if line_item.is_debit else None
             self.note = line_item.voucher.note
@@ -131,7 +131,7 @@ class LineItemCollector:
         line_item.is_brought_forward = True
         line_item.date = self.__period.start
         line_item.account = Account.accumulated_change()
-        line_item.summary = gettext("Brought forward")
+        line_item.description = gettext("Brought forward")
         if balance > 0:
             line_item.income = balance
         elif balance < 0:
@@ -184,7 +184,7 @@ class LineItemCollector:
             return None
         line_item: ReportLineItem = ReportLineItem()
         line_item.is_total = True
-        line_item.summary = gettext("Total")
+        line_item.description = gettext("Total")
         line_item.income = sum([x.income for x in self.line_items
                                 if x.income is not None])
         line_item.expense = sum([x.expense for x in self.line_items
@@ -215,7 +215,7 @@ class CSVRow(BaseCSVRow):
 
     def __init__(self, voucher_date: date | str | None,
                  account: str | None,
-                 summary: str | None,
+                 description: str | None,
                  income: str | Decimal | None,
                  expense: str | Decimal | None,
                  balance: str | Decimal | None,
@@ -224,7 +224,7 @@ class CSVRow(BaseCSVRow):
 
         :param voucher_date: The voucher date.
         :param account: The account.
-        :param summary: The summary.
+        :param description: The description.
         :param income: The income.
         :param expense: The expense.
         :param balance: The balance.
@@ -234,8 +234,8 @@ class CSVRow(BaseCSVRow):
         """The date."""
         self.account: str | None = account
         """The account."""
-        self.summary: str | None = summary
-        """The summary."""
+        self.description: str | None = description
+        """The description."""
         self.income: str | Decimal | None = income
         """The income."""
         self.expense: str | Decimal | None = expense
@@ -251,7 +251,7 @@ class CSVRow(BaseCSVRow):
 
         :return: The values of the row.
         """
-        return [self.date, self.account, self.summary,
+        return [self.date, self.account, self.description,
                 self.income, self.expense, self.balance, self.note]
 
 
@@ -405,18 +405,18 @@ class IncomeExpenses(BaseReport):
         :return: The CSV rows.
         """
         rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Account"),
-                                     gettext("Summary"), gettext("Income"),
+                                     gettext("Description"), gettext("Income"),
                                      gettext("Expense"), gettext("Balance"),
                                      gettext("Note"))]
         if self.__brought_forward is not None:
             rows.append(CSVRow(self.__brought_forward.date,
                                str(self.__brought_forward.account).title(),
-                               self.__brought_forward.summary,
+                               self.__brought_forward.description,
                                self.__brought_forward.income,
                                self.__brought_forward.expense,
                                self.__brought_forward.balance,
                                None))
-        rows.extend([CSVRow(x.date, str(x.account).title(), x.summary,
+        rows.extend([CSVRow(x.date, str(x.account).title(), x.description,
                             x.income, x.expense, x.balance, x.note)
                      for x in self.__line_items])
         if self.__total is not None:

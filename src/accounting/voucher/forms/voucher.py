@@ -35,7 +35,7 @@ from accounting.models import Voucher, Account, VoucherLineItem, \
 from accounting.voucher.utils.account_option import AccountOption
 from accounting.voucher.utils.original_line_items import \
     get_selectable_original_line_items
-from accounting.voucher.utils.summary_editor import SummaryEditor
+from accounting.voucher.utils.description_editor import DescriptionEditor
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_multiline_text
 from accounting.utils.user import get_current_user_pk
@@ -256,12 +256,12 @@ class VoucherForm(FlaskForm):
                 if isinstance(x, str) or isinstance(x, LazyString)]
 
     @property
-    def summary_editor(self) -> SummaryEditor:
-        """Returns the summary editor.
+    def description_editor(self) -> DescriptionEditor:
+        """Returns the description editor.
 
-        :return: The summary editor.
+        :return: The description editor.
         """
-        return SummaryEditor()
+        return DescriptionEditor()
 
     @property
     def original_line_item_options(self) -> list[VoucherLineItem]:
@@ -394,7 +394,7 @@ class LineItemCollector(t.Generic[T], ABC):
             candidates.sort(key=lambda x: x.no)
             line_item = candidates[0]
             line_item.account_id = Account.cash().id
-            line_item.summary = None
+            line_item.description = None
             line_item.amount = sum([x.amount.data for x in forms])
             line_item.no = no
             if db.session.is_modified(line_item):
@@ -405,7 +405,7 @@ class LineItemCollector(t.Generic[T], ABC):
             line_item.is_debit = is_debit
             line_item.currency_code = currency_code
             line_item.account_id = Account.cash().id
-            line_item.summary = None
+            line_item.description = None
             line_item.amount = sum([x.amount.data for x in forms])
             line_item.no = no
             self.__obj.line_items.append(line_item)

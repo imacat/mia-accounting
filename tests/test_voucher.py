@@ -264,7 +264,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[0].debit[0].no, 1)
             self.assertEqual(currencies[0].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[0].debit[0].summary)
+            self.assertIsNone(currencies[0].debit[0].description)
             self.assertEqual(currencies[0].debit[0].amount,
                              sum([x.amount for x in currencies[0].credit]))
             self.assertEqual(len(currencies[0].credit), 2)
@@ -280,7 +280,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[1].debit[0].no, 2)
             self.assertEqual(currencies[1].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[1].debit[0].summary)
+            self.assertIsNone(currencies[1].debit[0].description)
             self.assertEqual(currencies[1].debit[0].amount,
                              sum([x.amount for x in currencies[1].credit]))
             self.assertEqual(len(currencies[1].credit), 3)
@@ -299,7 +299,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[2].debit[0].no, 3)
             self.assertEqual(currencies[2].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[2].debit[0].summary)
+            self.assertIsNone(currencies[2].debit[0].description)
             self.assertEqual(currencies[2].debit[0].amount,
                              sum([x.amount for x in currencies[2].credit]))
             self.assertEqual(len(currencies[2].credit), 2)
@@ -424,7 +424,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[0].debit[0].no, 1)
             self.assertEqual(currencies1[0].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[0].debit[0].summary)
+            self.assertIsNone(currencies1[0].debit[0].description)
             self.assertEqual(currencies1[0].debit[0].amount,
                              sum([x.amount for x in currencies1[0].credit]))
             self.assertEqual(len(currencies1[0].credit), 2)
@@ -443,7 +443,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].debit[0].no, 2)
             self.assertEqual(currencies1[1].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].debit[0].summary)
+            self.assertIsNone(currencies1[1].debit[0].description)
             self.assertEqual(currencies1[1].debit[0].amount,
                              sum([x.amount for x in currencies1[1].credit]))
             self.assertEqual(len(currencies1[1].credit), 2)
@@ -465,7 +465,7 @@ class CashReceiptVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[2].debit[0].no, 3)
             self.assertEqual(currencies1[2].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].debit[0].summary)
+            self.assertIsNone(currencies1[2].debit[0].description)
             self.assertEqual(currencies1[2].debit[0].amount,
                              sum([x.amount for x in currencies1[2].credit]))
             self.assertEqual(len(currencies1[2].credit), 3)
@@ -843,7 +843,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[0].credit[0].no, 1)
             self.assertEqual(currencies[0].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[0].credit[0].summary)
+            self.assertIsNone(currencies[0].credit[0].description)
             self.assertEqual(currencies[0].credit[0].amount,
                              sum([x.amount for x in currencies[0].debit]))
 
@@ -852,20 +852,20 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[1].debit[0].no, 3)
             self.assertEqual(currencies[1].debit[0].account.code,
                              Accounts.BANK)
-            self.assertEqual(currencies[1].debit[0].summary, "Deposit")
+            self.assertEqual(currencies[1].debit[0].description, "Deposit")
             self.assertEqual(currencies[1].debit[1].no, 4)
             self.assertEqual(currencies[1].debit[1].account.code,
                              Accounts.OFFICE)
-            self.assertEqual(currencies[1].debit[1].summary, "Pens")
+            self.assertEqual(currencies[1].debit[1].description, "Pens")
             self.assertEqual(currencies[1].debit[2].no, 5)
             self.assertEqual(currencies[1].debit[2].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[1].debit[2].summary)
+            self.assertIsNone(currencies[1].debit[2].description)
             self.assertEqual(len(currencies[1].credit), 1)
             self.assertEqual(currencies[1].credit[0].no, 2)
             self.assertEqual(currencies[1].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[1].credit[0].summary)
+            self.assertIsNone(currencies[1].credit[0].description)
             self.assertEqual(currencies[1].credit[0].amount,
                              sum([x.amount for x in currencies[1].debit]))
 
@@ -881,7 +881,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[2].credit[0].no, 3)
             self.assertEqual(currencies[2].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[2].credit[0].summary)
+            self.assertIsNone(currencies[2].credit[0].description)
             self.assertEqual(currencies[2].credit[0].amount,
                              sum([x.amount for x in currencies[2].debit]))
 
@@ -1008,7 +1008,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[0].credit[0].no, 1)
             self.assertEqual(currencies1[0].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[0].credit[0].summary)
+            self.assertIsNone(currencies1[0].credit[0].description)
             self.assertEqual(currencies1[0].credit[0].amount,
                              sum([x.amount for x in currencies1[0].debit]))
 
@@ -1019,7 +1019,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].debit[0].no, 3)
             self.assertEqual(currencies1[1].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].debit[0].summary)
+            self.assertIsNone(currencies1[1].debit[0].description)
             self.assertEqual(currencies1[1].debit[1].id,
                              currencies0[2].debit[1].id)
             self.assertEqual(currencies1[1].debit[1].no, 4)
@@ -1030,7 +1030,7 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].credit[0].no, 2)
             self.assertEqual(currencies1[1].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].credit[0].summary)
+            self.assertIsNone(currencies1[1].credit[0].description)
             self.assertEqual(currencies1[1].credit[0].amount,
                              sum([x.amount for x in currencies1[1].debit]))
 
@@ -1040,26 +1040,26 @@ class CashDisbursementVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[2].debit[0].no, 5)
             self.assertEqual(currencies1[2].debit[0].account.code,
                              Accounts.TRAVEL)
-            self.assertIsNone(currencies1[2].debit[0].summary)
+            self.assertIsNone(currencies1[2].debit[0].description)
             self.assertEqual(currencies1[2].debit[1].id,
                              currencies0[1].debit[2].id)
             self.assertEqual(currencies1[2].debit[1].no, 6)
             self.assertEqual(currencies1[2].debit[1].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].debit[1].summary)
+            self.assertIsNone(currencies1[2].debit[1].description)
             self.assertEqual(currencies1[2].debit[2].id,
                              currencies0[1].debit[0].id)
             self.assertEqual(currencies1[2].debit[2].no, 7)
             self.assertEqual(currencies1[2].debit[2].account.code,
                              Accounts.BANK)
-            self.assertEqual(currencies1[2].debit[2].summary, "Deposit")
+            self.assertEqual(currencies1[2].debit[2].description, "Deposit")
             self.assertEqual(len(currencies1[2].credit), 1)
             self.assertEqual(currencies1[2].credit[0].id,
                              currencies0[1].credit[0].id)
             self.assertEqual(currencies1[2].credit[0].no, 3)
             self.assertEqual(currencies1[2].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].credit[0].summary)
+            self.assertIsNone(currencies1[2].credit[0].description)
             self.assertEqual(currencies1[2].credit[0].amount,
                              sum([x.amount for x in currencies1[2].debit]))
 
@@ -1464,15 +1464,15 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies[1].debit[0].no, 3)
             self.assertEqual(currencies[1].debit[0].account.code,
                              Accounts.BANK)
-            self.assertEqual(currencies[1].debit[0].summary, "Deposit")
+            self.assertEqual(currencies[1].debit[0].description, "Deposit")
             self.assertEqual(currencies[1].debit[1].no, 4)
             self.assertEqual(currencies[1].debit[1].account.code,
                              Accounts.OFFICE)
-            self.assertEqual(currencies[1].debit[1].summary, "Pens")
+            self.assertEqual(currencies[1].debit[1].description, "Pens")
             self.assertEqual(currencies[1].debit[2].no, 5)
             self.assertEqual(currencies[1].debit[2].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies[1].debit[2].summary)
+            self.assertIsNone(currencies[1].debit[2].description)
             self.assertEqual(len(currencies[1].credit), 3)
             self.assertEqual(currencies[1].credit[0].no, 3)
             self.assertEqual(currencies[1].credit[0].account.code,
@@ -1668,7 +1668,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].debit[0].no, 3)
             self.assertEqual(currencies1[1].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].debit[0].summary)
+            self.assertIsNone(currencies1[1].debit[0].description)
             self.assertEqual(currencies1[1].debit[1].id,
                              currencies0[2].debit[1].id)
             self.assertEqual(currencies1[1].debit[1].no, 4)
@@ -1692,19 +1692,19 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[2].debit[0].no, 5)
             self.assertEqual(currencies1[2].debit[0].account.code,
                              Accounts.TRAVEL)
-            self.assertIsNone(currencies1[2].debit[0].summary)
+            self.assertIsNone(currencies1[2].debit[0].description)
             self.assertEqual(currencies1[2].debit[1].id,
                              currencies0[1].debit[2].id)
             self.assertEqual(currencies1[2].debit[1].no, 6)
             self.assertEqual(currencies1[2].debit[1].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].debit[1].summary)
+            self.assertIsNone(currencies1[2].debit[1].description)
             self.assertEqual(currencies1[2].debit[2].id,
                              currencies0[1].debit[0].id)
             self.assertEqual(currencies1[2].debit[2].no, 7)
             self.assertEqual(currencies1[2].debit[2].account.code,
                              Accounts.BANK)
-            self.assertEqual(currencies1[2].debit[2].summary, "Deposit")
+            self.assertEqual(currencies1[2].debit[2].description, "Deposit")
             self.assertEqual(len(currencies1[2].credit), 3)
             self.assertNotIn(currencies1[2].credit[0].id, old_id)
             self.assertEqual(currencies1[2].credit[0].no, 5)
@@ -1824,7 +1824,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[0].debit[0].no, 1)
             self.assertEqual(currencies1[0].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[0].debit[0].summary)
+            self.assertIsNone(currencies1[0].debit[0].description)
             self.assertEqual(currencies1[0].debit[0].amount,
                              sum([x.amount for x in currencies1[0].credit]))
             self.assertEqual(len(currencies1[0].credit), 2)
@@ -1843,7 +1843,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].debit[0].no, 2)
             self.assertEqual(currencies1[1].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].debit[0].summary)
+            self.assertIsNone(currencies1[1].debit[0].description)
             self.assertEqual(currencies1[1].debit[0].amount,
                              sum([x.amount for x in currencies1[1].credit]))
             self.assertEqual(len(currencies1[1].credit), 2)
@@ -1865,7 +1865,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[2].debit[0].no, 3)
             self.assertEqual(currencies1[2].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].debit[0].summary)
+            self.assertIsNone(currencies1[2].debit[0].description)
             self.assertEqual(currencies1[2].debit[0].amount,
                              sum([x.amount for x in currencies1[2].credit]))
             self.assertEqual(len(currencies1[2].credit), 3)
@@ -1932,7 +1932,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[0].credit[0].no, 1)
             self.assertEqual(currencies1[0].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[0].credit[0].summary)
+            self.assertIsNone(currencies1[0].credit[0].description)
             self.assertEqual(currencies1[0].credit[0].amount,
                              sum([x.amount for x in currencies1[0].debit]))
 
@@ -1943,7 +1943,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].debit[0].no, 3)
             self.assertEqual(currencies1[1].debit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].debit[0].summary)
+            self.assertIsNone(currencies1[1].debit[0].description)
             self.assertEqual(currencies1[1].debit[1].id,
                              currencies0[2].debit[1].id)
             self.assertEqual(currencies1[1].debit[1].no, 4)
@@ -1954,7 +1954,7 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[1].credit[0].no, 2)
             self.assertEqual(currencies1[1].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[1].credit[0].summary)
+            self.assertIsNone(currencies1[1].credit[0].description)
             self.assertEqual(currencies1[1].credit[0].amount,
                              sum([x.amount for x in currencies1[1].debit]))
 
@@ -1964,26 +1964,26 @@ class TransferVoucherTestCase(unittest.TestCase):
             self.assertEqual(currencies1[2].debit[0].no, 5)
             self.assertEqual(currencies1[2].debit[0].account.code,
                              Accounts.TRAVEL)
-            self.assertIsNone(currencies1[2].debit[0].summary)
+            self.assertIsNone(currencies1[2].debit[0].description)
             self.assertEqual(currencies1[2].debit[1].id,
                              currencies0[1].debit[2].id)
             self.assertEqual(currencies1[2].debit[1].no, 6)
             self.assertEqual(currencies1[2].debit[1].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].debit[1].summary)
+            self.assertIsNone(currencies1[2].debit[1].description)
             self.assertEqual(currencies1[2].debit[2].id,
                              currencies0[1].debit[0].id)
             self.assertEqual(currencies1[2].debit[2].no, 7)
             self.assertEqual(currencies1[2].debit[2].account.code,
                              Accounts.BANK)
-            self.assertEqual(currencies1[2].debit[2].summary, "Deposit")
+            self.assertEqual(currencies1[2].debit[2].description, "Deposit")
             self.assertEqual(len(currencies1[2].credit), 1)
             self.assertEqual(currencies1[2].credit[0].id,
                              currencies0[1].credit[0].id)
             self.assertEqual(currencies1[2].credit[0].no, 3)
             self.assertEqual(currencies1[2].credit[0].account.code,
                              Accounts.CASH)
-            self.assertIsNone(currencies1[2].credit[0].summary)
+            self.assertIsNone(currencies1[2].credit[0].description)
             self.assertEqual(currencies1[2].credit[0].amount,
                              sum([x.amount for x in currencies1[2].debit]))
 

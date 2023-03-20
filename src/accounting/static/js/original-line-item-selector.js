@@ -244,10 +244,10 @@ class OriginalLineItem {
     accountText;
 
     /**
-     * The summary
+     * The description
      * @type {string}
      */
-    summary;
+    description;
 
     /**
      * The net balance, without the offset amounts on the form
@@ -294,7 +294,7 @@ class OriginalLineItem {
         this.#currencyCode = element.dataset.currencyCode;
         this.accountCode = element.dataset.accountCode;
         this.accountText = element.dataset.accountText;
-        this.summary = element.dataset.summary;
+        this.description = element.dataset.description;
         this.bareNetBalance = new Decimal(element.dataset.netBalance);
         this.netBalance = this.bareNetBalance;
         this.netBalanceText = document.getElementById("accounting-original-line-item-selector-option-" + this.id + "-net-balance");

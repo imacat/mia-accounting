@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The summary editor.
+"""The description editor.
 
 """
 import typing as t
@@ -25,11 +25,11 @@ from accounting import db
 from accounting.models import Account, VoucherLineItem
 
 
-class SummaryAccount:
-    """An account for a summary tag."""
+class DescriptionAccount:
+    """An account for a description tag."""
 
     def __init__(self, account: Account, freq: int):
-        """Constructs an account for a summary tag.
+        """Constructs an account for a description tag.
 
         :param account: The account.
         :param freq: The frequency of the tag with the account.
@@ -59,17 +59,17 @@ class SummaryAccount:
         self.freq = self.freq + freq
 
 
-class SummaryTag:
-    """A summary tag."""
+class DescriptionTag:
+    """A description tag."""
 
     def __init__(self, name: str):
-        """Constructs a summary tag.
+        """Constructs a description tag.
 
         :param name: The tag name.
         """
         self.name: str = name
         """The tag name."""
-        self.__account_dict: dict[int, SummaryAccount] = {}
+        self.__account_dict: dict[int, DescriptionAccount] = {}
         """The accounts that come with the tag, in the order of their
         frequency."""
         self.freq: int = 0
@@ -89,11 +89,11 @@ class SummaryTag:
         :param freq: The frequency of the tag name with the account.
         :return: None.
         """
-        self.__account_dict[account.id] = SummaryAccount(account, freq)
+        self.__account_dict[account.id] = DescriptionAccount(account, freq)
         self.freq = self.freq + freq
 
     @property
-    def accounts(self) -> list[SummaryAccount]:
+    def accounts(self) -> list[DescriptionAccount]:
         """Returns the accounts by the order of their frequencies.
 
         :return: The accounts by the order of their frequencies.
@@ -109,17 +109,17 @@ class SummaryTag:
         return [x.code for x in self.accounts]
 
 
-class SummaryType:
-    """A summary type"""
+class DescriptionType:
+    """A description type"""
 
     def __init__(self, type_id: t.Literal["general", "travel", "bus"]):
-        """Constructs a summary type.
+        """Constructs a description type.
 
         :param type_id: The type ID, either "general", "travel", or "bus".
         """
         self.id: t.Literal["general", "travel", "bus"] = type_id
         """The type ID."""
-        self.__tag_dict: dict[str, SummaryTag] = {}
+        self.__tag_dict: dict[str, DescriptionTag] = {}
         """A dictionary from the tag name to their corresponding tag."""
 
     def add_tag(self, name: str, account: Account, freq: int) -> None:
@@ -131,11 +131,11 @@ class SummaryType:
         :return: None.
         """
         if name not in self.__tag_dict:
-            self.__tag_dict[name] = SummaryTag(name)
+            self.__tag_dict[name] = DescriptionTag(name)
         self.__tag_dict[name].add_account(account, freq)
 
     @property
-    def tags(self) -> list[SummaryTag]:
+    def tags(self) -> list[DescriptionTag]:
         """Returns the tags by the order of their frequencies.
 
         :return: The tags by the order of their frequencies.
@@ -143,24 +143,24 @@ class SummaryType:
         return sorted(self.__tag_dict.values(), key=lambda x: -x.freq)
 
 
-class SummarySide:
-    """A summary side"""
+class DescriptionSide:
+    """A description side"""
 
     def __init__(self, side_id: t.Literal["debit", "credit"]):
-        """Constructs a summary side.
+        """Constructs a description side.
 
         :param side_id: The side ID, either "debit" or "credit".
         """
         self.side: t.Literal["debit", "credit"] = side_id
         """The side."""
-        self.general: SummaryType = SummaryType("general")
+        self.general: DescriptionType = DescriptionType("general")
         """The general tags."""
-        self.travel: SummaryType = SummaryType("travel")
+        self.travel: DescriptionType = DescriptionType("travel")
         """The travel tags."""
-        self.bus: SummaryType = SummaryType("bus")
+        self.bus: DescriptionType = DescriptionType("bus")
         """The bus tags."""
         self.__type_dict: dict[t.Literal["general", "travel", "bus"],
-                               SummaryType] \
+                               DescriptionType] \
             = {x.id: x for x in {self.general, self.travel, self.bus}}
         """A dictionary from the type ID to the corresponding tags."""
 
@@ -177,13 +177,13 @@ class SummarySide:
         self.__type_dict[tag_type].add_tag(name, account, freq)
 
     @property
-    def accounts(self) -> list[SummaryAccount]:
-        """Returns the suggested accounts of all tags in the summary editor in
-        the side, in their frequency order.
+    def accounts(self) -> list[DescriptionAccount]:
+        """Returns the suggested accounts of all tags in the description editor
+        in the side, in their frequency order.
 
         :return: The suggested accounts of all tags, in their frequency order.
         """
-        accounts: dict[int, SummaryAccount] = {}
+        accounts: dict[int, DescriptionAccount] = {}
         freq: dict[int, int] = {}
         for tag_type in self.__type_dict.values():
             for tag in tag_type.tags:
@@ -197,35 +197,36 @@ class SummarySide:
                                             key=lambda x: -freq[x])]
 
 
-class SummaryEditor:
-    """The summary editor."""
+class DescriptionEditor:
+    """The description editor."""
 
     def __init__(self):
-        """Constructs the summary editor."""
-        self.debit: SummarySide = SummarySide("debit")
+        """Constructs the description editor."""
+        self.debit: DescriptionSide = DescriptionSide("debit")
         """The debit tags."""
-        self.credit: SummarySide = SummarySide("credit")
+        self.credit: DescriptionSide = DescriptionSide("credit")
         """The credit tags."""
         side: sa.Label = sa.case((VoucherLineItem.is_debit, "debit"),
                                  else_="credit").label("side")
         tag_type: sa.Label = sa.case(
-            (VoucherLineItem.summary.like("_%—_%—_%→_%"), "bus"),
-            (sa.or_(VoucherLineItem.summary.like("_%—_%→_%"),
-                    VoucherLineItem.summary.like("_%—_%↔_%")), "travel"),
+            (VoucherLineItem.description.like("_%—_%—_%→_%"), "bus"),
+            (sa.or_(VoucherLineItem.description.like("_%—_%→_%"),
+                    VoucherLineItem.description.like("_%—_%↔_%")), "travel"),
             else_="general").label("tag_type")
-        tag: sa.Label = get_prefix(VoucherLineItem.summary, "—").label("tag")
+        tag: sa.Label = get_prefix(VoucherLineItem.description, "—")\
+            .label("tag")
         select: sa.Select = sa.Select(side, tag_type, tag,
                                       VoucherLineItem.account_id,
                                       sa.func.count().label("freq"))\
-            .filter(VoucherLineItem.summary.is_not(None),
-                    VoucherLineItem.summary.like("_%—_%"),
+            .filter(VoucherLineItem.description.is_not(None),
+                    VoucherLineItem.description.like("_%—_%"),
                     VoucherLineItem.original_line_item_id.is_(None))\
             .group_by(side, tag_type, tag, VoucherLineItem.account_id)
         result: list[sa.Row] = db.session.execute(select).all()
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query
                .filter(Account.id.in_({x.account_id for x in result})).all()}
-        side_dict: dict[t.Literal["debit", "credit"], SummarySide] \
+        side_dict: dict[t.Literal["debit", "credit"], DescriptionSide] \
             = {x.side: x for x in {self.debit, self.credit}}
         for row in result:
             side_dict[row.side].add_tag(

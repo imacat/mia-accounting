@@ -25,8 +25,8 @@ First written: 2023/3/14
     <div class="d-flex justify-content-between">
       <div>
         <div class="small">{{ line_item.account }}</div>
-        {% if line_item.summary is not none %}
-          <div>{{ line_item.summary }}</div>
+        {% if line_item.description is not none %}
+          <div>{{ line_item.description }}</div>
         {% endif %}
         {% if line_item.original_line_item %}
           <div class="fst-italic small accounting-original-line-item">

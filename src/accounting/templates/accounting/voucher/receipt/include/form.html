@@ -47,8 +47,8 @@ First written: 2023/2/25
 {% endblock %}
 
 {% block form_modals %}
-  {% with summary_editor = form.summary_editor.credit %}
-    {% include "accounting/voucher/include/summary-editor-modal.html" %}
+  {% with description_editor = form.description_editor.credit %}
+    {% include "accounting/voucher/include/description-editor-modal.html" %}
   {% endwith %}
   {% with side = "credit",
           account_options = form.credit_account_options %}

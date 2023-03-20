@@ -21,7 +21,7 @@ First written: 2023/3/8
 #}
 <div>{{ line_item.date|accounting_format_date }}</div>
 <div>{{ line_item.account.title|title }}</div>
-<div>{{ line_item.summary|accounting_default }}</div>
+<div>{{ line_item.description|accounting_default }}</div>
 <div class="accounting-amount">{{ line_item.income|accounting_format_amount|accounting_default }}</div>
 <div class="accounting-amount">{{ line_item.expense|accounting_format_amount|accounting_default }}</div>
 <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}">{{ line_item.balance|accounting_report_format_amount }}</div>

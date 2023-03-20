@@ -653,8 +653,8 @@ class VoucherLineItem(db.Model):
     """The account ID."""
     account = db.relationship(Account, back_populates="line_items", lazy=False)
     """The account."""
-    summary = db.Column(db.String, nullable=True)
-    """The summary."""
+    description = db.Column(db.String, nullable=True)
+    """The description."""
     amount = db.Column(db.Numeric(14, 2), nullable=False)
     """The amount."""
 
@@ -666,10 +666,10 @@ class VoucherLineItem(db.Model):
         if not hasattr(self, "__str"):
             from accounting.template_filters import format_date, format_amount
             setattr(self, "__str",
-                    gettext("%(date)s %(summary)s %(amount)s",
+                    gettext("%(date)s %(description)s %(amount)s",
                             date=format_date(self.voucher.date),
-                            summary="" if self.summary is None
-                            else self.summary,
+                            description="" if self.description is None
+                            else self.description,
                             amount=format_amount(self.amount)))
         return getattr(self, "__str")
 
@@ -753,8 +753,8 @@ class VoucherLineItem(db.Model):
             return str(whole) + str(abs(frac))[1:]
 
         voucher_day: date = self.voucher.date
-        summary: str = "" if self.summary is None else self.summary
-        return ([summary],
+        description: str = "" if self.description is None else self.description
+        return ([description],
                 [str(voucher_day.year),
                  "{}/{}".format(voucher_day.year, voucher_day.month),
                  "{}/{}".format(voucher_day.month, voucher_day.day),
