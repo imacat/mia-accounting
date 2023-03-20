@@ -28,25 +28,25 @@ First written: 2023/1/26
     </span>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item {% if request.endpoint.startswith("accounting.report.") %} active {% endif %}" href="{{ url_for("accounting.report.default") }}">
+        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.report.") %} active {% endif %}" href="{{ url_for("accounting.report.default") }}">
           <i class="fa-solid fa-book"></i>
           {{ A_("Reports") }}
         </a>
       </li>
       <li>
-        <a class="dropdown-item {% if request.endpoint.startswith("accounting.account.") %} active {% endif %}" href="{{ url_for("accounting.account.list") }}">
+        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.account.") %} active {% endif %}" href="{{ url_for("accounting.account.list") }}">
           <i class="fa-solid fa-clipboard"></i>
           {{ A_("Accounts") }}
         </a>
       </li>
       <li>
-        <a class="dropdown-item {% if request.endpoint.startswith("accounting.base-account.") %} active {% endif %}" href="{{ url_for("accounting.base-account.list") }}">
+        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.base-account.") %} active {% endif %}" href="{{ url_for("accounting.base-account.list") }}">
           <i class="fa-solid fa-list"></i>
           {{ A_("Base Accounts") }}
         </a>
       </li>
       <li>
-        <a class="dropdown-item {% if request.endpoint.startswith("accounting.currency.") %} active {% endif %}" href="{{ url_for("accounting.currency.list") }}">
+        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.currency.") %} active {% endif %}" href="{{ url_for("accounting.currency.list") }}">
           <i class="fa-solid fa-money-bill-wave"></i>
           {{ A_("Currencies") }}
         </a>
