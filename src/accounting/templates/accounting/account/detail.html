@@ -25,25 +25,25 @@ First written: 2023/1/31
 
 {% block content %}
 
-<div class="btn-group mb-3">
-  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|accounting_or_next }}">
+<div class="mb-3 accounting-toolbar">
+  <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.list")|accounting_or_next }}">
     <i class="fa-solid fa-circle-chevron-left"></i>
     {{ A_("Back") }}
   </a>
   {% if accounting_can_edit() %}
     <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.edit", account=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-gear"></i>
-      {{ A_("Settings") }}
+      <span class="d-none d-md-inline">{{ A_("Settings") }}</span>
     </a>
   {% endif %}
   <a class="btn btn-primary" href="{{ url_for("accounting.account.order", base=obj.base)|accounting_append_next }}">
     <i class="fa-solid fa-bars-staggered"></i>
-    {{ A_("Order") }}
+    <span class="d-none d-md-inline">{{ A_("Order") }}</span>
   </a>
   {% if accounting_can_edit() %}
     <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
       <i class="fa-solid fa-trash"></i>
-      {{ A_("Delete") }}
+      <span class="d-none d-md-inline">{{ A_("Delete") }}</span>
     </button>
   {% endif %}
 </div>
