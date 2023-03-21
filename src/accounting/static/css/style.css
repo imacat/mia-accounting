@@ -72,11 +72,14 @@
     }
 }
 @media(max-width:767px) {
+    .accounting-toolbar {
+    	width: 100%;
+    	justify-content: space-evenly;
+    }
     .accounting-toolbar > .btn:not(form), .accounting-toolbar > .btn-group > .btn {
         height: 3.2rem;
         width: 3.2rem;
         border-radius: 50%;
-        margin-left: 1rem;
     }
     .accounting-toolbar > a.btn, .accounting-toolbar > .btn-group > a.btn {
         padding-top: 0.7rem;
