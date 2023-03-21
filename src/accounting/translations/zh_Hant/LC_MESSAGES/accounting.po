@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-03-20 23:51+0800\n"
-"PO-Revision-Date: 2023-03-20 23:51+0800\n"
+"POT-Creation-Date: 2023-03-22 01:47+0800\n"
+"PO-Revision-Date: 2023-03-22 01:47+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -19,22 +19,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
 
-#: src/accounting/models.py:538
+#: src/accounting/models.py:559
 #, python-format
 msgid "Cash Disbursement Journal Entry#%(id)s"
 msgstr "現金支出傳票#%(id)s"
 
-#: src/accounting/models.py:541
+#: src/accounting/models.py:562
 #, python-format
 msgid "Cash Receipt Journal Entry#%(id)s"
 msgstr "現金收入傳票#%(id)s"
 
-#: src/accounting/models.py:542
+#: src/accounting/models.py:563
 #, python-format
 msgid "Transfer Journal Entry#%(id)s"
 msgstr "轉帳傳票#%(id)s"
 
-#: src/accounting/models.py:679
+#: src/accounting/models.py:696
 #, python-format
 msgid "%(date)s %(description)s %(amount)s"
 msgstr "%(date)s %(description)s %(amount)s"
@@ -86,7 +86,7 @@ msgstr "請填上標題。"
 
 #: src/accounting/account/queries.py:50
 #: src/accounting/report/reports/search.py:101
-#: src/accounting/templates/accounting/account/detail.html:90
+#: src/accounting/templates/accounting/account/detail.html:97
 #: src/accounting/templates/accounting/account/list.html:62
 msgid "Needs Offset"
 msgstr "需抵銷"
@@ -103,17 +103,21 @@ msgstr "科目未異動。"
 msgid "The account is updated successfully."
 msgstr "科目存好了。"
 
-#: src/accounting/account/views.py:163
+#: src/accounting/account/views.py:161
+msgid "The account cannot be deleted."
+msgstr "科目不可刪除。"
+
+#: src/accounting/account/views.py:166
 msgid "The account is deleted successfully."
 msgstr "科目刪掉了"
 
-#: src/accounting/account/views.py:190
-#: src/accounting/journal_entry/views.py:213
+#: src/accounting/account/views.py:193
+#: src/accounting/journal_entry/views.py:216
 msgid "The order was not modified."
 msgstr "順序未異動。"
 
-#: src/accounting/account/views.py:193
-#: src/accounting/journal_entry/views.py:216
+#: src/accounting/account/views.py:196
+#: src/accounting/journal_entry/views.py:219
 msgid "The order is updated successfully."
 msgstr "順序存好了。"
 
@@ -154,7 +158,11 @@ msgstr "貨幣未異動。"
 msgid "The currency is updated successfully."
 msgstr "貨幣存好了。"
 
-#: src/accounting/currency/views.py:165
+#: src/accounting/currency/views.py:164
+msgid "The currency cannot be deleted."
+msgstr "貨幣不可刪除。"
+
+#: src/accounting/currency/views.py:168
 msgid "The currency is deleted successfully."
 msgstr "貨幣刪掉了"
 
@@ -170,7 +178,11 @@ msgstr "傳票未異動。"
 msgid "The journal entry is updated successfully."
 msgstr "傳票存好了。"
 
-#: src/accounting/journal_entry/views.py:181
+#: src/accounting/journal_entry/views.py:179
+msgid "The journal entry cannot be deleted."
+msgstr "傳票不可刪除。"
+
+#: src/accounting/journal_entry/views.py:184
 msgid "The journal entry is deleted successfully."
 msgstr "傳票刪掉了"
 
@@ -358,13 +370,10 @@ msgstr "全部"
 #: src/accounting/report/reports/ledger.py:380
 #: src/accounting/report/reports/trial_balance.py:228
 #: src/accounting/templates/accounting/journal-entry/disbursement/detail.html:43
-#: src/accounting/templates/accounting/journal-entry/disbursement/include/form-currency.html:60
+#: src/accounting/templates/accounting/journal-entry/include/form-debit-credit.html:37
 #: src/accounting/templates/accounting/journal-entry/receipt/detail.html:43
-#: src/accounting/templates/accounting/journal-entry/receipt/include/form-currency.html:60
 #: src/accounting/templates/accounting/journal-entry/transfer/detail.html:39
 #: src/accounting/templates/accounting/journal-entry/transfer/detail.html:55
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:62
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:93
 #: src/accounting/templates/accounting/report/balance-sheet.html:59
 #: src/accounting/templates/accounting/report/balance-sheet.html:71
 #: src/accounting/templates/accounting/report/balance-sheet.html:81
@@ -399,7 +408,7 @@ msgstr "日期"
 #: src/accounting/report/reports/journal.py:156
 #: src/accounting/report/reports/trial_balance.py:224
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:57
-#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:92
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:90
 #: src/accounting/templates/accounting/report/income-expenses.html:56
 #: src/accounting/templates/accounting/report/journal.html:55
 #: src/accounting/templates/accounting/report/search.html:52
@@ -439,7 +448,7 @@ msgstr "餘額"
 #: src/accounting/report/reports/income_expenses.py:416
 #: src/accounting/report/reports/journal.py:158
 #: src/accounting/report/reports/ledger.py:368
-#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:172
+#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:178
 #: src/accounting/templates/accounting/journal-entry/include/form.html:73
 msgid "Note"
 msgstr "備註"
@@ -475,10 +484,8 @@ msgid "Amount"
 msgstr "金額"
 
 #: src/accounting/report/reports/journal.py:155
-#: src/accounting/templates/accounting/journal-entry/disbursement/include/form-currency.html:33
-#: src/accounting/templates/accounting/journal-entry/receipt/include/form-currency.html:33
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:33
-#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:75
+#: src/accounting/templates/accounting/journal-entry/include/form-currency.html:33
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:73
 #: src/accounting/templates/accounting/report/journal.html:54
 #: src/accounting/templates/accounting/report/search.html:51
 msgid "Currency"
@@ -488,7 +495,7 @@ msgstr "貨幣"
 #: src/accounting/report/reports/ledger.py:367
 #: src/accounting/report/reports/trial_balance.py:224
 #: src/accounting/templates/accounting/journal-entry/transfer/detail.html:33
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:48
+#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:30
 #: src/accounting/templates/accounting/report/journal.html:57
 #: src/accounting/templates/accounting/report/ledger.html:57
 #: src/accounting/templates/accounting/report/search.html:54
@@ -500,7 +507,7 @@ msgstr "借方"
 #: src/accounting/report/reports/ledger.py:367
 #: src/accounting/report/reports/trial_balance.py:225
 #: src/accounting/templates/accounting/journal-entry/transfer/detail.html:49
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:79
+#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:41
 #: src/accounting/templates/accounting/report/journal.html:58
 #: src/accounting/templates/accounting/report/ledger.html:58
 #: src/accounting/templates/accounting/report/search.html:55
@@ -555,24 +562,72 @@ msgstr "資產負債表"
 msgid "Please fill in the title."
 msgstr "請填上標題。"
 
-#: src/accounting/static/js/description-editor.js:767
-#: src/accounting/static/js/description-editor.js:953
+#: src/accounting/static/js/description-editor.js:756
+#: src/accounting/static/js/description-editor.js:934
 msgid "Please fill in the tag."
 msgstr "請填上標籤。"
 
-#: src/accounting/static/js/description-editor.js:777
-#: src/accounting/static/js/description-editor.js:973
+#: src/accounting/static/js/description-editor.js:766
+#: src/accounting/static/js/description-editor.js:954
 msgid "Please fill in the origin."
 msgstr "請填上起點。"
 
-#: src/accounting/static/js/description-editor.js:787
-#: src/accounting/static/js/description-editor.js:983
+#: src/accounting/static/js/description-editor.js:776
+#: src/accounting/static/js/description-editor.js:964
 msgid "Please fill in the destination."
 msgstr "請填上終點。"
 
-#: src/accounting/static/js/description-editor.js:963
+#: src/accounting/static/js/description-editor.js:944
 msgid "Please fill in the route."
 msgstr "請填上路線名稱。"
+
+#: src/accounting/static/js/description-editor.js:998
+msgid "January"
+msgstr "一月"
+
+#: src/accounting/static/js/description-editor.js:998
+msgid "February"
+msgstr "二月"
+
+#: src/accounting/static/js/description-editor.js:998
+msgid "March"
+msgstr "三月"
+
+#: src/accounting/static/js/description-editor.js:998
+msgid "April"
+msgstr "四月"
+
+#: src/accounting/static/js/description-editor.js:999
+msgid "May"
+msgstr "五月"
+
+#: src/accounting/static/js/description-editor.js:999
+msgid "June"
+msgstr "六月"
+
+#: src/accounting/static/js/description-editor.js:999
+msgid "July"
+msgstr "七月"
+
+#: src/accounting/static/js/description-editor.js:999
+msgid "August"
+msgstr "八月"
+
+#: src/accounting/static/js/description-editor.js:1000
+msgid "September"
+msgstr "九月"
+
+#: src/accounting/static/js/description-editor.js:1000
+msgid "October"
+msgstr "十月"
+
+#: src/accounting/static/js/description-editor.js:1000
+msgid "November"
+msgstr "十一月"
+
+#: src/accounting/static/js/description-editor.js:1000
+msgid "December"
+msgstr "十二月"
 
 #: src/accounting/static/js/journal-entry-form.js:985
 #: src/accounting/static/js/journal-entry-line-item-editor.js:449
@@ -629,28 +684,30 @@ msgstr "回上頁"
 #: src/accounting/templates/accounting/account/detail.html:36
 #: src/accounting/templates/accounting/currency/detail.html:36
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:36
-msgid "Settings"
-msgstr "設定"
+msgid "Edit"
+msgstr "編輯"
 
 #: src/accounting/templates/accounting/account/detail.html:41
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:41
 msgid "Order"
 msgstr "次序"
 
-#: src/accounting/templates/accounting/account/detail.html:46
-#: src/accounting/templates/accounting/currency/detail.html:42
+#: src/accounting/templates/accounting/account/detail.html:47
+#: src/accounting/templates/accounting/account/detail.html:52
+#: src/accounting/templates/accounting/currency/detail.html:43
+#: src/accounting/templates/accounting/currency/detail.html:48
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:48
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:53
 msgid "Delete"
 msgstr "刪除"
 
-#: src/accounting/templates/accounting/account/detail.html:69
+#: src/accounting/templates/accounting/account/detail.html:76
 msgid "Confirm Delete Account"
-msgstr "刪除科目確認"
+msgstr "確認刪除科目"
 
-#: src/accounting/templates/accounting/account/detail.html:70
+#: src/accounting/templates/accounting/account/detail.html:77
 #: src/accounting/templates/accounting/account/include/form.html:91
-#: src/accounting/templates/accounting/currency/detail.html:66
+#: src/accounting/templates/accounting/currency/detail.html:73
 #: src/accounting/templates/accounting/journal-entry/include/account-selector-modal.html:27
 #: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:30
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:78
@@ -661,36 +718,36 @@ msgstr "刪除科目確認"
 msgid "Close"
 msgstr "關閉"
 
-#: src/accounting/templates/accounting/account/detail.html:73
+#: src/accounting/templates/accounting/account/detail.html:80
 msgid "Do you really want to delete this account?"
 msgstr "你確定要刪掉這個科目嗎？"
 
-#: src/accounting/templates/accounting/account/detail.html:76
+#: src/accounting/templates/accounting/account/detail.html:83
 #: src/accounting/templates/accounting/account/include/form.html:112
-#: src/accounting/templates/accounting/currency/detail.html:72
+#: src/accounting/templates/accounting/currency/detail.html:79
 #: src/accounting/templates/accounting/journal-entry/include/account-selector-modal.html:49
-#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:187
+#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:193
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:84
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:70
 #: src/accounting/templates/accounting/report/include/search-modal.html:37
 msgid "Cancel"
 msgstr "取消"
 
-#: src/accounting/templates/accounting/account/detail.html:77
-#: src/accounting/templates/accounting/currency/detail.html:73
+#: src/accounting/templates/accounting/account/detail.html:84
+#: src/accounting/templates/accounting/currency/detail.html:80
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:85
 #: src/accounting/templates/accounting/report/include/period-chooser.html:141
 msgid "Confirm"
 msgstr "確定"
 
-#: src/accounting/templates/accounting/account/detail.html:94
-#: src/accounting/templates/accounting/currency/detail.html:85
+#: src/accounting/templates/accounting/account/detail.html:101
+#: src/accounting/templates/accounting/currency/detail.html:92
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:114
 msgid "Created"
 msgstr "建檔"
 
-#: src/accounting/templates/accounting/account/detail.html:95
-#: src/accounting/templates/accounting/currency/detail.html:86
+#: src/accounting/templates/accounting/account/detail.html:102
+#: src/accounting/templates/accounting/currency/detail.html:93
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:115
 msgid "Updated"
 msgstr "更新"
@@ -714,11 +771,8 @@ msgstr "科目管理"
 
 #: src/accounting/templates/accounting/account/list.html:32
 #: src/accounting/templates/accounting/currency/list.html:32
-#: src/accounting/templates/accounting/journal-entry/disbursement/include/form-currency.html:67
+#: src/accounting/templates/accounting/journal-entry/include/form-debit-credit.html:44
 #: src/accounting/templates/accounting/journal-entry/include/form.html:64
-#: src/accounting/templates/accounting/journal-entry/receipt/include/form-currency.html:67
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:69
-#: src/accounting/templates/accounting/journal-entry/transfer/include/form-currency.html:100
 #: src/accounting/templates/accounting/report/include/toolbar-buttons.html:26
 msgid "New"
 msgstr "新增"
@@ -730,7 +784,7 @@ msgstr "新增"
 #: src/accounting/templates/accounting/currency/list.html:65
 #: src/accounting/templates/accounting/journal-entry/include/account-selector-modal.html:46
 #: src/accounting/templates/accounting/journal-entry/include/original-line-item-selector-modal.html:51
-#: src/accounting/templates/accounting/journal-entry/order.html:80
+#: src/accounting/templates/accounting/journal-entry/order.html:82
 #: src/accounting/templates/accounting/report/balance-sheet.html:110
 #: src/accounting/templates/accounting/report/income-expenses.html:113
 #: src/accounting/templates/accounting/report/income-statement.html:96
@@ -749,7 +803,7 @@ msgstr "%(base)s下的科目"
 #: src/accounting/templates/accounting/account/include/form.html:75
 #: src/accounting/templates/accounting/account/order.html:62
 #: src/accounting/templates/accounting/currency/include/form.html:57
-#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:188
+#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:194
 #: src/accounting/templates/accounting/journal-entry/include/form.html:80
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:71
 #: src/accounting/templates/accounting/journal-entry/order.html:61
@@ -790,11 +844,11 @@ msgstr "基本科目管理"
 msgid "Add a New Currency"
 msgstr "新增貨幣"
 
-#: src/accounting/templates/accounting/currency/detail.html:65
+#: src/accounting/templates/accounting/currency/detail.html:72
 msgid "Confirm Delete Currency"
-msgstr "刪除貨幣確認"
+msgstr "確認刪除貨幣"
 
-#: src/accounting/templates/accounting/currency/detail.html:69
+#: src/accounting/templates/accounting/currency/detail.html:76
 msgid "Do you really want to delete this currency?"
 msgstr "你確定要刪掉這個貨幣嗎？"
 
@@ -850,14 +904,14 @@ msgstr "新增現金支出傳票"
 
 #: src/accounting/templates/accounting/journal-entry/disbursement/detail.html:27
 #: src/accounting/templates/accounting/journal-entry/receipt/detail.html:27
-msgid "To Transfer"
+msgid "As Transfer"
 msgstr "改轉帳"
 
 #: src/accounting/templates/accounting/journal-entry/disbursement/detail.html:37
-#: src/accounting/templates/accounting/journal-entry/disbursement/include/form-currency.html:46
+#: src/accounting/templates/accounting/journal-entry/disbursement/include/form-currency.html:28
 #: src/accounting/templates/accounting/journal-entry/include/form.html:56
 #: src/accounting/templates/accounting/journal-entry/receipt/detail.html:37
-#: src/accounting/templates/accounting/journal-entry/receipt/include/form-currency.html:46
+#: src/accounting/templates/accounting/journal-entry/receipt/include/form-currency.html:28
 msgid "Content"
 msgstr "內容"
 
@@ -893,8 +947,8 @@ msgid "Bus"
 msgstr "公車"
 
 #: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:59
-msgid "Regular"
-msgstr "帳單"
+msgid "Recurring"
+msgstr "常用"
 
 #: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:64
 msgid "Annotation"
@@ -922,7 +976,7 @@ msgstr "至"
 msgid "Route"
 msgstr "路線"
 
-#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:166
+#: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:172
 msgid "The Number of Items"
 msgstr "數量"
 
@@ -948,7 +1002,7 @@ msgstr "未抵銷"
 
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:77
 msgid "Confirm Delete Journal Entry"
-msgstr "刪除傳票確認"
+msgstr "確認刪除傳票"
 
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:81
 msgid "Do you really want to delete this journal entry?"
@@ -961,6 +1015,24 @@ msgstr "分錄內容"
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:34
 msgid "Original Line Item"
 msgstr "原始分錄"
+
+#: src/accounting/templates/accounting/journal-entry/include/order-journal-entry.html:26
+#: src/accounting/templates/accounting/report/include/add-journal-entry-material-fab.html:26
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:31
+msgid "Cash Disbursement"
+msgstr "現金支出"
+
+#: src/accounting/templates/accounting/journal-entry/include/order-journal-entry.html:28
+#: src/accounting/templates/accounting/report/include/add-journal-entry-material-fab.html:29
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:36
+msgid "Cash Receipt"
+msgstr "現金收入"
+
+#: src/accounting/templates/accounting/journal-entry/include/order-journal-entry.html:30
+#: src/accounting/templates/accounting/report/include/add-journal-entry-material-fab.html:32
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:41
+msgid "Transfer"
+msgstr "轉帳"
 
 #: src/accounting/templates/accounting/journal-entry/include/original-line-item-selector-modal.html:26
 msgid "Select Original Line Item"
@@ -1007,21 +1079,6 @@ msgstr "%(period)s%(currency)s%(account)s分類帳"
 msgid "Trial Balance of %(currency)s %(period)s"
 msgstr "%(period)s%(currency)s試算表"
 
-#: src/accounting/templates/accounting/report/include/add-journal-entry-material-fab.html:26
-#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:31
-msgid "Cash Disbursement"
-msgstr "現金支出"
-
-#: src/accounting/templates/accounting/report/include/add-journal-entry-material-fab.html:29
-#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:36
-msgid "Cash Receipt"
-msgstr "現金收入"
-
-#: src/accounting/templates/accounting/report/include/add-journal-entry-material-fab.html:32
-#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:41
-msgid "Transfer"
-msgstr "轉帳"
-
 #: src/accounting/templates/accounting/report/include/period-chooser.html:26
 msgid "Period Chooser"
 msgstr "選擇日期範圍"
@@ -1042,9 +1099,13 @@ msgstr "日"
 msgid "Custom"
 msgstr "自訂"
 
-#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:52
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:50
 msgid "Report"
 msgstr "報表"
+
+#: src/accounting/templates/accounting/report/include/toolbar-buttons.html:106
+msgid "Period"
+msgstr "期間"
 
 #: src/accounting/templates/accounting/report/include/toolbar-buttons.html:112
 #: src/accounting/templates/accounting/report/include/toolbar-buttons.html:117
