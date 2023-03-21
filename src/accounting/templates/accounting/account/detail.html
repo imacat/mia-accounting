@@ -32,8 +32,8 @@ First written: 2023/1/31
   </a>
   {% if accounting_can_edit() %}
     <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.account.edit", account=obj)|accounting_inherit_next }}">
-      <i class="fa-solid fa-gear"></i>
-      <span class="d-none d-md-inline">{{ A_("Settings") }}</span>
+      <i class="fa-solid fa-pen-to-square"></i>
+      {{ A_("Edit") }}
     </a>
   {% endif %}
   <a class="btn btn-primary" href="{{ url_for("accounting.account.order", base=obj.base)|accounting_append_next }}">
