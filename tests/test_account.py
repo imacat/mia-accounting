@@ -643,8 +643,8 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        detail_uri: str = f"{PREFIX}/{BANK.code}"
-        delete_uri: str = f"{PREFIX}/{BANK.code}/delete"
+        detail_uri: str = f"{PREFIX}/{PETTY.code}"
+        delete_uri: str = f"{PREFIX}/{PETTY.code}/delete"
         list_uri: str = PREFIX
         response: httpx.Response
 
@@ -653,8 +653,7 @@ class AccountTestCase(unittest.TestCase):
                                           "base_code": PETTY.base_code,
                                           "title": PETTY.title})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{PETTY.code}")
+        self.assertEqual(response.headers["Location"], detail_uri)
 
         response = self.client.post("/accounting/currencies/store",
                                     data={"csrf_token": self.csrf_token,
@@ -669,7 +668,7 @@ class AccountTestCase(unittest.TestCase):
                                 "next": NEXT_URI,
                                 "date": date.today().isoformat(),
                                 "currency-1-code": "USD",
-                                "currency-1-credit-1-account_code": PETTY.code,
+                                "currency-1-credit-1-account_code": BANK.code,
                                 "currency-1-credit-1-amount": "20"})
 
         with self.app.app_context():
@@ -680,15 +679,13 @@ class AccountTestCase(unittest.TestCase):
         response = self.client.post(f"{PREFIX}/{CASH.code}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{CASH.code}")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{CASH.code}")
 
         # Cannot delete the account that is in use
-        response = self.client.post(f"{PREFIX}/{PETTY.code}/delete",
+        response = self.client.post(f"{PREFIX}/{BANK.code}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{PETTY.code}")
+        self.assertEqual(response.headers["Location"], f"{PREFIX}/{BANK.code}")
 
         # Success
         response = self.client.get(detail_uri)
@@ -700,7 +697,7 @@ class AccountTestCase(unittest.TestCase):
 
         with self.app.app_context():
             self.assertEqual({x.code for x in Account.query.all()},
-                             {CASH.code, PETTY.code})
+                             {CASH.code, BANK.code})
 
         response = self.client.get(detail_uri)
         self.assertEqual(response.status_code, 404)
