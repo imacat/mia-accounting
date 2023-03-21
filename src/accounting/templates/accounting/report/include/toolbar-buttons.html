@@ -45,11 +45,11 @@ First written: 2023/3/8
   </div>
 {% endif %}
 <div class="btn-group" role="group">
-  <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+  <button id="accounting-choose-report" class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
     <i class="fa-solid fa-book"></i>
-    <span class="d-none d-md-inline">{{ report.report_chooser.current_report }}</span>
+    <span class="d-none d-md-inline">{{ A_("Report") }}</span>
   </button>
-  <ul class="dropdown-menu" aria-label="{{ A_("Report") }}">
+  <ul class="dropdown-menu" aria-labelledby="accounting-choose-report">
     {% for report in report.report_chooser %}
       <li>
         <a class="dropdown-item {% if report.is_active %} active {% endif %}" href="{{ report.url }}">
@@ -68,11 +68,11 @@ First written: 2023/3/8
 </div>
 {% if use_currency_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button id="accounting-choose-currency" class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-money-bill-wave"></i>
-      <span class="d-none d-md-inline">{{ report.currency.name|title }}</span>
+      <span class="d-none d-md-inline">{{ A_("Currency") }}</span>
     </button>
-    <ul class="dropdown-menu" aria-label="{{ A_("Currency") }}">
+    <ul class="dropdown-menu" aria-labelledby="accounting-choose-currency">
       {% for currency in report.currency_options %}
         <li>
           <a class="dropdown-item {% if currency.is_active %} active {% endif %}" href="{{ currency.url }}">
@@ -85,11 +85,11 @@ First written: 2023/3/8
 {% endif %}
 {% if use_account_chooser %}
   <div class="btn-group" role="group">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button id="accounting-choose-account" class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-clipboard"></i>
-      <span class="d-none d-md-inline">{{ report.account.title|title }}</span>
+      <span class="d-none d-md-inline">{{ A_("Account") }}</span>
     </button>
-    <ul class="dropdown-menu" aria-label="{{ A_("Account") }}">
+    <ul class="dropdown-menu" aria-labelledby="accounting-choose-account">
       {% for account in report.account_options %}
         <li>
           <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
@@ -103,7 +103,7 @@ First written: 2023/3/8
 {% if use_period_chooser %}
   <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-period-chooser-modal">
     <i class="fa-solid fa-calendar-day"></i>
-    <span class="d-none d-md-inline">{{ report.period.desc|title }}</span>
+    <span class="d-none d-md-inline">{{ A_("Period") }}</span>
   </button>
 {% endif %}
 {% if report.has_data %}
