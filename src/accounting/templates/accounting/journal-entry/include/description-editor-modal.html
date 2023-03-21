@@ -74,7 +74,7 @@ First written: 2023/2/28
               <div id="accounting-description-editor-{{ description_editor.debit_credit }}-general-tag-error" class="invalid-feedback"></div>
             </div>
 
-            <div>
+            <div class="accounting-description-editor-buttons">
               {% for tag in description_editor.general.tags %}
                 <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-general-btn-tag" type="button" tabindex="-1" data-value="{{ tag.name }}" data-accounts="{{ tag.account_codes|tojson|forceescape }}">
                   {{ tag }}
@@ -91,7 +91,7 @@ First written: 2023/2/28
               <div id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tag-error" class="invalid-feedback"></div>
             </div>
 
-            <div>
+            <div class="accounting-description-editor-buttons">
               {% for tag in description_editor.travel.tags %}
                 <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-travel-btn-tag" type="button" tabindex="-1" data-value="{{ tag.name }}" data-accounts="{{ tag.account_codes|tojson|forceescape }}">
                   {{ tag }}
@@ -99,7 +99,7 @@ First written: 2023/2/28
               {% endfor %}
             </div>
 
-            <div class="d-flex justify-content-between mt-2">
+            <div class="d-flex justify-content-between">
               <div class="form-floating">
                 <input id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-from" class="form-control" type="text" value="" placeholder=" ">
                 <label class="form-label" for="accounting-description-editor-{{ description_editor.debit_credit }}-travel-from">{{ A_("From") }}</label>
@@ -132,7 +132,7 @@ First written: 2023/2/28
               </div>
             </div>
 
-            <div>
+            <div class="accounting-description-editor-buttons">
               {% for tag in description_editor.bus.tags %}
                 <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-bus-btn-tag" type="button" tabindex="-1" data-value="{{ tag.name }}" data-accounts="{{ tag.account_codes|tojson|forceescape }}">
                   {{ tag }}
@@ -140,7 +140,7 @@ First written: 2023/2/28
               {% endfor %}
             </div>
 
-            <div class="d-flex justify-content-between mt-2">
+            <div class="d-flex justify-content-between">
               <div class="form-floating me-2">
                 <input id="accounting-description-editor-{{ description_editor.debit_credit }}-bus-from" class="form-control" type="text" value="" placeholder=" ">
                 <label class="form-label" for="accounting-description-editor-{{ description_editor.debit_credit }}-bus-from">{{ A_("From") }}</label>
@@ -156,11 +156,13 @@ First written: 2023/2/28
 
           {# A recurring transaction #}
           <div id="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-page" class="d-none" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-tab">
-            {% for recurring in description_editor.recurring %}
-              <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-recurring-item" type="button" tabindex="-1" data-template="{{ recurring.template }}" data-accounts="{{ recurring.account_codes|tojson|forceescape }}">
-                {{ recurring.name }}
-              </button>
-            {% endfor %}
+            <div class="accounting-description-editor-buttons">
+              {% for recurring in description_editor.recurring %}
+                <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-recurring-item" type="button" tabindex="-1" data-template="{{ recurring.template }}" data-accounts="{{ recurring.account_codes|tojson|forceescape }}">
+                  {{ recurring.name }}
+                </button>
+              {% endfor %}
+            </div>
           </div>
 
           {# The annotation #}

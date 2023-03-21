@@ -318,6 +318,11 @@ a.accounting-report-table-row {
     padding-left: 1rem;
 }
 
+/* The description editor */
+.accounting-description-editor-buttons .btn {
+    margin-bottom: 0.3rem;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
     position: relative;
