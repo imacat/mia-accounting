@@ -206,6 +206,13 @@ class DescriptionEditor:
         """The debit tags."""
         self.credit: DescriptionDebitCredit = DescriptionDebitCredit("credit")
         """The credit tags."""
+        self.__init_tags()
+
+    def __init_tags(self):
+        """Initializes the tags.
+
+        :return: None.
+        """
         debit_credit: sa.Label = sa.case(
             (JournalEntryLineItem.is_debit, "debit"),
             else_="credit").label("debit_credit")
