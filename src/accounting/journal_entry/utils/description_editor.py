@@ -280,11 +280,11 @@ class DescriptionEditor:
 
         :return: None.
         """
-        if "RECURRING" not in current_app.config:
+        if "ACCOUNTING_RECURRING" not in current_app.config:
             return
         data: list[tuple[t.Literal["debit", "credit"], str, str, str]] \
             = [x.split("|")
-               for x in current_app.config["RECURRING"].split(",")]
+               for x in current_app.config["ACCOUNTING_RECURRING"].split(",")]
         debit_credit_dict: dict[t.Literal["debit", "credit"],
                                 DescriptionDebitCredit] \
             = {x.debit_credit: x for x in {self.debit, self.credit}}
