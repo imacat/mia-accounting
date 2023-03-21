@@ -26,12 +26,12 @@ First written: 2023/2/6
 {% block content %}
 
 <div class="mb-3 accounting-toolbar">
-  <a class="btn btn-primary" href="{{ url_for("accounting.currency.list")|accounting_or_next }}">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.currency.list")|accounting_or_next }}">
     <i class="fa-solid fa-circle-chevron-left"></i>
     <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
   {% if accounting_can_edit() %}
-    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.currency.edit", currency=obj)|accounting_inherit_next }}">
+    <a class="btn btn-primary d-none d-md-inline" role="button" href="{{ url_for("accounting.currency.edit", currency=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
       {{ A_("Edit") }}
     </a>
@@ -53,7 +53,7 @@ First written: 2023/2/6
 
 {% if accounting_can_edit() %}
   <div class="d-md-none accounting-material-fab">
-    <a class="btn btn-primary" href="{{ url_for("accounting.currency.edit", currency=obj)|accounting_inherit_next }}">
+    <a class="btn btn-primary" role="button" href="{{ url_for("accounting.currency.edit", currency=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
     </a>
   </div>

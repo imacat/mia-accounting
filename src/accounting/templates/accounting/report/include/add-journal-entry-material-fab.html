@@ -22,13 +22,13 @@ First written: 2023/2/25
 {% if accounting_can_edit() %}
   <div id="accounting-material-fab-speed-dial" class="d-md-none accounting-material-fab">
     <div id="accounting-material-fab-speed-dial-actions" class="d-md-none accounting-material-fab-speed-dial-group">
-      <a class="btn rounded-pill" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_DISBURSEMENT)|accounting_append_next }}">
+      <a class="btn rounded-pill" role="button" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_DISBURSEMENT)|accounting_append_next }}">
         {{ A_("Cash Disbursement") }}
       </a>
-      <a class="btn rounded-pill" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_RECEIPT)|accounting_append_next }}">
+      <a class="btn rounded-pill" role="button" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.CASH_RECEIPT)|accounting_append_next }}">
         {{ A_("Cash Receipt") }}
       </a>
-      <a class="btn rounded-pill" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.TRANSFER)|accounting_append_next }}">
+      <a class="btn rounded-pill" role="button" href="{{ url_for("accounting.journal-entry.create", journal_entry_type=report.journal_entry_types.TRANSFER)|accounting_append_next }}">
         {{ A_("Transfer") }}
       </a>
     </div>

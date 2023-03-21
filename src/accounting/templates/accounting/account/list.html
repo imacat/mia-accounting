@@ -27,7 +27,7 @@ First written: 2023/1/30
 
 <div class="mb-2 accounting-toolbar">
   {% if accounting_can_edit() %}
-    <a class="btn btn-primary text-nowrap d-none d-md-block" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
+    <a class="btn btn-primary text-nowrap d-none d-md-block" role="button" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
       <i class="fa-solid fa-plus"></i>
       {{ A_("New") }}
     </a>
@@ -45,7 +45,7 @@ First written: 2023/1/30
 
 {% if accounting_can_edit() %}
   <div class="d-md-none accounting-material-fab">
-    <a class="btn btn-primary" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
+    <a class="btn btn-primary" role="button" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
       <i class="fa-solid fa-plus"></i>
     </a>
   </div>

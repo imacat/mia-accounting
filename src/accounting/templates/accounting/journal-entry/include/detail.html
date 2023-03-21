@@ -26,17 +26,17 @@ First written: 2023/2/26
 {% block content %}
 
 <div class="mb-3 accounting-toolbar">
-  <a class="btn btn-primary" href="{{ url_for("accounting.report.default")|accounting_or_next }}">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.report.default")|accounting_or_next }}">
     <i class="fa-solid fa-circle-chevron-left"></i>
     <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
   {% if accounting_can_edit() %}
-    <a class="btn btn-primary d-none d-md-inline" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_inherit_next }}">
+    <a class="btn btn-primary d-none d-md-inline" role="button" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
       {{ A_("Edit") }}
     </a>
   {% endif %}
-  <a class="btn btn-primary" href="{{ url_for("accounting.journal-entry.order", journal_entry_date=obj.date)|accounting_append_next }}">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.journal-entry.order", journal_entry_date=obj.date)|accounting_append_next }}">
     <i class="fa-solid fa-bars-staggered"></i>
     <span class="d-none d-md-inline">{{ A_("Order") }}</span>
   </a>
@@ -58,7 +58,7 @@ First written: 2023/2/26
 
 {% if accounting_can_edit() %}
   <div class="d-md-none accounting-material-fab">
-    <a class="btn btn-primary" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_inherit_next }}">
+    <a class="btn btn-primary" role="button" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_inherit_next }}">
       <i class="fa-solid fa-pen-to-square"></i>
     </a>
   </div>

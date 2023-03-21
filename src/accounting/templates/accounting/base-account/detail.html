@@ -26,7 +26,7 @@ First written: 2023/2/1
 {% block content %}
 
 <div class="mb-3 accounting-toolbar">
-  <a class="btn btn-primary" href="{{ url_for("accounting.account.list")|accounting_or_next }}">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.account.list")|accounting_or_next }}">
     <i class="fa-solid fa-circle-chevron-left"></i>
     <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
@@ -38,7 +38,7 @@ First written: 2023/2/1
   {% if obj.accounts %}
     <div>
     {% for account in obj.accounts %}
-      <a class="btn btn-primary" href="{{ url_for("accounting.account.detail", account=account)|accounting_append_next }}">
+      <a class="btn btn-primary" role="button" href="{{ url_for("accounting.account.detail", account=account)|accounting_append_next }}">
         {{ account }}
       </a>
     {% endfor %}
