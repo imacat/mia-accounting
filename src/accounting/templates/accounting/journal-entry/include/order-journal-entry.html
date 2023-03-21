@@ -21,7 +21,6 @@ First written: 2023/3/21
 #}
 <a class="small w-100 accounting-journal-entry-order-item" href="{{ url_for("accounting.journal-entry.detail", journal_entry=journal_entry)|accounting_append_next }}">
   <div>
-    {{ journal_entry.date|accounting_format_date }}
     {% if journal_entry.is_cash_disbursement %}
       {{ A_("Cash Disbursement") }}
     {% elif journal_entry.is_cash_receipt %}

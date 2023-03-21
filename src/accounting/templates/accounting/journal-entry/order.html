@@ -26,7 +26,7 @@ First written: 2023/2/26
   <script src="{{ url_for("accounting.static", filename="js/journal-entry-order.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ A_("Journal Entries on %(date)s", date=date) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Journal Entries on %(date)s", date=date|accounting_format_date) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
