@@ -618,14 +618,10 @@ class JournalEntry(db.Model):
 
         :return: True if the journal entry can be deleted, or False otherwise.
         """
-        if not hasattr(self, "__can_delete"):
-            def has_offset() -> bool:
-                for line_item in self.line_items:
-                    if len(line_item.offsets) > 0:
-                        return True
+        for line_item in self.line_items:
+            if len(line_item.offsets) > 0:
                 return False
-            setattr(self, "__can_delete", not has_offset())
-        return getattr(self, "__can_delete")
+        return True
 
     def delete(self) -> None:
         """Deletes the journal entry.
