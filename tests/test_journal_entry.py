@@ -569,12 +569,43 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        journal_entry_id: int \
+        from accounting.models import JournalEntry, JournalEntryLineItem
+        journal_entry_id_1: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
-        delete_uri: str = f"{PREFIX}/{journal_entry_id}/delete"
+        detail_uri: str = f"{PREFIX}/{journal_entry_id_1}?next=%2F_next"
+        delete_uri: str = f"{PREFIX}/{journal_entry_id_1}/delete"
         response: httpx.Response
 
+        form: dict[str, str] = self.__get_add_form()
+        key: str = [x for x in form if x.endswith("-account_code")][0]
+        form[key] = Accounts.PAYABLE
+        journal_entry_id_2: int = add_journal_entry(self.client, form)
+        with self.app.app_context():
+            journal_entry: JournalEntry | None \
+                = db.session.get(JournalEntry, journal_entry_id_2)
+            self.assertIsNotNone(journal_entry)
+            line_item: JournalEntryLineItem \
+                = [x for x in journal_entry.line_items
+                   if x.account_code == Accounts.PAYABLE][0]
+        add_journal_entry(
+            self.client,
+            form={"csrf_token": self.csrf_token,
+                  "next": NEXT_URI,
+                  "date": date.today().isoformat(),
+                  "currency-1-code": line_item.currency_code,
+                  "currency-1-debit-1-original_line_item_id": line_item.id,
+                  "currency-1-debit-1-account_code": line_item.account_code,
+                  "currency-1-debit-1-amount": "1"})
+
+        # Cannot delete the journal entry that is in use
+        response = self.client.post(f"{PREFIX}/{journal_entry_id_2}/delete",
+                                    data={"csrf_token": self.csrf_token,
+                                          "next": NEXT_URI})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{journal_entry_id_2}?next=%2F_next")
+
+        # Success
         response = self.client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
         response = self.client.post(delete_uri,

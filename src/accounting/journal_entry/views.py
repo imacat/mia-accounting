@@ -175,6 +175,9 @@ def delete_journal_entry(journal_entry: JournalEntry) -> redirect:
     :return: The redirection to the journal entry list on success, or the
         journal entry detail on error.
     """
+    if not journal_entry.can_delete:
+        flash(s(lazy_gettext("The journal entry cannot be deleted.")), "error")
+        return redirect(inherit_next(__get_detail_uri(journal_entry)))
     journal_entry.delete()
     sort_journal_entries_in(journal_entry.date, journal_entry.id)
     db.session.commit()
