@@ -160,6 +160,9 @@ def delete_currency(currency: Currency) -> redirect:
     :return: The redirection to the currency list on success, or the currency
         detail on error.
     """
+    if not currency.can_delete:
+        flash(s(lazy_gettext("The currency cannot be deleted.")), "error")
+        return redirect(inherit_next(__get_detail_uri(currency)))
     currency.delete()
     db.session.commit()
     flash(s(lazy_gettext("The currency is deleted successfully.")), "success")

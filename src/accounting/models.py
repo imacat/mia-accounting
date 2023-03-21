@@ -432,6 +432,17 @@ class Currency(db.Model):
                 return True
         return False
 
+    @property
+    def can_delete(self) -> bool:
+        """Returns whether the currency can be deleted.
+
+        :return: True if the currency can be deleted, or False otherwise.
+        """
+        from accounting.template_globals import default_currency_code
+        if self.code == default_currency_code():
+            return False
+        return len(self.line_items) == 0
+
     def delete(self) -> None:
         """Deletes the currency.
 
