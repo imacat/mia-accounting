@@ -323,6 +323,17 @@ a.accounting-report-table-row {
     margin-bottom: 0.3rem;
 }
 
+/* The order of the journal entries in a same day */
+.accounting-journal-entry-order-item, .accounting-journal-entry-order-item:hover {
+    color: inherit;
+    text-decoration: none;
+}
+.accounting-journal-entry-order-item-currency {
+    margin-left: 0.5rem;
+    border-top: thin solid lightgray;
+    margin-top: 0.2rem;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
     position: relative;

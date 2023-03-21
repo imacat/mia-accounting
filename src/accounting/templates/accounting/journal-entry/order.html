@@ -47,9 +47,9 @@ First written: 2023/2/26
       {% for item in list %}
         <li class="list-group-item d-flex justify-content-between" data-id="{{ item.id }}">
           <input id="accounting-order-{{ item.id }}-no" type="hidden" name="{{ item.id }}-no" value="{{ loop.index }}">
-          <div>
-            {{ item }}
-          </div>
+          {% with journal_entry = item %}
+            {% include "accounting/journal-entry/include/order-journal-entry.html" %}
+          {% endwith %}
           <i class="fa-solid fa-bars"></i>
         </li>
       {% endfor %}
@@ -72,7 +72,9 @@ First written: 2023/2/26
   <ul class="list-group mb-3">
     {% for item in list %}
       <li class="list-group-item">
-        {{ item }}
+        {% with journal_entry = item %}
+          {% include "accounting/journal-entry/include/order-journal-entry.html" %}
+        {% endwith %}
       </li>
     {% endfor %}
   </ul>

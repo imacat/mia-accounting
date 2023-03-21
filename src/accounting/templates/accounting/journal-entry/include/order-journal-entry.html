@@ -1,0 +1,57 @@
+{#
+The Mia! Accounting Flask Project
+order-journal-entry.html: The journal entry in the journal entry order page
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/21
+#}
+<a class="small w-100 accounting-journal-entry-order-item" href="{{ url_for("accounting.journal-entry.detail", journal_entry=journal_entry)|accounting_append_next }}">
+  <div>
+    {{ journal_entry.date|accounting_format_date }}
+    {% if journal_entry.is_cash_disbursement %}
+      {{ A_("Cash Disbursement") }}
+    {% elif journal_entry.is_cash_receipt %}
+      {{ A_("Cash Receipt") }}
+    {% else %}
+      {{ A_("Transfer") }}
+    {% endif %}
+  </div>
+  {% for currency in journal_entry.currencies %}
+    <div class="d-flex justify-content-between accounting-journal-entry-order-item-currency">
+      <div>
+        {% if not journal_entry.is_cash_receipt %}
+          {% for line_item in currency.debit %}
+            <div>{{ line_item.description|accounting_default }}</div>
+          {% endfor %}
+        {% endif %}
+        {% if not journal_entry.is_cash_disbursement %}
+          {% for line_item in currency.credit %}
+            <div class="accounting-mobile-journal-credit">{{ line_item.description|accounting_default }}</div>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div>
+        <span class="badge bg-info rounded-pill">
+          {% if currency.code != accounting_default_currency_code() %}
+            {{ currency.code }}
+          {% endif %}
+          {{ currency.debit_total|accounting_format_amount }}
+        </span>
+      </div>
+    </div>
+  {% endfor %}
+</a>
