@@ -21,10 +21,10 @@ First written: 2023/2/26
 #}
 {% extends "accounting/journal-entry/include/detail.html" %}
 
-{% block to_transfer %}
+{% block as_trasfer %}
   <a class="btn btn-primary" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_journal_entry_to_transfer|accounting_inherit_next }}">
-    <i class="fa-solid fa-bars-staggered"></i>
-    {{ A_("To Transfer") }}
+    <i class="fa-solid fa-table-columns"></i>
+    {{ A_("As Transfer") }}
   </a>
 {% endblock %}
 
