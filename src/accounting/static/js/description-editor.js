@@ -32,7 +32,7 @@ class DescriptionEditor {
      * The line item editor
      * @type {JournalEntryLineItemEditor}
      */
-    #lineItemEditor;
+    lineItemEditor;
 
     /**
      * The description editor form
@@ -113,7 +113,7 @@ class DescriptionEditor {
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
-        this.#lineItemEditor = lineItemEditor;
+        this.lineItemEditor = lineItemEditor;
         this.debitCredit = debitCredit;
         this.prefix = "accounting-description-editor-" + debitCredit;
         this.#form = document.getElementById(this.prefix);
@@ -132,7 +132,7 @@ class DescriptionEditor {
         this.currentTab = this.tabPlanes.general;
         this.#initializeSuggestedAccounts();
         this.description.onchange = () => this.#onDescriptionChange();
-        this.#offsetButton.onclick = () => this.#lineItemEditor.originalLineItemSelector.onOpen();
+        this.#offsetButton.onclick = () => this.lineItemEditor.originalLineItemSelector.onOpen();
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
                 this.#submit();
@@ -147,7 +147,7 @@ class DescriptionEditor {
      */
     #onDescriptionChange() {
         this.description.value = this.description.value.trim();
-        for (const tabPlane of [this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
+        for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
                 break;
             }
@@ -158,27 +158,31 @@ class DescriptionEditor {
     /**
      * Filters the suggested accounts.
      *
-     * @param tagButton {HTMLButtonElement|null} the tag button
+     * @param tagButton {HTMLButtonElement} the tag button
      */
     filterSuggestedAccounts(tagButton) {
-        for (const accountButton of this.#accountButtons) {
-            accountButton.classList.add("d-none");
-        }
-        if (tagButton === null) {
-            this.#selectAccount(null);
-            return;
-        }
+        this.clearSuggestedAccounts();
         const suggested = JSON.parse(tagButton.dataset.accounts);
-        let selectedAccountButton = null;
         for (const accountButton of this.#accountButtons) {
             if (suggested.includes(accountButton.dataset.code)) {
                 accountButton.classList.remove("d-none");
                 if (accountButton.dataset.code === suggested[0]) {
-                    selectedAccountButton = accountButton;
+                    this.#selectAccount(accountButton);
+                    return;
                 }
             }
         }
-        this.#selectAccount(selectedAccountButton);
+    }
+
+    /**
+     * Clears the suggested accounts.
+     *
+     */
+    clearSuggestedAccounts() {
+        for (const accountButton of this.#accountButtons) {
+            accountButton.classList.add("d-none");
+        }
+        this.#selectAccount(null);
     }
 
     /**
@@ -215,9 +219,9 @@ class DescriptionEditor {
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
         if (this.#selectedAccount !== null) {
-            this.#lineItemEditor.saveDescriptionWithAccount(this.description.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
+            this.lineItemEditor.saveDescriptionWithAccount(this.description.value, this.#selectedAccount.dataset.code, this.#selectedAccount.dataset.text, this.#selectedAccount.classList.contains("accounting-account-is-need-offset"));
         } else {
-            this.#lineItemEditor.saveDescription(this.description.value);
+            this.lineItemEditor.saveDescription(this.description.value);
         }
     }
 
@@ -227,7 +231,7 @@ class DescriptionEditor {
      */
     onOpen() {
         this.#reset();
-        this.description.value = this.#lineItemEditor.description === null? "": this.#lineItemEditor.description;
+        this.description.value = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
         this.#onDescriptionChange();
     }
 
@@ -418,7 +422,7 @@ class TagTabPlane extends TabPlane {
             }
         }
         if (!isMatched) {
-            this.editor.filterSuggestedAccounts(null);
+            this.editor.clearSuggestedAccounts();
         }
         this.validateTag();
     }
@@ -436,14 +440,13 @@ class TagTabPlane extends TabPlane {
      */
     switchToMe() {
         super.switchToMe();
-        let selectedTagButton = null;
         for (const tagButton of this.tagButtons) {
             if (tagButton.classList.contains("btn-primary")) {
-                selectedTagButton = tagButton;
-                break;
+                this.editor.filterSuggestedAccounts(tagButton);
+                return;
             }
         }
-        this.editor.filterSuggestedAccounts(selectedTagButton);
+        this.editor.clearSuggestedAccounts();
     }
 
     /**
@@ -560,13 +563,6 @@ class GeneralTagTab extends TagTabPlane {
         if (this.tag.value !== found[1]) {
             this.tag.value = found[1];
             this.onTagChange();
-        }
-        for (const tagButton of this.tagButtons) {
-            if (tagButton.dataset.value === this.tag.value) {
-                tagButton.classList.remove("btn-outline-primary");
-                tagButton.classList.add("btn-primary");
-                this.editor.filterSuggestedAccounts(tagButton);
-            }
         }
         this.switchToMe();
         return true;
@@ -732,13 +728,6 @@ class GeneralTripTab extends TagTabPlane {
             }
         }
         this.#to.value = found[4];
-        for (const tagButton of this.tagButtons) {
-            if (tagButton.dataset.value === this.tag.value) {
-                tagButton.classList.remove("btn-outline-primary");
-                tagButton.classList.add("btn-primary");
-                this.editor.filterSuggestedAccounts(tagButton);
-            }
-        }
         this.switchToMe();
         return true;
     }
@@ -917,14 +906,6 @@ class BusTripTab extends TagTabPlane {
         this.#route.value = found[2];
         this.#from.value = found[3];
         this.#to.value = found[4];
-        for (const tagButton of this.tagButtons) {
-            if (tagButton.dataset.value === this.tag.value) {
-                tagButton.classList.remove("btn-outline-primary");
-                tagButton.classList.add("btn-primary");
-                this.editor.filterSuggestedAccounts(tagButton);
-                break;
-            }
-        }
         this.switchToMe();
         return true;
     }
@@ -992,10 +973,16 @@ class BusTripTab extends TagTabPlane {
 class RecurringTransactionTab extends TabPlane {
 
     /**
-     * The transaction buttons
+     * The month names
+     * @type {string[]}
+     */
+    #monthNames;
+
+    /**
+     * The buttons of the recurring items
      * @type {HTMLButtonElement[]}
      */
-    #transactions;
+    #itemButtons;
 
     // noinspection JSValidateTypes
     /**
@@ -1006,8 +993,44 @@ class RecurringTransactionTab extends TabPlane {
      */
     constructor(editor) {
         super(editor);
+        this.#monthNames = [
+            "",
+            A_("January"), A_("February"), A_("March"), A_("April"),
+            A_("May"), A_("June"), A_("July"), A_("August"),
+            A_("September"), A_("October"), A_("November"), A_("December"),
+        ];
         // noinspection JSValidateTypes
-        this.#transactions = Array.from(document.getElementsByClassName(this.prefix + "-transaction"));
+        this.#itemButtons = Array.from(document.getElementsByClassName(this.prefix + "-item"));
+        for (const itemButton of this.#itemButtons) {
+            itemButton.onclick = () => {
+                this.reset();
+                itemButton.classList.add("btn-primary");
+                itemButton.classList.remove("btn-outline-primary");
+                this.editor.description.value = this.#getDescription(itemButton);
+                this.editor.filterSuggestedAccounts(itemButton);
+            };
+        }
+    }
+
+    /**
+     * Returns the description for a recurring item.
+     *
+     * @param itemButton {HTMLButtonElement} the recurring item
+     * @return {string} the description of the recurring item
+     */
+    #getDescription(itemButton) {
+        const today = new Date(this.editor.lineItemEditor.form.getDate());
+        const thisMonth = today.getMonth() + 1;
+        const lastMonth = (thisMonth + 10) % 12 + 1;
+        const lastBimonthlyFrom = ((thisMonth + thisMonth % 2 + 8) % 12 + 1);
+        const lastBimonthlyTo = ((thisMonth + thisMonth % 2 + 9) % 12 + 1);
+        return itemButton.dataset.template
+            .replaceAll("{this_month_number}", String(thisMonth))
+            .replaceAll("{this_month_name}", this.#monthNames[thisMonth])
+            .replaceAll("{last_month_number}", String(lastMonth))
+            .replaceAll("{last_month_name}", this.#monthNames[lastMonth])
+            .replaceAll("{last_bimonthly_number}", String(lastBimonthlyFrom) + "–" + String(lastBimonthlyTo))
+            .replaceAll("{last_bimonthly_name}", this.#monthNames[lastBimonthlyFrom] + "–" + this.#monthNames[lastBimonthlyTo]);
     }
 
     /**
@@ -1026,9 +1049,9 @@ class RecurringTransactionTab extends TabPlane {
      * @override
      */
     reset() {
-        for (const transaction of this.#transactions) {
-            transaction.classList.remove("btn-primary");
-            transaction.classList.add("btn-outline-primary");
+        for (const itemButton of this.#itemButtons) {
+            itemButton.classList.remove("btn-primary");
+            itemButton.classList.add("btn-outline-primary");
         }
     }
 
@@ -1039,7 +1062,30 @@ class RecurringTransactionTab extends TabPlane {
      * @override
      */
     populate() {
+        for (const itemButton of this.#itemButtons) {
+            if (this.#getDescription(itemButton) === this.editor.description.value) {
+                itemButton.classList.add("btn-primary");
+                itemButton.classList.remove("btn-outline-primary");
+                this.switchToMe();
+                return true;
+            }
+        }
         return false;
+    }
+
+    /**
+     * Switches to the tab plane.
+     *
+     */
+    switchToMe() {
+        super.switchToMe();
+        for (const itemButton of this.#itemButtons) {
+            if (itemButton.classList.contains("btn-primary")) {
+                this.editor.filterSuggestedAccounts(itemButton);
+                return;
+            }
+        }
+        this.editor.clearSuggestedAccounts();
     }
 
     /**

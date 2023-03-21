@@ -156,7 +156,11 @@ First written: 2023/2/28
 
           {# A recurring transaction #}
           <div id="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-page" class="d-none" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-tab">
-            {# TODO: To be done #}
+            {% for recurring in description_editor.recurring %}
+              <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-recurring-item" type="button" tabindex="-1" data-template="{{ recurring.template }}" data-accounts="{{ recurring.account_codes|tojson|forceescape }}">
+                {{ recurring.name }}
+              </button>
+            {% endfor %}
           </div>
 
           {# The annotation #}

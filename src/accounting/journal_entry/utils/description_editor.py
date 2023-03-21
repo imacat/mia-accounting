@@ -17,9 +17,11 @@
 """The description editor.
 
 """
+import re
 import typing as t
 
 import sqlalchemy as sa
+from flask import current_app
 
 from accounting import db
 from accounting.models import Account, JournalEntryLineItem
@@ -143,6 +145,29 @@ class DescriptionType:
         return sorted(self.__tag_dict.values(), key=lambda x: -x.freq)
 
 
+class DescriptionRecurring:
+    """A recurring transaction."""
+
+    def __init__(self, name: str, template: str, account: Account):
+        """Constructs a recurring transaction.
+
+        :param name: The name.
+        :param template: The template.
+        :param account: The account.
+        """
+        self.name: str = name
+        self.template: str = template
+        self.account: DescriptionAccount = DescriptionAccount(account, 0)
+
+    @property
+    def account_codes(self) -> list[str]:
+        """Returns the account codes by the order of their frequencies.
+
+        :return: The account codes by the order of their frequencies.
+        """
+        return [self.account.code]
+
+
 class DescriptionDebitCredit:
     """The description on debit or credit."""
 
@@ -163,6 +188,8 @@ class DescriptionDebitCredit:
                                DescriptionType] \
             = {x.id: x for x in {self.general, self.travel, self.bus}}
         """A dictionary from the type ID to the corresponding tags."""
+        self.recurring: list[DescriptionRecurring] = []
+        """The recurring transactions."""
 
     def add_tag(self, tag_type: t.Literal["general", "travel", "bus"],
                 name: str, account: Account, freq: int) -> None:
@@ -193,6 +220,10 @@ class DescriptionDebitCredit:
                         freq[account.id] = 0
                     freq[account.id] \
                         = freq[account.id] + account.freq
+        for recurring in self.recurring:
+            accounts[recurring.account.id] = recurring.account
+            if recurring.account.id not in freq:
+                freq[recurring.account.id] = 0
         return [accounts[y] for y in sorted(freq.keys(),
                                             key=lambda x: -freq[x])]
 
@@ -207,6 +238,7 @@ class DescriptionEditor:
         self.credit: DescriptionDebitCredit = DescriptionDebitCredit("credit")
         """The credit tags."""
         self.__init_tags()
+        self.__init_recurring()
 
     def __init_tags(self):
         """Initializes the tags.
@@ -242,6 +274,49 @@ class DescriptionEditor:
         for row in result:
             debit_credit_dict[row.debit_credit].add_tag(
                 row.tag_type, row.tag, accounts[row.account_id], row.freq)
+
+    def __init_recurring(self) -> None:
+        """Initializes the recurring transactions.
+
+        :return: None.
+        """
+        if "RECURRING" not in current_app.config:
+            return
+        data: list[tuple[t.Literal["debit", "credit"], str, str, str]] \
+            = [x.split("|")
+               for x in current_app.config["RECURRING"].split(",")]
+        debit_credit_dict: dict[t.Literal["debit", "credit"],
+                                DescriptionDebitCredit] \
+            = {x.debit_credit: x for x in {self.debit, self.credit}}
+        accounts: dict[str, Account] \
+            = self.__get_accounts({x[1] for x in data})
+        for row in data:
+            debit_credit_dict[row[0]].recurring.append(
+                DescriptionRecurring(row[2], row[3], accounts[row[1]]))
+
+    @staticmethod
+    def __get_accounts(codes: set[str]) -> dict[str, Account]:
+        """Finds and returns the accounts by codes.
+
+        :param codes: The account codes.
+        :return: The account.
+        """
+        def get_condition(code0: str) -> sa.BinaryExpression:
+            m: re.Match = re.match(r"^(\d{4})-(\d{3})$", code0)
+            assert m is not None,\
+                f"Malformed account code \"{code0}\" for regular transactions."
+            return sa.and_(Account.base_code == m.group(1),
+                           Account.no == int(m.group(2)))
+
+        conditions: list[sa.BinaryExpression] \
+            = [get_condition(x) for x in codes]
+        accounts: dict[str, Account] \
+            = {x.code: x for x in
+               Account.query.filter(sa.or_(*conditions)).all()}
+        for code in codes:
+            assert code in accounts,\
+                f"Unknown account \"{code}\" for regular transactions."
+        return accounts
 
 
 def get_prefix(string: str | sa.Column, separator: str | sa.Column) \
