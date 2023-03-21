@@ -35,5 +35,4 @@ def default_currency_code() -> str:
 
     :return: The default currency code.
     """
-    with current_app.app_context():
-        return current_app.config.get("ACCOUNTING_DEFAULT_CURRENCY", "USD")
+    return current_app.config.get("ACCOUNTING_DEFAULT_CURRENCY", "USD")

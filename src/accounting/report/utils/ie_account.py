@@ -71,9 +71,8 @@ def default_ie_account_code() -> str:
 
     :return: The default account code for the income and expenses log.
     """
-    with current_app.app_context():
-        return current_app.config.get("ACCOUNTING_DEFAULT_IE_ACCOUNT",
-                                      Account.CASH_CODE)
+    return current_app.config.get("ACCOUNTING_DEFAULT_IE_ACCOUNT",
+                                  Account.CASH_CODE)
 
 
 def default_ie_account() -> IncomeExpensesAccount:
