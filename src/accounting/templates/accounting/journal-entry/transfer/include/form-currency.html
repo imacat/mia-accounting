@@ -19,91 +19,70 @@ form-currency.html: The currency sub-form in the transfer journal entry form
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
-<div id="accounting-currency-{{ currency_index }}" class="mb-3 accounting-currency" data-index="{{ currency_index }}">
-  <input id="accounting-currency-{{ currency_index }}-no" type="hidden" name="currency-{{ currency_index }}-no" value="{{ currency_index }}">
-  <input id="accounting-currency-{{ currency_index }}-code" type="hidden" name="currency-{{ currency_index }}-code" value="{{ currency_code_data }}">
-  <div id="accounting-currency-{{ currency_index }}-control" class="form-control accounting-currency-control {% if currency_errors %} is-invalid {% endif %}">
-    <div class="d-flex justify-content-between mt-2 mb-3">
-      <div class="form-floating accounting-currency-content">
-        <select id="accounting-currency-{{ currency_index }}-code-select" class="form-select {% if currency_code_errors %} is-invalid {% endif %}" {% if currency_code_is_locked %} disabled="disabled" {% endif %}>
-          {% for currency in accounting_currency_options() %}
-            <option value="{{ currency.code }}" {% if currency.code == currency_code_data %} selected="selected" {% endif %}>{{ currency }}</option>
-          {% endfor %}
-        </select>
-        <label class="form-label" for="accounting-currency-{{ currency_index }}-code-select">{{ A_("Currency") }}</label>
-        <div id="accounting-currency-{{ currency_index }}-code-error" class="invalid-feedback">{% if currency_code_errors %}{{ currency_code_errors[0] }}{% endif %}</div>
+{% extends "accounting/journal-entry/include/form-currency.html" %}
+
+{% block line_items %}
+<div class="row">
+  {# The debit line items #}
+  <div class="col-sm-6 mb-3">
+    <div id="accounting-currency-{{ currency_index }}-debit" class="form-control accounting-material-text-field accounting-not-empty {% if debit_errors %} is-invalid {% endif %}">
+      <label class="form-label" for="accounting-currency-{{ currency_index }}-debit">{{ A_("Debit") }}</label>
+      <ul id="accounting-currency-{{ currency_index }}-debit-list" class="list-group accounting-line-item-list">
+        {% for line_item_form in debit_forms %}
+          {% with currency_index = currency_index,
+                  debit_credit = "debit",
+                  line_item_index = loop.index,
+                  only_one_line_item_form = debit_forms|length == 1,
+                  form = line_item_form.form %}
+            {% include "accounting/journal-entry/include/form-line-item.html" %}
+          {% endwith %}
+        {% endfor %}
+      </ul>
+
+      <div class="d-flex justify-content-between mb-2">
+        <div>{{ A_("Total") }}</div>
+        <div><span id="accounting-currency-{{ currency_index }}-debit-total" class="badge rounded-pill bg-primary">{{ debit_total }}</span></div>
       </div>
 
       <div>
-        <button id="accounting-currency-{{ currency_index }}-delete" class="btn btn-danger rounded-circle {% if only_one_currency_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}">
-          <i class="fas fa-minus"></i>
+        <button id="accounting-currency-{{ currency_index }}-debit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="debit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
+          <i class="fas fa-plus"></i>
+          {{ A_("New") }}
         </button>
       </div>
     </div>
+    <div id="accounting-currency-{{ currency_index }}-debit-error" class="invalid-feedback">{% if debit_errors %}{{ debit_errors[0] }}{% endif %}</div>
+  </div>
 
-    <div class="row">
-      {# The debit line items #}
-      <div class="col-sm-6 mb-3">
-        <div id="accounting-currency-{{ currency_index }}-debit" class="form-control accounting-material-text-field accounting-not-empty {% if debit_errors %} is-invalid {% endif %}">
-          <label class="form-label" for="accounting-currency-{{ currency_index }}-debit">{{ A_("Debit") }}</label>
-          <ul id="accounting-currency-{{ currency_index }}-debit-list" class="list-group accounting-line-item-list">
-            {% for line_item_form in debit_forms %}
-              {% with currency_index = currency_index,
-                      debit_credit = "debit",
-                      line_item_index = loop.index,
-                      only_one_line_item_form = debit_forms|length == 1,
-                      form = line_item_form.form %}
-                {% include "accounting/journal-entry/include/form-line-item.html" %}
-              {% endwith %}
-            {% endfor %}
-          </ul>
+  {# The credit line items #}
+  <div class="col-sm-6 mb-3">
+    <div id="accounting-currency-{{ currency_index }}-credit" class="form-control accounting-material-text-field accounting-not-empty {% if credit_errors %} is-invalid {% endif %}">
+      <label class="form-label" for="accounting-currency-{{ currency_index }}-credit">{{ A_("Credit") }}</label>
+      <ul id="accounting-currency-{{ currency_index }}-credit-list" class="list-group accounting-line-item-list">
+        {% for line_item_form in credit_forms %}
+          {% with currency_index = currency_index,
+                  debit_credit = "credit",
+                  line_item_index = loop.index,
+                  only_one_line_item_form = credit_forms|length == 1,
+                  form = line_item_form.form %}
+            {% include "accounting/journal-entry/include/form-line-item.html" %}
+          {% endwith %}
+        {% endfor %}
+      </ul>
 
-          <div class="d-flex justify-content-between mb-2">
-            <div>{{ A_("Total") }}</div>
-            <div><span id="accounting-currency-{{ currency_index }}-debit-total" class="badge rounded-pill bg-primary">{{ debit_total }}</span></div>
-          </div>
-
-          <div>
-            <button id="accounting-currency-{{ currency_index }}-debit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="debit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
-              <i class="fas fa-plus"></i>
-              {{ A_("New") }}
-            </button>
-          </div>
-        </div>
-        <div id="accounting-currency-{{ currency_index }}-debit-error" class="invalid-feedback">{% if debit_errors %}{{ debit_errors[0] }}{% endif %}</div>
+      <div class="d-flex justify-content-between mb-2">
+        <div>{{ A_("Total") }}</div>
+        <div><span id="accounting-currency-{{ currency_index }}-credit-total" class="badge rounded-pill bg-primary">{{ credit_total }}</span></div>
       </div>
 
-      {# The credit line items #}
-      <div class="col-sm-6 mb-3">
-        <div id="accounting-currency-{{ currency_index }}-credit" class="form-control accounting-material-text-field accounting-not-empty {% if credit_errors %} is-invalid {% endif %}">
-          <label class="form-label" for="accounting-currency-{{ currency_index }}-credit">{{ A_("Credit") }}</label>
-          <ul id="accounting-currency-{{ currency_index }}-credit-list" class="list-group accounting-line-item-list">
-            {% for line_item_form in credit_forms %}
-              {% with currency_index = currency_index,
-                      debit_credit = "credit",
-                      line_item_index = loop.index,
-                      only_one_line_item_form = credit_forms|length == 1,
-                      form = line_item_form.form %}
-                {% include "accounting/journal-entry/include/form-line-item.html" %}
-              {% endwith %}
-            {% endfor %}
-          </ul>
-
-          <div class="d-flex justify-content-between mb-2">
-            <div>{{ A_("Total") }}</div>
-            <div><span id="accounting-currency-{{ currency_index }}-credit-total" class="badge rounded-pill bg-primary">{{ credit_total }}</span></div>
-          </div>
-
-          <div>
-            <button id="accounting-currency-{{ currency_index }}-credit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="credit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
-              <i class="fas fa-plus"></i>
-              {{ A_("New") }}
-            </button>
-          </div>
-        </div>
-        <div id="accounting-currency-{{ currency_index }}-credit-error" class="invalid-feedback">{% if credit_errors %}{{ credit_errors[0] }}{% endif %}</div>
+      <div>
+        <button id="accounting-currency-{{ currency_index }}-credit-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="credit" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
+          <i class="fas fa-plus"></i>
+          {{ A_("New") }}
+        </button>
       </div>
     </div>
+    <div id="accounting-currency-{{ currency_index }}-credit-error" class="invalid-feedback">{% if credit_errors %}{{ credit_errors[0] }}{% endif %}</div>
   </div>
-  <div id="accounting-currency-{{ currency_index }}-error" class="invalid-feedback">{% if currency_errors %}{{ currency_errors[0] }}{% endif %}</div>
 </div>
+{% endblock %}

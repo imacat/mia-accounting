@@ -1,0 +1,47 @@
+{#
+The Mia! Accounting Flask Project
+form-currency.html: The currency sub-form in the journal entry form
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/21
+#}
+<div id="accounting-currency-{{ currency_index }}" class="mb-3 accounting-currency" data-index="{{ currency_index }}">
+  <input id="accounting-currency-{{ currency_index }}-no" type="hidden" name="currency-{{ currency_index }}-no" value="{{ currency_index }}">
+  <input id="accounting-currency-{{ currency_index }}-code" type="hidden" name="currency-{{ currency_index }}-code" value="{{ currency_code_data }}">
+  <div id="accounting-currency-{{ currency_index }}-control" class="form-control accounting-currency-control {% if currency_errors %} is-invalid {% endif %}">
+    <div class="d-flex justify-content-between mt-2 mb-3">
+      <div class="form-floating accounting-currency-content">
+        <select id="accounting-currency-{{ currency_index }}-code-select" class="form-select {% if currency_code_errors %} is-invalid {% endif %}" {% if currency_code_is_locked %} disabled="disabled" {% endif %}>
+          {% for currency in accounting_currency_options() %}
+            <option value="{{ currency.code }}" {% if currency.code == currency_code_data %} selected="selected" {% endif %}>{{ currency }}</option>
+          {% endfor %}
+        </select>
+        <label class="form-label" for="accounting-currency-{{ currency_index }}-code-select">{{ A_("Currency") }}</label>
+        <div id="accounting-currency-{{ currency_index }}-code-error" class="invalid-feedback">{% if currency_code_errors %}{{ currency_code_errors[0] }}{% endif %}</div>
+      </div>
+
+      <div>
+        <button id="accounting-currency-{{ currency_index }}-delete" class="btn btn-danger rounded-circle {% if only_one_currency_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}">
+          <i class="fas fa-minus"></i>
+        </button>
+      </div>
+    </div>
+
+    {% block line_items %}{% endblock %}
+  </div>
+  <div id="accounting-currency-{{ currency_index }}-error" class="invalid-feedback">{% if currency_errors %}{{ currency_errors[0] }}{% endif %}</div>
+</div>
