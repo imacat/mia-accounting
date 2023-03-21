@@ -32,10 +32,10 @@ First written: 2023/2/25
               currency_code_is_locked = currency_form.is_code_locked,
               debit_forms = currency_form.debit,
               debit_errors = currency_form.debit_errors,
-              debit_total = currency_form.form.debit_total|accounting_format_amount,
+              debit_total = currency_form.debit_total|accounting_format_amount,
               credit_forms = currency_form.credit,
               credit_errors = currency_form.credit_errors,
-              credit_total = currency_form.form.credit_total|accounting_format_amount %}
+              credit_total = currency_form.credit_total|accounting_format_amount %}
         {% include "accounting/journal-entry/transfer/include/form-currency.html" %}
       {% endwith %}
     {% endfor %}
