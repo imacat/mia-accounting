@@ -27,10 +27,10 @@ First written: 2023/2/1
 
 {% block content %}
 
-<div class="mb-3 d-none d-md-block">
+<div class="mb-3 accounting-toolbar">
   <a class="btn btn-primary" role="button" href="{% block back_url %}{% endblock %}">
     <i class="fa-solid fa-circle-chevron-left"></i>
-    {{ A_("Back") }}
+    <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
 </div>
 
