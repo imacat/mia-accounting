@@ -23,8 +23,8 @@ from flask import abort
 from werkzeug.routing import BaseConverter
 
 from accounting.models import Account
+from accounting.utils.ie_account import IncomeExpensesAccount
 from .period import Period, get_period
-from .utils.ie_account import IncomeExpensesAccount
 
 
 class PeriodConverter(BaseConverter):

@@ -23,11 +23,12 @@ from accounting import db
 from accounting.models import Currency, Account
 from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
+from accounting.utils.ie_account import IncomeExpensesAccount
 from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
 from .template_filters import format_amount
-from .utils.ie_account import IncomeExpensesAccount, default_ie_account
+from .utils.ie_account import default_ie_account
 
 bp: Blueprint = Blueprint("report", __name__)
 """The view blueprint for the reports."""

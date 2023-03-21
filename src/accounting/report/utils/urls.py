@@ -21,8 +21,9 @@ from flask import url_for
 
 from accounting.models import Currency, Account
 from accounting.report.period import Period
+from accounting.report.utils.ie_account import default_ie_account_code
 from accounting.template_globals import default_currency_code
-from .ie_account import IncomeExpensesAccount, default_ie_account_code
+from accounting.utils.ie_account import IncomeExpensesAccount
 
 
 def journal_url(period: Period) \

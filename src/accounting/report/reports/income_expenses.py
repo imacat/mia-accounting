@@ -33,12 +33,12 @@ from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
     period_spec
-from accounting.report.utils.ie_account import IncomeExpensesAccount
 from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.urls import income_expenses_url
 from accounting.utils.cast import be
+from accounting.utils.ie_account import IncomeExpensesAccount
 from accounting.utils.pagination import Pagination
 
 
