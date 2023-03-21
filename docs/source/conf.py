@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath('../../src/'))
 project = 'Mia! Accounting Flask'
 copyright = '2023, imacat'
 author = 'imacat'
-release = '0.7.0'
+release = '0.8.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
