@@ -66,7 +66,7 @@ data."""
 
 
 def can_view() -> bool:
-    """Returns whether the current user can view the account data.
+    """Returns whether the current user can view the accounting data.
 
     :return: True if the current user can view the accounting data, or False
         otherwise.
@@ -75,7 +75,7 @@ def can_view() -> bool:
 
 
 def can_edit() -> bool:
-    """Returns whether the current user can edit the account data.
+    """Returns whether the current user can edit the accounting data.
 
     The user has to log in.
 
