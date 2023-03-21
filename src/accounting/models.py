@@ -25,8 +25,8 @@ from datetime import date
 from decimal import Decimal
 
 import sqlalchemy as sa
-from flask import current_app
-from flask_babel import get_locale
+from babel import Locale
+from flask_babel import get_locale, get_babel
 from sqlalchemy import text
 
 from accounting import db
@@ -61,11 +61,11 @@ class BaseAccount(db.Model):
 
         :return: The title in the current locale.
         """
-        current_locale = str(get_locale())
-        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+        current_locale: Locale = get_locale()
+        if current_locale == get_babel().instance.default_locale:
             return self.title_l10n
         for l10n in self.l10n:
-            if l10n.locale == current_locale:
+            if l10n.locale == str(current_locale):
                 return l10n.title
         return self.title_l10n
 
@@ -171,11 +171,11 @@ class Account(db.Model):
 
         :return: The title in the current locale.
         """
-        current_locale = str(get_locale())
-        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+        current_locale: Locale = get_locale()
+        if current_locale == get_babel().instance.default_locale:
             return self.title_l10n
         for l10n in self.l10n:
-            if l10n.locale == current_locale:
+            if l10n.locale == str(current_locale):
                 return l10n.title
         return self.title_l10n
 
@@ -189,15 +189,15 @@ class Account(db.Model):
         if self.title_l10n is None:
             self.title_l10n = value
             return
-        current_locale = str(get_locale())
-        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+        current_locale: Locale = get_locale()
+        if current_locale == get_babel().instance.default_locale:
             self.title_l10n = value
             return
         for l10n in self.l10n:
-            if l10n.locale == current_locale:
+            if l10n.locale == str(current_locale):
                 l10n.title = value
                 return
-        self.l10n.append(AccountL10n(locale=current_locale, title=value))
+        self.l10n.append(AccountL10n(locale=str(current_locale), title=value))
 
     @property
     def is_real(self) -> bool:
@@ -381,11 +381,11 @@ class Currency(db.Model):
 
         :return: The name in the current locale.
         """
-        current_locale = str(get_locale())
-        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+        current_locale: Locale = get_locale()
+        if current_locale == get_babel().instance.default_locale:
             return self.name_l10n
         for l10n in self.l10n:
-            if l10n.locale == current_locale:
+            if l10n.locale == str(current_locale):
                 return l10n.name
         return self.name_l10n
 
@@ -399,15 +399,15 @@ class Currency(db.Model):
         if self.name_l10n is None:
             self.name_l10n = value
             return
-        current_locale = str(get_locale())
-        if current_locale == current_app.config["BABEL_DEFAULT_LOCALE"]:
+        current_locale: Locale = get_locale()
+        if current_locale == get_babel().instance.default_locale:
             self.name_l10n = value
             return
         for l10n in self.l10n:
-            if l10n.locale == current_locale:
+            if l10n.locale == str(current_locale):
                 l10n.name = value
                 return
-        self.l10n.append(CurrencyL10n(locale=current_locale, name=value))
+        self.l10n.append(CurrencyL10n(locale=str(current_locale), name=value))
 
     @property
     def is_modified(self) -> bool:
