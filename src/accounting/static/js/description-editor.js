@@ -102,7 +102,7 @@ class DescriptionEditor {
 
     /**
      * The tab planes
-     * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, regular: RegularPaymentTab, annotation: AnnotationTab}}
+     * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, recurring: RecurringTransactionTab, annotation: AnnotationTab}}
      */
     tabPlanes = {};
 
@@ -125,7 +125,7 @@ class DescriptionEditor {
         // noinspection JSValidateTypes
         this.#accountButtons = Array.from(document.getElementsByClassName(this.prefix + "-account"));
 
-        for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RegularPaymentTab, AnnotationTab]) {
+        for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RecurringTransactionTab, AnnotationTab]) {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
         }
@@ -985,17 +985,17 @@ class BusTripTab extends TagTabPlane {
 }
 
 /**
- * The regular payment tab plane.
+ * The recurring transaction tab plane.
  *
  * @private
  */
-class RegularPaymentTab extends TabPlane {
+class RecurringTransactionTab extends TabPlane {
 
     /**
-     * The payment buttons
+     * The transaction buttons
      * @type {HTMLButtonElement[]}
      */
-    #payments;
+    #transactions;
 
     // noinspection JSValidateTypes
     /**
@@ -1007,7 +1007,7 @@ class RegularPaymentTab extends TabPlane {
     constructor(editor) {
         super(editor);
         // noinspection JSValidateTypes
-        this.#payments = Array.from(document.getElementsByClassName(this.prefix + "-payment"));
+        this.#transactions = Array.from(document.getElementsByClassName(this.prefix + "-transaction"));
     }
 
     /**
@@ -1017,7 +1017,7 @@ class RegularPaymentTab extends TabPlane {
      * @abstract
      */
     tabId() {
-        return "regular";
+        return "recurring";
     };
 
     /**
@@ -1026,9 +1026,9 @@ class RegularPaymentTab extends TabPlane {
      * @override
      */
     reset() {
-        for (const payment of this.#payments) {
-            payment.classList.remove("btn-primary");
-            payment.classList.add("btn-outline-primary");
+        for (const transaction of this.#transactions) {
+            transaction.classList.remove("btn-primary");
+            transaction.classList.add("btn-outline-primary");
         }
     }
 
