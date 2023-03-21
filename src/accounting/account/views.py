@@ -157,6 +157,9 @@ def delete_account(account: Account) -> redirect:
     :return: The redirection to the account list on success, or the account
         detail on error.
     """
+    if not account.can_delete:
+        flash(s(lazy_gettext("The account cannot be deleted.")), "error")
+        return redirect(inherit_next(__get_detail_uri(account)))
     account.delete()
     sort_accounts_in(account.base_code, account.id)
     db.session.commit()

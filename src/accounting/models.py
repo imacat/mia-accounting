@@ -236,6 +236,16 @@ class Account(db.Model):
                 return True
         return False
 
+    @property
+    def can_delete(self) -> bool:
+        """Returns whether the account can be deleted.
+
+        :return: True if the account can be deleted, or False otherwise.
+        """
+        if self.code in {"1111-001", "3351-001", "3353-001"}:
+            return False
+        return len(self.line_items) == 0
+
     def delete(self) -> None:
         """Deletes this account.
 

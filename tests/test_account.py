@@ -18,7 +18,7 @@
 
 """
 import unittest
-from datetime import timedelta
+from datetime import timedelta, date
 
 import httpx
 import sqlalchemy as sa
@@ -28,6 +28,7 @@ from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import create_test_app, get_client, set_locale
+from testlib_journal_entry import add_journal_entry
 
 NEXT_URI: str = "/_next"
 """The next URI."""
@@ -55,6 +56,8 @@ class AccountData:
 
 cash: AccountData = AccountData("1111", 1, "Cash")
 """The cash account."""
+petty: AccountData = AccountData("1112", 1, "Bank")
+"""The petty cash account."""
 bank: AccountData = AccountData("1113", 1, "Bank")
 """The bank account."""
 stock: AccountData = AccountData("1121", 1, "Stock")
@@ -194,7 +197,7 @@ class AccountTestCase(unittest.TestCase):
                                      "title": f"{cash.title}-2"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post(f"{PREFIX}/{cash.code}/delete",
+        response = client.post(f"{PREFIX}/{bank.code}/delete",
                                data={"csrf_token": csrf_token})
         self.assertEqual(response.status_code, 403)
 
@@ -202,12 +205,12 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
 
         with self.app.app_context():
-            bank_id: int = Account.find_by_code(bank.code).id
+            cash_id: int = Account.find_by_code(cash.code).id
 
-        response = client.post(f"{PREFIX}/bases/{bank.base_code}",
+        response = client.post(f"{PREFIX}/bases/{cash.base_code}",
                                data={"csrf_token": csrf_token,
                                      "next": NEXT_URI,
-                                     f"{bank_id}-no": "5"})
+                                     f"{cash_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -243,7 +246,7 @@ class AccountTestCase(unittest.TestCase):
                                      "title": f"{cash.title}-2"})
         self.assertEqual(response.status_code, 403)
 
-        response = client.post(f"{PREFIX}/{cash.code}/delete",
+        response = client.post(f"{PREFIX}/{bank.code}/delete",
                                data={"csrf_token": csrf_token})
         self.assertEqual(response.status_code, 403)
 
@@ -251,12 +254,12 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         with self.app.app_context():
-            bank_id: int = Account.find_by_code(bank.code).id
+            cash_id: int = Account.find_by_code(cash.code).id
 
-        response = client.post(f"{PREFIX}/bases/{bank.base_code}",
+        response = client.post(f"{PREFIX}/bases/{cash.base_code}",
                                data={"csrf_token": csrf_token,
                                      "next": NEXT_URI,
-                                     f"{bank_id}-no": "5"})
+                                     f"{cash_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
     def test_editor(self) -> None:
@@ -294,7 +297,7 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], f"{PREFIX}/{cash.code}")
 
-        response = self.client.post(f"{PREFIX}/{cash.code}/delete",
+        response = self.client.post(f"{PREFIX}/{bank.code}/delete",
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], PREFIX)
@@ -303,12 +306,12 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         with self.app.app_context():
-            bank_id: int = Account.find_by_code(bank.code).id
+            cash_id: int = Account.find_by_code(cash.code).id
 
-        response = self.client.post(f"{PREFIX}/bases/{bank.base_code}",
+        response = self.client.post(f"{PREFIX}/bases/{cash.base_code}",
                                     data={"csrf_token": self.csrf_token,
                                           "next": NEXT_URI,
-                                          f"{bank_id}-no": "5"})
+                                          f"{cash_id}-no": "5"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -640,15 +643,54 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        detail_uri: str = f"{PREFIX}/{cash.code}"
-        delete_uri: str = f"{PREFIX}/{cash.code}/delete"
+        detail_uri: str = f"{PREFIX}/{bank.code}"
+        delete_uri: str = f"{PREFIX}/{bank.code}/delete"
         list_uri: str = PREFIX
         response: httpx.Response
 
+        response = self.client.post(f"{PREFIX}/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "base_code": petty.base_code,
+                                          "title": petty.title})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{petty.code}")
+
+        response = self.client.post("/accounting/currencies/store",
+                                    data={"csrf_token": self.csrf_token,
+                                          "code": "USD",
+                                          "name": "US Dollars"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/currencies/USD")
+
+        add_journal_entry(self.client,
+                          form={"csrf_token": self.csrf_token,
+                                "next": NEXT_URI,
+                                "date": date.today().isoformat(),
+                                "currency-1-code": "USD",
+                                "currency-1-credit-1-account_code": petty.code,
+                                "currency-1-credit-1-amount": "20"})
+
         with self.app.app_context():
             self.assertEqual({x.code for x in Account.query.all()},
-                             {cash.code, bank.code})
+                             {cash.code, petty.code, bank.code})
 
+        # Cannot delete the cash account
+        response = self.client.post(f"{PREFIX}/{cash.code}/delete",
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{cash.code}")
+
+        # Cannot delete the account that is in use
+        response = self.client.post(f"{PREFIX}/{petty.code}/delete",
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{petty.code}")
+
+        # Success
         response = self.client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
         response = self.client.post(delete_uri,
@@ -658,7 +700,7 @@ class AccountTestCase(unittest.TestCase):
 
         with self.app.app_context():
             self.assertEqual({x.code for x in Account.query.all()},
-                             {bank.code})
+                             {cash.code, petty.code})
 
         response = self.client.get(detail_uri)
         self.assertEqual(response.status_code, 404)
