@@ -619,7 +619,7 @@ class RecurringItemEditor {
         this.#accountSelector = new RecurringAccountSelector(this);
 
         this.#name.onchange = () => this.#validateName();
-        this.#accountControl.onclick = () => this.#accountSelector.clear();
+        this.#accountControl.onclick = () => this.#accountSelector.onOpen();
         this.#descriptionTemplate.onchange = () => this.#validateDescriptionTemplate();
         this.#form.onsubmit = () => {
             if (this.#validate()) {
@@ -848,15 +848,6 @@ class RecurringAccountSelector {
     }
 
     /**
-     * Clears the filter.
-     *
-     */
-    clear() {
-        this.#query.value = "";
-        this.#filterOptions();
-    }
-
-    /**
      * Filters the options.
      *
      */
@@ -876,6 +867,28 @@ class RecurringAccountSelector {
         } else {
             this.#optionList.classList.remove("d-none");
             this.#queryNoResult.classList.add("d-none");
+        }
+    }
+
+    /**
+     * The callback when the account selector is shown.
+     *
+     */
+    onOpen() {
+        this.#query.value = "";
+        this.#filterOptions();
+        console.log(this.editor.accountCode);
+        for (const option of this.#options) {
+            option.setActive(option.code === this.editor.accountCode);
+        }
+        if (this.editor.accountCode === null) {
+            this.#clearButton.classList.add("btn-secondary");
+            this.#clearButton.classList.remove("btn-danger");
+            this.#clearButton.disabled = true;
+        } else {
+            this.#clearButton.classList.add("btn-danger");
+            this.#clearButton.classList.remove("btn-secondary");
+            this.#clearButton.disabled = false;
         }
     }
 }
@@ -960,6 +973,19 @@ class RecurringAccount {
             this.#element.classList.remove("d-none");
         } else {
             this.#element.classList.add("d-none");
+        }
+    }
+
+    /**
+     * Sets whether the option is active.
+     *
+     * @param isActive {boolean} true if active, or false otherwise
+     */
+    setActive(isActive) {
+        if (isActive) {
+            this.#element.classList.add("active");
+        } else {
+            this.#element.classList.remove("active");
         }
     }
 }
