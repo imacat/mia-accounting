@@ -38,14 +38,14 @@ First written: 2023/3/22
   </a>
 </div>
 
-<div id="accounting-default-currency" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+<div class="form-floating mb-3">
+  <input id="accounting-default-currency" class="form-control" value="{{ obj.default_currency_text }}" readonly="readonly">
   <label class="form-label" for="accounting-default-currency">{{ A_("Default Currency") }}</label>
-  <div>{{ obj.default_currency_text }}</div>
 </div>
 
-<div id="accounting-default-ie-account" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+<div class="form-floating mb-3">
+  <input id="accounting-default-ie-account" class="form-control" value="{{ obj.default_ie_account_code_text }}" readonly="readonly">
   <label class="form-label" for="accounting-default-ie-account">{{ A_("Default Account for the Income and Expenses Log") }}</label>
-  <div>{{ obj.default_ie_account_code_text }}</div>
 </div>
 
 {% with expense_income = "expense",
