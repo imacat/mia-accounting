@@ -23,8 +23,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, FieldList, FormField, IntegerField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.forms import CurrencyExists, AccountExists, IsDebitAccount, \
-    IsCreditAccount
+from accounting.forms import ACCOUNT_REQUIRED, CurrencyExists, AccountExists, \
+    IsDebitAccount, IsCreditAccount
 from accounting.locale import lazy_gettext
 from accounting.models import Account
 from accounting.utils.current_account import CurrentAccount
@@ -126,6 +126,7 @@ class RecurringExpenseForm(RecurringItemForm):
     account_code = StringField(
         filters=[strip_text],
         validators=[
+            ACCOUNT_REQUIRED,
             AccountExists(),
             IsDebitAccount(lazy_gettext("This account is not for expense.")),
             NotStartPayableFromExpense()])
@@ -149,6 +150,7 @@ class RecurringIncomeForm(RecurringItemForm):
     account_code = StringField(
         filters=[strip_text],
         validators=[
+            ACCOUNT_REQUIRED,
             AccountExists(),
             IsCreditAccount(lazy_gettext("This account is not for income.")),
             NotStartReceivableFromIncome()])
