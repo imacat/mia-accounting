@@ -75,9 +75,19 @@ class CurrentAccount:
         accounts: list[cls] = [cls.current_assets_and_liabilities()]
         accounts.extend([CurrentAccount(x)
                          for x in db.session.query(Account)
-                        .filter(sa.or_(Account.base_code.startswith("11"),
-                                       Account.base_code.startswith("12"),
-                                       Account.base_code.startswith("21"),
-                                       Account.base_code.startswith("22")))
+                        .filter(cls.sql_condition())
                         .order_by(Account.base_code, Account.no)])
         return accounts
+
+    @classmethod
+    def sql_condition(cls) -> sa.BinaryExpression:
+        """Returns the SQL condition for the current assets and liabilities
+        accounts.
+
+        :return: The SQL condition for the current assets and liabilities
+            accounts.
+        """
+        return sa.or_(Account.base_code.startswith("11"),
+                      Account.base_code.startswith("12"),
+                      Account.base_code.startswith("21"),
+                      Account.base_code.startswith("22"))

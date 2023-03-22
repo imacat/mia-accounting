@@ -174,10 +174,7 @@ class LineItemCollector:
     @property
     def __account_condition(self) -> sa.BinaryExpression:
         if self.__account.code == CurrentAccount.CURRENT_AL_CODE:
-            return sa.or_(Account.base_code.startswith("11"),
-                          Account.base_code.startswith("12"),
-                          Account.base_code.startswith("21"),
-                          Account.base_code.startswith("22"))
+            return CurrentAccount.sql_condition()
         return Account.id == self.__account.id
 
     def __get_total(self) -> ReportLineItem | None:
@@ -352,10 +349,7 @@ class PageParams(BasePageParams):
             .join(Account)\
             .filter(be(JournalEntryLineItem.currency_code
                        == self.currency.code),
-                    sa.or_(Account.base_code.startswith("11"),
-                           Account.base_code.startswith("12"),
-                           Account.base_code.startswith("21"),
-                           Account.base_code.startswith("22")))\
+                    CurrentAccount.sql_condition())\
             .group_by(JournalEntryLineItem.account_id)
         options.extend([OptionLink(str(x),
                                    income_expenses_url(
