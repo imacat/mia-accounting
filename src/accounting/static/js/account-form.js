@@ -110,7 +110,7 @@ class AccountForm {
         this.#isNeedOffsetControl = document.getElementById("accounting-is-need-offset-control");
         this.#isNeedOffset = document.getElementById("accounting-is-need-offset");
         this.#formElement.onsubmit = () => {
-            return this.#validateForm();
+            return this.#validate();
         };
         this.#baseControl.onclick = () => {
             this.#baseControl.classList.add("accounting-not-empty");
@@ -163,7 +163,7 @@ class AccountForm {
      *
      * @returns {boolean} true if valid, or false otherwise
      */
-    #validateForm() {
+    #validate() {
         let isValid = true;
         isValid = this.#validateBase() && isValid;
         isValid = this.#validateTitle() && isValid;

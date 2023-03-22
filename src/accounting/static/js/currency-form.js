@@ -81,7 +81,7 @@ class CurrencyForm {
             this.#validateName();
         };
         this.#formElement.onsubmit = () => {
-            this.#validateForm().then((isValid) => {
+            this.#validate().then((isValid) => {
                 if (isValid) {
                     this.#formElement.submit();
                 }
@@ -95,7 +95,7 @@ class CurrencyForm {
      *
      * @returns {Promise<boolean>} true if valid, or false otherwise
      */
-    async #validateForm() {
+    async #validate() {
         let isValid = true;
         isValid = await this.#validateCode() && isValid;
         isValid = this.#validateName() && isValid;
