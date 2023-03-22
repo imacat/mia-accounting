@@ -24,7 +24,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, FieldList, FormField, IntegerField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.forms import CURRENCY_REQUIRED, CurrencyExists
+from accounting.forms import CurrencyExists
 from accounting.locale import lazy_gettext
 from accounting.models import Account
 from accounting.utils.current_account import CurrentAccount, current_accounts
@@ -235,8 +235,9 @@ class OptionForm(FlaskForm):
     """The form to update the options."""
     default_currency = StringField(
         filters=[strip_text],
-        validators=[CURRENCY_REQUIRED,
-                    CurrencyExists()])
+        validators=[
+            DataRequired(lazy_gettext("Please select the default currency.")),
+            CurrencyExists()])
     """The default currency code."""
     default_ie_account_code = StringField(
         filters=[strip_text],
