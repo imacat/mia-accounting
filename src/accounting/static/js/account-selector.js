@@ -105,7 +105,7 @@ class AccountSelector {
         };
         this.#clearButton.onclick = () => this.#lineItemEditor.clearAccount();
         for (const option of this.#options) {
-            option.onclick = () => this.#lineItemEditor.saveAccount(option.dataset.code, option.dataset.content, option.classList.contains("accounting-account-is-need-offset"));
+            option.onclick = () => this.#lineItemEditor.saveAccount(option.dataset.code, option.dataset.text, option.classList.contains("accounting-account-is-need-offset"));
         }
         this.#query.addEventListener("input", () => {
             this.#filterOptions();
