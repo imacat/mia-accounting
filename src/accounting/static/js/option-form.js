@@ -236,6 +236,7 @@ class RecurringExpenseIncomeSubForm {
         this.#addButton = document.getElementById(this.#prefix + "-add");
 
         this.#addButton.onclick = () => this.editor.onAddNew();
+        this.#initializeDragAndDropReordering();
     }
 
     /**
@@ -252,6 +253,8 @@ class RecurringExpenseIncomeSubForm {
         const element = document.getElementById(this.#prefix + "-" + String(newIndex))
         const item = new RecurringItemSubForm(this, element);
         this.#items.push(item);
+        this.#initializeDragAndDropReordering();
+        this.validate();
         return item;
     }
 
@@ -263,6 +266,20 @@ class RecurringExpenseIncomeSubForm {
     deleteItem(item) {
         const index = this.#items.indexOf(item);
         this.#items.splice(index, 1);
+    }
+
+    /**
+     * Initializes the drag and drop reordering on the recurring item sub-forms.
+     *
+     */
+    #initializeDragAndDropReordering() {
+        initializeDragAndDropReordering(this.#itemList, () => {
+            const itemId = Array.from(this.#itemList.children).map((item) => item.id);
+            this.#items.sort((a, b) => itemId.indexOf(a.element.id) - itemId.indexOf(b.element.id));
+            for (let i = 0; i < this.#items.length; i++) {
+                this.#items[i].no.value = String(i + 1);
+            }
+        });
     }
 
     /**
@@ -309,7 +326,7 @@ class RecurringItemSubForm {
      * The element
      * @type {HTMLLIElement}
      */
-    #element;
+    element;
 
     /**
      * The item index
@@ -328,6 +345,12 @@ class RecurringItemSubForm {
      * @type {HTMLDivElement}
      */
     #error;
+
+    /**
+     * The number
+     * @type {HTMLInputElement}
+     */
+    no;
 
     /**
      * The name input
@@ -379,11 +402,12 @@ class RecurringItemSubForm {
      */
     constructor(expenseIncomeSubForm, element) {
         this.#expenseIncomeSubForm = expenseIncomeSubForm
-        this.#element = element;
+        this.element = element;
         this.itemIndex = parseInt(element.dataset.itemIndex);
         const prefix = "accounting-recurring-" + expenseIncomeSubForm.expenseIncome + "-" + element.dataset.itemIndex;
         this.#control = document.getElementById(prefix + "-control");
         this.#error = document.getElementById(prefix + "-error");
+        this.no = document.getElementById(prefix + "-no");
         this.#name = document.getElementById(prefix + "-name");
         this.#nameText = document.getElementById(prefix + "-name-text");
         this.#accountCode = document.getElementById(prefix + "-account-code");
@@ -394,7 +418,7 @@ class RecurringItemSubForm {
 
         this.#control.onclick = () => this.#expenseIncomeSubForm.editor.onEdit(this);
         this.deleteButton.onclick = () => {
-            this.#element.parentElement.removeChild(this.#element);
+            this.element.parentElement.removeChild(this.element);
             this.#expenseIncomeSubForm.deleteItem(this);
         };
     }

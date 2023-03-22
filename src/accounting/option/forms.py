@@ -209,8 +209,26 @@ class RecurringForm(RecurringItemForm):
             return (item.name.data, item.account_code.data,
                     item.description_template.data)
 
-        return {"expense": [as_tuple(x.form) for x in self.expenses],
-                "income": [as_tuple(x.form) for x in self.incomes]}
+        expenses: list[RecurringItemForm] = [x.form for x in self.expenses]
+        self.__sort_item_forms(expenses)
+        incomes: list[RecurringItemForm] = [x.form for x in self.incomes]
+        self.__sort_item_forms(incomes)
+        return {"expense": [as_tuple(x) for x in expenses],
+                "income": [as_tuple(x) for x in incomes]}
+
+    @staticmethod
+    def __sort_item_forms(forms: list[RecurringItemForm]) -> None:
+        """Sorts the recurring item sub-forms.
+
+        :param forms: The recurring item sub-forms.
+        :return: None.
+        """
+        ord_by_form: dict[RecurringItemForm, int] \
+            = {forms[i]: i for i in range(len(forms))}
+        recv_no: set[int] = {x.no.data for x in forms if x.no.data is not None}
+        missing_recv_no: int = 100 if len(recv_no) == 0 else max(recv_no) + 100
+        forms.sort(key=lambda x: (x.no.data or missing_recv_no,
+                                  ord_by_form.get(x)))
 
 
 class OptionForm(FlaskForm):
