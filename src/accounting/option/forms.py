@@ -20,6 +20,7 @@
 import re
 
 from flask import render_template
+from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from wtforms import StringField, FieldList, FormField, IntegerField
 from wtforms.validators import DataRequired, ValidationError
@@ -118,6 +119,18 @@ class RecurringItemForm(FlaskForm):
             return None
         account: Account | None = Account.find_by_code(self.account_code.data)
         return None if account is None else str(account)
+
+    @property
+    def all_errors(self) -> list[str | LazyString]:
+        """Returns all the errors of the form.
+
+        :return: All the errors of the form.
+        """
+        all_errors: list[str | LazyString] = []
+        for key in self.errors:
+            if key != "csrf_token":
+                all_errors.extend(self.errors[key])
+        return all_errors
 
 
 class RecurringExpenseForm(RecurringItemForm):

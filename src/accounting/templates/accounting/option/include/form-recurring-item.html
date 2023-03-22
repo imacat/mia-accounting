@@ -27,12 +27,12 @@ First written: 2023/3/22
   <input id="accounting-recurring-{{ expense_income }}-{{ item_index }}-description-template" type="hidden" name="recurring-{{ expense_income }}-{{ item_index }}-description_template" value="{{ form.description_template.data|accounting_default }}">
   <div class="d-flex justify-content-between">
     <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-content" class="w-100">
-      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-control" class="form-control accounting-clickable {% if form.form_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
+      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-control" class="form-control accounting-clickable {% if form.all_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
         <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-account-text" class="small">{{ form.account_text|accounting_default }}</div>
         <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-name-text">{{ form.name.data|accounting_default }}</div>
         <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-description-template-text" class="small">{{ form.description_template.data|accounting_default }}</div>
       </div>
-      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-error" class="invalid-feedback">{% if form.form_errors %}{{ form.form_errors[0] }}{% endif %}</div>
+      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-error" class="invalid-feedback">{% if form.all_errors %}{{ form.all_errors[0] }}{% endif %}</div>
     </div>
 
     <div class="ms-2">
