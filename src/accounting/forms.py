@@ -19,15 +19,10 @@
 """
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
-from wtforms.validators import DataRequired
 
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency
-
-CURRENCY_REQUIRED: DataRequired = DataRequired(
-    lazy_gettext("Please select the currency."))
-"""The validator to check if the currency code is empty."""
 
 
 class CurrencyExists:

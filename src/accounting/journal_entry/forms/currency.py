@@ -24,15 +24,21 @@ from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError, FieldList, IntegerField, \
     BooleanField, FormField
+from wtforms.validators import DataRequired
 
 from accounting import db
-from accounting.forms import CURRENCY_REQUIRED, CurrencyExists
+from accounting.forms import CurrencyExists
 from accounting.journal_entry.utils.offset_alias import offset_alias
 from accounting.locale import lazy_gettext
 from accounting.models import JournalEntryLineItem
 from accounting.utils.cast import be
 from accounting.utils.strip_text import strip_text
 from .line_item import LineItemForm, CreditLineItemForm, DebitLineItemForm
+
+
+CURRENCY_REQUIRED: DataRequired = DataRequired(
+    lazy_gettext("Please select the currency."))
+"""The validator to check if the currency code is empty."""
 
 
 class SameCurrencyAsOriginalLineItems:
