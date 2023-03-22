@@ -17,7 +17,7 @@
 """The views for the option management.
 
 """
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl, urlencode
 
 from flask import Blueprint, render_template, redirect, session, request, \
     flash, url_for
@@ -28,6 +28,7 @@ from accounting.locale import lazy_gettext
 from accounting.option.forms import OptionForm
 from accounting.option.options import Options, options
 from accounting.utils.cast import s
+from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next
 from accounting.utils.permission import has_permission, can_admin
 
@@ -70,6 +71,10 @@ def update_options() -> redirect:
     :return: The redirection to the option form.
     """
     form = OptionForm(request.form)
+    if not form.validate():
+        flash_form_errors(form)
+        session["form"] = urlencode(list(request.form.items()))
+        return redirect(inherit_next(url_for("accounting.option.edit")))
     form.populate_obj(options)
     if not options.is_modified:
         flash(s(lazy_gettext("The settings were not modified.")), "success")
