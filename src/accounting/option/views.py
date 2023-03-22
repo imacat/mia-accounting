@@ -35,7 +35,17 @@ bp: Blueprint = Blueprint("option", __name__)
 """The view blueprint for the currency management."""
 
 
-@bp.get("", endpoint="form")
+@bp.get("", endpoint="detail")
+@has_permission(can_admin)
+def show_options() -> str:
+    """Shows the options.
+
+    :return: The options.
+    """
+    return render_template("accounting/option/detail.html", obj=options)
+
+
+@bp.get("edit", endpoint="edit")
 @has_permission(can_admin)
 def show_option_form() -> str:
     """Shows the option form.
@@ -52,7 +62,7 @@ def show_option_form() -> str:
     return render_template("accounting/option/form.html", form=form)
 
 
-@bp.post("", endpoint="update")
+@bp.post("update", endpoint="update")
 @has_permission(can_admin)
 def update_options() -> redirect:
     """Updates the options.
@@ -63,7 +73,7 @@ def update_options() -> redirect:
     form.populate_obj(options)
     if not options.is_modified:
         flash(s(lazy_gettext("The options were not modified.")), "success")
-        return redirect(inherit_next(url_for("accounting.option.form")))
+        return redirect(inherit_next(url_for("accounting.option.detail")))
     options.commit()
     flash(s(lazy_gettext("The options are saved successfully.")), "success")
-    return redirect(inherit_next(url_for("accounting.option.form")))
+    return redirect(inherit_next(url_for("accounting.option.detail")))

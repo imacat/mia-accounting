@@ -1,0 +1,63 @@
+{#
+The Mia! Accounting Flask Project
+detail.html: The option detail
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/22
+#}
+{% extends "accounting/base.html" %}
+
+{% block header %}{% block title %}{{ A_("Settings") }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="mb-3 accounting-toolbar">
+  <a class="btn btn-primary d-none d-md-inline" role="button" href="{{ url_for("accounting.option.edit")|accounting_inherit_next }}">
+    <i class="fa-solid fa-pen-to-square"></i>
+    {{ A_("Edit") }}
+  </a>
+</div>
+
+<div class="d-md-none accounting-material-fab">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.option.edit")|accounting_inherit_next }}">
+    <i class="fa-solid fa-pen-to-square"></i>
+  </a>
+</div>
+
+<div id="accounting-default-currency" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+  <label class="form-label" for="accounting-default-currency">{{ A_("Default Currency") }}</label>
+  <div>{{ obj.default_currency_text }}</div>
+</div>
+
+<div id="accounting-default-ie-account" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+  <label class="form-label" for="accounting-default-ie-account">{{ A_("Default Account for the Income and Expenses Log") }}</label>
+  <div>{{ obj.default_ie_account_code_text }}</div>
+</div>
+
+{% with expense_income = "expense",
+        label = A_("Expense"),
+        recurring_items = obj.recurring.expenses %}
+  {% include "accounting/option/include/detail-recurring-expense-income.html" %}
+{% endwith %}
+
+{% with expense_income = "income",
+        label = A_("Income"),
+        recurring_items = obj.recurring.incomes %}
+  {% include "accounting/option/include/detail-recurring-expense-income.html" %}
+{% endwith %}
+
+{% endblock %}

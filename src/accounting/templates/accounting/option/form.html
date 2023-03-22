@@ -29,7 +29,14 @@ First written: 2023/3/22
 
 {% block content %}
 
-<form id="accounting-form" action="{{ url_for("accounting.option.form") }}" method="post" data-recurring-item-template="{{ form.recurring.item_template }}">
+<div class="mb-3 accounting-toolbar">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.option.detail")|accounting_inherit_next }}">
+    <i class="fa-solid fa-circle-chevron-left"></i>
+    <span class="d-none d-md-inline">{{ A_("Back") }}</span>
+  </a>
+</div>
+
+<form id="accounting-form" action="{{ url_for("accounting.option.update") }}" method="post" data-recurring-item-template="{{ form.recurring.item_template }}">
   {{ form.csrf_token }}
   {% if request.args.next %}
     <input type="hidden" name="next" value="{{ request.args.next }}">

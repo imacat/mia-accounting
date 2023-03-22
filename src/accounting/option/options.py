@@ -22,7 +22,7 @@ import json
 import sqlalchemy as sa
 
 from accounting import db
-from accounting.models import Option, Account
+from accounting.models import Option, Account, Currency
 from accounting.utils.current_account import CurrentAccount
 from accounting.utils.user import get_current_user_pk
 
@@ -41,6 +41,14 @@ class RecurringItem:
         self.name: str = name
         self.account_code: str = account_code
         self.description_template: str = description_template
+
+    @property
+    def account_text(self) -> str:
+        """Returns the account text.
+
+        :return: The account text.
+        """
+        return str(Account.find_by_code(self.account_code))
 
 
 class Recurring:
@@ -91,6 +99,14 @@ class Options:
         self.__set_option("default_currency", value)
 
     @property
+    def default_currency_text(self) -> str:
+        """Returns the text of the default currency code.
+
+        :return: The text of the default currency code.
+        """
+        return str(db.session.get(Currency, self.default_currency))
+
+    @property
     def default_ie_account_code(self) -> str:
         """Returns the default account code for the income and expenses log.
 
@@ -106,6 +122,17 @@ class Options:
         :return: None.
         """
         self.__set_option("default_ie_account", value)
+
+    @property
+    def default_ie_account_code_text(self) -> str:
+        """Returns the text of the default currency code.
+
+        :return: The text of the default currency code.
+        """
+        code: str = self.default_ie_account_code
+        if code == CurrentAccount.CURRENT_AL_CODE:
+            return str(CurrentAccount.current_assets_and_liabilities())
+        return str(CurrentAccount(db.session.get(Account, code)))
 
     @property
     def default_ie_account(self) -> CurrentAccount:
