@@ -28,7 +28,7 @@ from wtforms.validators import DataRequired, ValidationError
 from accounting.forms import CURRENCY_REQUIRED, CurrencyExists
 from accounting.locale import lazy_gettext
 from accounting.models import Account
-from accounting.utils.ie_account import IncomeExpensesAccount, ie_accounts
+from accounting.utils.current_account import CurrentAccount, current_accounts
 from accounting.utils.strip_text import strip_text
 from .options import Options
 
@@ -242,9 +242,9 @@ class OptionForm(FlaskForm):
         obj.recurring_data = self.recurring.form.as_data
 
     @property
-    def ie_accounts(self) -> list[IncomeExpensesAccount]:
-        """Returns the accounts for the income and expenses log.
+    def current_accounts(self) -> list[CurrentAccount]:
+        """Returns the current accounts.
 
-        :return: The accounts for the income and expenses log.
+        :return: The current accounts.
         """
-        return ie_accounts()
+        return current_accounts()

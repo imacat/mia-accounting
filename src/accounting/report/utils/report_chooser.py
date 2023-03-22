@@ -30,7 +30,7 @@ from accounting.locale import gettext
 from accounting.models import Currency, Account
 from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
-from accounting.utils.ie_account import IncomeExpensesAccount
+from accounting.utils.current_account import CurrentAccount
 from .option_link import OptionLink
 from .report_type import ReportType
 from .urls import journal_url, ledger_url, income_expenses_url, \
@@ -113,7 +113,7 @@ class ReportChooser:
             account: Account = Account.cash()
         return OptionLink(gettext("Income and Expenses Log"),
                           income_expenses_url(self.__currency,
-                                              IncomeExpensesAccount(account),
+                                              CurrentAccount(account),
                                               self.__period),
                           self.__active_report == ReportType.INCOME_EXPENSES,
                           fa_icon="fa-solid fa-money-bill-wave")

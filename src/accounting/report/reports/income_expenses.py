@@ -38,7 +38,7 @@ from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.urls import income_expenses_url
 from accounting.utils.cast import be
-from accounting.utils.ie_account import IncomeExpensesAccount
+from accounting.utils.current_account import CurrentAccount
 from accounting.utils.pagination import Pagination
 
 
@@ -84,7 +84,7 @@ class ReportLineItem:
 class LineItemCollector:
     """The line item collector."""
 
-    def __init__(self, currency: Currency, account: IncomeExpensesAccount,
+    def __init__(self, currency: Currency, account: CurrentAccount,
                  period: Period):
         """Constructs the line item collector.
 
@@ -94,7 +94,7 @@ class LineItemCollector:
         """
         self.__currency: Currency = currency
         """The currency."""
-        self.__account: IncomeExpensesAccount = account
+        self.__account: CurrentAccount = account
         """The account."""
         self.__period: Period = period
         """The period"""
@@ -173,7 +173,7 @@ class LineItemCollector:
 
     @property
     def __account_condition(self) -> sa.BinaryExpression:
-        if self.__account.code == IncomeExpensesAccount.CURRENT_AL_CODE:
+        if self.__account.code == CurrentAccount.CURRENT_AL_CODE:
             return sa.or_(Account.base_code.startswith("11"),
                           Account.base_code.startswith("12"),
                           Account.base_code.startswith("21"),
@@ -264,7 +264,7 @@ class PageParams(BasePageParams):
     """The HTML page parameters."""
 
     def __init__(self, currency: Currency,
-                 account: IncomeExpensesAccount,
+                 account: CurrentAccount,
                  period: Period,
                  has_data: bool,
                  pagination: Pagination[ReportLineItem],
@@ -283,7 +283,7 @@ class PageParams(BasePageParams):
         """
         self.currency: Currency = currency
         """The currency."""
-        self.account: IncomeExpensesAccount = account
+        self.account: CurrentAccount = account
         """The account."""
         self.period: Period = period
         """The period."""
@@ -341,8 +341,8 @@ class PageParams(BasePageParams):
 
         :return: The account options.
         """
-        current_al: IncomeExpensesAccount \
-            = IncomeExpensesAccount.current_assets_and_liabilities()
+        current_al: CurrentAccount \
+            = CurrentAccount.current_assets_and_liabilities()
         options: list[OptionLink] \
             = [OptionLink(str(current_al),
                           income_expenses_url(self.currency, current_al,
@@ -360,7 +360,7 @@ class PageParams(BasePageParams):
         options.extend([OptionLink(str(x),
                                    income_expenses_url(
                                        self.currency,
-                                       IncomeExpensesAccount(x),
+                                       CurrentAccount(x),
                                        self.period),
                                    x.id == self.account.id)
                         for x in Account.query.filter(Account.id.in_(in_use))
@@ -371,7 +371,7 @@ class PageParams(BasePageParams):
 class IncomeExpenses(BaseReport):
     """The income and expenses log."""
 
-    def __init__(self, currency: Currency, account: IncomeExpensesAccount,
+    def __init__(self, currency: Currency, account: CurrentAccount,
                  period: Period):
         """Constructs an income and expenses log.
 
@@ -381,7 +381,7 @@ class IncomeExpenses(BaseReport):
         """
         self.__currency: Currency = currency
         """The currency."""
-        self.__account: IncomeExpensesAccount = account
+        self.__account: CurrentAccount = account
         """The account."""
         self.__period: Period = period
         """The period."""

@@ -23,7 +23,7 @@ from accounting.models import Currency, Account
 from accounting.option.options import options
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
-from accounting.utils.ie_account import IncomeExpensesAccount
+from accounting.utils.current_account import CurrentAccount
 
 
 def journal_url(period: Period) \
@@ -55,7 +55,7 @@ def ledger_url(currency: Currency, account: Account, period: Period) \
                    period=period)
 
 
-def income_expenses_url(currency: Currency, account: IncomeExpensesAccount,
+def income_expenses_url(currency: Currency, account: CurrentAccount,
                         period: Period) -> str:
     """Returns the URL of an income and expenses log.
 

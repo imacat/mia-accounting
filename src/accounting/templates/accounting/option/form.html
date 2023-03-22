@@ -46,7 +46,7 @@ First written: 2023/3/22
 
   <div class="form-floating mb-3">
     <select id="accounting-default-ie-account" class="form-select {% if form.default_ie_account_code.errors %} is-invalid {% endif %}" name="default_ie_account_code">
-      {% for account in form.ie_accounts %}
+      {% for account in form.current_accounts %}
         <option value="{{ account.code }}" {% if account.code == form.default_ie_account_code.data %} selected="selected" {% endif %}>{{ account }}</option>
       {% endfor %}
     </select>

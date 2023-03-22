@@ -23,7 +23,7 @@ from flask import abort
 from werkzeug.routing import BaseConverter
 
 from accounting.models import Account
-from accounting.utils.ie_account import IncomeExpensesAccount
+from accounting.utils.current_account import CurrentAccount
 from .period import Period, get_period
 
 
@@ -55,22 +55,22 @@ class IncomeExpensesAccountConverter(BaseConverter):
     """The supplier converter to convert the income and expenses log pseudo
     account code from and to the corresponding pseudo account in the routes."""
 
-    def to_python(self, value: str) -> IncomeExpensesAccount:
+    def to_python(self, value: str) -> CurrentAccount:
         """Converts an account code to an account.
 
         :param value: The account code.
         :return: The corresponding account.
         """
-        if value == IncomeExpensesAccount.CURRENT_AL_CODE:
-            return IncomeExpensesAccount.current_assets_and_liabilities()
+        if value == CurrentAccount.CURRENT_AL_CODE:
+            return CurrentAccount.current_assets_and_liabilities()
         if not re.match("^[12][12]", value):
             abort(404)
         account: Account | None = Account.find_by_code(value)
         if account is None:
             abort(404)
-        return IncomeExpensesAccount(account)
+        return CurrentAccount(account)
 
-    def to_url(self, value: IncomeExpensesAccount) -> str:
+    def to_url(self, value: CurrentAccount) -> str:
         """Converts an account to account code.
 
         :param value: The account.

@@ -24,7 +24,7 @@ from accounting.models import Currency, Account
 from accounting.option.options import options
 from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
-from accounting.utils.ie_account import IncomeExpensesAccount
+from accounting.utils.current_account import CurrentAccount
 from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
@@ -127,8 +127,7 @@ def __get_ledger(currency: Currency, account: Account, period: Period) \
 @bp.get("income-expenses/<currency:currency>/<ieAccount:account>",
         endpoint="income-expenses-default")
 @has_permission(can_view)
-def get_default_income_expenses(currency: Currency,
-                                account: IncomeExpensesAccount) \
+def get_default_income_expenses(currency: Currency, account: CurrentAccount) \
         -> str | Response:
     """Returns the income and expenses log in the default period.
 
@@ -143,7 +142,7 @@ def get_default_income_expenses(currency: Currency,
     "income-expenses/<currency:currency>/<ieAccount:account>/<period:period>",
     endpoint="income-expenses")
 @has_permission(can_view)
-def get_income_expenses(currency: Currency, account: IncomeExpensesAccount,
+def get_income_expenses(currency: Currency, account: CurrentAccount,
                         period: Period) -> str | Response:
     """Returns the income and expenses log.
 
@@ -155,7 +154,7 @@ def get_income_expenses(currency: Currency, account: IncomeExpensesAccount,
     return __get_income_expenses(currency, account, period)
 
 
-def __get_income_expenses(currency: Currency, account: IncomeExpensesAccount,
+def __get_income_expenses(currency: Currency, account: CurrentAccount,
                           period: Period) -> str | Response:
     """Returns the income and expenses log.
 

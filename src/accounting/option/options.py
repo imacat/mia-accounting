@@ -23,7 +23,7 @@ import sqlalchemy as sa
 
 from accounting import db
 from accounting.models import Option, Account
-from accounting.utils.ie_account import IncomeExpensesAccount
+from accounting.utils.current_account import CurrentAccount
 from accounting.utils.user import get_current_user_pk
 
 
@@ -108,15 +108,15 @@ class Options:
         self.__set_option("default_ie_account", value)
 
     @property
-    def default_ie_account(self) -> IncomeExpensesAccount:
+    def default_ie_account(self) -> CurrentAccount:
         """Returns the default account code for the income and expenses log.
 
         :return: The default account code for the income and expenses log.
         """
         if self.default_ie_account_code \
-                == IncomeExpensesAccount.CURRENT_AL_CODE:
-            return IncomeExpensesAccount.current_assets_and_liabilities()
-        return IncomeExpensesAccount(
+                == CurrentAccount.CURRENT_AL_CODE:
+            return CurrentAccount.current_assets_and_liabilities()
+        return CurrentAccount(
             Account.find_by_code(self.default_ie_account_code))
 
     @property

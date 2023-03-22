@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The pseudo account for the income and expenses log.
+"""The current account.
 
 """
 import typing as t
@@ -25,15 +25,15 @@ from accounting.models import Account
 import sqlalchemy as sa
 
 
-class IncomeExpensesAccount:
-    """The pseudo account for the income and expenses log."""
+class CurrentAccount:
+    """The current account."""
     CURRENT_AL_CODE: str = "0000-000"
     """The account code for the current assets and liabilities."""
 
     def __init__(self, account: Account | None = None):
-        """Constructs the pseudo account for the income and expenses log.
+        """Constructs the current account.
 
-        :param account: The actual account.
+        :param account: The account.
         """
         self.account: Account | None = account
         self.id: int = -1 if account is None else account.id
@@ -66,14 +66,14 @@ class IncomeExpensesAccount:
         return account
 
 
-def ie_accounts() -> list[IncomeExpensesAccount]:
+def current_accounts() -> list[CurrentAccount]:
     """Returns accounts for the income and expenses log.
 
     :return: The accounts for the income and expenses log.
     """
-    accounts: list[IncomeExpensesAccount] \
-        = [IncomeExpensesAccount.current_assets_and_liabilities()]
-    accounts.extend([IncomeExpensesAccount(x)
+    accounts: list[CurrentAccount] \
+        = [CurrentAccount.current_assets_and_liabilities()]
+    accounts.extend([CurrentAccount(x)
                      for x in db.session.query(Account)
                     .filter(sa.or_(Account.base_code.startswith("11"),
                                    Account.base_code.startswith("12"),
