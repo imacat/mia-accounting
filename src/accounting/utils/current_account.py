@@ -36,6 +36,7 @@ class CurrentAccount:
         :param account: The account.
         """
         self.account: Account | None = account
+        """The actual account."""
         self.id: int = -1 if account is None else account.id
         """The ID."""
         self.code: str = "" if account is None else account.code
