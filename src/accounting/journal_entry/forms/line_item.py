@@ -25,10 +25,11 @@ from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from sqlalchemy.orm import selectinload
 from wtforms import StringField, ValidationError, DecimalField, IntegerField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import Optional
 
 from accounting import db
-from accounting.forms import AccountExists, IsDebitAccount, IsCreditAccount
+from accounting.forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
+    IsCreditAccount
 from accounting.locale import lazy_gettext
 from accounting.models import Account, JournalEntryLineItem
 from accounting.template_filters import format_amount
@@ -36,10 +37,6 @@ from accounting.utils.cast import be
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_text
 from accounting.utils.user import get_current_user_pk
-
-ACCOUNT_REQUIRED: DataRequired = DataRequired(
-    lazy_gettext("Please select the account."))
-"""The validator to check if the account code is empty."""
 
 
 class OriginalLineItemExists:

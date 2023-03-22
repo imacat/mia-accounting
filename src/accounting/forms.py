@@ -22,10 +22,16 @@ import re
 from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
+from wtforms.validators import DataRequired
 
 from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency, Account
+
+
+ACCOUNT_REQUIRED: DataRequired = DataRequired(
+    lazy_gettext("Please select the account."))
+"""The validator to check if the account code is empty."""
 
 
 class CurrencyExists:
