@@ -32,6 +32,28 @@ from accounting.utils.options import Options
 from accounting.utils.strip_text import strip_text
 
 
+class CurrentAccountExists:
+    """The validator to check that the current account exists."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data is None or field.data == CurrentAccount.CURRENT_AL_CODE:
+            return
+        if Account.find_by_code(field.data) is None:
+            raise ValidationError(lazy_gettext(
+                "The current account does not exist."))
+
+
+class AccountNotCurrent:
+    """The validator to check that the account is a current account."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data is None or field.data == CurrentAccount.CURRENT_AL_CODE:
+            return
+        if field.data[:2] not in {"11", "12", "21", "22"}:
+            raise ValidationError(lazy_gettext(
+                "The current account does not exist."))
+
+
 class NotStartPayableFromExpense:
     """The validator to check that a payable line item does not start from
     expense."""
@@ -219,7 +241,9 @@ class OptionForm(FlaskForm):
         validators=[
             DataRequired(lazy_gettext(
                 "Please select the default account"
-                " for the income and expenses log."))])
+                " for the income and expenses log.")),
+            CurrentAccountExists(),
+            AccountNotCurrent()])
     """The default account code for the income and expenses log."""
     recurring = FormField(RecurringForm)
     """The recurring expenses and incomes."""
