@@ -28,14 +28,6 @@ accounting.report.utils.csv\_export module
    :undoc-members:
    :show-inheritance:
 
-accounting.report.utils.ie\_account module
-------------------------------------------
-
-.. automodule:: accounting.report.utils.ie_account
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 accounting.report.utils.option\_link module
 -------------------------------------------
 

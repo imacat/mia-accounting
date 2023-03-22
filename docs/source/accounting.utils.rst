@@ -12,6 +12,14 @@ accounting.utils.cast module
    :undoc-members:
    :show-inheritance:
 
+accounting.utils.current\_account module
+----------------------------------------
+
+.. automodule:: accounting.utils.current_account
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.utils.flash\_errors module
 -------------------------------------
 
@@ -32,6 +40,14 @@ accounting.utils.next\_uri module
 ---------------------------------
 
 .. automodule:: accounting.utils.next_uri
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.utils.options module
+-------------------------------
+
+.. automodule:: accounting.utils.options
    :members:
    :undoc-members:
    :show-inheritance:

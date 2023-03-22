@@ -11,11 +11,20 @@ Subpackages
    accounting.base_account
    accounting.currency
    accounting.journal_entry
+   accounting.option
    accounting.report
    accounting.utils
 
 Submodules
 ----------
+
+accounting.forms module
+-----------------------
+
+.. automodule:: accounting.forms
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 accounting.locale module
 ------------------------
