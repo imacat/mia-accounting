@@ -127,7 +127,7 @@ class RecurringExpenseForm(RecurringItemForm):
         filters=[strip_text],
         validators=[
             DataRequired(lazy_gettext(
-                "Please fill in the template of the description."))])
+                "Please fill in the description template."))])
     """The template for the line item description."""
 
     @property
@@ -242,7 +242,7 @@ class OptionForm(FlaskForm):
         filters=[strip_text],
         validators=[
             DataRequired(lazy_gettext(
-                "Please fill in the default account code"
+                "Please select the default account"
                 " for the income and expenses log."))])
     """The default account code for the income and expenses log."""
     recurring = FormField(RecurringForm)

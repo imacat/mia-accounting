@@ -72,8 +72,8 @@ def update_options() -> redirect:
     form = OptionForm(request.form)
     form.populate_obj(options)
     if not options.is_modified:
-        flash(s(lazy_gettext("The options were not modified.")), "success")
+        flash(s(lazy_gettext("The settings were not modified.")), "success")
         return redirect(inherit_next(url_for("accounting.option.detail")))
     options.commit()
-    flash(s(lazy_gettext("The options are saved successfully.")), "success")
+    flash(s(lazy_gettext("The settings are saved successfully.")), "success")
     return redirect(inherit_next(url_for("accounting.option.detail")))
