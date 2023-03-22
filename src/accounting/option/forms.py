@@ -18,7 +18,6 @@
 
 """
 import re
-import typing as t
 
 from flask import render_template
 from flask_wtf import FlaskForm
