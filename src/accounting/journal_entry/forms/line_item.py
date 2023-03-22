@@ -17,7 +17,6 @@
 """The line item sub-forms for the journal entry management.
 
 """
-import re
 from datetime import date
 from decimal import Decimal
 
@@ -29,6 +28,7 @@ from wtforms import StringField, ValidationError, DecimalField, IntegerField
 from wtforms.validators import DataRequired, Optional
 
 from accounting import db
+from accounting.forms import AccountExists, IsDebitAccount, IsCreditAccount
 from accounting.locale import lazy_gettext
 from accounting.models import Account, JournalEntryLineItem
 from accounting.template_filters import format_amount
@@ -103,45 +103,6 @@ class OriginalLineItemNotOffset:
         if original_line_item.original_line_item_id is not None:
             raise ValidationError(lazy_gettext(
                 "The original line item cannot be an offset item."))
-
-
-class AccountExists:
-    """The validator to check if the account exists."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if Account.find_by_code(field.data) is None:
-            raise ValidationError(lazy_gettext(
-                "The account does not exist."))
-
-
-class IsDebitAccount:
-    """The validator to check if the account is for debit line items."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[1235689]|7[5678])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for debit line items."))
-
-
-class IsCreditAccount:
-    """The validator to check if the account is for credit line items."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[123489]|7[1234])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for credit line items."))
 
 
 class SameAccountAsOriginalLineItem:

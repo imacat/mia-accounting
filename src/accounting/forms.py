@@ -17,12 +17,15 @@
 """The forms.
 
 """
+import re
+
+from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
 
 from accounting import db
 from accounting.locale import lazy_gettext
-from accounting.models import Currency
+from accounting.models import Currency, Account
 
 
 class CurrencyExists:
@@ -34,3 +37,60 @@ class CurrencyExists:
         if db.session.get(Currency, field.data) is None:
             raise ValidationError(lazy_gettext(
                 "The currency does not exist."))
+
+
+class AccountExists:
+    """The validator to check if the account exists."""
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data is None:
+            return
+        if Account.find_by_code(field.data) is None:
+            raise ValidationError(lazy_gettext(
+                "The account does not exist."))
+
+
+class IsDebitAccount:
+    """The validator to check if the account is for debit line items."""
+
+    def __init__(self, message: str | LazyString | None = None):
+        """Constructs the validator.
+
+        :param message: The optional custom error message.
+        """
+        if message is None:
+            message = lazy_gettext(
+                "This account is not for debit line items.")
+        self.__message: str | LazyString = message
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data is None:
+            return
+        if re.match(r"^(?:[1235689]|7[5678])", field.data) \
+                and not field.data.startswith("3351-") \
+                and not field.data.startswith("3353-"):
+            return
+        raise ValidationError(self.__message)
+
+
+class IsCreditAccount:
+    """The validator to check if the account is for credit line items."""
+
+    def __init__(self, message: str | LazyString | None = None):
+        """Constructs the validator.
+
+        :param message: The optional custom error message.
+        """
+        if message is None:
+            message = lazy_gettext(
+                "This account is not for credit line items.")
+        self.__message: str | LazyString = message
+
+    def __call__(self, form: FlaskForm, field: StringField) -> None:
+        if field.data is None:
+            return
+        if re.match(r"^(?:[123489]|7[1234])", field.data) \
+                and not field.data.startswith("3351-") \
+                and not field.data.startswith("3353-"):
+            return
+        raise ValidationError(self.__message)

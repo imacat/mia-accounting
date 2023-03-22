@@ -17,59 +17,19 @@
 """The forms for the option management.
 
 """
-import re
-
 from flask import render_template
 from flask_babel import LazyString
 from flask_wtf import FlaskForm
 from wtforms import StringField, FieldList, FormField, IntegerField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.forms import CurrencyExists
+from accounting.forms import CurrencyExists, AccountExists, IsDebitAccount, \
+    IsCreditAccount
 from accounting.locale import lazy_gettext
 from accounting.models import Account
 from accounting.utils.current_account import CurrentAccount, current_accounts
 from accounting.utils.options import Options
 from accounting.utils.strip_text import strip_text
-
-
-class AccountExists:
-    """The validator to check if the account exists."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if Account.find_by_code(field.data) is None:
-            raise ValidationError(lazy_gettext(
-                "The account does not exist."))
-
-
-class IsExpenseAccount:
-    """The validator to check if the account is for expense."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[1235689]|7[5678])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for expense."))
-
-
-class IsIncomeAccount:
-    """The validator to check if the account is for income."""
-
-    def __call__(self, form: FlaskForm, field: StringField) -> None:
-        if field.data is None:
-            return
-        if re.match(r"^(?:[123489]|7[1234])", field.data) \
-                and not field.data.startswith("3351-") \
-                and not field.data.startswith("3353-"):
-            return
-        raise ValidationError(lazy_gettext(
-            "This account is not for income."))
 
 
 class NotStartPayableFromExpense:
@@ -143,9 +103,10 @@ class RecurringExpenseForm(RecurringItemForm):
     """The name of the recurring item."""
     account_code = StringField(
         filters=[strip_text],
-        validators=[AccountExists(),
-                    IsExpenseAccount(),
-                    NotStartPayableFromExpense()])
+        validators=[
+            AccountExists(),
+            IsDebitAccount(lazy_gettext("This account is not for expense.")),
+            NotStartPayableFromExpense()])
     """The account code."""
     description_template = StringField(
         filters=[strip_text],
@@ -165,9 +126,10 @@ class RecurringIncomeForm(RecurringItemForm):
     """The name of the recurring item."""
     account_code = StringField(
         filters=[strip_text],
-        validators=[AccountExists(),
-                    IsIncomeAccount(),
-                    NotStartReceivableFromIncome()])
+        validators=[
+            AccountExists(),
+            IsCreditAccount(lazy_gettext("This account is not for income.")),
+            NotStartReceivableFromIncome()])
     """The account code."""
     description_template = StringField(
         filters=[strip_text],
