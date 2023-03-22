@@ -44,8 +44,8 @@ class AccountExists:
                 "The account does not exist."))
 
 
-class IsDebitAccount:
-    """The validator to check if the account is for debit line items."""
+class IsExpenseAccount:
+    """The validator to check if the account is for expense."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None:
@@ -55,11 +55,11 @@ class IsDebitAccount:
                 and not field.data.startswith("3353-"):
             return
         raise ValidationError(lazy_gettext(
-            "This account is not for debit line items."))
+            "This account is not for expense."))
 
 
-class IsCreditAccount:
-    """The validator to check if the account is for credit line items."""
+class IsIncomeAccount:
+    """The validator to check if the account is for income."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None:
@@ -69,12 +69,12 @@ class IsCreditAccount:
                 and not field.data.startswith("3353-"):
             return
         raise ValidationError(lazy_gettext(
-            "This account is not for credit line items."))
+            "This account is not for income."))
 
 
-class NotStartPayableFromDebit:
+class NotStartPayableFromExpense:
     """The validator to check that a payable line item does not start from
-    debit."""
+    expense."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None or field.data[0] != "2":
@@ -82,12 +82,12 @@ class NotStartPayableFromDebit:
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A payable line item cannot start from debit."))
+                "A payable line item cannot start from expense."))
 
 
-class NotStartReceivableFromCredit:
+class NotStartReceivableFromIncome:
     """The validator to check that a receivable line item does not start
-    from credit."""
+    from income."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None or field.data[0] != "1":
@@ -95,7 +95,7 @@ class NotStartReceivableFromCredit:
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A receivable line item cannot start from credit."))
+                "A receivable line item cannot start from income."))
 
 
 class RecurringItemForm(FlaskForm):
@@ -144,8 +144,8 @@ class RecurringExpenseForm(RecurringItemForm):
     account_code = StringField(
         filters=[strip_text],
         validators=[AccountExists(),
-                    IsDebitAccount(),
-                    NotStartPayableFromDebit()])
+                    IsExpenseAccount(),
+                    NotStartPayableFromExpense()])
     """The account code."""
     description_template = StringField(
         filters=[strip_text],
@@ -166,8 +166,8 @@ class RecurringIncomeForm(RecurringItemForm):
     account_code = StringField(
         filters=[strip_text],
         validators=[AccountExists(),
-                    IsCreditAccount(),
-                    NotStartReceivableFromCredit()])
+                    IsIncomeAccount(),
+                    NotStartReceivableFromIncome()])
     """The account code."""
     description_template = StringField(
         filters=[strip_text],
