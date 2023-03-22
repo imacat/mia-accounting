@@ -53,14 +53,11 @@ class AccountExists:
 class IsDebitAccount:
     """The validator to check if the account is for debit line items."""
 
-    def __init__(self, message: str | LazyString | None = None):
+    def __init__(self, message: str | LazyString):
         """Constructs the validator.
 
-        :param message: The optional custom error message.
+        :param message: The error message.
         """
-        if message is None:
-            message = lazy_gettext(
-                "This account is not for debit line items.")
         self.__message: str | LazyString = message
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
@@ -76,14 +73,11 @@ class IsDebitAccount:
 class IsCreditAccount:
     """The validator to check if the account is for credit line items."""
 
-    def __init__(self, message: str | LazyString | None = None):
+    def __init__(self, message: str | LazyString):
         """Constructs the validator.
 
-        :param message: The optional custom error message.
+        :param message: The error message.
         """
-        if message is None:
-            message = lazy_gettext(
-                "This account is not for credit line items.")
         self.__message: str | LazyString = message
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:

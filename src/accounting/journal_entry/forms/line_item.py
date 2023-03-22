@@ -413,12 +413,14 @@ class DebitLineItemForm(LineItemForm):
     """The ID of the original line item."""
     account_code = StringField(
         filters=[strip_text],
-        validators=[ACCOUNT_REQUIRED,
-                    AccountExists(),
-                    IsDebitAccount(),
-                    SameAccountAsOriginalLineItem(),
-                    KeepAccountWhenHavingOffset(),
-                    NotStartPayableFromDebit()])
+        validators=[
+            ACCOUNT_REQUIRED,
+            AccountExists(),
+            IsDebitAccount(lazy_gettext(
+                "This account is not for debit line items.")),
+            SameAccountAsOriginalLineItem(),
+            KeepAccountWhenHavingOffset(),
+            NotStartPayableFromDebit()])
     """The account code."""
     description = StringField(filters=[strip_text])
     """The description."""
@@ -463,12 +465,14 @@ class CreditLineItemForm(LineItemForm):
     """The ID of the original line item."""
     account_code = StringField(
         filters=[strip_text],
-        validators=[ACCOUNT_REQUIRED,
-                    AccountExists(),
-                    IsCreditAccount(),
-                    SameAccountAsOriginalLineItem(),
-                    KeepAccountWhenHavingOffset(),
-                    NotStartReceivableFromCredit()])
+        validators=[
+            ACCOUNT_REQUIRED,
+            AccountExists(),
+            IsCreditAccount(lazy_gettext(
+                "This account is not for credit line items.")),
+            SameAccountAsOriginalLineItem(),
+            KeepAccountWhenHavingOffset(),
+            NotStartReceivableFromCredit()])
     """The account code."""
     description = StringField(filters=[strip_text])
     """The description."""
