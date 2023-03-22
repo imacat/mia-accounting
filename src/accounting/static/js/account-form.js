@@ -282,7 +282,7 @@ class BaseAccountSelector {
         });
         for (const option of this.#options) {
             option.onclick = () => {
-                this.#form.setBaseAccount(option.dataset.code, option.dataset.content);
+                this.#form.setBaseAccount(option.dataset.code, option.dataset.text);
             };
         }
         this.#clearButton.onclick = () => {

@@ -101,7 +101,7 @@ First written: 2023/2/1
 
         <ul id="accounting-base-selector-option-list" class="list-group accounting-selector-list">
           {% for base in form.base_options %}
-            <li class="list-group-item accounting-clickable accounting-base-selector-option" data-code="{{ base.code }}" data-content="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}" data-bs-dismiss="modal">
+            <li class="list-group-item accounting-clickable accounting-base-selector-option" data-code="{{ base.code }}" data-text="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}" data-bs-dismiss="modal">
               {{ base }}
             </li>
           {% endfor %}
