@@ -50,6 +50,15 @@ class UserUtilityInterface(t.Generic[T], ABC):
             data, or False otherwise.
         """
 
+    @abstractmethod
+    def can_admin(self) -> bool:
+        """Returns whether the currently logged-in user can administrate the
+        accounting settings.
+
+        :return: True if the currently logged-in user can administrate the
+            accounting settings, or False otherwise.
+        """
+
     @property
     @abstractmethod
     def cls(self) -> t.Type[T]:

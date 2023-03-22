@@ -50,18 +50,6 @@ def create_app(is_testing: bool = False) -> Flask:
         "SQLALCHEMY_DATABASE_URI": db_uri,
         "BABEL_DEFAULT_LOCALE": "en",
         "ALL_LINGUAS": "zh_Hant|正體中文,en|English,zh_Hans|简体中文",
-        "ACCOUNTING_DEFAULT_CURRENCY": "USD",
-        "ACCOUNTING_DEFAULT_IE_ACCOUNT": "1111-001",
-        "ACCOUNTING_RECURRING": (
-            "debit|1314-001|Pension|Pension for {last_month_name},"
-            "debit|6262-001|Health insurance"
-            "|Health insurance for {last_month_name},"
-            "debit|6261-001|Electricity bill"
-            "|Electricity bill for {last_bimonthly_name},"
-            "debit|6261-001|Water bill|Water bill for {last_bimonthly_name},"
-            "debit|6261-001|Gas bill|Gas bill for {last_bimonthly_name},"
-            "debit|6261-001|Phone bill|Phone bill for {last_month_name},"
-            "credit|4611-001|Payroll|Payroll for {last_month_name}"),
     })
     if is_testing:
         app.config["TESTING"] = True
@@ -89,6 +77,10 @@ def create_app(is_testing: bool = False) -> Flask:
         def can_edit(self) -> bool:
             return auth.current_user() is not None \
                 and auth.current_user().username in ["editor", "editor2"]
+
+        def can_admin(self) -> bool:
+            return auth.current_user() is not None \
+                and auth.current_user().username == "editor"
 
         @property
         def cls(self) -> t.Type[auth.User]:

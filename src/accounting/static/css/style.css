@@ -331,6 +331,14 @@ a.accounting-report-table-row {
     margin-top: 0.2rem;
 }
 
+/* The illustration of the description template for the recurring transactions */
+.accounting-recurring-description-template-illustration p {
+    margin: 0.2rem 0;
+}
+.accounting-recurring-description-template-illustration ul {
+    margin: 0;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
     position: relative;

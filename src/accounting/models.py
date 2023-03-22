@@ -779,3 +779,33 @@ class JournalEntryLineItem(db.Model):
                                    journal_entry_day.day),
                  format_amount(self.amount),
                  format_amount(self.net_balance)])
+
+
+class Option(db.Model):
+    """An option."""
+    __tablename__ = "accounting_options"
+    """The table name."""
+    name = db.Column(db.String, nullable=False, primary_key=True)
+    """The name."""
+    value = db.Column(db.Text, nullable=False)
+    """The option value."""
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
+                           server_default=db.func.now())
+    """The time of creation."""
+    created_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
+                              nullable=False)
+    """The ID of the creator."""
+    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    """The creator."""
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
+                           server_default=db.func.now())
+    """The time of last update."""
+    updated_by_id = db.Column(db.Integer,
+                              db.ForeignKey(user_pk_column,
+                                            onupdate="CASCADE"),
+                              nullable=False)
+    """The ID of the updator."""
+    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    """The updator."""

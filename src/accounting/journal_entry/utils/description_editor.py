@@ -25,6 +25,7 @@ from flask import current_app
 
 from accounting import db
 from accounting.models import Account, JournalEntryLineItem
+from accounting.option.options import options, Recurring
 
 
 class DescriptionAccount:
@@ -148,16 +149,16 @@ class DescriptionType:
 class DescriptionRecurring:
     """A recurring transaction."""
 
-    def __init__(self, name: str, template: str, account: Account):
+    def __init__(self, name: str, account: Account, description_template: str):
         """Constructs a recurring transaction.
 
         :param name: The name.
-        :param template: The template.
+        :param description_template: The description template.
         :param account: The account.
         """
         self.name: str = name
-        self.template: str = template
         self.account: DescriptionAccount = DescriptionAccount(account, 0)
+        self.description_template: str = description_template
 
     @property
     def account_codes(self) -> list[str]:
@@ -280,19 +281,17 @@ class DescriptionEditor:
 
         :return: None.
         """
-        if "ACCOUNTING_RECURRING" not in current_app.config:
-            return
-        data: list[tuple[t.Literal["debit", "credit"], str, str, str]] \
-            = [x.split("|")
-               for x in current_app.config["ACCOUNTING_RECURRING"].split(",")]
-        debit_credit_dict: dict[t.Literal["debit", "credit"],
-                                DescriptionDebitCredit] \
-            = {x.debit_credit: x for x in {self.debit, self.credit}}
+        recurring: Recurring = options.recurring
         accounts: dict[str, Account] \
-            = self.__get_accounts({x[1] for x in data})
-        for row in data:
-            debit_credit_dict[row[0]].recurring.append(
-                DescriptionRecurring(row[2], row[3], accounts[row[1]]))
+            = self.__get_accounts(recurring.codes)
+        self.debit.recurring \
+            = [DescriptionRecurring(x.name, accounts[x.account_code],
+                                    x.description_template)
+               for x in recurring.expenses]
+        self.credit.recurring \
+            = [DescriptionRecurring(x.name, accounts[x.account_code],
+                                    x.description_template)
+               for x in recurring.incomes]
 
     @staticmethod
     def __get_accounts(codes: set[str]) -> dict[str, Account]:

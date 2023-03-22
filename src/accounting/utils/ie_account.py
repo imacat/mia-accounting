@@ -19,8 +19,10 @@
 """
 import typing as t
 
+from accounting import db
 from accounting.locale import gettext
 from accounting.models import Account
+import sqlalchemy as sa
 
 
 class IncomeExpensesAccount:
@@ -62,3 +64,20 @@ class IncomeExpensesAccount:
         account.title = gettext("current assets and liabilities")
         account.str = account.title
         return account
+
+
+def ie_accounts() -> list[IncomeExpensesAccount]:
+    """Returns accounts for the income and expenses log.
+
+    :return: The accounts for the income and expenses log.
+    """
+    accounts: list[IncomeExpensesAccount] \
+        = [IncomeExpensesAccount.current_assets_and_liabilities()]
+    accounts.extend([IncomeExpensesAccount(x)
+                     for x in db.session.query(Account)
+                    .filter(sa.or_(Account.base_code.startswith("11"),
+                                   Account.base_code.startswith("12"),
+                                   Account.base_code.startswith("21"),
+                                   Account.base_code.startswith("22")))
+                    .order_by(Account.base_code, Account.no)])
+    return accounts

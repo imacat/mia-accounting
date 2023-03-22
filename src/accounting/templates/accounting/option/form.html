@@ -1,0 +1,101 @@
+{#
+The Mia! Accounting Flask Project
+form.html: The option form
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/22
+#}
+{% extends "accounting/base.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/option-form.js") }}"></script>
+{% endblock %}
+
+{% block header %}{% block title %}{{ A_("Settings") }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<form id="accounting-form" action="{{ url_for("accounting.option.form") }}" method="post" data-recurring-item-template="{{ form.recurring.item_template }}">
+  {{ form.csrf_token }}
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
+  {% endif %}
+  <div class="form-floating mb-3">
+    <select id="accounting-default-currency" class="form-select {% if form.default_currency.errors %} is-invalid {% endif %}" name="default_currency">
+      {% for currency in accounting_currency_options() %}
+        <option value="{{ currency.code }}" {% if currency.code == form.default_currency.data %} selected="selected" {% endif %}>{{ currency }}</option>
+      {% endfor %}
+    </select>
+    <label class="form-label" for="accounting-default-currency">{{ A_("Default Currency") }}</label>
+    <div id="accounting-default-currency-error" class="invalid-feedback">{% if form.default_currency.errors %}{{ form.default_currency.errors[0] }}{% endif %}</div>
+  </div>
+
+  <div class="form-floating mb-3">
+    <select id="accounting-default-ie-account" class="form-select {% if form.default_ie_account_code.errors %} is-invalid {% endif %}" name="default_ie_account_code">
+      {% for account in form.ie_accounts %}
+        <option value="{{ account.code }}" {% if account.code == form.default_ie_account_code.data %} selected="selected" {% endif %}>{{ account }}</option>
+      {% endfor %}
+    </select>
+    <label class="form-label" for="accounting-default-ie-account">{{ A_("Default Account for the Income and Expenses Log") }}</label>
+    <div id="accounting-default-ie-account-error" class="invalid-feedback">{% if form.default_ie_account_code.errors %}{{ form.default_ie_account_code.errors[0] }}{% endif %}</div>
+  </div>
+
+  {% with expense_income = "expense",
+          label = A_("Expense"),
+          recurring_items = form.recurring.expenses %}
+    {% include "accounting/option/include/form-recurring-expense-income.html" %}
+  {% endwith %}
+
+  {% with expense_income = "income",
+          label = A_("Income"),
+          recurring_items = form.recurring.incomes %}
+    {% include "accounting/option/include/form-recurring-expense-income.html" %}
+  {% endwith %}
+
+  <div class="d-none d-md-block">
+    <button class="btn btn-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      {{ A_("Save") }}
+    </button>
+  </div>
+
+  <div class="d-md-none accounting-material-fab">
+    <button class="btn btn-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+    </button>
+  </div>
+</form>
+
+{% with expense_income = "expense",
+        title = A_("Recurring Expense") %}
+  {% include "accounting/option/include/recurring-item-editor-modal.html" %}
+{% endwith %}
+{% with expense_income = "income",
+        title = A_("Recurring Income") %}
+  {% include "accounting/option/include/recurring-item-editor-modal.html" %}
+{% endwith %}
+
+{% with expense_income = "expense",
+        accounts = form.recurring.expense_accounts %}
+  {% include "accounting/option/include/recurring-account-selector-modal.html" %}
+{% endwith %}
+{% with expense_income = "income",
+        accounts = form.recurring.income_accounts %}
+  {% include "accounting/option/include/recurring-account-selector-modal.html" %}
+{% endwith %}
+
+{% endblock %}

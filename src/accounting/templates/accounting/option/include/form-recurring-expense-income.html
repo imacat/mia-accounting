@@ -1,0 +1,39 @@
+{#
+The Mia! Accounting Flask Project
+form-recurring-item.html: The recurring expense or income sub-form in the option form
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/3/22
+#}
+<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+  <label class="form-label" for="accounting-recurring-{{ expense_income }}">{{ label }}</label>
+  <ul id="accounting-recurring-{{ expense_income }}-list" class="list-group mb-2 mt-2">
+    {% for recurring_item in recurring_items %}
+      {% with form = recurring_item.form,
+              item_index = loop.index %}
+        {% include "accounting/option/include/form-recurring-item.html" %}
+      {% endwith %}
+    {% endfor %}
+  </ul>
+
+  <div>
+    <button id="accounting-recurring-{{ expense_income }}-add" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
+      <i class="fas fa-plus"></i>
+      {{ A_("New") }}
+    </button>
+  </div>
+</div>

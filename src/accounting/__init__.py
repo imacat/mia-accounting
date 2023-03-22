@@ -86,4 +86,7 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     from . import report
     report.init_app(app, bp)
 
+    from . import option
+    option.init_app(bp)
+
     app.register_blueprint(bp)

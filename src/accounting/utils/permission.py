@@ -63,6 +63,9 @@ data."""
 __can_edit_func: t.Callable[[], bool] = lambda: True
 """The callback that returns whether the current user can edit the accounting
 data."""
+__can_admin_func: t.Callable[[], bool] = lambda: True
+"""The callback that returns whether the current user can administrate the
+accounting settings."""
 
 
 def can_view() -> bool:
@@ -87,6 +90,20 @@ def can_edit() -> bool:
     return __can_edit_func()
 
 
+def can_admin() -> bool:
+    """Returns whether the current user can administrate the accounting
+    settings.
+
+    The user has to log in.
+
+    :return: True if the current user can administrate the accounting settings,
+        or False otherwise.
+    """
+    if get_current_user() is None:
+        return False
+    return __can_admin_func()
+
+
 def init_app(bp: Blueprint, user_utils: UserUtilityInterface) -> None:
     """Initializes the application.
 
@@ -94,8 +111,10 @@ def init_app(bp: Blueprint, user_utils: UserUtilityInterface) -> None:
     :param user_utils: The user utilities.
     :return: None.
     """
-    global __can_view_func, __can_edit_func
+    global __can_view_func, __can_edit_func, __can_admin_func
     __can_view_func = user_utils.can_view
     __can_edit_func = user_utils.can_edit
+    __can_admin_func = user_utils.can_admin
     bp.add_app_template_global(user_utils.can_view, "accounting_can_view")
     bp.add_app_template_global(user_utils.can_edit, "accounting_can_edit")
+    bp.add_app_template_global(user_utils.can_admin, "accounting_can_admin")

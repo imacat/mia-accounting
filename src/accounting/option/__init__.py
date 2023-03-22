@@ -1,5 +1,5 @@
 # The Mia! Accounting Flask Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/3
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/22
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,24 +14,17 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The template globals.
+"""The option management.
 
 """
-from accounting.models import Currency
-from accounting.option.options import options
+from flask import Blueprint
 
 
-def currency_options() -> str:
-    """Returns the currency options.
+def init_app(bp: Blueprint) -> None:
+    """Initialize the application.
 
-    :return: The currency options.
+    :param bp: The blueprint of the accounting application.
+    :return: None.
     """
-    return Currency.query.order_by(Currency.code).all()
-
-
-def default_currency_code() -> str:
-    """Returns the default currency code.
-
-    :return: The default currency code.
-    """
-    return options.default_currency
+    from .views import bp as option_bp
+    bp.register_blueprint(option_bp, url_prefix="/options")
