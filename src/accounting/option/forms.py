@@ -166,7 +166,7 @@ class RecurringIncomeForm(RecurringItemForm):
     account_code = StringField(
         filters=[strip_text],
         validators=[AccountExists(),
-                    IsDebitAccount(),
+                    IsCreditAccount(),
                     NotStartReceivableFromCredit()])
     """The account code."""
     description_template = StringField(
