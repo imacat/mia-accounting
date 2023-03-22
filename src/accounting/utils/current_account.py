@@ -66,19 +66,18 @@ class CurrentAccount:
         account.str = account.title
         return account
 
+    @classmethod
+    def accounts(cls) -> list[t.Self]:
+        """Returns the current assets and liabilities accounts.
 
-def current_accounts() -> list[CurrentAccount]:
-    """Returns accounts for the income and expenses log.
-
-    :return: The accounts for the income and expenses log.
-    """
-    accounts: list[CurrentAccount] \
-        = [CurrentAccount.current_assets_and_liabilities()]
-    accounts.extend([CurrentAccount(x)
-                     for x in db.session.query(Account)
-                    .filter(sa.or_(Account.base_code.startswith("11"),
-                                   Account.base_code.startswith("12"),
-                                   Account.base_code.startswith("21"),
-                                   Account.base_code.startswith("22")))
-                    .order_by(Account.base_code, Account.no)])
-    return accounts
+        :return: The current assets and liabilities accounts.
+        """
+        accounts: list[cls] = [cls.current_assets_and_liabilities()]
+        accounts.extend([CurrentAccount(x)
+                         for x in db.session.query(Account)
+                        .filter(sa.or_(Account.base_code.startswith("11"),
+                                       Account.base_code.startswith("12"),
+                                       Account.base_code.startswith("21"),
+                                       Account.base_code.startswith("22")))
+                        .order_by(Account.base_code, Account.no)])
+        return accounts

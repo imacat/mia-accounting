@@ -27,7 +27,7 @@ from accounting.forms import CurrencyExists, AccountExists, IsDebitAccount, \
     IsCreditAccount
 from accounting.locale import lazy_gettext
 from accounting.models import Account
-from accounting.utils.current_account import CurrentAccount, current_accounts
+from accounting.utils.current_account import CurrentAccount
 from accounting.utils.options import Options
 from accounting.utils.strip_text import strip_text
 
@@ -240,4 +240,4 @@ class OptionForm(FlaskForm):
 
         :return: The current accounts.
         """
-        return current_accounts()
+        return CurrentAccount.accounts()
