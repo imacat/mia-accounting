@@ -82,7 +82,7 @@ class NotStartPayableFromExpense:
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A payable line item cannot start from expense."))
+                "You cannot select a payable account as expense."))
 
 
 class NotStartReceivableFromIncome:
@@ -95,7 +95,7 @@ class NotStartReceivableFromIncome:
         account: Account | None = Account.find_by_code(field.data)
         if account is not None and account.is_need_offset:
             raise ValidationError(lazy_gettext(
-                "A receivable line item cannot start from income."))
+                "You cannot select a receivable account as income."))
 
 
 class RecurringItemForm(FlaskForm):
