@@ -20,10 +20,10 @@
 from flask import url_for
 
 from accounting.models import Currency, Account
-from accounting.option.options import options
 from accounting.report.period import Period
 from accounting.template_globals import default_currency_code
 from accounting.utils.current_account import CurrentAccount
+from accounting.utils.options import options
 
 
 def journal_url(period: Period) \

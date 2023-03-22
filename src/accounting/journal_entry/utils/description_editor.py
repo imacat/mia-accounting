@@ -21,11 +21,10 @@ import re
 import typing as t
 
 import sqlalchemy as sa
-from flask import current_app
 
 from accounting import db
 from accounting.models import Account, JournalEntryLineItem
-from accounting.option.options import options, Recurring
+from accounting.utils.options import options, Recurring
 
 
 class DescriptionAccount:

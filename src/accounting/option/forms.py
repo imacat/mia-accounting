@@ -29,8 +29,8 @@ from accounting.forms import CurrencyExists
 from accounting.locale import lazy_gettext
 from accounting.models import Account
 from accounting.utils.current_account import CurrentAccount, current_accounts
+from accounting.utils.options import Options
 from accounting.utils.strip_text import strip_text
-from .options import Options
 
 
 class AccountExists:

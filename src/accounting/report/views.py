@@ -21,10 +21,10 @@ from flask import Blueprint, request, Response
 
 from accounting import db
 from accounting.models import Currency, Account
-from accounting.option.options import options
 from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
 from accounting.utils.current_account import CurrentAccount
+from accounting.utils.options import options
 from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search

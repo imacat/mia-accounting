@@ -18,7 +18,7 @@
 
 """
 from accounting.models import Currency
-from accounting.option.options import options
+from accounting.utils.options import options
 
 
 def currency_options() -> str:

@@ -27,9 +27,9 @@ from accounting.locale import lazy_gettext
 from accounting.utils.cast import s
 from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.next_uri import inherit_next
+from accounting.utils.options import options
 from accounting.utils.permission import has_permission, can_admin
 from .forms import OptionForm
-from .options import options
 
 bp: Blueprint = Blueprint("option", __name__)
 """The view blueprint for the currency management."""
