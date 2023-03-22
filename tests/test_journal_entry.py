@@ -309,7 +309,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             self.assertEqual(len(currencies[2].credit), 2)
             self.assertEqual(currencies[2].credit[0].no, 6)
             self.assertEqual(currencies[2].credit[0].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
             self.assertEqual(currencies[2].credit[1].no, 7)
             self.assertEqual(currencies[2].credit[1].account.code,
                              Accounts.DONATION)
@@ -441,7 +441,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             self.assertNotIn(currencies1[0].credit[1].id, old_id)
             self.assertEqual(currencies1[0].credit[1].no, 2)
             self.assertEqual(currencies1[0].credit[1].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
 
             self.assertEqual(currencies1[1].code, "EUR")
             self.assertEqual(len(currencies1[1].debit), 1)
@@ -457,7 +457,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
                              currencies0[2].credit[0].id)
             self.assertEqual(currencies1[1].credit[0].no, 3)
             self.assertEqual(currencies1[1].credit[0].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
             self.assertEqual(currencies1[1].credit[1].id,
                              currencies0[2].credit[1].id)
             self.assertEqual(currencies1[1].credit[1].no, 4)
@@ -1562,7 +1562,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             self.assertEqual(len(currencies[2].credit), 2)
             self.assertEqual(currencies[2].credit[0].no, 6)
             self.assertEqual(currencies[2].credit[0].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
             self.assertEqual(currencies[2].credit[1].no, 7)
             self.assertEqual(currencies[2].credit[1].account.code,
                              Accounts.DONATION)
@@ -1728,7 +1728,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             self.assertNotIn(currencies1[0].credit[1].id, old_id)
             self.assertEqual(currencies1[0].credit[1].no, 2)
             self.assertEqual(currencies1[0].credit[1].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
 
             self.assertEqual(currencies1[1].code, "EUR")
             self.assertEqual(len(currencies1[1].debit), 2)
@@ -1748,7 +1748,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
                              currencies0[2].credit[0].id)
             self.assertEqual(currencies1[1].credit[0].no, 3)
             self.assertEqual(currencies1[1].credit[0].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
             self.assertEqual(currencies1[1].credit[1].id,
                              currencies0[2].credit[1].id)
             self.assertEqual(currencies1[1].credit[1].no, 4)
@@ -1914,7 +1914,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             self.assertNotIn(currencies1[0].credit[1].id, old_id)
             self.assertEqual(currencies1[0].credit[1].no, 2)
             self.assertEqual(currencies1[0].credit[1].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
 
             self.assertEqual(currencies1[1].code, "EUR")
             self.assertEqual(len(currencies1[1].debit), 1)
@@ -1930,7 +1930,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
                              currencies0[2].credit[0].id)
             self.assertEqual(currencies1[1].credit[0].no, 3)
             self.assertEqual(currencies1[1].credit[0].account.code,
-                             Accounts.RENT)
+                             Accounts.RENT_INCOME)
             self.assertEqual(currencies1[1].credit[1].id,
                              currencies0[2].credit[1].id)
             self.assertEqual(currencies1[1].credit[1].no, 4)

@@ -48,12 +48,16 @@ class Accounts:
     SALES: str = "4111-001"
     SERVICE: str = "4611-001"
     AGENCY: str = "4711-001"
-    OFFICE: str = "6153-001"
-    TRAVEL: str = "6154-001"
-    MEAL: str = "6172-001"
+    RENT_EXPENSE: str = "6252-001"
+    OFFICE: str = "6253-001"
+    TRAVEL: str = "6254-001"
+    POSTAGE: str = "6256-001"
+    UTILITIES: str = "6261-001"
+    INSURANCE: str = "6262-001"
+    MEAL: str = "6272-001"
     INTEREST: str = "7111-001"
     DONATION: str = "7481-001"
-    RENT: str = "7482-001"
+    RENT_INCOME: str = "7482-001"
 
 
 def get_add_form(csrf_token: str) -> dict[str, str]:
@@ -115,7 +119,7 @@ def get_add_form(csrf_token: str) -> dict[str, str]:
             "currency-16-debit-9-description": " Gas ",
             "currency-16-debit-9-amount": "30000",
             "currency-16-credit-6-no": "6",
-            "currency-16-credit-6-account_code": Accounts.RENT,
+            "currency-16-credit-6-account_code": Accounts.RENT_INCOME,
             "currency-16-credit-6-description": " Rent ",
             "currency-16-credit-6-amount": "35000",
             "currency-16-credit-9-account_code": Accounts.DONATION,
@@ -349,7 +353,7 @@ def __mess_up_currencies(form: dict[str, str]) -> dict[str, str]:
         f"{prefix}debit-14-description": "  ",
         f"{prefix}debit-14-amount": "14.55",
         f"{prefix}credit-16-no": "7",
-        f"{prefix}credit-16-account_code": Accounts.RENT,
+        f"{prefix}credit-16-account_code": Accounts.RENT_INCOME,
         f"{prefix}credit-16-description": " Bike ",
         f"{prefix}credit-16-amount": "19.5",
         f"{prefix}credit-22-no": "5",
