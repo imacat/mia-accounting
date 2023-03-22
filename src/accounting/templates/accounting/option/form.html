@@ -63,13 +63,13 @@ First written: 2023/3/22
   </div>
 
   {% with expense_income = "expense",
-          label = A_("Expense"),
+          label = A_("Recurring Expense"),
           recurring_items = form.recurring.expenses %}
     {% include "accounting/option/include/form-recurring-expense-income.html" %}
   {% endwith %}
 
   {% with expense_income = "income",
-          label = A_("Income"),
+          label = A_("Recurring Income"),
           recurring_items = form.recurring.incomes %}
     {% include "accounting/option/include/form-recurring-expense-income.html" %}
   {% endwith %}
