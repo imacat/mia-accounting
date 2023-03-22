@@ -854,7 +854,7 @@ class RecurringAccountSelector {
     #filterOptions() {
         let hasAnyMatched = false;
         for (const option of this.#options) {
-            if (option.isMatches(this.#query.value)) {
+            if (option.isMatched(this.#query.value)) {
                 option.setShown(true);
                 hasAnyMatched = true;
             } else {
@@ -951,7 +951,7 @@ class RecurringAccount {
      * @param query {string} the query term
      * @return {boolean} true if the option matches, or false otherwise
      */
-    isMatches(query) {
+    isMatched(query) {
         if (query === "") {
             return true;
         }
