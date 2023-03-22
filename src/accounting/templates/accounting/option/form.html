@@ -43,13 +43,13 @@ First written: 2023/3/22
     <input type="hidden" name="next" value="{{ request.args.next }}">
   {% endif %}
   <div class="form-floating mb-3">
-    <select id="accounting-default-currency" class="form-select {% if form.default_currency.errors %} is-invalid {% endif %}" name="default_currency">
+    <select id="accounting-default-currency" class="form-select {% if form.default_currency_code.errors %} is-invalid {% endif %}" name="default_currency_code">
       {% for currency in accounting_currency_options() %}
-        <option value="{{ currency.code }}" {% if currency.code == form.default_currency.data %} selected="selected" {% endif %}>{{ currency }}</option>
+        <option value="{{ currency.code }}" {% if currency.code == form.default_currency_code.data %} selected="selected" {% endif %}>{{ currency }}</option>
       {% endfor %}
     </select>
     <label class="form-label" for="accounting-default-currency">{{ A_("Default Currency") }}</label>
-    <div id="accounting-default-currency-error" class="invalid-feedback">{% if form.default_currency.errors %}{{ form.default_currency.errors[0] }}{% endif %}</div>
+    <div id="accounting-default-currency-error" class="invalid-feedback">{% if form.default_currency_code.errors %}{{ form.default_currency_code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">

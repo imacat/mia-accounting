@@ -34,4 +34,4 @@ def default_currency_code() -> str:
 
     :return: The default currency code.
     """
-    return options.default_currency
+    return options.default_currency_code

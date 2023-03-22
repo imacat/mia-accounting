@@ -208,7 +208,7 @@ class RecurringForm(RecurringItemForm):
 
 class OptionForm(FlaskForm):
     """The form to update the options."""
-    default_currency = StringField(
+    default_currency_code = StringField(
         filters=[strip_text],
         validators=[
             DataRequired(lazy_gettext("Please select the default currency.")),
@@ -230,7 +230,7 @@ class OptionForm(FlaskForm):
         :param obj: The currency object.
         :return: None.
         """
-        obj.default_currency = self.default_currency.data
+        obj.default_currency_code = self.default_currency_code.data
         obj.default_ie_account_code = self.default_ie_account_code.data
         obj.recurring_data = self.recurring.form.as_data
 
