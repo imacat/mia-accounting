@@ -203,6 +203,18 @@ class RecurringExpenseIncomeSubForm {
     #prefix;
 
     /**
+     * The element
+     * @type {HTMLDivElement}
+     */
+    #element;
+
+    /**
+     * The content
+     * @type {HTMLDivElement}
+     */
+    #content;
+
+    /**
      * The recurring items list
      * @type {HTMLUListElement}
      */
@@ -231,10 +243,13 @@ class RecurringExpenseIncomeSubForm {
         this.expenseIncome = expenseIncome;
         this.editor = new RecurringItemEditor(this);
         this.#prefix = "accounting-recurring-" + expenseIncome;
+        this.#element = document.getElementById(this.#prefix);
+        this.#content = document.getElementById(this.#prefix + "-content");
         this.#itemList = document.getElementById(this.#prefix + "-list");
         this.#items = Array.from(document.getElementsByClassName(this.#prefix + "-item")).map((element) => new RecurringItemSubForm(this, element));
         this.#addButton = document.getElementById(this.#prefix + "-add");
 
+        this.#resetContent();
         this.#addButton.onclick = () => this.editor.onAddNew();
         this.#initializeDragAndDropReordering();
     }
@@ -253,6 +268,7 @@ class RecurringExpenseIncomeSubForm {
         const element = document.getElementById(this.#prefix + "-" + String(newIndex))
         const item = new RecurringItemSubForm(this, element);
         this.#items.push(item);
+        this.#resetContent();
         this.#initializeDragAndDropReordering();
         this.validate();
         return item;
@@ -266,6 +282,29 @@ class RecurringExpenseIncomeSubForm {
     deleteItem(item) {
         const index = this.#items.indexOf(item);
         this.#items.splice(index, 1);
+        this.#resetContent();
+    }
+
+    /**
+     * Resets the layout of the content.
+     *
+     */
+    #resetContent() {
+        if (this.#items.length === 0) {
+            this.#element.classList.remove("accounting-not-empty");
+            this.#element.classList.add("accounting-clickable");
+            this.#element.dataset.bsToggle = "modal"
+            this.#element.dataset.bsTarget = "#" + this.editor.modal.id;
+            this.#element.onclick = () => this.editor.onAddNew();
+            this.#content.classList.add("d-none");
+        } else {
+            this.#element.classList.add("accounting-not-empty");
+            this.#element.classList.remove("accounting-clickable");
+            delete this.#element.dataset.bsToggle;
+            delete this.#element.dataset.bsTarget;
+            this.#element.onclick = null;
+            this.#content.classList.remove("d-none");
+        }
     }
 
     /**
@@ -530,7 +569,7 @@ class RecurringItemEditor {
      * The modal
      * @type {HTMLDivElement}
      */
-    #modal;
+    modal;
 
     /**
      * The name
@@ -608,7 +647,7 @@ class RecurringItemEditor {
         this.expenseIncome = subForm.expenseIncome;
         const prefix = "accounting-recurring-item-editor-" + subForm.expenseIncome;
         this.#form = document.getElementById(prefix);
-        this.#modal = document.getElementById(prefix + "-modal");
+        this.modal = document.getElementById(prefix + "-modal");
         this.#name = document.getElementById(prefix + "-name");
         this.#nameError = document.getElementById(prefix + "-name-error");
         this.#accountControl = document.getElementById(prefix + "-account-control");
@@ -627,7 +666,7 @@ class RecurringItemEditor {
                     this.#item = this.#subForm.addItem();
                 }
                 this.#item.save(this);
-                bootstrap.Modal.getInstance(this.#modal).hide();
+                bootstrap.Modal.getInstance(this.modal).hide();
             }
             return false;
         };

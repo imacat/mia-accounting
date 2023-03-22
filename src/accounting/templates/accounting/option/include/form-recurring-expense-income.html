@@ -19,21 +19,23 @@ form-recurring-expense-income.html: The recurring expense or income sub-form in 
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/22
 #}
-<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field {% if recurring_items %} accounting-not-empty {% else %} accounting-clickable {% endif %}">
   <label class="form-label" for="accounting-recurring-{{ expense_income }}">{{ label }}</label>
-  <ul id="accounting-recurring-{{ expense_income }}-list" class="list-group mb-2 mt-2">
-    {% for recurring_item in recurring_items %}
-      {% with form = recurring_item.form,
-              item_index = loop.index %}
-        {% include "accounting/option/include/form-recurring-item.html" %}
-      {% endwith %}
-    {% endfor %}
-  </ul>
+  <div id="accounting-recurring-{{ expense_income }}-content" class="{% if not recurring_items %} d-none {% endif %}">
+    <ul id="accounting-recurring-{{ expense_income }}-list" class="list-group mb-2 mt-2">
+      {% for recurring_item in recurring_items %}
+        {% with form = recurring_item.form,
+                item_index = loop.index %}
+          {% include "accounting/option/include/form-recurring-item.html" %}
+        {% endwith %}
+      {% endfor %}
+    </ul>
 
-  <div>
-    <button id="accounting-recurring-{{ expense_income }}-add" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
-      <i class="fas fa-plus"></i>
-      {{ A_("New") }}
-    </button>
+    <div>
+      <button id="accounting-recurring-{{ expense_income }}-add" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
+        <i class="fas fa-plus"></i>
+        {{ A_("New") }}
+      </button>
+    </div>
   </div>
 </div>
