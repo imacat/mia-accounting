@@ -53,7 +53,7 @@ class JournalEntryLineItemEditor {
     debitCredit;
 
     /**
-     * The prefix of the HTML ID and class
+     * The prefix of the HTML ID and class names
      * @type {string}
      */
     #prefix = "accounting-line-item-editor"

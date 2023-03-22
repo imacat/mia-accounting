@@ -197,7 +197,7 @@ class RecurringExpenseIncomeSubForm {
     editor;
 
     /**
-     * The prefix of HTML ID and class
+     * The prefix of the HTML ID and class names
      * @type {string}
      */
     #prefix;

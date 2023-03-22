@@ -88,7 +88,7 @@ class TabPlane {
     chooser;
 
     /**
-     * The prefix of the HTML ID and class
+     * The prefix of the HTML ID and class names
      * @type {string}
      */
     prefix;

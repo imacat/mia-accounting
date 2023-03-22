@@ -35,7 +35,7 @@ class OriginalLineItemSelector {
     lineItemEditor;
 
     /**
-     * The prefix of the HTML ID and class
+     * The prefix of the HTML ID and class names
      * @type {string}
      */
     #prefix = "accounting-original-line-item-selector";

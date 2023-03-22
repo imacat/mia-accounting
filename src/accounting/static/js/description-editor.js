@@ -41,7 +41,7 @@ class DescriptionEditor {
     #form;
 
     /**
-     * The prefix of the HTML ID and class
+     * The prefix of the HTML ID and class names
      * @type {string}
      */
     prefix;
@@ -278,7 +278,7 @@ class TabPlane {
     editor;
 
     /**
-     * The prefix of the HTML ID and classes
+     * The prefix of the HTML ID and class names
      * @type {string}
      */
     prefix;
