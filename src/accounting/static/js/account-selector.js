@@ -41,12 +41,6 @@ class AccountSelector {
     #debitCredit;
 
     /**
-     * The prefix of the HTML ID and class
-     * @type {string}
-     */
-    #prefix;
-
-    /**
      * The button to clear the account
      * @type {HTMLButtonElement}
      */
@@ -91,14 +85,14 @@ class AccountSelector {
     constructor(lineItemEditor, debitCredit) {
         this.#lineItemEditor = lineItemEditor
         this.#debitCredit = debitCredit;
-        this.#prefix = "accounting-account-selector-" + debitCredit;
-        this.#query = document.getElementById(this.#prefix + "-query");
-        this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
-        this.#optionList = document.getElementById(this.#prefix + "-option-list");
+        const prefix = "accounting-account-selector-" + debitCredit;
+        this.#query = document.getElementById(prefix + "-query");
+        this.#queryNoResult = document.getElementById(prefix + "-option-no-result");
+        this.#optionList = document.getElementById(prefix + "-option-list");
         // noinspection JSValidateTypes
-        this.#options = Array.from(document.getElementsByClassName(this.#prefix + "-option"));
-        this.#more = document.getElementById(this.#prefix + "-more");
-        this.#clearButton = document.getElementById(this.#prefix + "-btn-clear");
+        this.#options = Array.from(document.getElementsByClassName(prefix + "-option"));
+        this.#more = document.getElementById(prefix + "-more");
+        this.#clearButton = document.getElementById(prefix + "-btn-clear");
         this.#more.onclick = () => {
             this.#more.classList.add("d-none");
             this.#filterOptions();

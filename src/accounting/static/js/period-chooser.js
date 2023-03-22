@@ -34,12 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
 class PeriodChooser {
 
     /**
-     * The prefix of the HTML ID and class
-     * @type {string}
-     */
-    prefix;
-
-    /**
      * The modal of the period chooser
      * @type {HTMLDivElement}
      */
@@ -56,8 +50,8 @@ class PeriodChooser {
      *
      */
     constructor() {
-        this.prefix = "accounting-period-chooser";
-        this.modal = document.getElementById(this.prefix + "-modal");
+        const prefix = "accounting-period-chooser";
+        this.modal = document.getElementById(prefix + "-modal");
         for (const cls of [MonthTab, YearTab, DayTab, CustomTab]) {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
