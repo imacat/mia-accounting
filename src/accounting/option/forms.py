@@ -168,7 +168,7 @@ class RecurringForm(RecurringItemForm):
     """The sub-form for the recurring expenses and incomes."""
     expenses = FieldList(FormField(RecurringExpenseForm), name="expense")
     """The recurring expenses."""
-    incomes = FieldList(FormField(RecurringExpenseForm), name="income")
+    incomes = FieldList(FormField(RecurringIncomeForm), name="income")
     """The recurring incomes."""
 
     @property
