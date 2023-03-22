@@ -19,11 +19,13 @@ detail-recurring-expense-income.html: The recurring expense or income in the opt
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/22
 #}
-<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field accounting-not-empty">
+<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field {% if recurring_items %} accounting-not-empty {% endif %}">
   <label class="form-label" for="accounting-recurring-{{ expense_income }}">{{ label }}</label>
-  <ul class="list-group mb-2 mt-2">
-    {% for item in recurring_items %}
-      {% include "accounting/option/include/detail-recurring-item.html" %}
-    {% endfor %}
-  </ul>
+  {% if recurring_items %}
+    <ul class="list-group mb-2 mt-2">
+      {% for item in recurring_items %}
+        {% include "accounting/option/include/detail-recurring-item.html" %}
+      {% endfor %}
+    </ul>
+  {% endif %}
 </div>
