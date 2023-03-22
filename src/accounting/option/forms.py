@@ -40,7 +40,7 @@ class CurrentAccountExists:
             return
         if Account.find_by_code(field.data) is None:
             raise ValidationError(lazy_gettext(
-                "The current account does not exist."))
+                "The account does not exist."))
 
 
 class AccountNotCurrent:
@@ -51,7 +51,7 @@ class AccountNotCurrent:
             return
         if field.data[:2] not in {"11", "12", "21", "22"}:
             raise ValidationError(lazy_gettext(
-                "The current account does not exist."))
+                "This is not a current account."))
 
 
 class NotStartPayableFromExpense:
