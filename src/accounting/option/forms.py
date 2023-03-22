@@ -202,7 +202,7 @@ class RecurringForm(RecurringItemForm):
 
         :return: None.
         """
-        return Account.debit()
+        return Account.selectable_debit()
 
     @property
     def income_accounts(self) -> list[Account]:
@@ -210,7 +210,7 @@ class RecurringForm(RecurringItemForm):
 
         :return: None.
         """
-        return Account.credit()
+        return Account.selectable_credit()
 
     @property
     def as_data(self) -> dict[str, list[tuple[str, str, str]]]:

@@ -220,7 +220,7 @@ class JournalEntryForm(FlaskForm):
         :return: The selectable debit accounts.
         """
         accounts: list[AccountOption] \
-            = [AccountOption(x) for x in Account.debit()
+            = [AccountOption(x) for x in Account.selectable_debit()
                if not (x.code[0] == "2" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntryLineItem.account_id)
@@ -237,7 +237,7 @@ class JournalEntryForm(FlaskForm):
         :return: The selectable credit accounts.
         """
         accounts: list[AccountOption] \
-            = [AccountOption(x) for x in Account.credit()
+            = [AccountOption(x) for x in Account.selectable_credit()
                if not (x.code[0] == "1" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntryLineItem.account_id)

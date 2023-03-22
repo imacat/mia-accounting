@@ -269,10 +269,11 @@ class Account(db.Model):
                                 cls.no == int(m.group(2))).first()
 
     @classmethod
-    def debit(cls) -> list[t.Self]:
-        """Returns the debit accounts.
+    def selectable_debit(cls) -> list[t.Self]:
+        """Returns the selectable debit accounts.
+        Payable line items can not start from debit.
 
-        :return: The debit accounts.
+        :return: The selectable debit accounts.
         """
         return cls.query.filter(sa.or_(cls.base_code.startswith("1"),
                                        sa.and_(cls.base_code.startswith("2"),
@@ -291,10 +292,11 @@ class Account(db.Model):
             .order_by(cls.base_code, cls.no).all()
 
     @classmethod
-    def credit(cls) -> list[t.Self]:
-        """Returns the debit accounts.
+    def selectable_credit(cls) -> list[t.Self]:
+        """Returns the selectable debit accounts.
+        Receivable line items can not start from credit.
 
-        :return: The debit accounts.
+        :return: The selectable debit accounts.
         """
         return cls.query.filter(sa.or_(sa.and_(cls.base_code.startswith("1"),
                                                sa.not_(cls.is_need_offset)),
