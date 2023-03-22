@@ -300,6 +300,9 @@ class DescriptionEditor:
         :param codes: The account codes.
         :return: The account.
         """
+        if len(codes) == 0:
+            return {}
+
         def get_condition(code0: str) -> sa.BinaryExpression:
             m: re.Match = re.match(r"^(\d{4})-(\d{3})$", code0)
             assert m is not None,\
