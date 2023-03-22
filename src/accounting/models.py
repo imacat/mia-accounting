@@ -275,7 +275,8 @@ class Account(db.Model):
         :return: The debit accounts.
         """
         return cls.query.filter(sa.or_(cls.base_code.startswith("1"),
-                                       cls.base_code.startswith("2"),
+                                       sa.and_(cls.base_code.startswith("2"),
+                                               sa.not_(cls.is_need_offset)),
                                        cls.base_code.startswith("3"),
                                        cls.base_code.startswith("5"),
                                        cls.base_code.startswith("6"),
@@ -295,7 +296,8 @@ class Account(db.Model):
 
         :return: The debit accounts.
         """
-        return cls.query.filter(sa.or_(cls.base_code.startswith("1"),
+        return cls.query.filter(sa.or_(sa.and_(cls.base_code.startswith("1"),
+                                               sa.not_(cls.is_need_offset)),
                                        cls.base_code.startswith("2"),
                                        cls.base_code.startswith("3"),
                                        cls.base_code.startswith("4"),
