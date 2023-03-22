@@ -108,6 +108,17 @@ class RecurringItemForm(FlaskForm):
     description_template = StringField()
     """The description template."""
 
+    @property
+    def account_text(self) -> str | None:
+        """Returns the account text.
+
+        :return: The account text.
+        """
+        if self.account_code.data is None:
+            return None
+        account: Account | None = Account.find_by_code(self.account_code.data)
+        return None if account is None else str(account)
+
 
 class RecurringExpenseForm(RecurringItemForm):
     """The sub-form to add or update the recurring expenses."""
@@ -129,17 +140,6 @@ class RecurringExpenseForm(RecurringItemForm):
             DataRequired(lazy_gettext(
                 "Please fill in the description template."))])
     """The template for the line item description."""
-
-    @property
-    def account_text(self) -> str | None:
-        """Returns the account text.
-
-        :return: The account text.
-        """
-        if self.account_code.data is None:
-            return None
-        account: Account | None = Account.find_by_code(self.account_code.data)
-        return None if account is None else str(account)
 
 
 class RecurringIncomeForm(RecurringItemForm):
