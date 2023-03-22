@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The current account.
+"""The current assets and liabilities account.
 
 """
 import typing as t
@@ -26,14 +26,14 @@ import sqlalchemy as sa
 
 
 class CurrentAccount:
-    """The current account."""
+    """A current assets and liabilities account."""
     CURRENT_AL_CODE: str = "0000-000"
-    """The account code for the current assets and liabilities."""
+    """The account code for all current assets and liabilities."""
 
     def __init__(self, account: Account | None = None):
-        """Constructs the current account.
+        """Constructs the current assets and liabilities account.
 
-        :param account: The account.
+        :param account: The actual account.
         """
         self.account: Account | None = account
         """The actual account."""
@@ -55,9 +55,9 @@ class CurrentAccount:
 
     @classmethod
     def current_assets_and_liabilities(cls) -> t.Self:
-        """Returns the pseudo account for current assets and liabilities.
+        """Returns the pseudo account for all current assets and liabilities.
 
-        :return: The pseudo account for current assets and liabilities.
+        :return: The pseudo account for all current assets and liabilities.
         """
         account: cls = cls()
         account.id = 0
