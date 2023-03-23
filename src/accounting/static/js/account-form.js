@@ -131,13 +131,12 @@ class AccountForm {
     /**
      * Sets the base account.
      *
-     * @param code {string} the base account code
-     * @param text {string} the text for the base account
+     * @param account {BaseAccountOption} the selected base account
      */
-    setBaseAccount(code, text) {
-        this.#baseCode.value = code;
-        this.#base.innerText = text;
-        if (["1", "2", "3"].includes(code.substring(0, 1))) {
+    setBaseAccount(account) {
+        this.#baseCode.value = account.code;
+        this.#base.innerText = account.text;
+        if (["1", "2", "3"].includes(account.code.substring(0, 1))) {
             this.#isNeedOffsetControl.classList.remove("d-none");
             this.#isNeedOffset.disabled = false;
         } else {
@@ -225,7 +224,7 @@ class BaseAccountSelector {
      * The account form
      * @type {AccountForm}
      */
-    #form;
+    form;
 
     /**
      * The selector modal
@@ -253,7 +252,7 @@ class BaseAccountSelector {
 
     /**
      * The options
-     * @type {HTMLLIElement[]}
+     * @type {BaseAccountOption[]}
      */
     #options;
 
@@ -269,67 +268,40 @@ class BaseAccountSelector {
      * @param form {AccountForm} the form
      */
     constructor(form) {
-        this.#form = form;
+        this.form = form;
         this.#modal = document.getElementById("accounting-base-selector-modal");
         this.#query = document.getElementById("accounting-base-selector-query");
-        this.#optionList = document.getElementById("accounting-base-selector-option-list");
-        // noinspection JSValidateTypes
-        this.#options = Array.from(document.getElementsByClassName("accounting-base-selector-option"));
-        this.#clearButton = document.getElementById("accounting-base-selector-clear");
         this.#queryNoResult = document.getElementById("accounting-base-selector-option-no-result");
-        this.#modal.addEventListener("hidden.bs.modal", () => {
-            this.#form.onBaseAccountSelectorClosed();
-        });
-        for (const option of this.#options) {
-            option.onclick = () => {
-                this.#form.setBaseAccount(option.dataset.code, option.dataset.text);
-            };
-        }
-        this.#clearButton.onclick = () => {
-            this.#form.clearBaseAccount();
-        };
-        this.#initializeBaseAccountQuery();
+        this.#optionList = document.getElementById("accounting-base-selector-option-list");
+        this.#options = Array.from(document.getElementsByClassName("accounting-base-selector-option")).map((element) => new BaseAccountOption(this, element));
+        this.#clearButton = document.getElementById("accounting-base-selector-clear");
+
+        this.#modal.addEventListener("hidden.bs.modal", () => this.form.onBaseAccountSelectorClosed());
+        this.#query.oninput = () => this.#filterOptions();
+        this.#clearButton.onclick = () => this.form.clearBaseAccount();
     }
 
     /**
-     * Initializes the query.
+     * Filters the options.
      *
      */
-    #initializeBaseAccountQuery() {
-        this.#query.addEventListener("input", () => {
-            if (this.#query.value === "") {
-                for (const option of this.#options) {
-                    option.classList.remove("d-none");
-                }
-                this.#optionList.classList.remove("d-none");
-                this.#queryNoResult.classList.add("d-none");
-                return
-            }
-            let hasAnyMatched = false;
-            for (const option of this.#options) {
-                const queryValues = JSON.parse(option.dataset.queryValues);
-                let isMatched = false;
-                for (const queryValue of queryValues) {
-                    if (queryValue.toLowerCase().includes(this.#query.value.toLowerCase())) {
-                        isMatched = true;
-                        break;
-                    }
-                }
-                if (isMatched) {
-                    option.classList.remove("d-none");
-                    hasAnyMatched = true;
-                } else {
-                    option.classList.add("d-none");
-                }
-            }
-            if (!hasAnyMatched) {
-                this.#optionList.classList.add("d-none");
-                this.#queryNoResult.classList.remove("d-none");
+    #filterOptions() {
+        let hasAnyMatched = false;
+        for (const option of this.#options) {
+            if (option.isMatched(this.#query.value)) {
+                option.setShown(true);
+                hasAnyMatched = true;
             } else {
-                this.#optionList.classList.remove("d-none");
-                this.#queryNoResult.classList.add("d-none");
+                option.setShown(false);
             }
-        });
+        }
+        if (!hasAnyMatched) {
+            this.#optionList.classList.add("d-none");
+            this.#queryNoResult.classList.remove("d-none");
+        } else {
+            this.#optionList.classList.remove("d-none");
+            this.#queryNoResult.classList.add("d-none");
+        }
     }
 
     /**
@@ -338,12 +310,10 @@ class BaseAccountSelector {
      * @param baseCode {string} the active base code
      */
     onOpen(baseCode) {
+        this.#query.value = "";
+        this.#filterOptions();
         for (const option of this.#options) {
-            if (option.dataset.code === baseCode) {
-                option.classList.add("active");
-            } else {
-                option.classList.remove("active");
-            }
+            option.setActive(option.code === baseCode);
         }
         if (baseCode === "") {
             this.#clearButton.classList.add("btn-secondary")
@@ -353,6 +323,103 @@ class BaseAccountSelector {
             this.#clearButton.classList.add("btn-danger");
             this.#clearButton.classList.remove("btn-secondary")
             this.#clearButton.disabled = false;
+        }
+    }
+}
+
+/**
+ * A basic account option.
+ *
+ */
+class BaseAccountOption {
+
+    /**
+     * The base account selector
+     * @type {BaseAccountSelector}
+     */
+    #selector;
+
+    /**
+     * The element
+     * @type {HTMLLIElement}
+     */
+    #element;
+
+    /**
+     * The account code
+     * @type {string}
+     */
+    code;
+
+    /**
+     * The account text
+     * @type {string}
+     */
+    text;
+
+    /**
+     * The values to query against
+     * @type {string[]}
+     */
+    #queryValues;
+
+    /**
+     * Constructs the account in the account selector for the recurring item editor.
+     *
+     * @param selector {BaseAccountSelector} the base account selector
+     * @param element {HTMLLIElement} the element
+     */
+    constructor(selector, element) {
+        this.#selector = selector;
+        this.#element = element;
+        this.code = element.dataset.code;
+        this.text = element.dataset.text;
+        this.#queryValues = JSON.parse(element.dataset.queryValues);
+
+        this.#element.onclick = () => this.#selector.form.setBaseAccount(this);
+    }
+
+    /**
+     * Returns whether the account matches the query.
+     *
+     * @param query {string} the query term
+     * @return {boolean} true if the option matches, or false otherwise
+     */
+    isMatched(query) {
+        if (query === "") {
+            return true;
+        }
+        for (const queryValue of this.#queryValues) {
+            if (queryValue.toLowerCase().includes(query.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Sets whether the option is shown.
+     *
+     * @param isShown {boolean} true to show, or false otherwise
+     */
+    setShown(isShown) {
+        if (isShown) {
+            this.#element.classList.remove("d-none");
+        } else {
+            this.#element.classList.add("d-none");
+        }
+    }
+
+    /**
+     * Sets whether the option is active.
+     *
+     * @param isActive {boolean} true if active, or false otherwise
+     */
+    setActive(isActive) {
+        if (isActive) {
+            this.#element.classList.add("active");
+        } else {
+            this.#element.classList.remove("active");
         }
     }
 }
