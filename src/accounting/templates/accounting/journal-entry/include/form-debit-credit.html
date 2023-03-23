@@ -20,29 +20,31 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/21
 #}
 <div class="mb-2">
-  <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}" class="form-control accounting-material-text-field accounting-not-empty {% if debit_errors %} is-invalid {% endif %}">
+  <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}" class="form-control accounting-material-text-field {% if line_item_forms %} accounting-not-empty {% else %} accounting-clickable {% endif %} {% if debit_errors %} is-invalid {% endif %}">
     <label class="form-label" for="accounting-currency-{{ currency_index }}-{{ debit_credit }}">{{ header }}</label>
-    <ul id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-list" class="list-group accounting-line-item-list">
-      {% for line_item_form in line_item_forms %}
-        {% with currency_index = currency_index,
-                line_item_index = loop.index,
-                only_one_line_item_form = line_item_forms|length == 1,
-                form = line_item_form.form %}
-          {% include "accounting/journal-entry/include/form-line-item.html" %}
-        {% endwith %}
-      {% endfor %}
-    </ul>
+    <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-content" class="mt-2 {% if not line_item_forms %} d-none {% endif %}">
+      <ul id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-list" class="list-group accounting-line-item-list">
+        {% for line_item_form in line_item_forms %}
+          {% with currency_index = currency_index,
+                  line_item_index = loop.index,
+                  only_one_line_item_form = line_item_forms|length == 1,
+                  form = line_item_form.form %}
+            {% include "accounting/journal-entry/include/form-line-item.html" %}
+          {% endwith %}
+        {% endfor %}
+      </ul>
 
-    <div class="d-flex justify-content-between mb-2">
-      <div>{{ A_("Total") }}</div>
-      <div><span id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-total" class="badge rounded-pill bg-primary">{{ debit_credit_total }}</span></div>
-    </div>
+      <div class="d-flex justify-content-between mt-2 mb-2">
+        <div>{{ A_("Total") }}</div>
+        <div><span id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-total" class="badge rounded-pill bg-primary">{{ debit_credit_total }}</span></div>
+      </div>
 
-    <div>
-      <button id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="{{ debit_credit }}" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
-        <i class="fas fa-plus"></i>
-        {{ A_("New") }}
-      </button>
+      <div>
+        <button id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-add-line-item" class="btn btn-primary" type="button" data-currency-index="{{ currency_index }}" data-debit-credit="{{ debit_credit }}" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
+          <i class="fas fa-plus"></i>
+          {{ A_("New") }}
+        </button>
+      </div>
     </div>
   </div>
   <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-error" class="invalid-feedback">{% if debit_credit_errors %}{{ debit_credit_errors[0] }}{% endif %}</div>

@@ -44,7 +44,7 @@ class JournalEntryLineItemEditor {
      * The bootstrap modal
      * @type {HTMLDivElement}
      */
-    #modal;
+    modal;
 
     /**
      * Either "debit" or "credit"
@@ -216,7 +216,7 @@ class JournalEntryLineItemEditor {
     constructor(form) {
         this.form = form;
         this.#element = document.getElementById(this.#prefix);
-        this.#modal = document.getElementById(this.#prefix + "-modal");
+        this.modal = document.getElementById(this.#prefix + "-modal");
         this.#originalLineItemContainer = document.getElementById(this.#prefix + "-original-line-item-container");
         this.#originalLineItemControl = document.getElementById(this.#prefix + "-original-line-item-control");
         this.#originalLineItemText = document.getElementById(this.#prefix + "-original-line-item");
@@ -244,7 +244,7 @@ class JournalEntryLineItemEditor {
                     this.lineItem = this.#debitCreditSubForm.addLineItem();
                 }
                 this.lineItem.save(this);
-                bootstrap.Modal.getInstance(this.#modal).hide();
+                bootstrap.Modal.getInstance(this.modal).hide();
             }
             return false;
         };
@@ -333,7 +333,7 @@ class JournalEntryLineItemEditor {
         this.description = description === ""? null: description;
         this.#descriptionText.innerText = description;
         this.#validateDescription();
-        bootstrap.Modal.getOrCreateInstance(this.#modal).show();
+        bootstrap.Modal.getOrCreateInstance(this.modal).show();
     }
 
     /**

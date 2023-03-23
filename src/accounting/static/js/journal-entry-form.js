@@ -111,6 +111,7 @@ class JournalEntryForm {
     constructor() {
         this.#element = document.getElementById("accounting-form");
         this.lineItemTemplate = this.#element.dataset.lineItemTemplate;
+        this.lineItemEditor = new JournalEntryLineItemEditor(this);
         this.#date = document.getElementById("accounting-date");
         this.#dateError = document.getElementById("accounting-date-error");
         this.#currencyControl = document.getElementById("accounting-currencies");
@@ -121,7 +122,6 @@ class JournalEntryForm {
         this.#addCurrencyButton = document.getElementById("accounting-add-currency");
         this.#note = document.getElementById("accounting-note");
         this.#noteError = document.getElementById("accounting-note-error");
-        this.lineItemEditor = new JournalEntryLineItemEditor(this);
 
         this.#addCurrencyButton.onclick = () => {
             const newIndex = 1 + (this.#currencies.length === 0? 0: Math.max(...this.#currencies.map((currency) => currency.index)));
@@ -552,6 +552,12 @@ class DebitCreditSubForm {
     #element;
 
     /**
+     * The content
+     * @type {HTMLDivElement}
+     */
+    #content;
+
+    /**
      * The currencyIndex
      * @type {number}
      */
@@ -612,12 +618,15 @@ class DebitCreditSubForm {
         this.#currencyIndex = currency.index;
         this.debitCredit = debitCredit;
         this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + debitCredit;
+        this.#content = document.getElementById(this.#prefix + "-content");
         this.#error = document.getElementById(this.#prefix + "-error");
         this.#lineItemList = document.getElementById(this.#prefix + "-list");
         // noinspection JSValidateTypes
         this.lineItems = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new LineItemSubForm(this, element));
         this.#total = document.getElementById(this.#prefix + "-total");
         this.#addLineItemButton = document.getElementById(this.#prefix + "-add-line-item");
+
+        this.#resetContent();
         this.#addLineItemButton.onclick = () => this.currency.form.lineItemEditor.onAddNew(this);
         this.#resetDeleteLineItemButtons();
         this.#initializeDragAndDropReordering();
@@ -637,6 +646,7 @@ class DebitCreditSubForm {
         this.#lineItemList.insertAdjacentHTML("beforeend", html);
         const lineItem = new LineItemSubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
         this.lineItems.push(lineItem);
+        this.#resetContent();
         this.#resetDeleteLineItemButtons();
         this.#initializeDragAndDropReordering();
         this.validate();
@@ -654,6 +664,7 @@ class DebitCreditSubForm {
         this.updateTotal();
         this.currency.updateCodeSelectorStatus();
         this.currency.form.updateMinDate();
+        this.#resetContent();
         this.#resetDeleteLineItemButtons();
     }
 
@@ -668,6 +679,28 @@ class DebitCreditSubForm {
             for (const lineItem of this.lineItems) {
                 lineItem.setDeleteButtonShown(!lineItem.isMatched);
             }
+        }
+    }
+
+    /**
+     * Resets the layout of the content.
+     *
+     */
+    #resetContent() {
+        if (this.lineItems.length === 0) {
+            this.#element.classList.remove("accounting-not-empty");
+            this.#element.classList.add("accounting-clickable");
+            this.#element.dataset.bsToggle = "modal"
+            this.#element.dataset.bsTarget = "#" + this.currency.form.lineItemEditor.modal.id;
+            this.#element.onclick = () => this.currency.form.lineItemEditor.onAddNew(this);
+            this.#content.classList.add("d-none");
+        } else {
+            this.#element.classList.add("accounting-not-empty");
+            this.#element.classList.remove("accounting-clickable");
+            delete this.#element.dataset.bsToggle;
+            delete this.#element.dataset.bsTarget;
+            this.#element.onclick = null;
+            this.#content.classList.remove("d-none");
         }
     }
 
