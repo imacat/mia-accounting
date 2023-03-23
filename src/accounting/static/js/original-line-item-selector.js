@@ -366,12 +366,26 @@ class OriginalLineItem {
         if (query === "") {
             return true;
         }
+        if (this.#getNetBalanceForQuery().includes(query.toLowerCase())) {
+            return true;
+        }
         for (const queryValue of this.#queryValues) {
             if (queryValue.toLowerCase().includes(query.toLowerCase())) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the net balance in the format for query match.
+     *
+     * @return {string} the net balance in the format for query match
+     */
+    #getNetBalanceForQuery() {
+        const frac = this.netBalance.modulo(1);
+        const whole = Number(this.netBalance.minus(frac));
+        return String(whole) + String(frac).substring(1);
     }
 
     /**

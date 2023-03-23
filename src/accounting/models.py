@@ -781,8 +781,7 @@ class JournalEntryLineItem(db.Model):
                 "{}/{}/{}".format(journal_entry_day.year,
                                   journal_entry_day.month,
                                   journal_entry_day.day),
-                format_amount(self.amount),
-                format_amount(self.net_balance)]
+                format_amount(self.amount)]
 
 
 class Option(db.Model):
