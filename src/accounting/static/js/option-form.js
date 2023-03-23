@@ -923,7 +923,6 @@ class RecurringAccountSelector {
     onOpen() {
         this.#query.value = "";
         this.#filterOptions();
-        console.log(this.editor.accountCode);
         for (const option of this.#options) {
             option.setActive(option.code === this.editor.accountCode);
         }
