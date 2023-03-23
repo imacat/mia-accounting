@@ -213,7 +213,7 @@ class JournalEntryForm {
      * @return {string[]} the account codes used in the form
      */
     getAccountCodesUsed(debitCredit) {
-        return this.getLineItems(debitCredit).map((lineItem) => lineItem.getAccountCode())
+        return this.getLineItems(debitCredit).map((lineItem) => lineItem.accountCode)
             .filter((code) => code !== null);
     }
 
@@ -222,7 +222,7 @@ class JournalEntryForm {
      *
      * @return {string} the date
      */
-    getDate() {
+    get date() {
         return this.#date.value;
     }
 
@@ -233,7 +233,7 @@ class JournalEntryForm {
     updateMinDate() {
         let lastOriginalLineItemDate = null;
         for (const lineItem of this.getLineItems()) {
-            const date = lineItem.getOriginalLineItemDate();
+            const date = lineItem.originalLineItemDate;
             if (date !== null) {
                 if (lastOriginalLineItemDate === null || lastOriginalLineItemDate < date) {
                     lastOriginalLineItemDate = date;
@@ -444,7 +444,7 @@ class CurrencySubForm {
      *
      * @return {string} the currency code
      */
-    getCurrencyCode() {
+    get currencyCode() {
         return this.#code.value;
     }
 
@@ -473,7 +473,7 @@ class CurrencySubForm {
     updateCodeSelectorStatus() {
         let isEnabled = true;
         for (const lineItem of this.getLineItems()) {
-            if (lineItem.getOriginalLineItemId() !== null) {
+            if (lineItem.originalLineItemId !== null) {
                 isEnabled = false;
                 break;
             }
@@ -505,7 +505,7 @@ class CurrencySubForm {
      */
     validateBalance() {
         if (this.#debit !== null && this.#credit !== null) {
-            if (!this.#debit.getTotal().equals(this.#credit.getTotal())) {
+            if (!this.#debit.total.equals(this.#credit.total)) {
                 this.#control.classList.add("is-invalid");
                 this.#error.innerText = A_("The totals of the debit and credit amounts do not match.");
                 return false;
@@ -664,10 +664,10 @@ class DebitCreditSubForm {
      *
      * @return {Decimal} the total amount
      */
-    getTotal() {
+    get total() {
         let total = new Decimal("0");
         for (const lineItem of this.lineItems) {
-            const amount = lineItem.getAmount();
+            const amount = lineItem.amount;
             if (amount !== null) {
                 total = total.plus(amount);
             }
@@ -680,7 +680,7 @@ class DebitCreditSubForm {
      *
      */
     updateTotal() {
-        this.#total.innerText = formatDecimal(this.getTotal());
+        this.#total.innerText = formatDecimal(this.total);
         this.currency.validateBalance();
     }
 
@@ -881,7 +881,7 @@ class LineItemSubForm {
      *
      * @return {boolean} true if the line item needs offset, or false otherwise
      */
-    isNeedOffset() {
+    get isNeedOffset() {
         return "isNeedOffset" in this.element.dataset;
     }
 
@@ -890,7 +890,7 @@ class LineItemSubForm {
      *
      * @return {string|null} the ID of the original line item
      */
-    getOriginalLineItemId() {
+    get originalLineItemId() {
         return this.#originalLineItemId.value === ""? null: this.#originalLineItemId.value;
     }
 
@@ -899,7 +899,7 @@ class LineItemSubForm {
      *
      * @return {string|null} the date of the original line item
      */
-    getOriginalLineItemDate() {
+    get originalLineItemDate() {
         return this.#originalLineItemId.dataset.date === ""? null: this.#originalLineItemId.dataset.date;
     }
 
@@ -908,7 +908,7 @@ class LineItemSubForm {
      *
      * @return {string|null} the text of the original line item
      */
-    getOriginalLineItemText() {
+    get originalLineItemText() {
         return this.#originalLineItemId.dataset.text === ""? null: this.#originalLineItemId.dataset.text;
     }
 
@@ -917,7 +917,7 @@ class LineItemSubForm {
      *
      * @return {string|null} the description
      */
-    getDescription() {
+    get description() {
         return this.#description.value === ""? null: this.#description.value;
     }
 
@@ -926,7 +926,7 @@ class LineItemSubForm {
      *
      * @return {string|null} the account code
      */
-    getAccountCode() {
+    get accountCode() {
         return this.#accountCode.value === ""? null: this.#accountCode.value;
     }
 
@@ -935,7 +935,7 @@ class LineItemSubForm {
      *
      * @return {string|null} the account text
      */
-    getAccountText() {
+    get accountText() {
         return this.#accountCode.dataset.text === ""? null: this.#accountCode.dataset.text;
     }
 
@@ -944,7 +944,7 @@ class LineItemSubForm {
      *
      * @return {Decimal|null} the amount
      */
-    getAmount() {
+    get amount() {
         return this.#amount.value === ""? null: new Decimal(this.#amount.value);
     }
 
@@ -953,7 +953,7 @@ class LineItemSubForm {
      *
      * @return {Decimal|null} the minimal amount
      */
-    getAmountMin() {
+    get amountMin() {
         return this.#amount.dataset.min === ""? null: new Decimal(this.#amount.dataset.min);
     }
 

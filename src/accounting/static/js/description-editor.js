@@ -1019,7 +1019,7 @@ class RecurringTransactionTab extends TabPlane {
      * @return {string} the description of the recurring item
      */
     #getDescription(itemButton) {
-        const today = new Date(this.editor.lineItemEditor.form.getDate());
+        const today = new Date(this.editor.lineItemEditor.form.date);
         const thisMonth = today.getMonth() + 1;
         const lastMonth = (thisMonth + 10) % 12 + 1;
         const lastBimonthlyFrom = ((thisMonth + thisMonth % 2 + 8) % 12 + 1);

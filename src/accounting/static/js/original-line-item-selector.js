@@ -113,8 +113,8 @@ class OriginalLineItemSelector {
         const otherLineItems = form.getLineItems().filter((lineItem) => lineItem !== currentLineItem);
         let otherOffset = new Decimal(0);
         for (const otherLineItem of otherLineItems) {
-            if (otherLineItem.getOriginalLineItemId() === originalLineItemId) {
-                const amount = otherLineItem.getAmount();
+            if (otherLineItem.originalLineItemId === originalLineItemId) {
+                const amount = otherLineItem.amount;
                 if (amount !== null) {
                     otherOffset = otherOffset.plus(amount);
                 }
@@ -131,8 +131,8 @@ class OriginalLineItemSelector {
         const otherLineItems = this.lineItemEditor.form.getLineItems().filter((lineItem) => lineItem !== this.lineItemEditor.lineItem);
         const otherOffsets = {}
         for (const otherLineItem of otherLineItems) {
-            const otherOriginalLineItemId = otherLineItem.getOriginalLineItemId();
-            const amount = otherLineItem.getAmount();
+            const otherOriginalLineItemId = otherLineItem.originalLineItemId;
+            const amount = otherLineItem.amount;
             if (otherOriginalLineItemId === null || amount === null) {
                 continue;
             }
@@ -178,7 +178,7 @@ class OriginalLineItemSelector {
      *
      */
     onOpen() {
-        this.#currencyCode = this.lineItemEditor.getCurrencyCode();
+        this.#currencyCode = this.lineItemEditor.currencyCode;
         this.#debitCredit = this.lineItemEditor.debitCredit;
         for (const option of this.#options) {
             option.setActive(option.id === this.lineItemEditor.originalLineItemId);
@@ -341,7 +341,7 @@ class OriginalLineItem {
      */
     isMatched(debitCredit, currencyCode, query = null) {
         return this.netBalance.greaterThan(0)
-            && this.date <= this.#selector.lineItemEditor.form.getDate()
+            && this.date <= this.#selector.lineItemEditor.form.date
             && this.#isDebitCreditMatches(debitCredit)
             && this.#currencyCode === currencyCode
             && this.#isQueryMatches(query);

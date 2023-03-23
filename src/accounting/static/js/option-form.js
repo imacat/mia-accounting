@@ -467,7 +467,7 @@ class RecurringItemSubForm {
      *
      * @return {string|null} the name
      */
-    getName() {
+    get name() {
         return this.#name.value === ""? null: this.#name.value;
     }
 
@@ -476,7 +476,7 @@ class RecurringItemSubForm {
      *
      * @return {string|null} the account code
      */
-    getAccountCode() {
+    get accountCode() {
         return this.#accountCode.value === ""? null: this.#accountCode.value;
     }
 
@@ -485,7 +485,7 @@ class RecurringItemSubForm {
      *
      * @return {string|null} the account text
      */
-    getAccountText() {
+    get accountText() {
         return this.#accountCode.dataset.text === ""? null: this.#accountCode.dataset.text;
     }
 
@@ -494,7 +494,7 @@ class RecurringItemSubForm {
      *
      * @return {string|null} the description template
      */
-    getDescriptionTemplate() {
+    get descriptionTemplate() {
         return this.#descriptionTemplate.value === ""? null: this.#descriptionTemplate.value;
     }
 
@@ -504,12 +504,12 @@ class RecurringItemSubForm {
      * @param editor {RecurringItemEditor} the recurring item editor
      */
     save(editor) {
-        this.#name.value = editor.getName() === null? "": editor.getName();
+        this.#name.value = editor.name === null? "": editor.name;
         this.#nameText.innerText = this.#name.value;
         this.#accountCode.value = editor.accountCode;
         this.#accountCode.dataset.text = editor.accountText;
         this.#accountText.innerText = editor.accountText;
-        this.#descriptionTemplate.value = editor.getDescriptionTemplate() === null? "": editor.getDescriptionTemplate();
+        this.#descriptionTemplate.value = editor.descriptionTemplate === null? "": editor.descriptionTemplate;
         this.#descriptionTemplateText.innerText = this.#descriptionTemplate.value;
         this.validate();
     }
@@ -677,7 +677,7 @@ class RecurringItemEditor {
      *
      * @return {string|null} the name
      */
-    getName() {
+    get name() {
         return this.#name.value === ""? null: this.#name.value;
     }
 
@@ -686,7 +686,7 @@ class RecurringItemEditor {
      *
      * @return {string|null} the description template
      */
-    getDescriptionTemplate() {
+    get descriptionTemplate() {
         return this.#descriptionTemplate.value === ""? null: this.#descriptionTemplate.value;
     }
 
@@ -742,16 +742,16 @@ class RecurringItemEditor {
      */
     onEdit(item) {
         this.#item = item;
-        this.#name.value = item.getName() === null? "": item.getName();
-        this.accountCode = item.getAccountCode();
-        this.accountText = item.getAccountText();
+        this.#name.value = item.name === null? "": item.name;
+        this.accountCode = item.accountCode;
+        this.accountText = item.accountText;
         if (this.accountText === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.#accountContainer.innerText = item.getAccountText() == null? "": item.getAccountText();
-        this.#descriptionTemplate.value = item.getDescriptionTemplate() === null? "": item.getDescriptionTemplate();
+        this.#accountContainer.innerText = this.accountText === null? "": this.accountText;
+        this.#descriptionTemplate.value = item.descriptionTemplate === null? "": item.descriptionTemplate;
         this.#validate();
     }
 

@@ -191,12 +191,6 @@ class JournalEntryLineItemEditor {
     description = null;
 
     /**
-     * The amount
-     * @type {string}
-     */
-    amount = "";
-
-    /**
      * The description editors
      * @type {{debit: DescriptionEditor, credit: DescriptionEditor}}
      */
@@ -249,12 +243,29 @@ class JournalEntryLineItemEditor {
                 if (this.lineItem === null) {
                     this.lineItem = this.#debitCreditSubForm.addLineItem();
                 }
-                this.amount = this.#amountInput.value;
                 this.lineItem.save(this);
                 bootstrap.Modal.getInstance(this.#modal).hide();
             }
             return false;
         };
+    }
+
+    /**
+     * Returns the amount.
+     *
+     * @return {string} the amount
+     */
+    get amount() {
+        return this.#amountInput.value;
+    }
+
+    /**
+     * Returns the currency code.
+     *
+     * @return {string} the currency code
+     */
+    get currencyCode() {
+        return this.#debitCreditSubForm.currency.currencyCode;
     }
 
     /**
@@ -306,15 +317,6 @@ class JournalEntryLineItemEditor {
         this.accountText = null;
         this.#accountText.innerText = "";
         this.#amountInput.max = "";
-    }
-
-    /**
-     * Returns the currency code.
-     *
-     * @return {string} the currency code
-     */
-    getCurrencyCode() {
-        return this.#debitCreditSubForm.currency.getCurrencyCode();
     }
 
     /**
@@ -520,10 +522,10 @@ class JournalEntryLineItemEditor {
         this.lineItem = lineItem;
         this.#debitCreditSubForm = lineItem.debitCreditSubForm;
         this.debitCredit = this.#debitCreditSubForm.debitCredit;
-        this.isNeedOffset = lineItem.isNeedOffset();
-        this.originalLineItemId = lineItem.getOriginalLineItemId();
-        this.originalLineItemDate = lineItem.getOriginalLineItemDate();
-        this.originalLineItemText = lineItem.getOriginalLineItemText();
+        this.isNeedOffset = lineItem.isNeedOffset;
+        this.originalLineItemId = lineItem.originalLineItemId;
+        this.originalLineItemDate = lineItem.originalLineItemDate;
+        this.originalLineItemText = lineItem.originalLineItemText;
         this.#originalLineItemText.innerText = this.originalLineItemText;
         if (this.originalLineItemId === null) {
             this.#originalLineItemContainer.classList.add("d-none");
@@ -533,25 +535,25 @@ class JournalEntryLineItemEditor {
             this.#originalLineItemControl.classList.add("accounting-not-empty");
         }
         this.#setEnableDescriptionAccount(!lineItem.isMatched && this.originalLineItemId === null);
-        this.description = lineItem.getDescription();
+        this.description = lineItem.description;
         if (this.description === null) {
             this.#descriptionControl.classList.remove("accounting-not-empty");
         } else {
             this.#descriptionControl.classList.add("accounting-not-empty");
         }
         this.#descriptionText.innerText = this.description === null? "": this.description;
-        if (lineItem.getAccountCode() === null) {
+        if (lineItem.accountCode === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.accountCode = lineItem.getAccountCode();
-        this.accountText = lineItem.getAccountText();
+        this.accountCode = lineItem.accountCode;
+        this.accountText = lineItem.accountText;
         this.#accountText.innerText = this.accountText;
-        this.#amountInput.value = lineItem.getAmount() === null? "": String(lineItem.getAmount());
+        this.#amountInput.value = lineItem.amount === null? "": String(lineItem.amount);
         const maxAmount = this.#getMaxAmount();
         this.#amountInput.max = maxAmount === null? "": maxAmount;
-        this.#amountInput.min = lineItem.getAmountMin() === null? "": String(lineItem.getAmountMin());
+        this.#amountInput.min = lineItem.amountMin === null? "": String(lineItem.amountMin);
         this.#validate();
     }
 
