@@ -30,6 +30,31 @@ NEXT_URI: str = "/_next"
 """The next URI."""
 
 
+class Accounts:
+    """The shortcuts to the common accounts."""
+    CASH: str = "1111-001"
+    PETTY_CASH: str = "1112-001"
+    BANK: str = "1113-001"
+    NOTES_RECEIVABLE: str = "1131-001"
+    RECEIVABLE: str = "1141-001"
+    PREPAID: str = "1258-001"
+    NOTES_PAYABLE: str = "2131-001"
+    PAYABLE: str = "2141-001"
+    SALES: str = "4111-001"
+    SERVICE: str = "4611-001"
+    AGENCY: str = "4711-001"
+    RENT_EXPENSE: str = "6252-001"
+    OFFICE: str = "6253-001"
+    TRAVEL: str = "6254-001"
+    POSTAGE: str = "6256-001"
+    UTILITIES: str = "6261-001"
+    INSURANCE: str = "6262-001"
+    MEAL: str = "6272-001"
+    INTEREST: str = "7111-001"
+    DONATION: str = "7481-001"
+    RENT_INCOME: str = "7482-001"
+
+
 def create_test_app() -> Flask:
     """Creates and returns the testing Flask application.
 
