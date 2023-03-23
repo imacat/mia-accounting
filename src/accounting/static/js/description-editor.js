@@ -984,7 +984,6 @@ class RecurringTransactionTab extends TabPlane {
      */
     #itemButtons;
 
-    // noinspection JSValidateTypes
     /**
      * Constructs a tab plane.
      *
