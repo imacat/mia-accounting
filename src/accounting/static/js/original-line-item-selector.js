@@ -357,7 +357,7 @@ class OriginalLineItem {
     }
 
     /**
-     * Returns whether the original line item matches the query.
+     * Returns whether the original line item matches the query term.
      *
      * @param query {string|null} the query term
      * @return {boolean} true if the option matches, or false otherwise
