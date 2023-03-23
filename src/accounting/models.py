@@ -760,7 +760,7 @@ class JournalEntryLineItem(db.Model):
         setattr(self, "__net_balance", net_balance)
 
     @property
-    def query_values(self) -> tuple[list[str], list[str]]:
+    def query_values(self) -> list[str]:
         """Returns the values to be queried.
 
         :return: The values to be queried.
@@ -772,17 +772,17 @@ class JournalEntryLineItem(db.Model):
 
         journal_entry_day: date = self.journal_entry.date
         description: str = "" if self.description is None else self.description
-        return ([description],
-                [str(journal_entry_day.year),
-                 "{}/{}".format(journal_entry_day.year,
-                                journal_entry_day.month),
-                 "{}/{}".format(journal_entry_day.month,
-                                journal_entry_day.day),
-                 "{}/{}/{}".format(journal_entry_day.year,
-                                   journal_entry_day.month,
-                                   journal_entry_day.day),
-                 format_amount(self.amount),
-                 format_amount(self.net_balance)])
+        return [description,
+                str(journal_entry_day.year),
+                "{}/{}".format(journal_entry_day.year,
+                               journal_entry_day.month),
+                "{}/{}".format(journal_entry_day.month,
+                               journal_entry_day.day),
+                "{}/{}/{}".format(journal_entry_day.year,
+                                  journal_entry_day.month,
+                                  journal_entry_day.day),
+                format_amount(self.amount),
+                format_amount(self.net_balance)]
 
 
 class Option(db.Model):

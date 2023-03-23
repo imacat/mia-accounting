@@ -273,7 +273,7 @@ class OriginalLineItem {
 
     /**
      * The values to query against
-     * @type {string[][]}
+     * @type {string[]}
      */
     #queryValues;
 
@@ -366,13 +366,8 @@ class OriginalLineItem {
         if (query === "") {
             return true;
         }
-        for (const queryValue of this.#queryValues[0]) {
+        for (const queryValue of this.#queryValues) {
             if (queryValue.toLowerCase().includes(query.toLowerCase())) {
-                return true;
-            }
-        }
-        for (const queryValue of this.#queryValues[1]) {
-            if (queryValue === query) {
                 return true;
             }
         }
