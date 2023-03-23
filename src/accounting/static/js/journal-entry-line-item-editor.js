@@ -198,7 +198,7 @@ class JournalEntryLineItemEditor {
 
     /**
      * The account selectors
-     * @type {{debit: AccountSelector, credit: AccountSelector}}
+     * @type {{debit: JournalEntryAccountSelector, credit: JournalEntryAccountSelector}}
      */
     #accountSelectors;
 
@@ -231,7 +231,7 @@ class JournalEntryLineItemEditor {
         this.#amountInput = document.getElementById(this.#prefix + "-amount");
         this.#amountError = document.getElementById(this.#prefix + "-amount-error");
         this.#descriptionEditors = DescriptionEditor.getInstances(this);
-        this.#accountSelectors = AccountSelector.getInstances(this);
+        this.#accountSelectors = JournalEntryAccountSelector.getInstances(this);
         this.originalLineItemSelector = new OriginalLineItemSelector(this);
         this.#originalLineItemControl.onclick = () => this.originalLineItemSelector.onOpen()
         this.#originalLineItemDelete.onclick = () => this.clearOriginalLineItem();
@@ -370,7 +370,7 @@ class JournalEntryLineItemEditor {
     /**
      * Saves the selected account.
      *
-     * @param account {AccountOption} the selected account
+     * @param account {JournalEntryAccountOption} the selected account
      */
     saveAccount(account) {
         this.isNeedOffset = account.isNeedOffset;

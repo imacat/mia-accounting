@@ -1,5 +1,5 @@
 /* The Mia! Accounting Flask Project
- * account-selector.js: The JavaScript for the account selector
+ * journal-entry-account-selector.js: The JavaScript for the account selector of the journal entry form
  */
 
 /*  Copyright (c) 2023 imacat.
@@ -26,7 +26,7 @@
  * The account selector.
  *
  */
-class AccountSelector {
+class JournalEntryAccountSelector {
 
     /**
      * The line item editor
@@ -66,7 +66,7 @@ class AccountSelector {
 
     /**
      * The options
-     * @type {AccountOption[]}
+     * @type {JournalEntryAccountOption[]}
      */
     #options;
 
@@ -95,7 +95,7 @@ class AccountSelector {
         this.#query = document.getElementById(prefix + "-query");
         this.#queryNoResult = document.getElementById(prefix + "-option-no-result");
         this.#optionList = document.getElementById(prefix + "-option-list");
-        this.#options = Array.from(document.getElementsByClassName(prefix + "-option")).map((element) => new AccountOption(this, element));
+        this.#options = Array.from(document.getElementsByClassName(prefix + "-option")).map((element) => new JournalEntryAccountOption(this, element));
         this.#more = document.getElementById(prefix + "-more");
         this.#clearButton = document.getElementById(prefix + "-btn-clear");
 
@@ -172,13 +172,13 @@ class AccountSelector {
      * Returns the account selector instances.
      *
      * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
-     * @return {{debit: AccountSelector, credit: AccountSelector}}
+     * @return {{debit: JournalEntryAccountSelector, credit: JournalEntryAccountSelector}}
      */
     static getInstances(lineItemEditor) {
         const selectors = {}
         const modals = Array.from(document.getElementsByClassName("accounting-account-selector"));
         for (const modal of modals) {
-            selectors[modal.dataset.debitCredit] = new AccountSelector(lineItemEditor, modal.dataset.debitCredit);
+            selectors[modal.dataset.debitCredit] = new JournalEntryAccountSelector(lineItemEditor, modal.dataset.debitCredit);
         }
         return selectors;
     }
@@ -188,11 +188,11 @@ class AccountSelector {
  * An account option
  *
  */
-class AccountOption {
+class JournalEntryAccountOption {
 
     /**
      * The account selector
-     * @type {AccountSelector}
+     * @type {JournalEntryAccountSelector}
      */
     #selector;
 
@@ -235,7 +235,7 @@ class AccountOption {
     /**
      * Constructs the account in the account selector.
      *
-     * @param selector {AccountSelector} the account selector
+     * @param selector {JournalEntryAccountSelector} the account selector
      * @param element {HTMLLIElement} the element
      */
     constructor(selector, element) {
