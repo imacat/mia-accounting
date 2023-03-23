@@ -368,18 +368,16 @@ class JournalEntryLineItemEditor {
     }
 
     /**
-     * Sets the account.
+     * Saves the selected account.
      *
-     * @param code {string} the account code
-     * @param text {string} the account text
-     * @param isNeedOffset {boolean} true if the line items in the account need offset or false otherwise
+     * @param account {AccountOption} the selected account
      */
-    saveAccount(code, text, isNeedOffset) {
-        this.isNeedOffset = isNeedOffset;
+    saveAccount(account) {
+        this.isNeedOffset = account.isNeedOffset;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.accountCode = code;
-        this.accountText = text;
-        this.#accountText.innerText = text;
+        this.accountCode = account.code;
+        this.accountText = account.text;
+        this.#accountText.innerText = account.text;
         this.#validateAccount();
     }
 

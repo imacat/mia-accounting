@@ -32,7 +32,7 @@ class AccountSelector {
      * The line item editor
      * @type {JournalEntryLineItemEditor}
      */
-    #lineItemEditor;
+    lineItemEditor;
 
     /**
      * Either "debit" or "credit"
@@ -66,7 +66,7 @@ class AccountSelector {
 
     /**
      * The options
-     * @type {HTMLLIElement[]}
+     * @type {AccountOption[]}
      */
     #options;
 
@@ -77,33 +77,35 @@ class AccountSelector {
     #more;
 
     /**
+     * Whether to show all accounts
+     * @type {boolean}
+     */
+    #isShowMore = false;
+
+    /**
      * Constructs an account selector.
      *
      * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
-        this.#lineItemEditor = lineItemEditor
+        this.lineItemEditor = lineItemEditor
         this.#debitCredit = debitCredit;
         const prefix = "accounting-account-selector-" + debitCredit;
         this.#query = document.getElementById(prefix + "-query");
         this.#queryNoResult = document.getElementById(prefix + "-option-no-result");
         this.#optionList = document.getElementById(prefix + "-option-list");
-        // noinspection JSValidateTypes
-        this.#options = Array.from(document.getElementsByClassName(prefix + "-option"));
+        this.#options = Array.from(document.getElementsByClassName(prefix + "-option")).map((element) => new AccountOption(this, element));
         this.#more = document.getElementById(prefix + "-more");
         this.#clearButton = document.getElementById(prefix + "-btn-clear");
+
         this.#more.onclick = () => {
+            this.#isShowMore = true;
             this.#more.classList.add("d-none");
             this.#filterOptions();
         };
-        this.#clearButton.onclick = () => this.#lineItemEditor.clearAccount();
-        for (const option of this.#options) {
-            option.onclick = () => this.#lineItemEditor.saveAccount(option.dataset.code, option.dataset.text, option.classList.contains("accounting-account-is-need-offset"));
-        }
-        this.#query.addEventListener("input", () => {
-            this.#filterOptions();
-        });
+        this.#query.oninput = () => this.#filterOptions();
+        this.#clearButton.onclick = () => this.lineItemEditor.clearAccount();
     }
 
     /**
@@ -112,17 +114,16 @@ class AccountSelector {
      */
     #filterOptions() {
         const codesInUse = this.#getCodesUsedInForm();
-        let shouldAnyShow = false;
+        let isAnyMatched = false;
         for (const option of this.#options) {
-            const shouldShow = this.#shouldOptionShow(option, this.#more, codesInUse, this.#query);
-            if (shouldShow) {
-                option.classList.remove("d-none");
-                shouldAnyShow = true;
+            if (option.isMatched(this.#isShowMore, codesInUse, this.#query.value)) {
+                option.setShown(true);
+                isAnyMatched = true;
             } else {
-                option.classList.add("d-none");
+                option.setShown(false);
             }
         }
-        if (!shouldAnyShow && this.#more.classList.contains("d-none")) {
+        if (!isAnyMatched) {
             this.#optionList.classList.add("d-none");
             this.#queryNoResult.classList.remove("d-none");
         } else {
@@ -137,42 +138,11 @@ class AccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getCodesUsedInForm() {
-        const inUse = this.#lineItemEditor.form.getAccountCodesUsed(this.#debitCredit);
-        if (this.#lineItemEditor.accountCode !== null) {
-            inUse.push(this.#lineItemEditor.accountCode);
+        const inUse = this.lineItemEditor.form.getAccountCodesUsed(this.#debitCredit);
+        if (this.lineItemEditor.accountCode !== null) {
+            inUse.push(this.lineItemEditor.accountCode);
         }
         return inUse
-    }
-
-    /**
-     * Returns whether an option should show.
-     *
-     * @param option {HTMLLIElement} the option
-     * @param more {HTMLLIElement} the more element
-     * @param inUse {string[]} the account codes that are used in the form
-     * @param query {HTMLInputElement} the query element, if any
-     * @return {boolean} true if the option should show, or false otherwise
-     */
-    #shouldOptionShow(option, more, inUse, query) {
-        const isQueryMatched = () => {
-            if (query.value === "") {
-                return true;
-            }
-            const queryValues = JSON.parse(option.dataset.queryValues);
-            for (const queryValue of queryValues) {
-                if (queryValue.toLowerCase().includes(query.value.toLowerCase())) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        const isMoreMatched = () => {
-            if (more.classList.contains("d-none")) {
-                return true;
-            }
-            return option.classList.contains("accounting-account-in-use") || inUse.includes(option.dataset.code);
-        };
-        return isMoreMatched() && isQueryMatched();
     }
 
     /**
@@ -181,16 +151,13 @@ class AccountSelector {
      */
     onOpen() {
         this.#query.value = "";
+        this.#isShowMore = false;
         this.#more.classList.remove("d-none");
         this.#filterOptions();
         for (const option of this.#options) {
-            if (option.dataset.code === this.#lineItemEditor.accountCode) {
-                option.classList.add("active");
-            } else {
-                option.classList.remove("active");
-            }
+            option.setActive(option.code === this.lineItemEditor.accountCode);
         }
-        if (this.#lineItemEditor.accountCode === null) {
+        if (this.lineItemEditor.accountCode === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
@@ -214,5 +181,139 @@ class AccountSelector {
             selectors[modal.dataset.debitCredit] = new AccountSelector(lineItemEditor, modal.dataset.debitCredit);
         }
         return selectors;
+    }
+}
+
+/**
+ * An account option
+ *
+ */
+class AccountOption {
+
+    /**
+     * The account selector
+     * @type {AccountSelector}
+     */
+    #selector;
+
+    /**
+     * The element
+     * @type {HTMLLIElement}
+     */
+    #element;
+
+    /**
+     * The account code
+     * @type {string}
+     */
+    code;
+
+    /**
+     * The account text
+     * @type {string}
+     */
+    text;
+
+    /**
+     * Whether the account is in use
+     * @type {boolean}
+     */
+    #isInUse;
+
+    /**
+     * Whether line items in the account need offset
+     * @type {boolean}
+     */
+    isNeedOffset;
+
+    /**
+     * The values to query against
+     * @type {string[]}
+     */
+    #queryValues;
+
+    /**
+     * Constructs the account in the account selector.
+     *
+     * @param selector {AccountSelector} the account selector
+     * @param element {HTMLLIElement} the element
+     */
+    constructor(selector, element) {
+        this.#selector = selector;
+        this.#element = element;
+        this.code = element.dataset.code;
+        this.text = element.dataset.text;
+        this.#isInUse = element.classList.contains("accounting-account-is-in-use");
+        this.isNeedOffset = element.classList.contains("accounting-account-is-need-offset");
+        this.#queryValues = JSON.parse(element.dataset.queryValues);
+
+        this.#element.onclick = () => this.#selector.lineItemEditor.saveAccount(this);
+    }
+
+    /**
+     * Returns whether the account matches the query.
+     *
+     * @param isShowMore {boolean} true to show all accounts, or false to show only those in use
+     * @param codesInUse {string[]} the account codes that are used in the form
+     * @param query {string} the query term
+     * @return {boolean} true if the option matches, or false otherwise
+     */
+    isMatched(isShowMore, codesInUse, query) {
+        return this.#isInUseMatched(isShowMore, codesInUse) && this.#isQueryMatched(query);
+    }
+
+    /**
+     * Returns whether the account matches the "in-use" condition.
+     *
+     * @param isShowMore {boolean} true to show all accounts, or false to show only those in use
+     * @param codesInUse {string[]} the account codes that are used in the form
+     * @return {boolean} true if the option matches, or false otherwise
+     */
+    #isInUseMatched(isShowMore, codesInUse) {
+        return isShowMore || this.#isInUse || codesInUse.includes(this.code);
+    }
+
+    /**
+     * Returns whether the account matches the query term.
+     *
+     * @param query {string} the query term
+     * @return {boolean} true if the option matches, or false otherwise
+     */
+    #isQueryMatched(query) {
+        if (query === "") {
+            return true;
+        }
+        for (const queryValue of this.#queryValues) {
+            if (queryValue.toLowerCase().includes(query.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Sets whether the option is shown.
+     *
+     * @param isShown {boolean} true to show, or false otherwise
+     */
+    setShown(isShown) {
+        if (isShown) {
+            this.#element.classList.remove("d-none");
+        } else {
+            this.#element.classList.add("d-none");
+        }
+    }
+
+    /**
+     * Sets whether the option is active.
+     *
+     * @param isActive {boolean} true if active, or false otherwise
+     */
+    setActive(isActive) {
+        if (isActive) {
+            this.#element.classList.add("active");
+        } else {
+            this.#element.classList.remove("active");
+        }
     }
 }
