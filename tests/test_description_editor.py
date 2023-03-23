@@ -24,8 +24,8 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from testlib import create_test_app, get_client
-from testlib_journal_entry import Accounts, NEXT_URI, add_journal_entry
+from testlib import NEXT_URI, create_test_app, get_client
+from testlib_journal_entry import Accounts, add_journal_entry
 
 
 class DescriptionEditorTestCase(unittest.TestCase):

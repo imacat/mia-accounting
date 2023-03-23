@@ -26,8 +26,8 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import db
-from testlib import create_test_app, get_client
-from testlib_journal_entry import NEXT_URI, Accounts
+from testlib import NEXT_URI, create_test_app, get_client
+from testlib_journal_entry import Accounts
 from testlib_offset import TestData
 
 PREFIX: str = "/accounting/options"

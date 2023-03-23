@@ -26,8 +26,8 @@ import httpx
 from flask import Flask
 
 from test_site import db
-from testlib_journal_entry import Accounts, match_journal_entry_detail, \
-    NEXT_URI
+from testlib import NEXT_URI
+from testlib_journal_entry import Accounts, match_journal_entry_detail
 
 
 class JournalEntryLineItemData:

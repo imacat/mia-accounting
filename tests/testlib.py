@@ -26,6 +26,8 @@ from test_site import create_app
 
 TEST_SERVER: str = "https://testserver"
 """The test server URI."""
+NEXT_URI: str = "/_next"
+"""The next URI."""
 
 
 def create_test_app() -> Flask:

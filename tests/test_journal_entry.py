@@ -27,8 +27,8 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import db
-from testlib import create_test_app, get_client
-from testlib_journal_entry import NEXT_URI, NON_EMPTY_NOTE, EMPTY_NOTE, \
+from testlib import NEXT_URI, create_test_app, get_client
+from testlib_journal_entry import NON_EMPTY_NOTE, EMPTY_NOTE, \
     Accounts, get_add_form, get_unchanged_update_form, get_update_form, \
     match_journal_entry_detail, set_negative_amount, \
     remove_debit_in_a_currency, remove_credit_in_a_currency, add_journal_entry

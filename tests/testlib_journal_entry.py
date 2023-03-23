@@ -26,9 +26,8 @@ import httpx
 from flask import Flask
 
 from test_site import db
+from testlib import NEXT_URI
 
-NEXT_URI: str = "/_next"
-"""The next URI."""
 NON_EMPTY_NOTE: str = "  This is \n\na test."
 """The stripped content of an non-empty note."""
 EMPTY_NOTE: str = " \n\n  "

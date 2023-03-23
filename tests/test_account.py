@@ -27,11 +27,8 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import db
-from testlib import create_test_app, get_client, set_locale
+from testlib import NEXT_URI, create_test_app, get_client, set_locale
 from testlib_journal_entry import add_journal_entry
-
-NEXT_URI: str = "/_next"
-"""The next URI."""
 
 
 class AccountData:
