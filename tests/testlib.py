@@ -84,7 +84,6 @@ def get_csrf_token(client: httpx.Client) -> str:
     return client.get("/.csrf-token").text
 
 
-
 def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
     """Returns a user client.
 
