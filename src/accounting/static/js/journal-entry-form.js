@@ -621,7 +621,6 @@ class DebitCreditSubForm {
         this.#content = document.getElementById(this.#prefix + "-content");
         this.#error = document.getElementById(this.#prefix + "-error");
         this.#lineItemList = document.getElementById(this.#prefix + "-list");
-        // noinspection JSValidateTypes
         this.lineItems = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new LineItemSubForm(this, element));
         this.#total = document.getElementById(this.#prefix + "-total");
         this.#addLineItemButton = document.getElementById(this.#prefix + "-add-line-item");
