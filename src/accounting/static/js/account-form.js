@@ -329,7 +329,7 @@ class BaseAccountSelector {
 }
 
 /**
- * A basic account option.
+ * A base account option.
  *
  */
 class BaseAccountOption {
@@ -365,7 +365,7 @@ class BaseAccountOption {
     #queryValues;
 
     /**
-     * Constructs the account in the account selector for the recurring item editor.
+     * Constructs the account in the base account selector.
      *
      * @param selector {BaseAccountSelector} the base account selector
      * @param element {HTMLLIElement} the element
