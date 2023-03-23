@@ -155,16 +155,16 @@ class OriginalLineItemSelector {
      *
      */
     #filterOptions() {
-        let hasAnyMatched = false;
+        let isAnyMatched = false;
         for (const option of this.#options) {
             if (option.isMatched(this.#debitCredit, this.#currencyCode, this.#query.value)) {
                 option.setShown(true);
-                hasAnyMatched = true;
+                isAnyMatched = true;
             } else {
                 option.setShown(false);
             }
         }
-        if (!hasAnyMatched) {
+        if (!isAnyMatched) {
             this.#optionList.classList.add("d-none");
             this.#queryNoResult.classList.remove("d-none");
         } else {
