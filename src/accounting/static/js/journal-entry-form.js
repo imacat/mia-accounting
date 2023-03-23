@@ -632,6 +632,16 @@ class DebitCreditSubForm {
     }
 
     /**
+     * The callback when the line item editor is closed.
+     *
+     */
+    onLineItemEditorClosed() {
+        if (this.lineItems.length === 0) {
+            this.#element.classList.remove("accounting-not-empty");
+        }
+    }
+
+    /**
      * Adds a new line item sub-form
      *
      * @returns {LineItemSubForm} the newly-added line item sub-form
@@ -691,7 +701,10 @@ class DebitCreditSubForm {
             this.#element.classList.add("accounting-clickable");
             this.#element.dataset.bsToggle = "modal"
             this.#element.dataset.bsTarget = "#" + this.currency.form.lineItemEditor.modal.id;
-            this.#element.onclick = () => this.currency.form.lineItemEditor.onAddNew(this);
+            this.#element.onclick = () => {
+                this.#element.classList.add("accounting-not-empty");
+                this.currency.form.lineItemEditor.onAddNew(this);
+            };
             this.#content.classList.add("d-none");
         } else {
             this.#element.classList.add("accounting-not-empty");

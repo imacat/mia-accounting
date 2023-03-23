@@ -249,6 +249,7 @@ class JournalEntryLineItemEditor {
             }
             return false;
         };
+        this.modal.addEventListener("hidden.bs.modal", () => this.#debitCreditSubForm.onLineItemEditorClosed());
     }
 
     /**
