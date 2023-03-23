@@ -640,7 +640,7 @@ class DebitCreditSubForm {
      * @returns {LineItemSubForm} the newly-added line item sub-form
      */
     addLineItem() {
-        const newIndex = 1 + (this.lineItems.length === 0? 0: Math.max(...this.lineItems.map((lineItem) => lineItem.lineItemIndex)));
+        const newIndex = 1 + (this.lineItems.length === 0? 0: Math.max(...this.lineItems.map((lineItem) => lineItem.index)));
         const html = this.currency.form.lineItemTemplate
             .replaceAll("CURRENCY_INDEX", escapeHtml(String(this.#currencyIndex)))
             .replaceAll("DEBIT_CREDIT", escapeHtml(this.debitCredit))
@@ -780,7 +780,7 @@ class LineItemSubForm {
      * The line item index
      * @type {number}
      */
-    lineItemIndex;
+    index;
 
     /**
      * Whether this is an original line item with offsets
@@ -876,9 +876,9 @@ class LineItemSubForm {
         this.debitCreditSubForm = debitCredit;
         this.#element = element;
         this.debitCredit = element.dataset.debitCredit;
-        this.lineItemIndex = parseInt(element.dataset.lineItemIndex);
+        this.index = parseInt(element.dataset.lineItemIndex);
         this.isMatched = element.classList.contains("accounting-matched-line-item");
-        const prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + String(this.lineItemIndex);
+        const prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + String(this.index);
         this.#control = document.getElementById(prefix + "-control");
         this.#error = document.getElementById(prefix + "-error");
         this.#no = document.getElementById(prefix + "-no");
