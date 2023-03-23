@@ -96,9 +96,7 @@ class OriginalLineItemSelector {
         for (const option of this.#options) {
             this.#optionById[option.id] = option;
         }
-        this.#query.addEventListener("input", () => {
-            this.#filterOptions();
-        });
+        this.#query.oninput = () => this.#filterOptions();
     }
 
     /**
