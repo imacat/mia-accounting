@@ -180,10 +180,8 @@ class JournalEntryForm {
      */
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#currencyList, () => {
-            const currencyId = Array.from(this.#currencyList.children).map((currency) => currency.id);
-            this.#currencies.sort((a, b) => currencyId.indexOf(a.elementId) - currencyId.indexOf(b.elementId));
-            for (let i = 0; i < this.#currencies.length; i++) {
-                this.#currencies[i].no = i + 1;
+            for (const currency of this.#currencies) {
+                currency.resetNo();
             }
         });
     }
@@ -436,21 +434,12 @@ class CurrencySubForm {
     }
 
     /**
-     * Returns the element ID.
+     * Reset the order number.
      *
-     * @return {string|null} element ID
      */
-    get elementId() {
-        return this.#element.id;
-    }
-
-    /**
-     * Sets the order number.
-     *
-     * @param value {number} the order number
-     */
-    set no(value) {
-        this.#no.value = String(value);
+    resetNo() {
+        const siblings = Array.from(this.#element.parentElement.children);
+        this.#no.value = String(siblings.indexOf(this.#element) + 1);
     }
 
     /**
@@ -713,10 +702,8 @@ class DebitCreditSubForm {
      */
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#lineItemList, () => {
-            const lineItemId = Array.from(this.#lineItemList.children).map((lineItem) => lineItem.id);
-            this.lineItems.sort((a, b) => lineItemId.indexOf(a.elementId) - lineItemId.indexOf(b.elementId));
-            for (let i = 0; i < this.lineItems.length; i++) {
-                this.lineItems[i].no = i + 1;
+            for (const lineItem of this.lineItems) {
+                lineItem.resetNo();
             }
         });
     }
@@ -900,21 +887,12 @@ class LineItemSubForm {
     }
 
     /**
-     * Returns the element ID.
+     * Reset the order number.
      *
-     * @return {string|null} element ID
      */
-    get elementId() {
-        return this.#element.id;
-    }
-
-    /**
-     * Sets the order number.
-     *
-     * @param value {number} the order number
-     */
-    set no(value) {
-        this.#no.value = String(value);
+    resetNo() {
+        const siblings = Array.from(this.#element.parentElement.children);
+        this.#no.value = String(siblings.indexOf(this.#element) + 1);
     }
 
     /**

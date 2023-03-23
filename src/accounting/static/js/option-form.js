@@ -313,10 +313,8 @@ class RecurringExpenseIncomeSubForm {
      */
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#itemList, () => {
-            const itemId = Array.from(this.#itemList.children).map((item) => item.id);
-            this.#items.sort((a, b) => itemId.indexOf(a.elementId) - itemId.indexOf(b.elementId));
-            for (let i = 0; i < this.#items.length; i++) {
-                this.#items[i].no = i + 1;
+            for (const item of this.#items) {
+                item.resetNo();
             }
         });
     }
@@ -463,21 +461,12 @@ class RecurringItemSubForm {
     }
 
     /**
-     * Returns the element ID.
+     * Reset the order number.
      *
-     * @return {string|null} element ID
      */
-    get elementId() {
-        return this.#element.id;
-    }
-
-    /**
-     * Sets the order number.
-     *
-     * @param value {number} the order number
-     */
-    set no(value) {
-        this.#no.value = String(value);
+    resetNo() {
+        const siblings = Array.from(this.#element.parentElement.children);
+        this.#no.value = String(siblings.indexOf(this.#element) + 1);
     }
 
     /**
