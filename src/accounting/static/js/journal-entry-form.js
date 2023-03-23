@@ -878,7 +878,7 @@ class LineItemSubForm {
         this.debitCredit = element.dataset.debitCredit;
         this.lineItemIndex = parseInt(element.dataset.lineItemIndex);
         this.isMatched = element.classList.contains("accounting-matched-line-item");
-        const prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + this.lineItemIndex;
+        const prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + String(this.lineItemIndex);
         this.#control = document.getElementById(prefix + "-control");
         this.#error = document.getElementById(prefix + "-error");
         this.#no = document.getElementById(prefix + "-no");
