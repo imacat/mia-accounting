@@ -138,11 +138,11 @@ class AccountForm {
     }
 
     /**
-     * Sets the base account.
+     * Saves the selected base account.
      *
      * @param account {BaseAccountOption} the selected base account
      */
-    setBaseAccount(account) {
+    saveBaseAccount(account) {
         this.#baseCode.value = account.code;
         this.#base.innerText = account.text;
         if (["1", "2", "3"].includes(account.code.substring(0, 1))) {
@@ -385,7 +385,7 @@ class BaseAccountOption {
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
 
-        this.#element.onclick = () => this.#selector.form.setBaseAccount(this);
+        this.#element.onclick = () => this.#selector.form.saveBaseAccount(this);
     }
 
     /**
