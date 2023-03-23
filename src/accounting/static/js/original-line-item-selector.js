@@ -340,9 +340,9 @@ class OriginalLineItem {
     isMatched(debitCredit, currencyCode, query = null) {
         return this.netBalance.greaterThan(0)
             && this.date <= this.#selector.lineItemEditor.form.date
-            && this.#isDebitCreditMatches(debitCredit)
+            && this.#isDebitCreditMatched(debitCredit)
             && this.#currencyCode === currencyCode
-            && this.#isQueryMatches(query);
+            && this.#isQueryMatched(query);
     }
 
     /**
@@ -351,7 +351,7 @@ class OriginalLineItem {
      * @param debitCredit {string} either "debit" or credit
      * @return {boolean} true if the option matches, or false otherwise
      */
-    #isDebitCreditMatches(debitCredit) {
+    #isDebitCreditMatched(debitCredit) {
         return (debitCredit === "debit" && this.#debitCredit === "credit")
             || (debitCredit === "credit" && this.#debitCredit === "debit");
     }
@@ -362,7 +362,7 @@ class OriginalLineItem {
      * @param query {string|null} the query term
      * @return {boolean} true if the option matches, or false otherwise
      */
-    #isQueryMatches(query) {
+    #isQueryMatched(query) {
         if (query === "") {
             return true;
         }
