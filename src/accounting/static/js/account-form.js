@@ -269,12 +269,13 @@ class BaseAccountSelector {
      */
     constructor(form) {
         this.form = form;
-        this.#modal = document.getElementById("accounting-base-selector-modal");
-        this.#query = document.getElementById("accounting-base-selector-query");
-        this.#queryNoResult = document.getElementById("accounting-base-selector-option-no-result");
-        this.#optionList = document.getElementById("accounting-base-selector-option-list");
-        this.#options = Array.from(document.getElementsByClassName("accounting-base-selector-option")).map((element) => new BaseAccountOption(this, element));
-        this.#clearButton = document.getElementById("accounting-base-selector-clear");
+        const prefix = "accounting-base-selector";
+        this.#modal = document.getElementById(`${prefix}-modal`);
+        this.#query = document.getElementById(`${prefix}-query`);
+        this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
+        this.#optionList = document.getElementById(`${prefix}-option-list`);
+        this.#options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new BaseAccountOption(this, element));
+        this.#clearButton = document.getElementById(`${prefix}-clear`);
 
         this.#modal.addEventListener("hidden.bs.modal", () => this.form.onBaseAccountSelectorClosed());
         this.#query.oninput = () => this.#filterOptions();
