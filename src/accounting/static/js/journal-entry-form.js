@@ -185,9 +185,9 @@ class JournalEntryForm {
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#currencyList, () => {
             const currencyId = Array.from(this.#currencyList.children).map((currency) => currency.id);
-            this.#currencies.sort((a, b) => currencyId.indexOf(a.element.id) - currencyId.indexOf(b.element.id));
+            this.#currencies.sort((a, b) => currencyId.indexOf(a.elementId) - currencyId.indexOf(b.elementId));
             for (let i = 0; i < this.#currencies.length; i++) {
-                this.#currencies[i].no.value = String(i + 1);
+                this.#currencies[i].no = i + 1;
             }
         });
     }
@@ -349,7 +349,7 @@ class CurrencySubForm {
      * The element
      * @type {HTMLDivElement}
      */
-    element;
+    #element;
 
     /**
      * The journal entry form
@@ -379,7 +379,7 @@ class CurrencySubForm {
      * The number
      * @type {HTMLInputElement}
      */
-    no;
+    #no;
 
     /**
      * The currency code
@@ -418,13 +418,13 @@ class CurrencySubForm {
      * @param element {HTMLDivElement} the currency sub-form element
      */
     constructor(form, element) {
-        this.element = element;
+        this.#element = element;
         this.form = form;
-        this.index = parseInt(this.element.dataset.index);
+        this.index = parseInt(this.#element.dataset.index);
         const prefix = "accounting-currency-" + String(this.index);
         this.#control = document.getElementById(prefix + "-control");
         this.#error = document.getElementById(prefix + "-error");
-        this.no = document.getElementById(prefix + "-no");
+        this.#no = document.getElementById(prefix + "-no");
         this.#code = document.getElementById(prefix + "-code");
         this.#codeSelect = document.getElementById(prefix + "-code-select");
         this.deleteButton = document.getElementById(prefix + "-delete");
@@ -434,9 +434,27 @@ class CurrencySubForm {
         this.#credit = creditElement == null? null: new DebitCreditSubForm(this, creditElement, "credit");
         this.#codeSelect.onchange = () => this.#code.value = this.#codeSelect.value;
         this.deleteButton.onclick = () => {
-            this.element.parentElement.removeChild(this.element);
+            this.#element.parentElement.removeChild(this.#element);
             this.form.deleteCurrency(this);
         };
+    }
+
+    /**
+     * Returns the element ID.
+     *
+     * @return {string|null} element ID
+     */
+    get elementId() {
+        return this.#element.id;
+    }
+
+    /**
+     * Sets the order number.
+     *
+     * @param value {number} the order number
+     */
+    set no(value) {
+        this.#no.value = String(value);
     }
 
     /**
@@ -691,9 +709,9 @@ class DebitCreditSubForm {
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#lineItemList, () => {
             const lineItemId = Array.from(this.#lineItemList.children).map((lineItem) => lineItem.id);
-            this.lineItems.sort((a, b) => lineItemId.indexOf(a.element.id) - lineItemId.indexOf(b.element.id));
+            this.lineItems.sort((a, b) => lineItemId.indexOf(a.elementId) - lineItemId.indexOf(b.elementId));
             for (let i = 0; i < this.lineItems.length; i++) {
-                this.lineItems[i].no.value = String(i + 1);
+                this.lineItems[i].no = i + 1;
             }
         });
     }
@@ -745,7 +763,7 @@ class LineItemSubForm {
      * The element
      * @type {HTMLLIElement}
      */
-    element;
+    #element;
 
     /**
      * Either "debit" or "credit"
@@ -781,7 +799,7 @@ class LineItemSubForm {
      * The number
      * @type {HTMLInputElement}
      */
-    no;
+    #no;
 
     /**
      * The account code
@@ -851,14 +869,14 @@ class LineItemSubForm {
      */
     constructor(debitCredit, element) {
         this.debitCreditSubForm = debitCredit;
-        this.element = element;
+        this.#element = element;
         this.debitCredit = element.dataset.debitCredit;
         this.lineItemIndex = parseInt(element.dataset.lineItemIndex);
         this.isMatched = element.classList.contains("accounting-matched-line-item");
         const prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + this.lineItemIndex;
         this.#control = document.getElementById(prefix + "-control");
         this.#error = document.getElementById(prefix + "-error");
-        this.no = document.getElementById(prefix + "-no");
+        this.#no = document.getElementById(prefix + "-no");
         this.#accountCode = document.getElementById(prefix + "-account-code");
         this.#accountText = document.getElementById(prefix + "-account-text");
         this.#description = document.getElementById(prefix + "-description");
@@ -871,9 +889,27 @@ class LineItemSubForm {
         this.deleteButton = document.getElementById(prefix + "-delete");
         this.#control.onclick = () => this.debitCreditSubForm.currency.form.lineItemEditor.onEdit(this);
         this.deleteButton.onclick = () => {
-            this.element.parentElement.removeChild(this.element);
+            this.#element.parentElement.removeChild(this.#element);
             this.debitCreditSubForm.deleteLineItem(this);
         };
+    }
+
+    /**
+     * Returns the element ID.
+     *
+     * @return {string|null} element ID
+     */
+    get elementId() {
+        return this.#element.id;
+    }
+
+    /**
+     * Sets the order number.
+     *
+     * @param value {number} the order number
+     */
+    set no(value) {
+        this.#no.value = String(value);
     }
 
     /**
@@ -882,7 +918,7 @@ class LineItemSubForm {
      * @return {boolean} true if the line item needs offset, or false otherwise
      */
     get isNeedOffset() {
-        return "isNeedOffset" in this.element.dataset;
+        return "isNeedOffset" in this.#element.dataset;
     }
 
     /**

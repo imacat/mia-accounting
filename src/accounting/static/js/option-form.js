@@ -314,9 +314,9 @@ class RecurringExpenseIncomeSubForm {
     #initializeDragAndDropReordering() {
         initializeDragAndDropReordering(this.#itemList, () => {
             const itemId = Array.from(this.#itemList.children).map((item) => item.id);
-            this.#items.sort((a, b) => itemId.indexOf(a.element.id) - itemId.indexOf(b.element.id));
+            this.#items.sort((a, b) => itemId.indexOf(a.elementId) - itemId.indexOf(b.elementId));
             for (let i = 0; i < this.#items.length; i++) {
-                this.#items[i].no.value = String(i + 1);
+                this.#items[i].no = i + 1;
             }
         });
     }
@@ -365,7 +365,7 @@ class RecurringItemSubForm {
      * The element
      * @type {HTMLLIElement}
      */
-    element;
+    #element;
 
     /**
      * The item index
@@ -386,10 +386,10 @@ class RecurringItemSubForm {
     #error;
 
     /**
-     * The number
+     * The order number
      * @type {HTMLInputElement}
      */
-    no;
+    #no;
 
     /**
      * The name input
@@ -441,12 +441,12 @@ class RecurringItemSubForm {
      */
     constructor(expenseIncomeSubForm, element) {
         this.#expenseIncomeSubForm = expenseIncomeSubForm
-        this.element = element;
+        this.#element = element;
         this.itemIndex = parseInt(element.dataset.itemIndex);
         const prefix = "accounting-recurring-" + expenseIncomeSubForm.expenseIncome + "-" + element.dataset.itemIndex;
         this.#control = document.getElementById(prefix + "-control");
         this.#error = document.getElementById(prefix + "-error");
-        this.no = document.getElementById(prefix + "-no");
+        this.#no = document.getElementById(prefix + "-no");
         this.#name = document.getElementById(prefix + "-name");
         this.#nameText = document.getElementById(prefix + "-name-text");
         this.#accountCode = document.getElementById(prefix + "-account-code");
@@ -457,9 +457,27 @@ class RecurringItemSubForm {
 
         this.#control.onclick = () => this.#expenseIncomeSubForm.editor.onEdit(this);
         this.deleteButton.onclick = () => {
-            this.element.parentElement.removeChild(this.element);
+            this.#element.parentElement.removeChild(this.#element);
             this.#expenseIncomeSubForm.deleteItem(this);
         };
+    }
+
+    /**
+     * Returns the element ID.
+     *
+     * @return {string|null} element ID
+     */
+    get elementId() {
+        return this.#element.id;
+    }
+
+    /**
+     * Sets the order number.
+     *
+     * @param value {number} the order number
+     */
+    set no(value) {
+        this.#no.value = String(value);
     }
 
     /**
