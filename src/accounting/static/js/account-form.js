@@ -114,8 +114,17 @@ class AccountForm {
         };
         this.#baseControl.onclick = () => {
             this.#baseControl.classList.add("accounting-not-empty");
-            this.#baseAccountSelector.onOpen(this.#baseCode.value);
+            this.#baseAccountSelector.onOpen();
         };
+    }
+
+    /**
+     * Returns the base code.
+     *
+     * @return {string|null}
+     */
+    get baseCode() {
+        return this.#baseCode.value === ""? null: this.#baseCode.value;
     }
 
     /**
@@ -308,15 +317,14 @@ class BaseAccountSelector {
     /**
      * The callback when the base account selector is shown.
      *
-     * @param baseCode {string} the active base code
      */
-    onOpen(baseCode) {
+    onOpen() {
         this.#query.value = "";
         this.#filterOptions();
         for (const option of this.#options) {
-            option.setActive(option.code === baseCode);
+            option.setActive(option.code === this.form.baseCode);
         }
-        if (baseCode === "") {
+        if (this.form.baseCode === null) {
             this.#clearButton.classList.add("btn-secondary")
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
