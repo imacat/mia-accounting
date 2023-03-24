@@ -88,10 +88,10 @@ class OriginalLineItemSelector {
      */
     constructor(lineItemEditor) {
         this.lineItemEditor = lineItemEditor;
-        this.#query = document.getElementById(this.#prefix + "-query");
-        this.#queryNoResult = document.getElementById(this.#prefix + "-option-no-result");
-        this.#optionList = document.getElementById(this.#prefix + "-option-list");
-        this.#options = Array.from(document.getElementsByClassName(this.#prefix + "-option")).map((element) => new OriginalLineItem(this, element));
+        this.#query = document.getElementById(`${this.#prefix}-query`);
+        this.#queryNoResult = document.getElementById(`${this.#prefix}-option-no-result`);
+        this.#optionList = document.getElementById(`${this.#prefix}-option-list`);
+        this.#options = Array.from(document.getElementsByClassName(`${this.#prefix}-option`)).map((element) => new OriginalLineItem(this, element));
         this.#optionById = {};
         for (const option of this.#options) {
             this.#optionById[option.id] = option;
@@ -295,7 +295,7 @@ class OriginalLineItem {
         this.description = element.dataset.description;
         this.bareNetBalance = new Decimal(element.dataset.netBalance);
         this.netBalance = this.bareNetBalance;
-        this.netBalanceText = document.getElementById("accounting-original-line-item-selector-option-" + this.id + "-net-balance");
+        this.netBalanceText = document.getElementById(`accounting-original-line-item-selector-option-${this.id}-net-balance`);
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
         this.#element.onclick = () => this.#selector.lineItemEditor.saveOriginalLineItem(this);

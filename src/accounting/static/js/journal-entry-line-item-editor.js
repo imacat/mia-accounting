@@ -216,20 +216,20 @@ class JournalEntryLineItemEditor {
     constructor(form) {
         this.form = form;
         this.#element = document.getElementById(this.#prefix);
-        this.modal = document.getElementById(this.#prefix + "-modal");
-        this.#originalLineItemContainer = document.getElementById(this.#prefix + "-original-line-item-container");
-        this.#originalLineItemControl = document.getElementById(this.#prefix + "-original-line-item-control");
-        this.#originalLineItemText = document.getElementById(this.#prefix + "-original-line-item");
-        this.#originalLineItemError = document.getElementById(this.#prefix + "-original-line-item-error");
-        this.#originalLineItemDelete = document.getElementById(this.#prefix + "-original-line-item-delete");
-        this.#descriptionControl = document.getElementById(this.#prefix + "-description-control");
-        this.#descriptionText = document.getElementById(this.#prefix + "-description");
-        this.#descriptionError = document.getElementById(this.#prefix + "-description-error");
-        this.#accountControl = document.getElementById(this.#prefix + "-account-control");
-        this.#accountText = document.getElementById(this.#prefix + "-account");
-        this.#accountError = document.getElementById(this.#prefix + "-account-error")
-        this.#amountInput = document.getElementById(this.#prefix + "-amount");
-        this.#amountError = document.getElementById(this.#prefix + "-amount-error");
+        this.modal = document.getElementById(`${this.#prefix}-modal`);
+        this.#originalLineItemContainer = document.getElementById(`${this.#prefix}-original-line-item-container`);
+        this.#originalLineItemControl = document.getElementById(`${this.#prefix}-original-line-item-control`);
+        this.#originalLineItemText = document.getElementById(`${this.#prefix}-original-line-item`);
+        this.#originalLineItemError = document.getElementById(`${this.#prefix}-original-line-item-error`);
+        this.#originalLineItemDelete = document.getElementById(`${this.#prefix}-original-line-item-delete`);
+        this.#descriptionControl = document.getElementById(`${this.#prefix}-description-control`);
+        this.#descriptionText = document.getElementById(`${this.#prefix}-description`);
+        this.#descriptionError = document.getElementById(`${this.#prefix}-description-error`);
+        this.#accountControl = document.getElementById(`${this.#prefix}-account-control`);
+        this.#accountText = document.getElementById(`${this.#prefix}-account`);
+        this.#accountError = document.getElementById(`${this.#prefix}-account-error`)
+        this.#amountInput = document.getElementById(`${this.#prefix}-amount`);
+        this.#amountError = document.getElementById(`${this.#prefix}-amount-error`);
         this.#descriptionEditors = DescriptionEditor.getInstances(this);
         this.#accountSelectors = JournalEntryAccountSelector.getInstances(this);
         this.originalLineItemSelector = new OriginalLineItemSelector(this);
@@ -577,11 +577,11 @@ class JournalEntryLineItemEditor {
     #setEnableDescriptionAccount(isEnabled) {
         if (isEnabled) {
             this.#descriptionControl.dataset.bsToggle = "modal";
-            this.#descriptionControl.dataset.bsTarget = "#accounting-description-editor-" + this.#debitCreditSubForm.debitCredit + "-modal";
+            this.#descriptionControl.dataset.bsTarget = `#accounting-description-editor-${this.#debitCreditSubForm.debitCredit}-modal`;
             this.#descriptionControl.classList.remove("accounting-disabled");
             this.#descriptionControl.classList.add("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "modal";
-            this.#accountControl.dataset.bsTarget = "#accounting-account-selector-" + this.#debitCreditSubForm.debitCredit + "-modal";
+            this.#accountControl.dataset.bsTarget = `#accounting-account-selector-${this.#debitCreditSubForm.debitCredit}-modal`;
             this.#accountControl.classList.remove("accounting-disabled");
             this.#accountControl.classList.add("accounting-clickable");
         } else {

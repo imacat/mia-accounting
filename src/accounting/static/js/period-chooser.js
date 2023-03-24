@@ -51,7 +51,7 @@ class PeriodChooser {
      */
     constructor() {
         const prefix = "accounting-period-chooser";
-        this.modal = document.getElementById(prefix + "-modal");
+        this.modal = document.getElementById(`${prefix}-modal`);
         for (const cls of [MonthTab, YearTab, DayTab, CustomTab]) {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
@@ -112,9 +112,9 @@ class TabPlane {
      */
     constructor(chooser) {
         this.chooser = chooser;
-        this.prefix = "accounting-period-chooser-" + this.tabId();
-        this.#tab = document.getElementById(this.prefix + "-tab");
-        this.#page = document.getElementById(this.prefix + "-page");
+        this.prefix = `accounting-period-chooser-${this.tabId()}`;
+        this.#tab = document.getElementById(`${this.prefix}-tab`);
+        this.#page = document.getElementById(`${this.prefix}-page`);
         this.#tab.onclick = () => this.#switchToMe();
     }
 
@@ -164,7 +164,7 @@ class MonthTab extends TabPlane {
      */
     constructor(chooser) {
         super(chooser);
-        const monthChooser = document.getElementById(this.prefix + "-chooser");
+        const monthChooser = document.getElementById(`${this.prefix}-chooser`);
         if (monthChooser !== null) {
             let start = monthChooser.dataset.start;
             this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
@@ -182,9 +182,7 @@ class MonthTab extends TabPlane {
             });
             monthChooser.addEventListener(tempusDominus.Namespace.events.change, (e) => {
                 const date = e.detail.date;
-                const year = date.year;
-                const month = date.month + 1;
-                const period = month < 10? year + "-0" + month: year + "-" + month;
+                const period = `${date.year}-${`0${date.month + 1}`.slice(-2)}`;
                 window.location = chooser.modal.dataset.urlTemplate
                     .replaceAll("PERIOD", period);
             });
@@ -244,8 +242,8 @@ class DayTab extends TabPlane {
      */
     constructor(chooser) {
         super(chooser);
-        this.#date = document.getElementById(this.prefix + "-date");
-        this.#dateError = document.getElementById(this.prefix + "-date-error");
+        this.#date = document.getElementById(`${this.prefix}-date`);
+        this.#dateError = document.getElementById(`${this.prefix}-date-error`);
         if (this.#date !== null) {
             this.#date.onchange = () => {
                 if (this.#validateDate()) {
@@ -331,11 +329,11 @@ class CustomTab extends TabPlane {
      */
     constructor(chooser) {
         super(chooser);
-        this.#start = document.getElementById(this.prefix + "-start");
-        this.#startError = document.getElementById(this.prefix + "-start-error");
-        this.#end = document.getElementById(this.prefix + "-end");
-        this.#endError = document.getElementById(this.prefix + "-end-error");
-        this.#conform = document.getElementById(this.prefix + "-confirm");
+        this.#start = document.getElementById(`${this.prefix}-start`);
+        this.#startError = document.getElementById(`${this.prefix}-start-error`);
+        this.#end = document.getElementById(`${this.prefix}-end`);
+        this.#endError = document.getElementById(`${this.prefix}-end-error`);
+        this.#conform = document.getElementById(`${this.prefix}-confirm`);
         if (this.#start !== null) {
             this.#start.onchange = () => {
                 if (this.#validateStart()) {
@@ -353,7 +351,7 @@ class CustomTab extends TabPlane {
                 isValid = this.#validateEnd() && isValid;
                 if (isValid) {
                     window.location = chooser.modal.dataset.urlTemplate
-                        .replaceAll("PERIOD", this.#start.value + "-" + this.#end.value);
+                        .replaceAll("PERIOD", `${this.#start.value}-${this.#end.value}`);
                 }
             };
         }

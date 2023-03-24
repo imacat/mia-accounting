@@ -128,7 +128,7 @@ class CurrencyForm {
         }
         const original = this.#code.dataset.original;
         if (original === "" || this.#code.value !== original) {
-            const response = await fetch(this.#code.dataset.existsUrl + "?q=" + encodeURIComponent(this.#code.value));
+            const response = await fetch(`${this.#code.dataset.existsUrl}?q=${encodeURIComponent(this.#code.value)}`);
             const data = await response.json();
             if (data["exists"]) {
                 this.#code.classList.add("is-invalid");

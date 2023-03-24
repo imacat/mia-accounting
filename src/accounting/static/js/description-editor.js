@@ -115,15 +115,15 @@ class DescriptionEditor {
     constructor(lineItemEditor, debitCredit) {
         this.lineItemEditor = lineItemEditor;
         this.debitCredit = debitCredit;
-        this.prefix = "accounting-description-editor-" + debitCredit;
+        this.prefix = `accounting-description-editor-${debitCredit}`;
         this.#form = document.getElementById(this.prefix);
-        this.#modal = document.getElementById(this.prefix + "-modal");
-        this.description = document.getElementById(this.prefix + "-description");
-        this.#offsetButton = document.getElementById(this.prefix + "-offset");
-        this.number = document.getElementById(this.prefix + "-annotation-number");
-        this.note = document.getElementById(this.prefix + "-annotation-note");
+        this.#modal = document.getElementById(`${this.prefix}-modal`);
+        this.description = document.getElementById(`${this.prefix}-description`);
+        this.#offsetButton = document.getElementById(`${this.prefix}-offset`);
+        this.number = document.getElementById(`${this.prefix}-annotation-number`);
+        this.note = document.getElementById(`${this.prefix}-annotation-note`);
         // noinspection JSValidateTypes
-        this.#accountButtons = Array.from(document.getElementsByClassName(this.prefix + "-account"));
+        this.#accountButtons = Array.from(document.getElementsByClassName(`${this.prefix}-account`));
 
         for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RecurringTransactionTab, AnnotationTab]) {
             const tab = new cls(this);
@@ -302,9 +302,9 @@ class TabPlane {
      */
     constructor(editor) {
         this.editor = editor;
-        this.prefix = this.editor.prefix + "-" + this.tabId();
-        this.#tab = document.getElementById(this.prefix + "-tab");
-        this.#page = document.getElementById(this.prefix + "-page");
+        this.prefix = `${this.editor.prefix}-${this.tabId()}`;
+        this.#tab = document.getElementById(`${this.prefix}-tab`);
+        this.#page = document.getElementById(`${this.prefix}-page`);
         this.#tab.onclick = () => this.switchToMe();
     }
 
@@ -392,10 +392,10 @@ class TagTabPlane extends TabPlane {
      */
     constructor(editor) {
         super(editor);
-        this.tag = document.getElementById(this.prefix + "-tag");
-        this.tagError = document.getElementById(this.prefix + "-tag-error");
+        this.tag = document.getElementById(`${this.prefix}-tag`);
+        this.tagError = document.getElementById(`${this.prefix}-tag-error`);
         // noinspection JSValidateTypes
-        this.tagButtons = Array.from(document.getElementsByClassName(this.prefix + "-btn-tag"));
+        this.tagButtons = Array.from(document.getElementsByClassName(`${this.prefix}-btn-tag`));
         this.initializeTagButtons();
         this.tag.onchange = () => {
             this.onTagChange();
@@ -541,11 +541,11 @@ class GeneralTagTab extends TagTabPlane {
      */
     updateDescription() {
         const pos = this.editor.description.value.indexOf("—");
-        const prefix = this.tag.value === ""? "": this.tag.value + "—";
+        const prefix = this.tag.value === ""? "": `${this.tag.value}—`;
         if (pos === -1) {
-            this.editor.description.value = prefix + this.editor.description.value;
+            this.editor.description.value = `${prefix}${this.editor.description.value}`;
         } else {
-            this.editor.description.value = prefix + this.editor.description.value.substring(pos + 1);
+            this.editor.description.value = `${prefix}${this.editor.description.value.substring(pos + 1)}`;
         }
     }
 
@@ -623,12 +623,12 @@ class GeneralTripTab extends TagTabPlane {
      */
     constructor(editor) {
         super(editor);
-        this.#from = document.getElementById(this.prefix + "-from");
-        this.#fromError = document.getElementById(this.prefix + "-from-error");
-        this.#to = document.getElementById(this.prefix + "-to");
-        this.#toError = document.getElementById(this.prefix + "-to-error")
+        this.#from = document.getElementById(`${this.prefix}-from`);
+        this.#fromError = document.getElementById(`${this.prefix}-from-error`);
+        this.#to = document.getElementById(`${this.prefix}-to`);
+        this.#toError = document.getElementById(`${this.prefix}-to-error`)
         // noinspection JSValidateTypes
-        this.#directionButtons = Array.from(document.getElementsByClassName(this.prefix + "-direction"));
+        this.#directionButtons = Array.from(document.getElementsByClassName(`${this.prefix}-direction`));
         this.#from.onchange = () => {
             this.#from.value = this.#from.value.trim();
             this.updateDescription();
@@ -675,7 +675,7 @@ class GeneralTripTab extends TagTabPlane {
                 break;
             }
         }
-        this.editor.description.value = this.tag.value + "—" + this.#from.value + direction + this.#to.value;
+        this.editor.description.value = `${this.tag.value}—${this.#from.value}${direction}${this.#to.value}`;
     }
 
     /**
@@ -828,12 +828,12 @@ class BusTripTab extends TagTabPlane {
      */
     constructor(editor) {
         super(editor);
-        this.#route = document.getElementById(this.prefix + "-route");
-        this.#routeError = document.getElementById(this.prefix + "-route-error");
-        this.#from = document.getElementById(this.prefix + "-from");
-        this.#fromError = document.getElementById(this.prefix + "-from-error");
-        this.#to = document.getElementById(this.prefix + "-to");
-        this.#toError = document.getElementById(this.prefix + "-to-error")
+        this.#route = document.getElementById(`${this.prefix}-route`);
+        this.#routeError = document.getElementById(`${this.prefix}-route-error`);
+        this.#from = document.getElementById(`${this.prefix}-from`);
+        this.#fromError = document.getElementById(`${this.prefix}-from-error`);
+        this.#to = document.getElementById(`${this.prefix}-to`);
+        this.#toError = document.getElementById(`${this.prefix}-to-error`)
         this.#route.onchange = () => {
             this.#route.value = this.#route.value.trim();
             this.updateDescription();
@@ -867,7 +867,7 @@ class BusTripTab extends TagTabPlane {
      * @override
      */
     updateDescription() {
-        this.editor.description.value = this.tag.value + "—" + this.#route.value + "—" + this.#from.value + "→" + this.#to.value;
+        this.editor.description.value = `${this.tag.value}—${this.#route.value}—${this.#from.value}→${this.#to.value}`;
     }
 
     /**
@@ -999,7 +999,7 @@ class RecurringTransactionTab extends TabPlane {
             A_("September"), A_("October"), A_("November"), A_("December"),
         ];
         // noinspection JSValidateTypes
-        this.#itemButtons = Array.from(document.getElementsByClassName(this.prefix + "-item"));
+        this.#itemButtons = Array.from(document.getElementsByClassName(`${this.prefix}-item`));
         for (const itemButton of this.#itemButtons) {
             itemButton.onclick = () => {
                 this.reset();
@@ -1028,8 +1028,8 @@ class RecurringTransactionTab extends TabPlane {
             .replaceAll("{this_month_name}", this.#monthNames[thisMonth])
             .replaceAll("{last_month_number}", String(lastMonth))
             .replaceAll("{last_month_name}", this.#monthNames[lastMonth])
-            .replaceAll("{last_bimonthly_number}", String(lastBimonthlyFrom) + "–" + String(lastBimonthlyTo))
-            .replaceAll("{last_bimonthly_name}", this.#monthNames[lastBimonthlyFrom] + "–" + this.#monthNames[lastBimonthlyTo]);
+            .replaceAll("{last_bimonthly_number}", `${String(lastBimonthlyFrom)}–${String(lastBimonthlyTo)}`)
+            .replaceAll("{last_bimonthly_name}", `${this.#monthNames[lastBimonthlyFrom]}–${this.#monthNames[lastBimonthlyTo]}`);
     }
 
     /**
@@ -1141,10 +1141,10 @@ class AnnotationTab extends TabPlane {
             this.editor.description.value = found[1];
         }
         if (parseInt(this.editor.number.value) > 1) {
-            this.editor.description.value = this.editor.description.value + "×" + this.editor.number.value;
+            this.editor.description.value = `${this.editor.description.value}×${this.editor.number.value}`;
         }
         if (this.editor.note.value !== "") {
-            this.editor.description.value = this.editor.description.value + "(" + this.editor.note.value + ")";
+            this.editor.description.value = `${this.editor.description.value}(${this.editor.note.value})`;
         }
     }
 
@@ -1171,13 +1171,13 @@ class AnnotationTab extends TabPlane {
             this.editor.number.value = "";
         } else {
             this.editor.number.value = found[2];
-            this.editor.description.value = this.editor.description.value + "×" + this.editor.number.value;
+            this.editor.description.value = `${this.editor.description.value}×${this.editor.number.value}`;
         }
         if (found[3] === undefined) {
             this.editor.note.value = "";
         } else {
             this.editor.note.value = found[3];
-            this.editor.description.value = this.editor.description.value + "(" + this.editor.note.value + ")";
+            this.editor.description.value = `${this.editor.description.value}(${this.editor.note.value})`;
         }
         return true;
     }

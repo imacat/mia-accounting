@@ -128,7 +128,7 @@ class JournalEntryForm {
             const html = this.#element.dataset.currencyTemplate
                 .replaceAll("CURRENCY_INDEX", escapeHtml(String(newIndex)));
             this.#currencyList.insertAdjacentHTML("beforeend", html);
-            const element = document.getElementById("accounting-currency-" + String(newIndex));
+            const element = document.getElementById(`accounting-currency-${String(newIndex)}`);
             this.#currencies.push(new CurrencySubForm(this, element));
             this.#resetDeleteCurrencyButtons();
             this.#initializeDragAndDropReordering();
@@ -415,16 +415,16 @@ class CurrencySubForm {
         this.#element = element;
         this.form = form;
         this.index = parseInt(this.#element.dataset.index);
-        const prefix = "accounting-currency-" + String(this.index);
-        this.#control = document.getElementById(prefix + "-control");
-        this.#error = document.getElementById(prefix + "-error");
-        this.#no = document.getElementById(prefix + "-no");
-        this.#code = document.getElementById(prefix + "-code");
-        this.#codeSelect = document.getElementById(prefix + "-code-select");
-        this.#deleteButton = document.getElementById(prefix + "-delete");
-        const debitElement = document.getElementById(prefix + "-debit");
+        const prefix = `accounting-currency-${String(this.index)}`;
+        this.#control = document.getElementById(`${prefix}-control`);
+        this.#error = document.getElementById(`${prefix}-error`);
+        this.#no = document.getElementById(`${prefix}-no`);
+        this.#code = document.getElementById(`${prefix}-code`);
+        this.#codeSelect = document.getElementById(`${prefix}-code-select`);
+        this.#deleteButton = document.getElementById(`${prefix}-delete`);
+        const debitElement = document.getElementById(`${prefix}-debit`);
         this.#debit = debitElement === null? null: new DebitCreditSubForm(this, debitElement, "debit");
-        const creditElement = document.getElementById(prefix + "-credit");
+        const creditElement = document.getElementById(`${prefix}-credit`);
         this.#credit = creditElement == null? null: new DebitCreditSubForm(this, creditElement, "credit");
         this.#codeSelect.onchange = () => this.#code.value = this.#codeSelect.value;
         this.#deleteButton.onclick = () => {
@@ -617,13 +617,13 @@ class DebitCreditSubForm {
         this.#element = element;
         this.#currencyIndex = currency.index;
         this.debitCredit = debitCredit;
-        this.#prefix = "accounting-currency-" + String(this.#currencyIndex) + "-" + debitCredit;
-        this.#content = document.getElementById(this.#prefix + "-content");
-        this.#error = document.getElementById(this.#prefix + "-error");
-        this.#lineItemList = document.getElementById(this.#prefix + "-list");
+        this.#prefix = `accounting-currency-${String(this.#currencyIndex)}-${debitCredit}`;
+        this.#content = document.getElementById(`${this.#prefix}-content`);
+        this.#error = document.getElementById(`${this.#prefix}-error`);
+        this.#lineItemList = document.getElementById(`${this.#prefix}-list`);
         this.lineItems = Array.from(document.getElementsByClassName(this.#prefix)).map((element) => new LineItemSubForm(this, element));
-        this.#total = document.getElementById(this.#prefix + "-total");
-        this.#addLineItemButton = document.getElementById(this.#prefix + "-add-line-item");
+        this.#total = document.getElementById(`${this.#prefix}-total`);
+        this.#addLineItemButton = document.getElementById(`${this.#prefix}-add-line-item`);
 
         this.#resetContent();
         this.#addLineItemButton.onclick = () => this.currency.form.lineItemEditor.onAddNew(this);
@@ -653,7 +653,7 @@ class DebitCreditSubForm {
             .replaceAll("DEBIT_CREDIT", escapeHtml(this.debitCredit))
             .replaceAll("LINE_ITEM_INDEX", escapeHtml(String(newIndex)));
         this.#lineItemList.insertAdjacentHTML("beforeend", html);
-        const lineItem = new LineItemSubForm(this, document.getElementById(this.#prefix + "-" + String(newIndex)));
+        const lineItem = new LineItemSubForm(this, document.getElementById(`${this.#prefix}-${String(newIndex)}`));
         this.lineItems.push(lineItem);
         this.#resetContent();
         this.#resetDeleteLineItemButtons();
@@ -700,7 +700,7 @@ class DebitCreditSubForm {
             this.#element.classList.remove("accounting-not-empty");
             this.#element.classList.add("accounting-clickable");
             this.#element.dataset.bsToggle = "modal"
-            this.#element.dataset.bsTarget = "#" + this.currency.form.lineItemEditor.modal.id;
+            this.#element.dataset.bsTarget = `#${this.currency.form.lineItemEditor.modal.id}`;
             this.#element.onclick = () => {
                 this.#element.classList.add("accounting-not-empty");
                 this.currency.form.lineItemEditor.onAddNew(this);
@@ -910,20 +910,20 @@ class LineItemSubForm {
         this.debitCredit = element.dataset.debitCredit;
         this.index = parseInt(element.dataset.lineItemIndex);
         this.isMatched = element.classList.contains("accounting-matched-line-item");
-        const prefix = "accounting-currency-" + element.dataset.currencyIndex + "-" + this.debitCredit + "-" + String(this.index);
-        this.#control = document.getElementById(prefix + "-control");
-        this.#error = document.getElementById(prefix + "-error");
-        this.#no = document.getElementById(prefix + "-no");
-        this.#accountCode = document.getElementById(prefix + "-account-code");
-        this.#accountText = document.getElementById(prefix + "-account-text");
-        this.#description = document.getElementById(prefix + "-description");
-        this.#descriptionText = document.getElementById(prefix + "-description-text");
-        this.#originalLineItemId = document.getElementById(prefix + "-original-line-item-id");
-        this.#originalLineItemText = document.getElementById(prefix + "-original-line-item-text");
-        this.#offsets = document.getElementById(prefix + "-offsets");
-        this.#amount = document.getElementById(prefix + "-amount");
-        this.#amountText = document.getElementById(prefix + "-amount-text");
-        this.#deleteButton = document.getElementById(prefix + "-delete");
+        const prefix = `accounting-currency-${element.dataset.currencyIndex}-${this.debitCredit}-${String(this.index)}`;
+        this.#control = document.getElementById(`${prefix}-control`);
+        this.#error = document.getElementById(`${prefix}-error`);
+        this.#no = document.getElementById(`${prefix}-no`);
+        this.#accountCode = document.getElementById(`${prefix}-account-code`);
+        this.#accountText = document.getElementById(`${prefix}-account-text`);
+        this.#description = document.getElementById(`${prefix}-description`);
+        this.#descriptionText = document.getElementById(`${prefix}-description-text`);
+        this.#originalLineItemId = document.getElementById(`${prefix}-original-line-item-id`);
+        this.#originalLineItemText = document.getElementById(`${prefix}-original-line-item-text`);
+        this.#offsets = document.getElementById(`${prefix}-offsets`);
+        this.#amount = document.getElementById(`${prefix}-amount`);
+        this.#amountText = document.getElementById(`${prefix}-amount-text`);
+        this.#deleteButton = document.getElementById(`${prefix}-delete`);
         this.#control.onclick = () => this.debitCreditSubForm.currency.form.lineItemEditor.onEdit(this);
         this.#deleteButton.onclick = () => {
             this.#element.parentElement.removeChild(this.#element);

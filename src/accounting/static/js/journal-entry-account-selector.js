@@ -91,13 +91,13 @@ class JournalEntryAccountSelector {
     constructor(lineItemEditor, debitCredit) {
         this.lineItemEditor = lineItemEditor
         this.#debitCredit = debitCredit;
-        const prefix = "accounting-account-selector-" + debitCredit;
-        this.#query = document.getElementById(prefix + "-query");
-        this.#queryNoResult = document.getElementById(prefix + "-option-no-result");
-        this.#optionList = document.getElementById(prefix + "-option-list");
-        this.#options = Array.from(document.getElementsByClassName(prefix + "-option")).map((element) => new JournalEntryAccountOption(this, element));
-        this.#more = document.getElementById(prefix + "-more");
-        this.#clearButton = document.getElementById(prefix + "-btn-clear");
+        const prefix = `accounting-account-selector-${debitCredit}`;
+        this.#query = document.getElementById(`${prefix}-query`);
+        this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
+        this.#optionList = document.getElementById(`${prefix}-option-list`);
+        this.#options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new JournalEntryAccountOption(this, element));
+        this.#more = document.getElementById(`${prefix}-more`);
+        this.#clearButton = document.getElementById(`${prefix}-btn-clear`);
 
         this.#more.onclick = () => {
             this.#isShowMore = true;

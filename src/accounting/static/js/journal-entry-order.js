@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const onReorder = () => {
             const accounts = Array.from(list.children);
             for (let i = 0; i < accounts.length; i++) {
-                const no = document.getElementById("accounting-order-" + accounts[i].dataset.id + "-no");
+                const no = document.getElementById(`accounting-order-${accounts[i].dataset.id}-no`);
                 no.value = String(i + 1);
             }
         };

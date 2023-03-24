@@ -242,12 +242,12 @@ class RecurringExpenseIncomeSubForm {
         this.#form = form;
         this.expenseIncome = expenseIncome;
         this.editor = new RecurringItemEditor(this);
-        this.#prefix = "accounting-recurring-" + expenseIncome;
+        this.#prefix = `accounting-recurring-${expenseIncome}`;
         this.#element = document.getElementById(this.#prefix);
-        this.#content = document.getElementById(this.#prefix + "-content");
-        this.#itemList = document.getElementById(this.#prefix + "-list");
-        this.#items = Array.from(document.getElementsByClassName(this.#prefix + "-item")).map((element) => new RecurringItemSubForm(this, element));
-        this.#addButton = document.getElementById(this.#prefix + "-add");
+        this.#content = document.getElementById(`${this.#prefix}-content`);
+        this.#itemList = document.getElementById(`${this.#prefix}-list`);
+        this.#items = Array.from(document.getElementsByClassName(`${this.#prefix}-item`)).map((element) => new RecurringItemSubForm(this, element));
+        this.#addButton = document.getElementById(`${this.#prefix}-add`);
 
         this.#resetContent();
         this.#addButton.onclick = () => this.editor.onAddNew();
@@ -265,7 +265,7 @@ class RecurringExpenseIncomeSubForm {
             .replaceAll("EXPENSE_INCOME", escapeHtml(this.expenseIncome))
             .replaceAll("ITEM_INDEX", escapeHtml(String(newIndex)));
         this.#itemList.insertAdjacentHTML("beforeend", html);
-        const element = document.getElementById(this.#prefix + "-" + String(newIndex))
+        const element = document.getElementById(`${this.#prefix}-${String(newIndex)}`)
         const item = new RecurringItemSubForm(this, element);
         this.#items.push(item);
         this.#resetContent();
@@ -294,7 +294,7 @@ class RecurringExpenseIncomeSubForm {
             this.#element.classList.remove("accounting-not-empty");
             this.#element.classList.add("accounting-clickable");
             this.#element.dataset.bsToggle = "modal"
-            this.#element.dataset.bsTarget = "#" + this.editor.modal.id;
+            this.#element.dataset.bsTarget = `#${this.editor.modal.id}`;
             this.#element.onclick = () => this.editor.onAddNew();
             this.#content.classList.add("d-none");
         } else {
@@ -441,17 +441,17 @@ class RecurringItemSubForm {
         this.#expenseIncomeSubForm = expenseIncomeSubForm
         this.#element = element;
         this.itemIndex = parseInt(element.dataset.itemIndex);
-        const prefix = "accounting-recurring-" + expenseIncomeSubForm.expenseIncome + "-" + element.dataset.itemIndex;
-        this.#control = document.getElementById(prefix + "-control");
-        this.#error = document.getElementById(prefix + "-error");
-        this.#no = document.getElementById(prefix + "-no");
-        this.#name = document.getElementById(prefix + "-name");
-        this.#nameText = document.getElementById(prefix + "-name-text");
-        this.#accountCode = document.getElementById(prefix + "-account-code");
-        this.#accountText = document.getElementById(prefix + "-account-text");
-        this.#descriptionTemplate = document.getElementById(prefix + "-description-template");
-        this.#descriptionTemplateText = document.getElementById(prefix + "-description-template-text");
-        this.deleteButton = document.getElementById(prefix + "-delete");
+        const prefix = `accounting-recurring-${expenseIncomeSubForm.expenseIncome}-${element.dataset.itemIndex}`;
+        this.#control = document.getElementById(`${prefix}-control`);
+        this.#error = document.getElementById(`${prefix}-error`);
+        this.#no = document.getElementById(`${prefix}-no`);
+        this.#name = document.getElementById(`${prefix}-name`);
+        this.#nameText = document.getElementById(`${prefix}-name-text`);
+        this.#accountCode = document.getElementById(`${prefix}-account-code`);
+        this.#accountText = document.getElementById(`${prefix}-account-text`);
+        this.#descriptionTemplate = document.getElementById(`${prefix}-description-template`);
+        this.#descriptionTemplateText = document.getElementById(`${prefix}-description-template-text`);
+        this.deleteButton = document.getElementById(`${prefix}-delete`);
 
         this.#control.onclick = () => this.#expenseIncomeSubForm.editor.onEdit(this);
         this.deleteButton.onclick = () => {
@@ -652,16 +652,16 @@ class RecurringItemEditor {
     constructor(subForm) {
         this.#subForm = subForm;
         this.expenseIncome = subForm.expenseIncome;
-        const prefix = "accounting-recurring-item-editor-" + subForm.expenseIncome;
+        const prefix = `accounting-recurring-item-editor-${subForm.expenseIncome}`;
         this.#form = document.getElementById(prefix);
-        this.modal = document.getElementById(prefix + "-modal");
-        this.#name = document.getElementById(prefix + "-name");
-        this.#nameError = document.getElementById(prefix + "-name-error");
-        this.#accountControl = document.getElementById(prefix + "-account-control");
-        this.#accountContainer = document.getElementById(prefix + "-account");
-        this.#accountError = document.getElementById(prefix + "-account-error");
-        this.#descriptionTemplate = document.getElementById(prefix + "-description-template");
-        this.#descriptionTemplateError = document.getElementById(prefix + "-description-template-error");
+        this.modal = document.getElementById(`${prefix}-modal`);
+        this.#name = document.getElementById(`${prefix}-name`);
+        this.#nameError = document.getElementById(`${prefix}-name-error`);
+        this.#accountControl = document.getElementById(`${prefix}-account-control`);
+        this.#accountContainer = document.getElementById(`${prefix}-account`);
+        this.#accountError = document.getElementById(`${prefix}-account-error`);
+        this.#descriptionTemplate = document.getElementById(`${prefix}-description-template`);
+        this.#descriptionTemplateError = document.getElementById(`${prefix}-description-template-error`);
         this.#accountSelector = new RecurringAccountSelector(this);
 
         this.#name.onchange = () => this.#validateName();
@@ -882,12 +882,12 @@ class RecurringAccountSelector {
     constructor(editor) {
         this.editor = editor;
         this.#expenseIncome = editor.expenseIncome;
-        const prefix = "accounting-recurring-accounting-selector-" + editor.expenseIncome;
-        this.#query = document.getElementById(prefix + "-query");
-        this.#queryNoResult = document.getElementById(prefix + "-option-no-result");
-        this.#optionList = document.getElementById(prefix + "-option-list");
-        this.#options = Array.from(document.getElementsByClassName(prefix + "-option")).map((element) => new RecurringAccount(this, element));
-        this.#clearButton = document.getElementById(prefix + "-clear");
+        const prefix = `accounting-recurring-accounting-selector-${editor.expenseIncome}`;
+        this.#query = document.getElementById(`${prefix}-query`);
+        this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
+        this.#optionList = document.getElementById(`${prefix}-option-list`);
+        this.#options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new RecurringAccount(this, element));
+        this.#clearButton = document.getElementById(`${prefix}-clear`);
 
         this.#query.oninput = () => this.#filterOptions();
         this.#clearButton.onclick = () => this.editor.clearAccount();
