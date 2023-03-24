@@ -773,11 +773,6 @@ class JournalEntryLineItem(db.Model):
         journal_entry_day: date = self.journal_entry.date
         description: str = "" if self.description is None else self.description
         return [description,
-                str(journal_entry_day.year),
-                "{}/{}".format(journal_entry_day.year,
-                               journal_entry_day.month),
-                "{}/{}".format(journal_entry_day.month,
-                               journal_entry_day.day),
                 "{}/{}/{}".format(journal_entry_day.year,
                                   journal_entry_day.month,
                                   journal_entry_day.day),
