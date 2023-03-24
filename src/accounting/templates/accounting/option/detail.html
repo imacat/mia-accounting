@@ -38,26 +38,49 @@ First written: 2023/3/22
   </a>
 </div>
 
-<div class="form-floating mb-3">
-  <input id="accounting-default-currency" class="form-control" value="{{ obj.default_currency_text }}" readonly="readonly">
-  <label class="form-label" for="accounting-default-currency">{{ A_("Default Currency") }}</label>
-</div>
+<table class="table table-striped table-hover table-light" aria-label="{{ A_("Settings") }}">
+<tbody>
+<tr>
+  <th scope="row">{{ A_("Default Currency") }}</th>
+  <td>{{ obj.default_currency_text }}</td>
+</tr>
+<tr>
+  <th scope="row">{{ A_("Default Account for the Income and Expenses Log") }}</th>
+  <td>{{ obj.default_ie_account_code_text }}</td>
+</tr>
+</tbody>
+</table>
 
-<div class="form-floating mb-3">
-  <input id="accounting-default-ie-account" class="form-control" value="{{ obj.default_ie_account_code_text }}" readonly="readonly">
-  <label class="form-label" for="accounting-default-ie-account">{{ A_("Default Account for the Income and Expenses Log") }}</label>
-</div>
+<h2>{{ A_("Recurring Expense") }}</h2>
 
-{% with expense_income = "expense",
-        label = A_("Recurring Expense"),
-        recurring_items = obj.recurring.expenses %}
-  {% include "accounting/option/include/detail-recurring-expense-income.html" %}
-{% endwith %}
+{% if obj.recurring.expenses %}
+  <ul class="list-group mb-3 accounting-list-group-stripped accounting-list-group-hover">
+    {% for recurring_item in obj.recurring.expenses %}
+      <li class="list-group-item">
+        <div class="small">{{ recurring_item.account_text }}</div>
+        <div>{{ recurring_item.name }}</div>
+        <div class="small">{{ recurring_item.description_template }}</div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
 
-{% with expense_income = "income",
-        label = A_("Recurring Income"),
-        recurring_items = obj.recurring.incomes %}
-  {% include "accounting/option/include/detail-recurring-expense-income.html" %}
-{% endwith %}
+<h2>{{ A_("Recurring Income") }}</h2>
+
+{% if obj.recurring.incomes %}
+  <ul class="list-group mb-3 accounting-list-group-stripped accounting-list-group-hover">
+    {% for recurring_item in obj.recurring.incomes %}
+      <li class="list-group-item">
+        <div class="small">{{ recurring_item.account_text }}</div>
+        <div>{{ recurring_item.name }}</div>
+        <div class="small">{{ recurring_item.description_template }}</div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
 
 {% endblock %}
