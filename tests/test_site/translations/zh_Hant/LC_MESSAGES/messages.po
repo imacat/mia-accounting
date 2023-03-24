@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mia! Accounting Flask Demonstration 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-02-27 10:07+0800\n"
-"PO-Revision-Date: 2023-02-27 10:08+0800\n"
+"POT-Creation-Date: 2023-03-24 08:32+0800\n"
+"PO-Revision-Date: 2023-03-24 08:33+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -18,27 +18,27 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: tests/test_site/templates/base.html:23
 msgid "en"
 msgstr "zh-Hant"
 
-#: tests/test_site/templates/base.html:43
+#: tests/test_site/templates/base.html:46
 #: tests/test_site/templates/home.html:24
 msgid "Home"
 msgstr "首頁"
 
-#: tests/test_site/templates/base.html:68
+#: tests/test_site/templates/base.html:71
 msgid "Log Out"
 msgstr "登出"
 
-#: tests/test_site/templates/base.html:78
+#: tests/test_site/templates/base.html:81
 #: tests/test_site/templates/login.html:24
 msgid "Log In"
 msgstr "登入"
 
-#: tests/test_site/templates/base.html:119
+#: tests/test_site/templates/base.html:122
 msgid "Error:"
 msgstr "錯誤："
 
@@ -51,8 +51,8 @@ msgid "Editor"
 msgstr "記帳者"
 
 #: tests/test_site/templates/login.html:32
-msgid "Editor2"
-msgstr "記帳者2"
+msgid "Administrator"
+msgstr "管理者"
 
 #: tests/test_site/templates/login.html:33
 msgid "Nobody"
