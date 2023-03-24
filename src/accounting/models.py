@@ -770,12 +770,10 @@ class JournalEntryLineItem(db.Model):
             frac: Decimal = (value - whole).normalize()
             return str(whole) + str(abs(frac))[1:]
 
-        journal_entry_day: date = self.journal_entry.date
-        description: str = "" if self.description is None else self.description
-        return [description,
-                "{}/{}/{}".format(journal_entry_day.year,
-                                  journal_entry_day.month,
-                                  journal_entry_day.day),
+        return ["{}/{}/{}".format(self.journal_entry.date.year,
+                                  self.journal_entry.date.month,
+                                  self.journal_entry.date.day),
+                "" if self.description is None else self.description,
                 format_amount(self.amount)]
 
 
