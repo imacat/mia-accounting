@@ -547,8 +547,8 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self.app, editor2_username)
+        editor_username, admin_username = "editor", "admin"
+        client, csrf_token = get_client(self.app, admin_username)
         detail_uri: str = f"{PREFIX}/{CASH.code}"
         update_uri: str = f"{PREFIX}/{CASH.code}/update"
         account: Account
@@ -571,7 +571,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual(account.created_by.username,
                              editor_username)
             self.assertEqual(account.updated_by.username,
-                             editor2_username)
+                             admin_username)
 
     def test_l10n(self) -> None:
         """Tests the localization.

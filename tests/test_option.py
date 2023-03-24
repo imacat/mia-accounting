@@ -67,7 +67,7 @@ class OptionTestCase(unittest.TestCase):
             self.assertEqual(result.exit_code, 0)
             Option.query.delete()
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client, self.csrf_token = get_client(self.app, "admin")
         self.data: TestData = TestData(self.app, self.client, self.csrf_token)
 
     def test_nobody(self) -> None:
@@ -104,12 +104,12 @@ class OptionTestCase(unittest.TestCase):
         response = client.post(UPDATE_URI, data=self.__get_form(csrf_token))
         self.assertEqual(response.status_code, 403)
 
-    def test_editor2(self) -> None:
-        """Test the permission as non-administrator.
+    def test_editor(self) -> None:
+        """Test the permission as editor.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "editor2")
+        client, csrf_token = get_client(self.app, "editor")
         response: httpx.Response
 
         response = client.get(DETAIL_URI)
@@ -121,7 +121,7 @@ class OptionTestCase(unittest.TestCase):
         response = client.post(UPDATE_URI, data=self.__get_form(csrf_token))
         self.assertEqual(response.status_code, 403)
 
-    def test_editor(self) -> None:
+    def test_admin(self) -> None:
         """Test the permission as administrator.
 
         :return: None.
@@ -343,7 +343,7 @@ class OptionTestCase(unittest.TestCase):
         """
         from accounting.models import Option
         from accounting.utils.user import get_user_pk
-        editor_username, editor2_username = "editor", "editor2"
+        admin_username, editor_username = "admin", "editor"
         option: Option | None
         response: httpx.Response
 
@@ -352,11 +352,11 @@ class OptionTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], DETAIL_URI)
 
         with self.app.app_context():
-            editor2_pk: int = get_user_pk(editor2_username)
+            editor_pk: int = get_user_pk(editor_username)
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
-            option.created_by_id = editor2_pk
-            option.updated_by_id = editor2_pk
+            option.created_by_id = editor_pk
+            option.updated_by_id = editor_pk
             db.session.commit()
 
         form: dict[str, str] = self.__get_form()
@@ -371,8 +371,8 @@ class OptionTestCase(unittest.TestCase):
         with self.app.app_context():
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
-            self.assertEqual(option.created_by.username, editor2_username)
-            self.assertEqual(option.updated_by.username, editor_username)
+            self.assertEqual(option.created_by.username, editor_username)
+            self.assertEqual(option.updated_by.username, admin_username)
 
     def __get_form(self, csrf_token: str | None = None) -> dict[str, str]:
         """Returns the option form.

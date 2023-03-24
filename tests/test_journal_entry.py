@@ -537,8 +537,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self.app, editor2_username)
+        editor_username, admin_username = "editor", "admin"
+        client, csrf_token = get_client(self.app, admin_username)
         detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
@@ -562,7 +562,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
             self.assertEqual(journal_entry.updated_by.username,
-                             editor2_username)
+                             admin_username)
 
     def test_delete(self) -> None:
         """Tests to delete a journal entry.
@@ -1163,8 +1163,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self.app, editor2_username)
+        editor_username, admin_username = "editor", "admin"
+        client, csrf_token = get_client(self.app, admin_username)
         detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
@@ -1188,7 +1188,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
             self.assertEqual(journal_entry.updated_by.username,
-                             editor2_username)
+                             admin_username)
 
     def test_delete(self) -> None:
         """Tests to delete a journal entry.
@@ -1837,8 +1837,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self.app, editor2_username)
+        editor_username, admin_username = "editor", "admin"
+        client, csrf_token = get_client(self.app, admin_username)
         detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
@@ -1862,7 +1862,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
             self.assertEqual(journal_entry.updated_by.username,
-                             editor2_username)
+                             admin_username)
 
     def test_save_as_receipt(self) -> None:
         """Tests to save a transfer journal entry as a cash receipt journal

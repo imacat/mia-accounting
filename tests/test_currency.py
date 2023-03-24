@@ -471,8 +471,8 @@ class CurrencyTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Currency
-        editor_username, editor2_username = "editor", "editor2"
-        client, csrf_token = get_client(self.app, editor2_username)
+        editor_username, admin_username = "editor", "admin"
+        client, csrf_token = get_client(self.app, admin_username)
         detail_uri: str = f"{PREFIX}/{USD.code}"
         update_uri: str = f"{PREFIX}/{USD.code}/update"
         currency: Currency
@@ -493,7 +493,7 @@ class CurrencyTestCase(unittest.TestCase):
         with self.app.app_context():
             currency = db.session.get(Currency, USD.code)
             self.assertEqual(currency.created_by.username, editor_username)
-            self.assertEqual(currency.updated_by.username, editor2_username)
+            self.assertEqual(currency.updated_by.username, admin_username)
 
     def test_api_exists(self) -> None:
         """Tests the API to check if a code exists.

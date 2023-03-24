@@ -72,15 +72,15 @@ def create_app(is_testing: bool = False) -> Flask:
         def can_view(self) -> bool:
             return auth.current_user() is not None \
                 and auth.current_user().username in ["viewer", "editor",
-                                                     "editor2"]
+                                                     "admin"]
 
         def can_edit(self) -> bool:
             return auth.current_user() is not None \
-                and auth.current_user().username in ["editor", "editor2"]
+                and auth.current_user().username in ["editor", "admin"]
 
         def can_admin(self) -> bool:
             return auth.current_user() is not None \
-                and auth.current_user().username == "editor"
+                and auth.current_user().username == "admin"
 
         @property
         def cls(self) -> t.Type[auth.User]:
@@ -112,7 +112,7 @@ def init_db_command() -> None:
     """Initializes the database."""
     db.create_all()
     from .auth import User
-    for username in ["viewer", "editor", "editor2", "nobody"]:
+    for username in ["viewer", "editor", "admin", "nobody"]:
         if User.query.filter(User.username == username).first() is None:
             db.session.add(User(username=username))
     db.session.commit()
