@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import re
 import typing as t
-from datetime import date
 from decimal import Decimal
 
 import sqlalchemy as sa
