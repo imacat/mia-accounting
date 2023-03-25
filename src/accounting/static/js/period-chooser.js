@@ -166,10 +166,9 @@ class MonthTab extends TabPlane {
         super(chooser);
         const monthChooser = document.getElementById(`${this.prefix}-chooser`);
         if (monthChooser !== null) {
-            let start = monthChooser.dataset.start;
             this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
                 restrictions: {
-                    minDate: new Date(start),
+                    minDate: new Date(monthChooser.dataset.start),
                 },
                 display: {
                     inline: true,
