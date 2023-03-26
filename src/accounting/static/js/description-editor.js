@@ -60,7 +60,7 @@ class DescriptionEditor {
 
     /**
      * The current tab
-     * @type {TabPlane}
+     * @type {DescriptionEditorTabPlane}
      */
     currentTab;
 
@@ -102,7 +102,7 @@ class DescriptionEditor {
 
     /**
      * The tab planes
-     * @type {{general: GeneralTagTab, travel: GeneralTripTab, bus: BusTripTab, recurring: RecurringTransactionTab, annotation: AnnotationTab}}
+     * @type {{general: DescriptionEditorGeneralTagTab, travel: DescriptionEditorGeneralTripTab, bus: DescriptionEditorBusTripTab, recurring: DescriptionEditorRecurringTab, annotation: DescriptionEditorAnnotationTab}}
      */
     tabPlanes = {};
 
@@ -125,7 +125,7 @@ class DescriptionEditor {
         // noinspection JSValidateTypes
         this.#accountButtons = Array.from(document.getElementsByClassName(`${this.prefix}-account`));
 
-        for (const cls of [GeneralTagTab, GeneralTripTab, BusTripTab, RecurringTransactionTab, AnnotationTab]) {
+        for (const cls of [DescriptionEditorGeneralTagTab, DescriptionEditorGeneralTripTab, DescriptionEditorBusTripTab, DescriptionEditorRecurringTab, DescriptionEditorAnnotationTab]) {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
         }
@@ -269,7 +269,7 @@ class DescriptionEditor {
  * @abstract
  * @private
  */
-class TabPlane {
+class DescriptionEditorTabPlane {
 
     /**
      * The parent description editor
@@ -364,7 +364,7 @@ class TabPlane {
  * @abstract
  * @private
  */
-class TagTabPlane extends TabPlane {
+class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
 
     /**
      * The tag input
@@ -522,7 +522,7 @@ class TagTabPlane extends TabPlane {
  *
  * @private
  */
-class GeneralTagTab extends TagTabPlane {
+class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
 
     /**
      * The tab ID
@@ -583,7 +583,7 @@ class GeneralTagTab extends TagTabPlane {
  *
  * @private
  */
-class GeneralTripTab extends TagTabPlane {
+class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
 
     /**
      * The origin
@@ -782,7 +782,7 @@ class GeneralTripTab extends TagTabPlane {
  *
  * @private
  */
-class BusTripTab extends TagTabPlane {
+class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
 
     /**
      * The route
@@ -970,7 +970,7 @@ class BusTripTab extends TagTabPlane {
  *
  * @private
  */
-class RecurringTransactionTab extends TabPlane {
+class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
 
     /**
      * The month names
@@ -1103,7 +1103,7 @@ class RecurringTransactionTab extends TabPlane {
  *
  * @private
  */
-class AnnotationTab extends TabPlane {
+class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
 
     /**
      * Constructs a tab plane.
