@@ -230,16 +230,10 @@ class OriginalLineItem {
     #currencyCode;
 
     /**
-     * The account code
-     * @type {string}
+     * The account
+     * @type {JournalEntryAccount}
      */
-    accountCode;
-
-    /**
-     * The account text
-     * @type {string}
-     */
-    accountText;
+    account;
 
     /**
      * The description
@@ -290,8 +284,7 @@ class OriginalLineItem {
         this.date = element.dataset.date;
         this.#debitCredit = element.dataset.debitCredit;
         this.#currencyCode = element.dataset.currencyCode;
-        this.accountCode = element.dataset.accountCode;
-        this.accountText = element.dataset.accountText;
+        this.account = new JournalEntryAccount(element.dataset.accountCode, element.dataset.accountText, false);
         this.description = element.dataset.description;
         this.bareNetBalance = new Decimal(element.dataset.netBalance);
         this.netBalance = this.bareNetBalance;

@@ -279,7 +279,7 @@ class JournalEntryLineItemEditor {
         this.description = originalLineItem.description === ""? null: originalLineItem.description;
         this.#descriptionText.innerText = originalLineItem.description;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.account = new JournalEntryAccount(originalLineItem.accountCode, originalLineItem.accountText, false);
+        this.account = originalLineItem.account.copy();
         this.#accountText.innerText = this.account.text;
         this.#amountInput.value = String(originalLineItem.netBalance);
         this.#amountInput.max = String(originalLineItem.netBalance);
@@ -606,5 +606,14 @@ class JournalEntryAccount {
         this.code = code;
         this.text = text;
         this.isNeedOffset = isNeedOffset;
+    }
+
+    /**
+     * Returns a copy of the account.
+     *
+     * @return {JournalEntryAccount} the copy of the account
+     */
+    copy() {
+        return new JournalEntryAccount(this.code, this.text, this.isNeedOffset);
     }
 }
