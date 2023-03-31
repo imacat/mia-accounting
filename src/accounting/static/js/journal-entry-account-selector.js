@@ -139,8 +139,8 @@ class JournalEntryAccountSelector {
      */
     #getCodesUsedInForm() {
         const inUse = this.lineItemEditor.form.getAccountCodesUsed(this.#debitCredit);
-        if (this.lineItemEditor.accountCode !== null) {
-            inUse.push(this.lineItemEditor.accountCode);
+        if (this.lineItemEditor.account !== null) {
+            inUse.push(this.lineItemEditor.account.code);
         }
         return inUse
     }
@@ -155,9 +155,9 @@ class JournalEntryAccountSelector {
         this.#more.classList.remove("d-none");
         this.#filterOptions();
         for (const option of this.#options) {
-            option.setActive(option.code === this.lineItemEditor.accountCode);
+            option.setActive(this.lineItemEditor.account !== null && option.code === this.lineItemEditor.account.code);
         }
-        if (this.lineItemEditor.accountCode === null) {
+        if (this.lineItemEditor.account === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;

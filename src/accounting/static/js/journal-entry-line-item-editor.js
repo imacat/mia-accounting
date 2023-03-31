@@ -149,12 +149,6 @@ class JournalEntryLineItemEditor {
     #debitCreditSubForm;
 
     /**
-     * Whether the journal entry line item needs offset
-     * @type {boolean}
-     */
-    isNeedOffset = false;
-
-    /**
      * The ID of the original line item
      * @type {string|null}
      */
@@ -173,16 +167,10 @@ class JournalEntryLineItemEditor {
     originalLineItemText = null;
 
     /**
-     * The account code
-     * @type {string|null}
+     * The account
+     * @type {JournalEntryAccount|null}
      */
-    accountCode = null;
-
-    /**
-     * The account text
-     * @type {string|null}
-     */
-    accountText = null;
+    account = null;
 
     /**
      * The description
@@ -276,7 +264,6 @@ class JournalEntryLineItemEditor {
      * @param originalLineItem {OriginalLineItem} the original line item
      */
     saveOriginalLineItem(originalLineItem) {
-        this.isNeedOffset = false;
         this.#originalLineItemContainer.classList.remove("d-none");
         this.#originalLineItemControl.classList.add("accounting-not-empty");
         this.originalLineItemId = originalLineItem.id;
@@ -292,9 +279,8 @@ class JournalEntryLineItemEditor {
         this.description = originalLineItem.description === ""? null: originalLineItem.description;
         this.#descriptionText.innerText = originalLineItem.description;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.accountCode = originalLineItem.accountCode;
-        this.accountText = originalLineItem.accountText;
-        this.#accountText.innerText = originalLineItem.accountText;
+        this.account = new JournalEntryAccount(originalLineItem.accountCode, originalLineItem.accountText, false);
+        this.#accountText.innerText = this.account.text;
         this.#amountInput.value = String(originalLineItem.netBalance);
         this.#amountInput.max = String(originalLineItem.netBalance);
         this.#amountInput.min = "0";
@@ -306,7 +292,6 @@ class JournalEntryLineItemEditor {
      *
      */
     clearOriginalLineItem() {
-        this.isNeedOffset = false;
         this.#originalLineItemContainer.classList.add("d-none");
         this.#originalLineItemControl.classList.remove("accounting-not-empty");
         this.originalLineItemId = null;
@@ -315,8 +300,7 @@ class JournalEntryLineItemEditor {
         this.#originalLineItemText.innerText = "";
         this.#setEnableDescriptionAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
-        this.accountCode = null;
-        this.accountText = null;
+        this.account = null;
         this.#accountText.innerText = "";
         this.#amountInput.max = "";
     }
@@ -347,10 +331,8 @@ class JournalEntryLineItemEditor {
      * @param isAccountNeedOffset {boolean} true if the line items in the account need offset, or false otherwise
      */
     saveDescriptionWithAccount(description, accountCode, accountText, isAccountNeedOffset) {
-        this.isNeedOffset = isAccountNeedOffset;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.accountCode = accountCode;
-        this.accountText = accountText;
+        this.account = new JournalEntryAccount(accountCode, accountText, isAccountNeedOffset);
         this.#accountText.innerText = accountText;
         this.#validateAccount();
         this.saveDescription(description)
@@ -361,10 +343,8 @@ class JournalEntryLineItemEditor {
      *
      */
     clearAccount() {
-        this.isNeedOffset = false;
         this.#accountControl.classList.remove("accounting-not-empty");
-        this.accountCode = null;
-        this.accountText = null;
+        this.account = null;
         this.#accountText.innerText = "";
         this.#validateAccount();
     }
@@ -375,10 +355,8 @@ class JournalEntryLineItemEditor {
      * @param account {JournalEntryAccountOption} the selected account
      */
     saveAccount(account) {
-        this.isNeedOffset = account.isNeedOffset;
         this.#accountControl.classList.add("accounting-not-empty");
-        this.accountCode = account.code;
-        this.accountText = account.text;
+        this.account = new JournalEntryAccount(account.code, account.text, account.isNeedOffset);
         this.#accountText.innerText = account.text;
         this.#validateAccount();
     }
@@ -427,7 +405,7 @@ class JournalEntryLineItemEditor {
      * @return {boolean} true if valid, or false otherwise
      */
     #validateAccount() {
-        if (this.accountCode === null) {
+        if (this.account === null) {
             this.#accountControl.classList.add("is-invalid");
             this.#accountError.innerText = A_("Please select the account.");
             return false;
@@ -486,7 +464,6 @@ class JournalEntryLineItemEditor {
         this.lineItem = null;
         this.#debitCreditSubForm = debitCredit;
         this.debitCredit = this.#debitCreditSubForm.debitCredit;
-        this.isNeedOffset = false;
         this.#originalLineItemContainer.classList.add("d-none");
         this.#originalLineItemControl.classList.remove("accounting-not-empty");
         this.#originalLineItemControl.classList.remove("is-invalid");
@@ -502,8 +479,7 @@ class JournalEntryLineItemEditor {
         this.#descriptionError.innerText = ""
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
-        this.accountCode = null;
-        this.accountText = null;
+        this.account = null;
         this.#accountText.innerText = "";
         this.#accountError.innerText = "";
         this.#amountInput.value = "";
@@ -522,7 +498,6 @@ class JournalEntryLineItemEditor {
         this.lineItem = lineItem;
         this.#debitCreditSubForm = lineItem.debitCreditSubForm;
         this.debitCredit = this.#debitCreditSubForm.debitCredit;
-        this.isNeedOffset = lineItem.isNeedOffset;
         this.originalLineItemId = lineItem.originalLineItemId;
         this.originalLineItemDate = lineItem.originalLineItemDate;
         this.originalLineItemText = lineItem.originalLineItemText;
@@ -547,9 +522,8 @@ class JournalEntryLineItemEditor {
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.accountCode = lineItem.accountCode;
-        this.accountText = lineItem.accountText;
-        this.#accountText.innerText = this.accountText;
+        this.account = new JournalEntryAccount(lineItem.accountCode, lineItem.accountText, lineItem.isNeedOffset);
+        this.#accountText.innerText = this.account.text;
         this.#amountInput.value = lineItem.amount === null? "": String(lineItem.amount);
         const maxAmount = this.#getMaxAmount();
         this.#amountInput.max = maxAmount === null? "": maxAmount;
@@ -594,5 +568,43 @@ class JournalEntryLineItemEditor {
             this.#accountControl.classList.add("accounting-disabled");
             this.#accountControl.classList.remove("accounting-clickable");
         }
+    }
+}
+
+/**
+ * A journal entry account.
+ *
+ */
+class JournalEntryAccount {
+
+    /**
+     * The account code
+     * @type {string}
+     */
+    code;
+
+    /**
+     * The account text
+     * @type {string}
+     */
+    text;
+
+    /**
+     * Whether the line items in the account needs offset
+     * @type {boolean}
+     */
+    isNeedOffset;
+
+    /**
+     * Constructs a journal entry account.
+     *
+     * @param code {string} the account code
+     * @param text {string} the account text
+     * @param isNeedOffset {boolean} true if the line items in the account needs offset, or false otherwise
+     */
+    constructor(code, text, isNeedOffset) {
+        this.code = code;
+        this.text = text;
+        this.isNeedOffset = isNeedOffset;
     }
 }

@@ -1061,7 +1061,7 @@ class LineItemSubForm {
      * @param editor {JournalEntryLineItemEditor} the line item editor
      */
     save(editor) {
-        if (editor.isNeedOffset) {
+        if (editor.account.isNeedOffset) {
             this.#offsets.classList.remove("d-none");
         } else {
             this.#offsets.classList.add("d-none");
@@ -1076,9 +1076,9 @@ class LineItemSubForm {
             this.#originalLineItemText.classList.remove("d-none");
             this.#originalLineItemText.innerText = A_("Offset %(item)s", {item: editor.originalLineItemText});
         }
-        this.#accountCode.value = editor.accountCode === null? "": editor.accountCode;
-        this.#accountCode.dataset.text = editor.accountText === null? "": editor.accountText;
-        this.#accountText.innerText = editor.accountText === null? "": editor.accountText;
+        this.#accountCode.value = editor.account === null? "": editor.account.code;
+        this.#accountCode.dataset.text = editor.account === null? "": editor.account.text;
+        this.#accountText.innerText = editor.account === null? "": editor.account.text;
         this.#description.value = editor.description === null? "": editor.description;
         this.#descriptionText.innerText = editor.description === null? "": editor.description;
         this.#amount.value = editor.amount;
