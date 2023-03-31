@@ -207,8 +207,8 @@ class JournalEntryForm {
      * @return {string[]} the account codes used in the form
      */
     getAccountCodesUsed(debitCredit) {
-        return this.getLineItems(debitCredit).map((lineItem) => lineItem.accountCode)
-            .filter((code) => code !== null);
+        return this.getLineItems(debitCredit).filter((lineItem) => lineItem.account !== null)
+            .map((lineItem) => lineItem.account.code);
     }
 
     /**
@@ -941,15 +941,6 @@ class LineItemSubForm {
     }
 
     /**
-     * Returns whether the line item needs offset.
-     *
-     * @return {boolean} true if the line item needs offset, or false otherwise
-     */
-    get isNeedOffset() {
-        return "isNeedOffset" in this.#element.dataset;
-    }
-
-    /**
      * Returns the ID of the original line item.
      *
      * @return {string|null} the ID of the original line item
@@ -986,21 +977,12 @@ class LineItemSubForm {
     }
 
     /**
-     * Returns the account code.
+     * Returns the account.
      *
-     * @return {string|null} the account code
+     * @return {JournalEntryAccount|null} the account
      */
-    get accountCode() {
-        return this.#accountCode.value === ""? null: this.#accountCode.value;
-    }
-
-    /**
-     * Returns the account text.
-     *
-     * @return {string|null} the account text
-     */
-    get accountText() {
-        return this.#accountCode.dataset.text === ""? null: this.#accountCode.dataset.text;
+    get account() {
+        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.text, "isNeedOffset" in this.#element.dataset);
     }
 
     /**

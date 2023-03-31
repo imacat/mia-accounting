@@ -517,12 +517,12 @@ class JournalEntryLineItemEditor {
             this.#descriptionControl.classList.add("accounting-not-empty");
         }
         this.#descriptionText.innerText = this.description === null? "": this.description;
-        if (lineItem.accountCode === null) {
+        this.account = lineItem.account;
+        if (this.account === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
             this.#accountControl.classList.add("accounting-not-empty");
         }
-        this.account = new JournalEntryAccount(lineItem.accountCode, lineItem.accountText, lineItem.isNeedOffset);
         this.#accountText.innerText = this.account.text;
         this.#amountInput.value = lineItem.amount === null? "": String(lineItem.amount);
         const maxAmount = this.#getMaxAmount();
