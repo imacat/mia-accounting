@@ -982,7 +982,7 @@ class LineItemSubForm {
      * @return {JournalEntryAccount|null} the account
      */
     get account() {
-        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.text, "isNeedOffset" in this.#element.dataset);
+        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.text, this.#accountCode.classList.contains("accounting-is-need-offset"));
     }
 
     /**
