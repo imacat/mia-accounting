@@ -1060,6 +1060,11 @@ class LineItemSubForm {
         }
         this.#accountCode.value = editor.account.code;
         this.#accountCode.dataset.text = editor.account.text;
+        if (editor.account.isNeedOffset) {
+            this.#accountCode.classList.add("accounting-is-need-offset");
+        } else {
+            this.#accountCode.classList.remove("accounting-is-need-offset");
+        }
         this.#accountText.innerText = editor.account.text;
         this.#description.value = editor.description === null? "": editor.description;
         this.#descriptionText.innerText = editor.description === null? "": editor.description;
