@@ -1058,9 +1058,9 @@ class LineItemSubForm {
             this.#originalLineItemText.classList.remove("d-none");
             this.#originalLineItemText.innerText = A_("Offset %(item)s", {item: editor.originalLineItemText});
         }
-        this.#accountCode.value = editor.account === null? "": editor.account.code;
-        this.#accountCode.dataset.text = editor.account === null? "": editor.account.text;
-        this.#accountText.innerText = editor.account === null? "": editor.account.text;
+        this.#accountCode.value = editor.account.code;
+        this.#accountCode.dataset.text = editor.account.text;
+        this.#accountText.innerText = editor.account.text;
         this.#description.value = editor.description === null? "": editor.description;
         this.#descriptionText.innerText = editor.description === null? "": editor.description;
         this.#amount.value = editor.amount;
