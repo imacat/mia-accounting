@@ -173,6 +173,12 @@ class JournalEntryLineItemEditor {
     account = null;
 
     /**
+     * Whether the user has confirmed the account
+     * @type {boolean}
+     */
+    isAccountConfirmed = false;
+
+    /**
      * The description
      * @type {string|null}
      */
@@ -280,6 +286,7 @@ class JournalEntryLineItemEditor {
         this.#descriptionText.innerText = originalLineItem.description;
         this.#accountControl.classList.add("accounting-not-empty");
         this.account = originalLineItem.account.copy();
+        this.isAccountConfirmed = false;
         this.#accountText.innerText = this.account.text;
         this.#amountInput.value = String(originalLineItem.netBalance);
         this.#amountInput.max = String(originalLineItem.netBalance);
@@ -301,6 +308,7 @@ class JournalEntryLineItemEditor {
         this.#setEnableDescriptionAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
         this.account = null;
+        this.isAccountConfirmed = false;
         this.#accountText.innerText = "";
         this.#amountInput.max = "";
     }
@@ -345,6 +353,7 @@ class JournalEntryLineItemEditor {
     clearAccount() {
         this.#accountControl.classList.remove("accounting-not-empty");
         this.account = null;
+        this.isAccountConfirmed = false;
         this.#accountText.innerText = "";
         this.#validateAccount();
     }
@@ -357,6 +366,7 @@ class JournalEntryLineItemEditor {
     saveAccount(account) {
         this.#accountControl.classList.add("accounting-not-empty");
         this.account = new JournalEntryAccount(account.code, account.text, account.isNeedOffset);
+        this.isAccountConfirmed = true;
         this.#accountText.innerText = account.text;
         this.#validateAccount();
     }
@@ -480,6 +490,7 @@ class JournalEntryLineItemEditor {
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
         this.account = null;
+        this.isAccountConfirmed = false;
         this.#accountText.innerText = "";
         this.#accountError.innerText = "";
         this.#amountInput.value = "";
@@ -518,6 +529,7 @@ class JournalEntryLineItemEditor {
         }
         this.#descriptionText.innerText = this.description === null? "": this.description;
         this.account = lineItem.account;
+        this.isAccountConfirmed = true;
         if (this.account === null) {
             this.#accountControl.classList.remove("accounting-not-empty");
         } else {
