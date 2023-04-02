@@ -1029,7 +1029,7 @@ class LineItemSubForm {
      * @return {JournalEntryAccount|null} the account
      */
     get account() {
-        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.text, this.#accountCode.classList.contains("accounting-is-need-offset"));
+        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.text, this.#accountCode.classList.contains("accounting-account-is-need-offset"));
     }
 
     /**
@@ -1108,9 +1108,9 @@ class LineItemSubForm {
         this.#accountCode.value = editor.account.code;
         this.#accountCode.dataset.text = editor.account.text;
         if (editor.account.isNeedOffset) {
-            this.#accountCode.classList.add("accounting-is-need-offset");
+            this.#accountCode.classList.add("accounting-account-is-need-offset");
         } else {
-            this.#accountCode.classList.remove("accounting-is-need-offset");
+            this.#accountCode.classList.remove("accounting-account-is-need-offset");
         }
         this.#accountText.innerText = editor.account.text;
         this.#description.value = editor.description === null? "": editor.description;
