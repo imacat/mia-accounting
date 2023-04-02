@@ -42,6 +42,8 @@ class DescriptionAccount:
         """The account ID."""
         self.code: str = account.code
         """The account code."""
+        self.is_need_offset: bool = account.is_need_offset
+        """Whether the journal entry line items of this account need offset."""
         self.freq: int = freq
         """The frequency of the tag with the account."""
 
