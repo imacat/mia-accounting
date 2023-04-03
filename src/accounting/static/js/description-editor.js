@@ -199,6 +199,7 @@ class DescriptionEditor {
      *
      */
     #onDescriptionChange() {
+        this.#reset();
         this.description = this.description.trim();
         for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
@@ -206,6 +207,17 @@ class DescriptionEditor {
             }
         }
         this.tabPlanes.annotation.populate();
+    }
+
+    /**
+     * Resets the description editor.
+     *
+     */
+    #reset() {
+        for (const tabPlane of Object.values(this.tabPlanes)) {
+            tabPlane.reset();
+        }
+        this.tabPlanes.general.switchToMe();
     }
 
     /**
@@ -289,10 +301,9 @@ class DescriptionEditor {
      *
      */
     onOpen() {
-        this.#reset();
-        this.#setConfirmedAccount();
         this.description = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
         this.#onDescriptionChange();
+        this.#setConfirmedAccount();
     }
 
     /**
@@ -309,18 +320,6 @@ class DescriptionEditor {
             this.#confirmedAccount = null;
         }
         this.selectAccount(this.#confirmedAccount);
-    }
-
-    /**
-     * Resets the description editor.
-     *
-     */
-    #reset() {
-        this.description = "";
-        for (const tabPlane of Object.values(this.tabPlanes)) {
-            tabPlane.reset();
-        }
-        this.tabPlanes.general.switchToMe();
     }
 
     /**
