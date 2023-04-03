@@ -334,14 +334,12 @@ class JournalEntryLineItemEditor {
      * Saves the description with the suggested account from the description editor.
      *
      * @param description {string} the description
-     * @param accountCode {string} the account code
-     * @param accountText {string} the account text
-     * @param isAccountNeedOffset {boolean} true if the line items in the account need offset, or false otherwise
+     * @param account {DescriptionEditorAccount} the suggested account
      */
-    saveDescriptionWithAccount(description, accountCode, accountText, isAccountNeedOffset) {
+    saveDescriptionWithAccount(description, account) {
         this.#accountControl.classList.add("accounting-not-empty");
-        this.account = new JournalEntryAccount(accountCode, accountText, isAccountNeedOffset);
-        this.#accountText.innerText = accountText;
+        this.account = account.copy();
+        this.#accountText.innerText = account.text;
         this.#validateAccount();
         this.saveDescription(description)
     }
