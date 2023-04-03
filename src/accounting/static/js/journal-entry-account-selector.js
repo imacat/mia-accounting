@@ -191,12 +191,6 @@ class JournalEntryAccountSelector {
 class JournalEntryAccountOption {
 
     /**
-     * The account selector
-     * @type {JournalEntryAccountSelector}
-     */
-    #selector;
-
-    /**
      * The element
      * @type {HTMLLIElement}
      */
@@ -239,7 +233,6 @@ class JournalEntryAccountOption {
      * @param element {HTMLLIElement} the element
      */
     constructor(selector, element) {
-        this.#selector = selector;
         this.#element = element;
         this.code = element.dataset.code;
         this.text = element.dataset.text;
@@ -247,7 +240,7 @@ class JournalEntryAccountOption {
         this.isNeedOffset = element.classList.contains("accounting-account-is-need-offset");
         this.#queryValues = JSON.parse(element.dataset.queryValues);
 
-        this.#element.onclick = () => this.#selector.lineItemEditor.saveAccount(this);
+        this.#element.onclick = () => selector.lineItemEditor.saveAccount(this);
     }
 
     /**
