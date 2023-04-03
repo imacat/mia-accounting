@@ -945,12 +945,6 @@ class RecurringAccountSelector {
 class RecurringAccount {
 
     /**
-     * The account selector for the recurring item editor
-     * @type {RecurringAccountSelector}
-     */
-    #selector;
-
-    /**
      * The element
      * @type {HTMLLIElement}
      */
@@ -981,13 +975,12 @@ class RecurringAccount {
      * @param element {HTMLLIElement} the element
      */
     constructor(selector, element) {
-        this.#selector = selector;
         this.#element = element;
         this.code = element.dataset.code;
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
 
-        this.#element.onclick = () => this.#selector.editor.saveAccount(this);
+        this.#element.onclick = () => selector.editor.saveAccount(this);
     }
 
     /**
