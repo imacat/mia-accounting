@@ -457,11 +457,7 @@ class CurrencySubForm {
      * @param isShown {boolean} true to show, or false otherwise
      */
     setDeleteButtonShown(isShown) {
-        if (isShown) {
-            this.#deleteButton.classList.remove("d-none");
-        } else {
-            this.#deleteButton.classList.add("d-none");
-        }
+        setElementShown(this.#deleteButton, isShown);
     }
 
     /**
@@ -705,15 +701,14 @@ class DebitCreditSubForm {
                 this.#element.classList.add("accounting-not-empty");
                 this.currency.form.lineItemEditor.onAddNew(this);
             };
-            this.#content.classList.add("d-none");
         } else {
             this.#element.classList.add("accounting-not-empty");
             this.#element.classList.remove("accounting-clickable");
             delete this.#element.dataset.bsToggle;
             delete this.#element.dataset.bsTarget;
             this.#element.onclick = null;
-            this.#content.classList.remove("d-none");
         }
+        setElementShown(this.#content, this.lineItems.length !== 0);
     }
 
     /**
@@ -1056,11 +1051,7 @@ class LineItemSubForm {
      * @param isShown {boolean} true to show, or false otherwise
      */
     setDeleteButtonShown(isShown) {
-        if (isShown) {
-            this.#deleteButton.classList.remove("d-none");
-        } else {
-            this.#deleteButton.classList.add("d-none");
-        }
+        setElementShown(this.#deleteButton, isShown);
     }
 
     /**
@@ -1090,19 +1081,14 @@ class LineItemSubForm {
      * @param editor {JournalEntryLineItemEditor} the line item editor
      */
     save(editor) {
-        if (editor.account.isNeedOffset) {
-            this.#offsets.classList.remove("d-none");
-        } else {
-            this.#offsets.classList.add("d-none");
-        }
+        setElementShown(this.#offsets, editor.account.isNeedOffset);
         this.#originalLineItemId.value = editor.originalLineItemId === null? "": editor.originalLineItemId;
         this.#originalLineItemId.dataset.date = editor.originalLineItemDate === null? "": editor.originalLineItemDate;
         this.#originalLineItemId.dataset.text = editor.originalLineItemText === null? "": editor.originalLineItemText;
+        setElementShown(this.#originalLineItemText, editor.originalLineItemText !== null);
         if (editor.originalLineItemText === null) {
-            this.#originalLineItemText.classList.add("d-none");
             this.#originalLineItemText.innerText = "";
         } else {
-            this.#originalLineItemText.classList.remove("d-none");
             this.#originalLineItemText.innerText = A_("Offset %(item)s", {item: editor.originalLineItemText});
         }
         this.#accountCode.value = editor.account.code;
@@ -1152,4 +1138,19 @@ function formatDecimal(number) {
     const frac = number.modulo(1);
     const whole = Number(number.minus(frac)).toLocaleString();
     return whole + String(frac).substring(1);
+}
+
+/**
+ * Sets whether an element is shown.
+ *
+ * @param element {HTMLElement} the element
+ * @param isShown {boolean} true to show, or false otherwise
+ * @private
+ */
+function setElementShown(element, isShown) {
+    if (isShown) {
+        element.classList.remove("d-none");
+    } else {
+        element.classList.add("d-none");
+    }
 }
