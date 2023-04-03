@@ -89,22 +89,28 @@ class DescriptionEditor {
     note;
 
     /**
-     * The account buttons
-     * @type {HTMLButtonElement[]}
+     * The placeholder of the confirmed account
+     * @type {DescriptionEditorConfirmedAccount}
      */
-    #accountButtons;
+    #confirmedAccountPlaceholder;
 
     /**
-     * The suggested account buttons
-     * @type {HTMLButtonElement[]}
+     * All the suggested accounts
+     * @type {DescriptionEditorSuggestedAccount[]}
      */
-    #suggestedAccountButtons;
+    #allSuggestedAccounts;
 
     /**
-     * The account that the user has confirmed
-     * @type {HTMLButtonElement}
+     * The current suggested accounts
+     * @type {DescriptionEditorSuggestedAccount[]}
      */
-    #confirmedAccountButton;
+    #currentSuggestedAccounts;
+
+    /**
+     * The account that the user specified or confirmed
+     * @type {DescriptionEditorConfirmedAccount|null}
+     */
+    #confirmedAccount = null;
 
     /**
      * Whether the user has confirmed the account
@@ -113,10 +119,10 @@ class DescriptionEditor {
     #isAccountConfirmed = false;
 
     /**
-     * The selected account button
-     * @type {HTMLButtonElement|null}
+     * The selected account.
+     * @type {DescriptionEditorAccount|null}
      */
-    #selectedAccountButton = null;
+    #selectedAccount = null;
 
     /**
      * The tab planes
@@ -140,17 +146,14 @@ class DescriptionEditor {
         this.#offsetButton = document.getElementById(`${this.prefix}-offset`);
         this.number = document.getElementById(`${this.prefix}-annotation-number`);
         this.note = document.getElementById(`${this.prefix}-annotation-note`);
-        // noinspection JSValidateTypes
-        this.#accountButtons = Array.from(document.getElementsByClassName(`${this.prefix}-account`));
-        this.#confirmedAccountButton = document.getElementById(`${this.prefix}-account-confirmed`)
-
+        this.#confirmedAccountPlaceholder = new DescriptionEditorConfirmedAccount(this, document.getElementById(`${this.prefix}-account-confirmed`));
+        this.#allSuggestedAccounts = Array.from(document.getElementsByClassName(`${this.prefix}-account`)).map((button) => new DescriptionEditorSuggestedAccount(this, button));
 
         for (const cls of [DescriptionEditorGeneralTagTab, DescriptionEditorGeneralTripTab, DescriptionEditorBusTripTab, DescriptionEditorRecurringTab, DescriptionEditorAnnotationTab]) {
             const tab = new cls(this);
             this.tabPlanes[tab.tabId()] = tab;
         }
         this.currentTab = this.tabPlanes.general;
-        this.#initializeSuggestedAccountButtons();
         this.description.onchange = () => this.#onDescriptionChange();
         this.#offsetButton.onclick = () => this.lineItemEditor.originalLineItemSelector.onOpen();
         this.#form.onsubmit = () => {
@@ -159,6 +162,18 @@ class DescriptionEditor {
             }
             return false;
         };
+    }
+
+    /**
+     * Returns the current account options.
+     *
+     * @return {DescriptionEditorAccount[]} the current account options.
+     */
+    get #currentAccountOptions() {
+        if (this.#confirmedAccount === null) {
+            return this.#currentSuggestedAccounts;
+        }
+        return [this.#confirmedAccount].concat(this.#currentSuggestedAccounts);
     }
 
     /**
@@ -176,83 +191,69 @@ class DescriptionEditor {
     }
 
     /**
-     * Filters the suggested account buttons.
+     * Updates the current suggested accounts.
      *
      * @param tagButton {HTMLButtonElement} the tag button
      */
-    filterSuggestedAccountButtons(tagButton) {
-        this.clearSuggestedAccountButtons();
+    updateCurrentSuggestedAccounts(tagButton) {
+        this.clearSuggestedAccounts();
         const suggestedAccountCodes = JSON.parse(tagButton.dataset.accounts);
-        const suggestedAccountButtons = this.#suggestedAccountButtons.filter((button) => suggestedAccountCodes.includes(button.dataset.code));
-        for (const button of suggestedAccountButtons) {
-            button.classList.remove("d-none");
+        this.#currentSuggestedAccounts = this.#allSuggestedAccounts.filter((account) => {
+            if (this.#confirmedAccount !== null && account.code === this.#confirmedAccount.code) {
+                return false;
+            }
+            return suggestedAccountCodes.includes(account.code);
+        });
+        for (const account of this.#currentSuggestedAccounts) {
+            account.setShown(true);
         }
-        this.#selectSuggestedAccountButton(suggestedAccountButtons, suggestedAccountCodes[0]);
+        this.#selectSuggestedAccount(suggestedAccountCodes[0]);
     }
 
     /**
-     * Selects the suggested account button.
+     * Selects the suggested account.
      *
-     * @param suggestedAccountButtons {HTMLButtonElement[]} the suggested account buttons
      * @param code {string} the code of the most-frequent suggested account
      */
-    #selectSuggestedAccountButton(suggestedAccountButtons, code) {
+    #selectSuggestedAccount(code) {
         if (this.#isAccountConfirmed) {
             return;
         }
-        if (this.#confirmedAccountButton.dataset.code === code) {
-            this.#selectAccountButton(this.#confirmedAccountButton);
-        } else {
-            for (const button of suggestedAccountButtons) {
-                if (!this.#isAccountConfirmed && button.dataset.code === code) {
-                    this.#selectAccountButton(button);
-                }
+        for (const account of this.#currentAccountOptions) {
+            if (account.code === code) {
+                this.selectAccount(account);
+                return;
             }
         }
     }
 
     /**
-     * Clears the suggested account buttons.
+     * Clears the suggested accounts.
      *
      */
-    clearSuggestedAccountButtons() {
-        for (const button of this.#suggestedAccountButtons) {
-            button.classList.add("d-none");
+    clearSuggestedAccounts() {
+        for (const account of this.#allSuggestedAccounts) {
+            account.setShown(false);
+            account.setActive(false);
         }
-        if (this.#isAccountConfirmed) {
-            this.#selectAccountButton(this.#confirmedAccountButton);
-        } else {
-            this.#selectAccountButton(null);
-        }
+        this.#currentSuggestedAccounts = [];
     }
 
     /**
-     * Initializes the suggested account buttons.
+     * Select an account.
      *
+     * @param selectedAccount {DescriptionEditorAccount|null} the account, or null to deselect the account
      */
-    #initializeSuggestedAccountButtons() {
-        for (const accountButton of this.#accountButtons) {
-            accountButton.onclick = () => this.#selectAccountButton(accountButton);
+    selectAccount(selectedAccount) {
+        for (const account of this.#currentAccountOptions) {
+            account.setActive(false);
         }
-    }
-
-    /**
-     * Select a suggested account button.
-     *
-     * @param selectedAccountButton {HTMLButtonElement|null} the account button, or null to deselect the account
-     */
-    #selectAccountButton(selectedAccountButton) {
-        for (const accountButton of this.#accountButtons) {
-            accountButton.classList.remove("btn-primary");
-            accountButton.classList.add("btn-outline-primary");
+        if (selectedAccount !== null) {
+            selectedAccount.setActive(true);
         }
-        if (selectedAccountButton !== null) {
-            selectedAccountButton.classList.remove("btn-outline-primary");
-            selectedAccountButton.classList.add("btn-primary");
-        }
-        this.#selectedAccountButton = selectedAccountButton;
-        if (this.#selectedAccountButton !== null) {
-            this.#isAccountConfirmed &= this.#selectedAccountButton.id === this.#confirmedAccountButton.id;
+        this.#selectedAccount = selectedAccount;
+        if (this.#selectedAccount !== null) {
+            this.#isAccountConfirmed &= this.#selectedAccount.isConfirmedAccount;
         }
     }
 
@@ -262,8 +263,8 @@ class DescriptionEditor {
      */
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
-        if (this.#selectedAccountButton !== null) {
-            this.lineItemEditor.saveDescriptionWithAccount(this.description.value, this.#selectedAccountButton.dataset.code, this.#selectedAccountButton.dataset.text, this.#selectedAccountButton.classList.contains("accounting-account-is-need-offset"));
+        if (this.#selectedAccount !== null) {
+            this.lineItemEditor.saveDescriptionWithAccount(this.description.value, this.#selectedAccount.code, this.#selectedAccount.text, this.#selectedAccount.isNeedOffset);
         } else {
             this.lineItemEditor.saveDescription(this.description.value);
         }
@@ -274,51 +275,26 @@ class DescriptionEditor {
      *
      */
     onOpen() {
-        this.#setConfirmedAccountButton();
-        this.#setSuggestedAccountButtons();
         this.#reset();
+        this.#setConfirmedAccount();
         this.description.value = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
-        if (this.#isAccountConfirmed) {
-            this.#selectAccountButton(this.#confirmedAccountButton);
-        }
         this.#onDescriptionChange();
     }
 
     /**
-     * Sets the confirmed account button.
+     * Sets the confirmed account.
      *
      */
-    #setConfirmedAccountButton() {
+    #setConfirmedAccount() {
         this.#isAccountConfirmed = this.lineItemEditor.isAccountConfirmed;
+        this.#confirmedAccountPlaceholder.setShown(this.#isAccountConfirmed);
         if (this.#isAccountConfirmed) {
-            this.#confirmedAccountButton.dataset.code = this.lineItemEditor.account.code;
-            this.#confirmedAccountButton.dataset.text = this.lineItemEditor.account.text;
-            this.#confirmedAccountButton.innerText = this.lineItemEditor.account.text
-            this.#confirmedAccountButton.classList.remove("d-none");
+            this.#confirmedAccountPlaceholder.initializeFrom(this.lineItemEditor.account);
+            this.#confirmedAccount = this.#confirmedAccountPlaceholder;
         } else {
-            this.#confirmedAccountButton.dataset.code = "";
-            this.#confirmedAccountButton.dataset.text = "";
-            this.#confirmedAccountButton.innerText = "";
-            this.#confirmedAccountButton.classList.add("d-none");
+            this.#confirmedAccount = null;
         }
-    }
-
-    /**
-     * Sets the suggested account buttons.
-     *
-     */
-    #setSuggestedAccountButtons() {
-        this.#suggestedAccountButtons = []
-        for (const button of this.#accountButtons) {
-            if (button.id === this.#confirmedAccountButton.id) {
-                continue;
-            }
-            if (button.dataset.code === this.#confirmedAccountButton.dataset.code) {
-                button.classList.add("d-none");
-            } else {
-                this.#suggestedAccountButtons.push(button);
-            }
-        }
+        this.selectAccount(this.#confirmedAccount);
     }
 
     /**
@@ -346,6 +322,123 @@ class DescriptionEditor {
             editors[form.dataset.debitCredit] = new DescriptionEditor(lineItemEditor, form.dataset.debitCredit);
         }
         return editors;
+    }
+}
+
+/**
+ * An account option in the description editor.
+ *
+ */
+class DescriptionEditorAccount extends JournalEntryAccount {
+
+    /**
+     * The account button
+     * @type {HTMLButtonElement}
+     */
+    #element;
+
+    /**
+     * Whether this is the account specified or confirmed by the user
+     * @type {boolean}
+     */
+    isConfirmedAccount = false;
+
+    /**
+     * Constructs an account option in the description editor.
+     *
+     * @param editor {DescriptionEditor} the description editor
+     * @param code {string} the account code
+     * @param text {string} the account text
+     * @param isNeedOffset {boolean} true if the line items in the account needs offset, or false otherwise
+     * @param button {HTMLButtonElement} the account button
+     */
+    constructor(editor, code, text, isNeedOffset, button) {
+        super(code, text, isNeedOffset);
+        this.#element = button;
+        this.#element.onclick = () => editor.selectAccount(this);
+    }
+
+    /**
+     * Sets whether the option is shown.
+     *
+     * @param isShown {boolean} true to show, or false otherwise
+     */
+    setShown(isShown) {
+        if (isShown) {
+            this.#element.classList.remove("d-none");
+        } else {
+            this.#element.classList.add("d-none");
+        }
+    }
+
+    /**
+     * Sets whether the option is active.
+     *
+     * @param isActive {boolean} true if active, or false otherwise
+     */
+    setActive(isActive) {
+        if (isActive) {
+            this.#element.classList.add("btn-primary");
+            this.#element.classList.remove("btn-outline-primary");
+        } else {
+            this.#element.classList.remove("btn-primary");
+            this.#element.classList.add("btn-outline-primary");
+        }
+    }
+
+    /**
+     * Sets the content of the account button.
+     *
+     */
+    resetContent() {
+        this.#element.innerText = this.text;
+    }
+}
+
+/**
+ * A suggested account.
+ *
+ */
+class DescriptionEditorSuggestedAccount extends DescriptionEditorAccount {
+
+    /**
+     * Constructs a suggested account.
+     *
+     * @param editor {DescriptionEditor} the description editor
+     * @param button {HTMLButtonElement} the account button
+     */
+    constructor(editor, button) {
+        super(editor, button.dataset.code, button.dataset.text, button.classList.contains("accounting-account-is-need-offset"), button);
+    }
+}
+
+/**
+ * The account option that is specified or confirmed by the user.
+ *
+ */
+class DescriptionEditorConfirmedAccount extends DescriptionEditorAccount {
+
+    /**
+     * Constructs the account option that is specified or confirmed by the user.
+     *
+     * @param editor {DescriptionEditor} the description editor
+     * @param button {HTMLButtonElement} the account button
+     */
+    constructor(editor, button) {
+        super(editor, "", "", false, button);
+        this.isConfirmedAccount = true;
+    }
+
+    /**
+     * Initializes the confirmed account from the line item editor.
+     *
+     * @param account {JournalEntryAccount} the confirmed account from the line item editor
+     */
+    initializeFrom(account) {
+        this.code = account.code;
+        this.text = account.text;
+        this.isNeedOffset = account.isNeedOffset;
+        this.resetContent();
     }
 }
 
@@ -500,7 +593,7 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
             if (tagButton.dataset.value === this.tag.value) {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
-                this.editor.filterSuggestedAccountButtons(tagButton);
+                this.editor.updateCurrentSuggestedAccounts(tagButton);
                 isMatched = true;
             } else {
                 tagButton.classList.remove("btn-primary");
@@ -508,7 +601,7 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
             }
         }
         if (!isMatched) {
-            this.editor.clearSuggestedAccountButtons();
+            this.editor.clearSuggestedAccounts();
         }
         this.validateTag();
     }
@@ -528,11 +621,11 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
         super.switchToMe();
         for (const tagButton of this.tagButtons) {
             if (tagButton.classList.contains("btn-primary")) {
-                this.editor.filterSuggestedAccountButtons(tagButton);
+                this.editor.updateCurrentSuggestedAccounts(tagButton);
                 return;
             }
         }
-        this.editor.clearSuggestedAccountButtons();
+        this.editor.clearSuggestedAccounts();
     }
 
     /**
@@ -549,7 +642,7 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
                 this.tag.value = tagButton.dataset.value;
-                this.editor.filterSuggestedAccountButtons(tagButton);
+                this.editor.updateCurrentSuggestedAccounts(tagButton);
                 this.updateDescription();
             };
         }
@@ -1092,7 +1185,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
                 itemButton.classList.add("btn-primary");
                 itemButton.classList.remove("btn-outline-primary");
                 this.editor.description.value = this.#getDescription(itemButton);
-                this.editor.filterSuggestedAccountButtons(itemButton);
+                this.editor.updateCurrentSuggestedAccounts(itemButton);
             };
         }
     }
@@ -1166,11 +1259,11 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
         super.switchToMe();
         for (const itemButton of this.#itemButtons) {
             if (itemButton.classList.contains("btn-primary")) {
-                this.editor.filterSuggestedAccountButtons(itemButton);
+                this.editor.updateCurrentSuggestedAccounts(itemButton);
                 return;
             }
         }
-        this.editor.clearSuggestedAccountButtons();
+        this.editor.clearSuggestedAccounts();
     }
 
     /**

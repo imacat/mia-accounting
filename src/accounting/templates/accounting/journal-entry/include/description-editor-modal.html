@@ -182,7 +182,7 @@ First written: 2023/2/28
 
           {# The suggested accounts #}
           <div class="mt-3">
-            <button id="accounting-description-editor-{{ description_editor.debit_credit }}-account-confirmed" class="btn btn-primary accounting-description-editor-{{ description_editor.debit_credit }}-account d-none" type="button" data-code="" data-text=""></button>
+            <button id="accounting-description-editor-{{ description_editor.debit_credit }}-account-confirmed" class="btn btn-primary d-none" type="button"></button>
             {% for account in description_editor.accounts %}
               <button class="btn btn-outline-primary d-none accounting-description-editor-{{ description_editor.debit_credit }}-account {% if account.is_need_offset %} accounting-account-is-need-offset {% endif %}" type="button" data-code="{{ account.code }}" data-text="{{ account }}">
                 {{ account }}
