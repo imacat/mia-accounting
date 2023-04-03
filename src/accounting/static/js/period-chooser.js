@@ -181,7 +181,8 @@ class MonthTab extends TabPlane {
             });
             monthChooser.addEventListener(tempusDominus.Namespace.events.change, (e) => {
                 const date = e.detail.date;
-                const period = `${date.year}-${`0${date.month + 1}`.slice(-2)}`;
+                const zeroPaddedMonth = `0${date.month + 1}`.slice(-2)
+                const period = `${date.year}-${zeroPaddedMonth}`;
                 window.location = chooser.modal.dataset.urlTemplate
                     .replaceAll("PERIOD", period);
             });
