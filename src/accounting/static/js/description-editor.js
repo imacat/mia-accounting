@@ -200,6 +200,7 @@ class DescriptionEditor {
      */
     #onDescriptionChange() {
         this.#resetTabPlanes();
+        this.#selectedAccount = null;
         this.description = this.description.trim();
         for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
