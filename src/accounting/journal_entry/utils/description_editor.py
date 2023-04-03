@@ -36,7 +36,7 @@ class DescriptionAccount:
         :param account: The account.
         :param freq: The frequency of the tag with the account.
         """
-        self.account: Account = account
+        self.__account: Account = account
         """The account."""
         self.id: int = account.id
         """The account ID."""
@@ -52,7 +52,7 @@ class DescriptionAccount:
 
         :return: The string representation of the account.
         """
-        return str(self.account)
+        return str(self.__account)
 
     def add_freq(self, freq: int) -> None:
         """Adds the frequency of an account.
