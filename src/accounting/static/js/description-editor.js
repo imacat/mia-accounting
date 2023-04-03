@@ -68,7 +68,7 @@ class DescriptionEditor {
      * The description input
      * @type {HTMLInputElement}
      */
-    description;
+    #descriptionInput;
 
     /**
      * The button to the original line item selector
@@ -142,7 +142,7 @@ class DescriptionEditor {
         this.prefix = `accounting-description-editor-${debitCredit}`;
         this.#form = document.getElementById(this.prefix);
         this.#modal = document.getElementById(`${this.prefix}-modal`);
-        this.description = document.getElementById(`${this.prefix}-description`);
+        this.#descriptionInput = document.getElementById(`${this.prefix}-description`);
         this.#offsetButton = document.getElementById(`${this.prefix}-offset`);
         this.number = document.getElementById(`${this.prefix}-annotation-number`);
         this.note = document.getElementById(`${this.prefix}-annotation-note`);
@@ -154,7 +154,7 @@ class DescriptionEditor {
             this.tabPlanes[tab.tabId()] = tab;
         }
         this.currentTab = this.tabPlanes.general;
-        this.description.onchange = () => this.#onDescriptionChange();
+        this.#descriptionInput.onchange = () => this.#onDescriptionChange();
         this.#offsetButton.onclick = () => this.lineItemEditor.originalLineItemSelector.onOpen();
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
@@ -162,6 +162,24 @@ class DescriptionEditor {
             }
             return false;
         };
+    }
+
+    /**
+     * Returns the description.
+     *
+     * @return {string} the description
+     */
+    get description() {
+        return this.#descriptionInput.value;
+    }
+
+    /**
+     * Sets the description.
+     *
+     * @param description {string} the description
+     */
+    set description(description) {
+        this.#descriptionInput.value = description;
     }
 
     /**
@@ -181,7 +199,7 @@ class DescriptionEditor {
      *
      */
     #onDescriptionChange() {
-        this.description.value = this.description.value.trim();
+        this.description = this.description.trim();
         for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
                 break;
@@ -263,7 +281,7 @@ class DescriptionEditor {
      */
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
-        this.lineItemEditor.saveDescription(this.description.value, this.#selectedAccount);
+        this.lineItemEditor.saveDescription(this.description, this.#selectedAccount);
     }
 
     /**
@@ -273,7 +291,7 @@ class DescriptionEditor {
     onOpen() {
         this.#reset();
         this.#setConfirmedAccount();
-        this.description.value = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
+        this.description = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
         this.#onDescriptionChange();
     }
 
@@ -298,7 +316,7 @@ class DescriptionEditor {
      *
      */
     #reset() {
-        this.description.value = "";
+        this.description = "";
         for (const tabPlane of Object.values(this.tabPlanes)) {
             tabPlane.reset();
         }
@@ -715,12 +733,12 @@ class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
      * @override
      */
     updateDescription() {
-        const pos = this.editor.description.value.indexOf("—");
+        const pos = this.editor.description.indexOf("—");
         const prefix = this.tag.value === ""? "": `${this.tag.value}—`;
         if (pos === -1) {
-            this.editor.description.value = `${prefix}${this.editor.description.value}`;
+            this.editor.description = `${prefix}${this.editor.description}`;
         } else {
-            this.editor.description.value = `${prefix}${this.editor.description.value.substring(pos + 1)}`;
+            this.editor.description = `${prefix}${this.editor.description.substring(pos + 1)}`;
         }
     }
 
@@ -731,7 +749,7 @@ class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.description.value.match(/^([^—]+)—/);
+        const found = this.editor.description.match(/^([^—]+)—/);
         if (found === null) {
             return false;
         }
@@ -850,7 +868,7 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
                 break;
             }
         }
-        this.editor.description.value = `${this.tag.value}—${this.#from.value}${direction}${this.#to.value}`;
+        this.editor.description = `${this.tag.value}—${this.#from.value}${direction}${this.#to.value}`;
     }
 
     /**
@@ -884,7 +902,7 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.description.value.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
+        const found = this.editor.description.match(/^([^—]+)—([^—→↔]+)([→↔])(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -1042,7 +1060,7 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
      * @override
      */
     updateDescription() {
-        this.editor.description.value = `${this.tag.value}—${this.#route.value}—${this.#from.value}→${this.#to.value}`;
+        this.editor.description = `${this.tag.value}—${this.#route.value}—${this.#from.value}→${this.#to.value}`;
     }
 
     /**
@@ -1070,7 +1088,7 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.description.value.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
+        const found = this.editor.description.match(/^([^—]+)—([^—]+)—([^—→]+)→(.+?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found === null) {
             return false;
         }
@@ -1180,7 +1198,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
                 this.reset();
                 itemButton.classList.add("btn-primary");
                 itemButton.classList.remove("btn-outline-primary");
-                this.editor.description.value = this.#getDescription(itemButton);
+                this.editor.description = this.#getDescription(itemButton);
                 this.editor.updateCurrentSuggestedAccounts(itemButton);
             };
         }
@@ -1237,7 +1255,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
      */
     populate() {
         for (const itemButton of this.#itemButtons) {
-            if (this.#getDescription(itemButton) === this.editor.description.value) {
+            if (this.#getDescription(itemButton) === this.editor.description) {
                 itemButton.classList.add("btn-primary");
                 itemButton.classList.remove("btn-outline-primary");
                 this.switchToMe();
@@ -1311,15 +1329,15 @@ class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
      * @override
      */
     updateDescription() {
-        const found = this.editor.description.value.match(/^(.*?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
+        const found = this.editor.description.match(/^(.*?)(?:[*×]\d+)?(?:\([^()]+\))?$/);
         if (found !== null) {
-            this.editor.description.value = found[1];
+            this.editor.description = found[1];
         }
         if (parseInt(this.editor.number.value) > 1) {
-            this.editor.description.value = `${this.editor.description.value}×${this.editor.number.value}`;
+            this.editor.description = `${this.editor.description}×${this.editor.number.value}`;
         }
         if (this.editor.note.value !== "") {
-            this.editor.description.value = `${this.editor.description.value}(${this.editor.note.value})`;
+            this.editor.description = `${this.editor.description}(${this.editor.note.value})`;
         }
     }
 
@@ -1340,19 +1358,19 @@ class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
      * @override
      */
     populate() {
-        const found = this.editor.description.value.match(/^(.*?)(?:[*×](\d+))?(?:\(([^()]+)\))?$/);
-        this.editor.description.value = found[1];
+        const found = this.editor.description.match(/^(.*?)(?:[*×](\d+))?(?:\(([^()]+)\))?$/);
+        this.editor.description = found[1];
         if (found[2] === undefined || parseInt(found[2]) === 1) {
             this.editor.number.value = "";
         } else {
             this.editor.number.value = found[2];
-            this.editor.description.value = `${this.editor.description.value}×${this.editor.number.value}`;
+            this.editor.description = `${this.editor.description}×${this.editor.number.value}`;
         }
         if (found[3] === undefined) {
             this.editor.note.value = "";
         } else {
             this.editor.note.value = found[3];
-            this.editor.description.value = `${this.editor.description.value}(${this.editor.note.value})`;
+            this.editor.description = `${this.editor.description}(${this.editor.note.value})`;
         }
         return true;
     }
