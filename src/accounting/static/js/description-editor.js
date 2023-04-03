@@ -122,7 +122,7 @@ class DescriptionEditor {
      * The selected account.
      * @type {DescriptionEditorAccount|null}
      */
-    #selectedAccount = null;
+    selectedAccount = null;
 
     /**
      * The tab planes
@@ -200,7 +200,7 @@ class DescriptionEditor {
      */
     #onDescriptionChange() {
         this.#resetTabPlanes();
-        this.#selectedAccount = null;
+        this.selectedAccount = null;
         this.description = this.description.trim();
         for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
@@ -282,9 +282,9 @@ class DescriptionEditor {
         if (selectedAccount !== null) {
             selectedAccount.setActive(true);
         }
-        this.#selectedAccount = selectedAccount;
-        if (this.#selectedAccount !== null) {
-            this.#isAccountConfirmed &= this.#selectedAccount.isConfirmedAccount;
+        this.selectedAccount = selectedAccount;
+        if (this.selectedAccount !== null) {
+            this.#isAccountConfirmed &= this.selectedAccount.isConfirmedAccount;
         }
     }
 
@@ -294,7 +294,7 @@ class DescriptionEditor {
      */
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
-        this.lineItemEditor.saveDescription(this.description, this.#selectedAccount);
+        this.lineItemEditor.saveDescription(this);
     }
 
     /**

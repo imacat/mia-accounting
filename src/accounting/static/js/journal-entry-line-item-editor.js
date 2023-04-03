@@ -316,23 +316,22 @@ class JournalEntryLineItemEditor {
     /**
      * Saves the description from the description editor.
      *
-     * @param description {string} the description
-     * @param account {DescriptionEditorAccount|null} the suggested account
+     * @param editor {DescriptionEditor} the description editor
      */
-    saveDescription(description, account = null) {
-        if (account !== null) {
+    saveDescription(editor) {
+        if (editor.selectedAccount !== null) {
             this.#accountControl.classList.add("accounting-not-empty");
-            this.account = account.copy();
-            this.#accountText.innerText = account.text;
+            this.account = editor.selectedAccount.copy();
+            this.#accountText.innerText = editor.selectedAccount.text;
             this.#validateAccount();
         }
-        if (description === "") {
+        if (editor.description === "") {
             this.#descriptionControl.classList.remove("accounting-not-empty");
         } else {
             this.#descriptionControl.classList.add("accounting-not-empty");
         }
-        this.description = description === ""? null: description;
-        this.#descriptionText.innerText = description;
+        this.description = editor.description === ""? null: editor.description;
+        this.#descriptionText.innerText = editor.description;
         this.#validateDescription();
         bootstrap.Modal.getOrCreateInstance(this.modal).show();
     }
