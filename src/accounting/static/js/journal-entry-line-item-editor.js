@@ -323,6 +323,7 @@ class JournalEntryLineItemEditor {
             this.#accountControl.classList.add("accounting-not-empty");
             this.account = editor.selectedAccount.copy();
             this.#accountText.innerText = editor.selectedAccount.text;
+            this.isAccountConfirmed = editor.isAccountConfirmed;
             this.#validateAccount();
         }
         if (editor.description === "") {

@@ -116,7 +116,7 @@ class DescriptionEditor {
      * Whether the user has confirmed the account
      * @type {boolean}
      */
-    #isAccountConfirmed = false;
+    isAccountConfirmed = false;
 
     /**
      * The selected account.
@@ -247,7 +247,7 @@ class DescriptionEditor {
      * @param code {string} the code of the most-frequent suggested account
      */
     #selectSuggestedAccount(code) {
-        if (this.#isAccountConfirmed) {
+        if (this.isAccountConfirmed) {
             return;
         }
         for (const account of this.#currentAccountOptions) {
@@ -284,7 +284,7 @@ class DescriptionEditor {
         }
         this.selectedAccount = selectedAccount;
         if (this.selectedAccount !== null) {
-            this.#isAccountConfirmed &&= this.selectedAccount.isConfirmedAccount;
+            this.isAccountConfirmed &&= this.selectedAccount.isConfirmedAccount;
         }
     }
 
@@ -305,7 +305,7 @@ class DescriptionEditor {
         this.description = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
         this.#setConfirmedAccount();
         this.#onDescriptionChange();
-        if (this.#isAccountConfirmed) {
+        if (this.isAccountConfirmed) {
             this.selectAccount(this.#confirmedAccount);
         }
     }
@@ -315,9 +315,9 @@ class DescriptionEditor {
      *
      */
     #setConfirmedAccount() {
-        this.#isAccountConfirmed = this.lineItemEditor.isAccountConfirmed;
-        this.#confirmedAccountPlaceholder.setShown(this.#isAccountConfirmed);
-        if (this.#isAccountConfirmed) {
+        this.isAccountConfirmed = this.lineItemEditor.isAccountConfirmed;
+        this.#confirmedAccountPlaceholder.setShown(this.isAccountConfirmed);
+        if (this.isAccountConfirmed) {
             this.#confirmedAccountPlaceholder.initializeFrom(this.lineItemEditor.account);
             this.#confirmedAccount = this.#confirmedAccountPlaceholder;
         } else {
