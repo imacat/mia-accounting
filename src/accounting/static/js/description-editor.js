@@ -284,7 +284,7 @@ class DescriptionEditor {
         }
         this.selectedAccount = selectedAccount;
         if (this.selectedAccount !== null) {
-            this.#isAccountConfirmed &= this.selectedAccount.isConfirmedAccount;
+            this.#isAccountConfirmed &&= this.selectedAccount.isConfirmedAccount;
         }
     }
 
