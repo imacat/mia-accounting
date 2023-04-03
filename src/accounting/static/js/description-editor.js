@@ -303,8 +303,11 @@ class DescriptionEditor {
      */
     onOpen() {
         this.description = this.lineItemEditor.description === null? "": this.lineItemEditor.description;
-        this.#onDescriptionChange();
         this.#setConfirmedAccount();
+        this.#onDescriptionChange();
+        if (this.#isAccountConfirmed) {
+            this.selectAccount(this.#confirmedAccount);
+        }
     }
 
     /**
@@ -320,7 +323,6 @@ class DescriptionEditor {
         } else {
             this.#confirmedAccount = null;
         }
-        this.selectAccount(this.#confirmedAccount);
     }
 
     /**
