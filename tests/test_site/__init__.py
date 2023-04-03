@@ -22,7 +22,7 @@ import typing as t
 from secrets import token_urlsafe
 
 import click
-from flask import Flask, Blueprint, render_template
+from flask import Flask, Blueprint, render_template, redirect, Response
 from flask.cli import with_appcontext
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
@@ -81,6 +81,9 @@ def create_app(is_testing: bool = False) -> Flask:
         def can_admin(self) -> bool:
             return auth.current_user() is not None \
                 and auth.current_user().username == "admin"
+
+        def unauthorized(self) -> Response:
+            return redirect("/login")
 
         @property
         def cls(self) -> t.Type[auth.User]:

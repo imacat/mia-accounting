@@ -23,7 +23,7 @@ import typing as t
 from abc import ABC, abstractmethod
 
 import sqlalchemy as sa
-from flask import g
+from flask import g, Response
 from flask_sqlalchemy.model import Model
 
 T = t.TypeVar("T", bound=Model)
@@ -57,6 +57,17 @@ class UserUtilityInterface(t.Generic[T], ABC):
 
         :return: True if the currently logged-in user can administrate the
             accounting settings, or False otherwise.
+        """
+
+    @abstractmethod
+    def unauthorized(self) -> Response | None:
+        """Returns the response to require the user to log in.
+
+        This may be a redirection to the login page, or an HTTP 401
+        Unauthorized response for HTTP Authentication.  If this returns None,
+        an HTTP 403 Forbidden response is return to the user.
+
+        :return: The response to require the user to log in.
         """
 
     @property
