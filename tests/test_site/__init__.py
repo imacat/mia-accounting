@@ -30,9 +30,13 @@ from flask_wtf import CSRFProtect
 from sqlalchemy import Column
 
 bp: Blueprint = Blueprint("home", __name__)
+"""The global blueprint."""
 babel_js: BabelJS = BabelJS()
+"""The Babel JavaScript instance."""
 csrf: CSRFProtect = CSRFProtect()
+"""The CSRF protector."""
 db: SQLAlchemy = SQLAlchemy()
+"""The database instance."""
 
 
 def create_app(is_testing: bool = False) -> Flask:
