@@ -317,8 +317,15 @@ class JournalEntryLineItemEditor {
      * Saves the description from the description editor.
      *
      * @param description {string} the description
+     * @param account {DescriptionEditorAccount|null} the suggested account
      */
-    saveDescription(description) {
+    saveDescription(description, account = null) {
+        if (account !== null) {
+            this.#accountControl.classList.add("accounting-not-empty");
+            this.account = account.copy();
+            this.#accountText.innerText = account.text;
+            this.#validateAccount();
+        }
         if (description === "") {
             this.#descriptionControl.classList.remove("accounting-not-empty");
         } else {
@@ -328,20 +335,6 @@ class JournalEntryLineItemEditor {
         this.#descriptionText.innerText = description;
         this.#validateDescription();
         bootstrap.Modal.getOrCreateInstance(this.modal).show();
-    }
-
-    /**
-     * Saves the description with the suggested account from the description editor.
-     *
-     * @param description {string} the description
-     * @param account {DescriptionEditorAccount} the suggested account
-     */
-    saveDescriptionWithAccount(description, account) {
-        this.#accountControl.classList.add("accounting-not-empty");
-        this.account = account.copy();
-        this.#accountText.innerText = account.text;
-        this.#validateAccount();
-        this.saveDescription(description)
     }
 
     /**

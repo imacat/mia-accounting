@@ -263,11 +263,7 @@ class DescriptionEditor {
      */
     #submit() {
         bootstrap.Modal.getOrCreateInstance(this.#modal).hide();
-        if (this.#selectedAccount !== null) {
-            this.lineItemEditor.saveDescriptionWithAccount(this.description.value, this.#selectedAccount);
-        } else {
-            this.lineItemEditor.saveDescription(this.description.value);
-        }
+        this.lineItemEditor.saveDescription(this.description.value, this.#selectedAccount);
     }
 
     /**
