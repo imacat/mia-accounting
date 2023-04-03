@@ -194,10 +194,10 @@ class OriginalLineItemSelector {
 class OriginalLineItem {
 
     /**
-     * The original line item selector
-     * @type {OriginalLineItemSelector}
+     * The journal entry form
+     * @type {JournalEntryForm}
      */
-    #selector;
+    #form;
 
     /**
      * The element
@@ -278,7 +278,7 @@ class OriginalLineItem {
      * @param element {HTMLLIElement} the element
      */
     constructor(selector, element) {
-        this.#selector = selector;
+        this.#form = selector.lineItemEditor.form;
         this.#element = element;
         this.id = element.dataset.id;
         this.date = element.dataset.date;
@@ -291,7 +291,7 @@ class OriginalLineItem {
         this.netBalanceText = document.getElementById(`accounting-original-line-item-selector-option-${this.id}-net-balance`);
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
-        this.#element.onclick = () => this.#selector.lineItemEditor.saveOriginalLineItem(this);
+        this.#element.onclick = () => selector.lineItemEditor.saveOriginalLineItem(this);
     }
 
     /**
@@ -332,7 +332,7 @@ class OriginalLineItem {
      */
     isMatched(debitCredit, currencyCode, query = null) {
         return this.netBalance.greaterThan(0)
-            && this.date <= this.#selector.lineItemEditor.form.date
+            && this.date <= this.#form.date
             && this.#isDebitCreditMatched(debitCredit)
             && this.#currencyCode === currencyCode
             && this.#isQueryMatched(query);
