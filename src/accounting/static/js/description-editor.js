@@ -199,7 +199,7 @@ class DescriptionEditor {
      *
      */
     #onDescriptionChange() {
-        this.#reset();
+        this.#resetTabPlanes();
         this.description = this.description.trim();
         for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
             if (tabPlane.populate()) {
@@ -210,10 +210,10 @@ class DescriptionEditor {
     }
 
     /**
-     * Resets the description editor.
+     * Resets the tab planes.
      *
      */
-    #reset() {
+    #resetTabPlanes() {
         for (const tabPlane of Object.values(this.tabPlanes)) {
             tabPlane.reset();
         }
