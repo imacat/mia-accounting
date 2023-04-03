@@ -32,7 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 const no = document.getElementById(`accounting-order-${accounts[i].dataset.id}-no`);
                 const code = document.getElementById(`accounting-order-${accounts[i].dataset.id}-code`);
                 no.value = String(i + 1);
-                code.innerText = `${list.dataset.baseCode}-${`000${i + 1}`.slice(-3)}`;
+                const zeroPaddedNo = `000${no.value}`.slice(-3)
+                code.innerText = `${list.dataset.baseCode}-${zeroPaddedNo}`;
             }
         };
         initializeDragAndDropReordering(list, onReorder);
