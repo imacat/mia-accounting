@@ -72,8 +72,8 @@ def get_selectable_original_line_items(
     line_items: list[JournalEntryLineItem] = JournalEntryLineItem.query\
         .filter(JournalEntryLineItem.id.in_({x for x in net_balances}))\
         .join(JournalEntry)\
-        .order_by(JournalEntry.date, JournalEntryLineItem.is_debit,
-                  JournalEntryLineItem.no)\
+        .order_by(JournalEntry.date, JournalEntry.no,
+                  JournalEntryLineItem.is_debit, JournalEntryLineItem.no)\
         .options(selectinload(JournalEntryLineItem.currency),
                  selectinload(JournalEntryLineItem.account),
                  selectinload(JournalEntryLineItem.journal_entry)).all()
