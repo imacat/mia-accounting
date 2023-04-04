@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * original-line-item-selector.js: The JavaScript for the original line item selector
  */
 

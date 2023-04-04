@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('../../src/'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Mia! Accounting Flask'
+project = 'Mia! Accounting'
 copyright = '2023, imacat'
 author = 'imacat'
 release = '0.10.0'

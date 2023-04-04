@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * account-order.js: The JavaScript for the account order
  */
 

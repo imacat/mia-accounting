@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * drag-and-drop-reorder.js: The JavaScript for the reorder a list with drag-and-drop
  */
 

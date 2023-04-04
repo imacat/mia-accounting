@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * period-chooser.js: The JavaScript for the period chooser
  */
 

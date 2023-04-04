@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * currency-form.js: The JavaScript for the currency form
  */
 

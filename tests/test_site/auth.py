@@ -1,4 +1,4 @@
-# The Mia! Accounting Flask Demonstration Website.
+# The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/27
 
 #  Copyright (c) 2023 imacat.
@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The authentication for the Mia! Accounting Flask demonstration website.
+"""The authentication for the Mia! Accounting demonstration website.
 
 """
 from flask import Blueprint, render_template, Flask, redirect, url_for, \

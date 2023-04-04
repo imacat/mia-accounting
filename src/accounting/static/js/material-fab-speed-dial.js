@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * material-fab-speed-dial.js: The JavaScript for the speed dial for the material floating buttons
  */
 

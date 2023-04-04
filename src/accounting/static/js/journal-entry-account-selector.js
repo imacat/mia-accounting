@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * journal-entry-account-selector.js: The JavaScript for the account selector of the journal entry form
  */
 

@@ -1,12 +1,12 @@
-=====================
-Mia! Accounting Flask
-=====================
+===============
+Mia! Accounting
+===============
 
 
 Description
 ===========
 
-This is the Mia! Accounting Flask project.  It is an accounting
+This is the Mia! Accounting project.  It is an accounting
 module for the Flask_ applications.
 
 
@@ -14,11 +14,11 @@ Install
 =======
 
 Install the latest source from the
-`Mia! Accounting Flask repository`_.
+`Mia! Accounting repository`_.
 
 ::
 
-    pip install git+https://gitea.imacat.idv.tw/imacat/mia-accounting-flask.git
+    pip install git+https://github.com/imacat/mia-accounting.git
 
 
 Copyright
@@ -47,4 +47,4 @@ Authors
 | 2023/1/27
 
 .. _Flask: https://flask.palletsprojects.com
-.. _Mia! Accounting Flask repository: https://gitea.imacat.idv.tw/imacat/mia-accounting-flask
+.. _Mia! Accounting repository: https://github.com/imacat/mia-accounting

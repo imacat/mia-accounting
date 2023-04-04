@@ -1,4 +1,4 @@
-# Chinese (Traditional) translations for the Mia! Accounting Flask
+# Chinese (Traditional) translations for the Mia! Accounting
 # Demonstration website.
 # Copyright (C) 2023 imacat
 # This file is distributed under the same license as the Mia! Accounting
@@ -7,7 +7,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Mia! Accounting Flask Demonstration 0.0.0\n"
+"Project-Id-Version: Mia! Accounting Demonstration 0.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
 "POT-Creation-Date: 2023-03-24 08:32+0800\n"
 "PO-Revision-Date: 2023-03-24 08:33+0800\n"

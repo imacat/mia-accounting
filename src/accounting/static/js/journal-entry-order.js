@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * journal-entry-order.js: The JavaScript for the journal entry order
  */
 

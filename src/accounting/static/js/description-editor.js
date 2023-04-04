@@ -1,4 +1,4 @@
-/* The Mia! Accounting Flask Project
+/* The Mia! Accounting Project
  * description-editor.js: The JavaScript for the description editor
  */
 

@@ -1,4 +1,4 @@
-# The Mia! Accounting Flask Project.
+# The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/22
 
 #  Copyright (c) 2023 imacat.

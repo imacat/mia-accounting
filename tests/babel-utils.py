@@ -1,5 +1,5 @@
 #! env python3
-# The Mia! Accounting Flask Project.
+# The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/28
 
 #  Copyright (c) 2023 imacat.
