@@ -13,12 +13,21 @@ module for the Flask_ applications.
 Install
 =======
 
-Install the latest source from the
-`Mia! Accounting repository`_.
+Install ``mia-accounting`` with ``pip``.
 
 ::
 
-    pip install git+https://github.com/imacat/mia-accounting.git
+    pip install mia-accounting
+
+
+Usage
+=====
+
+This needs to be done.  Currently, you can refer to the test site
+located in the test directory on the `Mia! Accounting repository`_.
+
+The test site is running as the
+`live demonstration for Mia! Accounting`_.
 
 
 Copyright
@@ -48,3 +57,4 @@ Authors
 
 .. _Flask: https://flask.palletsprojects.com
 .. _Mia! Accounting repository: https://github.com/imacat/mia-accounting
+.. _live demonstration for Mia! Accounting: https://accounting.imacat.idv.tw
