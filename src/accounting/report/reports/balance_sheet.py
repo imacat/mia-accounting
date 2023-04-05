@@ -137,6 +137,7 @@ class AccountCollector:
             .join(JournalEntry).join(Account)\
             .filter(*conditions)\
             .group_by(Account.id, Account.base_code, Account.no)\
+            .having(balance_func != 0)\
             .order_by(Account.base_code, Account.no)
         account_balances: list[sa.Row] \
             = db.session.execute(select_balance).all()
