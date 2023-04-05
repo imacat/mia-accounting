@@ -15,6 +15,51 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+[project]
+name = "mia-accounting"
+version = "0.11.1"
+description = "A Flask accounting module."
+readme = "README.rst"
+requires-python = ">=3.11"
+authors = [
+    {name = "imacat", email = "imacat@mail.imacat.idv.tw"},
+]
+keywords = ["mia", "accounting", "flask"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Framework :: Flask",
+    "Topic :: Office/Business :: Financial :: Accounting",
+]
+dependencies = [
+    "flask",
+    "Flask-SQLAlchemy",
+    "Flask-WTF",
+    "Flask-Babel >= 3",
+    "Flask-Babel-JS",
+]
+
+[project.optional-dependencies]
+test = [
+    "unittest",
+    "httpx",
+    "OpenCC",
+]
+
+[project.urls]
+"Documentation" = "https://mia-accounting.readthedocs.io"
+"Repository" = "https://github.com/imacat/mia-accounting"
+"Bug Tracker" = "https://github.com/imacat/mia-accounting/issues"
+"Demonstration" = "https://accounting.imacat.idv.tw"
+
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+    "babel.cfg",
+    "*.pot",
+    "*.po",
+]

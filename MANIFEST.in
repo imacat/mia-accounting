@@ -15,17 +15,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+recursive-include src/accounting/static *
 exclude src/accounting/static/js/dummy.js
-include src/accounting/translations/*
-include src/accounting/translations/*/LC_MESSAGES/*
-include docs/*
-include docs/source/*
-include docs/source/_static/*
-include docs/source/_templates/*
-include tests/*
+recursive-include src/accounting/templates *
+recursive-include src/accounting/translations *
+recursive-include src/accounting/data *
+recursive-include docs *
+recursive-exclude docs/build *
+recursive-include tests *
 exclude tests/test_temp.py
-include tests/test_site/*
-include tests/test_site/static/*
-include tests/test_site/templates/*
-include tests/test_site/translations/*
-include tests/test_site/translations/*/LC_MESSAGES/*
+recursive-exclude tests *.pyc
+recursive-exclude tests/instance *
