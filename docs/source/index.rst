@@ -10,6 +10,10 @@ Welcome to Mia! Accounting's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   intro
+   accounting
+   examples
+
 
 
 Indices and tables

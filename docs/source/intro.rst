@@ -1,10 +1,5 @@
-===============
-Mia! Accounting
-===============
-
-
-Description
-===========
+Introduction
+============
 
 *Mia! Accounting* is an accounting module for Flask_ applications.
 It implements `double-entry bookkeeping`_, and generates the following
@@ -21,7 +16,7 @@ You may try the `Mia! Accounting live demonstration`_.
 
 
 History
-=======
+-------
 
 I created my own private accounting application in Perl_/mod_perl_ in
 2007, as part of my personal website.  The first revision was made
@@ -60,7 +55,7 @@ Flask in 2023.
 
 
 Installation
-============
+------------
 
 Install *Mia! Accounting* with ``pip``:
 
@@ -73,7 +68,7 @@ You may also download the from the `PyPI project page`_ or the
 
 
 Prerequisites
-=============
+-------------
 
 You need a running Flask application with database user login.
 The primary key of the user data model must be integer.
@@ -88,71 +83,21 @@ download it locally or use CDN_.
 
 
 Configuration
-=============
+-------------
 
 You need to pass the Flask *app* and an implementation of
-``UserUtilityInterface`` to the ``init_app`` function.
-``UserUtilityInterface`` contains everything *Mia! Accounting* needs.
+:py:class:`accounting.utils.user.UserUtilityInterface` to the
+:py:func:`accounting.init_app` function.  ``UserUtilityInterface``
+contains everything *Mia! Accounting* needs.
 
-The following is an example configuration for *Mia! Accounting*.
-
-::
-
-    from flask import Response, redirect
-    from .auth import current_user()
-    from .modules import User
-
-    def create_app(test_config=None) -> Flask:
-        app: Flask = Flask(__name__)
-
-        ... (Configuration of SQLAlchemy, CSRF, Babel_JS, ... etc) ...
-
-        import accounting
-
-        class UserUtilities(accounting.UserUtilityInterface[User]):
-
-            def can_view(self) -> bool:
-                return True
-
-            def can_edit(self) -> bool:
-                return "editor" in current_user().roles
-
-            def can_admin(self) -> bool:
-                return current_user().is_admin
-
-            def unauthorized(self) -> Response:
-                return redirect("/login")
-
-            @property
-            def cls(self) -> t.Type[User]:
-                return User
-
-            @property
-            def pk_column(self) -> Column:
-                return User.id
-
-            @property
-            def current_user(self) -> User | None:
-                return current_user()
-
-            def get_by_username(self, username: str) -> User | None:
-                return User.query.filter(User.username == username).first()
-
-            def get_pk(self, user: User) -> int:
-                return user.id
-
-        accounting.init_app(app, UserUtils())
-
-        ... (Any other configuration) ...
-
-        return app
+See an example in :ref:`example-userutils`.
 
 
 Database Initialization
-=======================
+-----------------------
 
 After the configuration, you need to run
-`flask_sqlalchemy.SQLAlchemy.create_all`_ to create the
+:py:meth:`flask_sqlalchemy.SQLAlchemy.create_all` to create the
 database tables that *Mia! Accounting* uses.
 
 *Mia! Accounting* adds three console commands:
@@ -172,7 +117,7 @@ two commands.
 
 
 Navigation Menu
-===============
+---------------
 
 Include the navigation menu in the `Bootstrap navigation bar`_ in your
 base template:
@@ -197,7 +142,7 @@ Check your Flask application and see how it works.
 
 
 Test Site and Live Demonstration
-================================
+--------------------------------
 
 You may find a working example in the `test site`_ in the
 `source distribution`_.  It is the simplest website that works with
@@ -209,35 +154,9 @@ test site.
 
 
 Documentation
-=============
+-------------
 
 Refer to the `documentation on Read the Docs`_.
-
-
-Copyright
-=========
-
- Copyright (c) 2023 imacat.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-
-
-Authors
-=======
-
-| imacat
-| imacat@mail.imacat.idv.tw
-| 2023/1/27
 
 
 .. _Flask: https://flask.palletsprojects.com
@@ -262,7 +181,6 @@ Authors
 .. _PyPI project page: https://pypi.org/project/mia-accounting
 .. _release page: https://github.com/imacat/mia-accounting/releases
 .. _Git repository: https://github.com/imacat/mia-accounting
-.. _flask_sqlalchemy.SQLAlchemy.create_all: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.create_all
 .. _Bootstrap navigation bar: https://getbootstrap.com/docs/5.3/components/navbar/
 .. _test site: https://github.com/imacat/mia-accounting/tree/main/tests/test_site
 .. _source distribution: https://pypi.org/project/mia-accounting/#files
