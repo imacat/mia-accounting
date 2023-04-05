@@ -77,6 +77,7 @@ def get_selectable_original_line_items(
         .options(selectinload(JournalEntryLineItem.currency),
                  selectinload(JournalEntryLineItem.account),
                  selectinload(JournalEntryLineItem.journal_entry)).all()
+    line_items.reverse()
     for line_item in line_items:
         line_item.net_balance = line_item.amount \
             if net_balances[line_item.id] is None \
