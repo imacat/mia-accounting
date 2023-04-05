@@ -47,7 +47,6 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     init_user_utils(user_utils)
 
     bp: Blueprint = Blueprint("accounting", __name__,
-                              url_prefix=url_prefix,
                               template_folder="templates",
                               static_folder="static")
 
@@ -89,4 +88,4 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     from . import option
     option.init_app(bp)
 
-    app.register_blueprint(bp)
+    app.register_blueprint(bp, url_prefix=url_prefix)
