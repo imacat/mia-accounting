@@ -30,6 +30,12 @@ The test site is running as the
 `live demonstration for Mia! Accounting`_.
 
 
+Documentation
+=============
+
+Refer to the `Mia! Accounting documentation`_.
+
+
 Copyright
 =========
 
@@ -58,3 +64,4 @@ Authors
 .. _Flask: https://flask.palletsprojects.com
 .. _Mia! Accounting repository: https://github.com/imacat/mia-accounting
 .. _live demonstration for Mia! Accounting: https://accounting.imacat.idv.tw
+.. _Mia! Accounting documentation: https://mia-accounting.readthedocs.io
