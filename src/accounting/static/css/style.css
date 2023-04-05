@@ -316,6 +316,10 @@ a.accounting-report-table-row {
 }
 
 /* The description editor */
+.accounting-description-editor-buttons {
+    max-height: 7rem;
+    overflow-y: scroll;
+}
 .accounting-description-editor-buttons .btn {
     margin-bottom: 0.3rem;
 }
