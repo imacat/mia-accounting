@@ -68,9 +68,9 @@ class ReportChooser:
         """The title of the current report."""
         self.is_search: bool = active_report == ReportType.SEARCH
         """Whether the current report is the search page."""
-        self.__reports.append(self.__journal)
-        self.__reports.append(self.__ledger)
         self.__reports.append(self.__income_expenses)
+        self.__reports.append(self.__ledger)
+        self.__reports.append(self.__journal)
         self.__reports.append(self.__trial_balance)
         self.__reports.append(self.__income_statement)
         self.__reports.append(self.__balance_sheet)
@@ -79,28 +79,6 @@ class ReportChooser:
                 self.current_report = report.title
         if self.is_search:
             self.current_report = gettext("Search")
-
-    @property
-    def __journal(self) -> OptionLink:
-        """Returns the journal.
-
-        :return: The journal.
-        """
-        return OptionLink(gettext("Journal"), journal_url(self.__period),
-                          self.__active_report == ReportType.JOURNAL,
-                          fa_icon="fa-solid fa-book")
-
-    @property
-    def __ledger(self) -> OptionLink:
-        """Returns the ledger.
-
-        :return: The ledger.
-        """
-        return OptionLink(gettext("Ledger"),
-                          ledger_url(self.__currency, self.__account,
-                                     self.__period),
-                          self.__active_report == ReportType.LEDGER,
-                          fa_icon="fa-solid fa-clipboard")
 
     @property
     def __income_expenses(self) -> OptionLink:
@@ -117,6 +95,28 @@ class ReportChooser:
                                               self.__period),
                           self.__active_report == ReportType.INCOME_EXPENSES,
                           fa_icon="fa-solid fa-money-bill-wave")
+
+    @property
+    def __ledger(self) -> OptionLink:
+        """Returns the ledger.
+
+        :return: The ledger.
+        """
+        return OptionLink(gettext("Ledger"),
+                          ledger_url(self.__currency, self.__account,
+                                     self.__period),
+                          self.__active_report == ReportType.LEDGER,
+                          fa_icon="fa-solid fa-clipboard")
+
+    @property
+    def __journal(self) -> OptionLink:
+        """Returns the journal.
+
+        :return: The journal.
+        """
+        return OptionLink(gettext("Journal"), journal_url(self.__period),
+                          self.__active_report == ReportType.JOURNAL,
+                          fa_icon="fa-solid fa-book")
 
     @property
     def __trial_balance(self) -> OptionLink:
