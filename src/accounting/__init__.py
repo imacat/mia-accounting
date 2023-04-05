@@ -84,7 +84,7 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     journal_entry.init_app(app, bp)
 
     from . import report
-    report.init_app(app, bp)
+    report.init_app(app, url_prefix)
 
     from . import option
     option.init_app(bp)

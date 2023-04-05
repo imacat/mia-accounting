@@ -17,14 +17,14 @@
 """The report management.
 
 """
-from flask import Flask, Blueprint
+from flask import Flask
 
 
-def init_app(app: Flask, bp: Blueprint) -> None:
+def init_app(app: Flask, url_prefix: str) -> None:
     """Initialize the application.
 
     :param app: The Flask application.
-    :param bp: The blueprint of the accounting application.
+    :param url_prefix: The URL prefix of the accounting application.
     :return: None.
     """
     from .converters import PeriodConverter, IncomeExpensesAccountConverter
@@ -32,4 +32,4 @@ def init_app(app: Flask, bp: Blueprint) -> None:
     app.url_map.converters["ieAccount"] = IncomeExpensesAccountConverter
 
     from .views import bp as report_bp
-    bp.register_blueprint(report_bp, url_prefix="/reports")
+    app.register_blueprint(report_bp, url_prefix=url_prefix)

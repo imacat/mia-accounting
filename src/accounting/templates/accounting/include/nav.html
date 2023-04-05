@@ -28,7 +28,7 @@ First written: 2023/1/26
     </span>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.report.") %} active {% endif %}" href="{{ url_for("accounting.report.default") }}">
+        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting-report.") %} active {% endif %}" href="{{ url_for("accounting-report.default") }}">
           <i class="fa-solid fa-book"></i>
           {{ A_("Reports") }}
         </a>

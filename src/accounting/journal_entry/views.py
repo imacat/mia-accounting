@@ -235,4 +235,4 @@ def __get_default_page_uri() -> str:
 
     :return: The URI for the default page.
     """
-    return url_for("accounting.report.default")
+    return url_for("accounting-report.default")

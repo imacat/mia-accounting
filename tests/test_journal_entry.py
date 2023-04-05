@@ -35,7 +35,7 @@ from testlib_journal_entry import NON_EMPTY_NOTE, EMPTY_NOTE, \
 
 PREFIX: str = "/accounting/journal-entries"
 """The URL prefix for the journal entry management."""
-RETURN_TO_URI: str = "/accounting/reports"
+RETURN_TO_URI: str = "/accounting"
 """The URL to return to after the operation."""
 
 
