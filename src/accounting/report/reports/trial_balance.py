@@ -191,6 +191,7 @@ class TrialBalance(BaseReport):
             .join(JournalEntry).join(Account)\
             .filter(*conditions)\
             .group_by(Account.id)\
+            .having(balance_func != 0)\
             .order_by(Account.base_code, Account.no)
         balances: list[sa.Row] = db.session.execute(select_balances).all()
         accounts: dict[int, Account] \
