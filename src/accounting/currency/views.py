@@ -34,6 +34,7 @@ from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_view, can_edit
 from accounting.utils.user import get_current_user_pk
 from .forms import CurrencyForm
+from .queries import get_currency_query
 
 bp: Blueprint = Blueprint("currency", __name__)
 """The view blueprint for the currency management."""
@@ -48,7 +49,6 @@ def list_currencies() -> str:
 
     :return: The currency list.
     """
-    from .queries import get_currency_query
     currencies: list[Currency] = get_currency_query()
     pagination: Pagination = Pagination[Currency](currencies)
     return render_template("accounting/currency/list.html",
