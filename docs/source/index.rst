@@ -13,6 +13,7 @@ Welcome to Mia! Accounting's documentation!
    intro
    accounting
    examples
+   history
 
 
 
