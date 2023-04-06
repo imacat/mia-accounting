@@ -70,7 +70,7 @@ The following is an example configuration for *Mia! Accounting*.
 
         import accounting
 
-        class UserUtilities(accounting.UserUtilityInterface[User]):
+        class UserUtils(accounting.UserUtilityInterface[User]):
 
             def can_view(self) -> bool:
                 return True
