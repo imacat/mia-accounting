@@ -52,7 +52,7 @@ Configuration
 =============
 
 You need to pass the Flask *app* and an implementation of
-``UserUtilityInterface`` to the ``init_app`` function.
+`UserUtilityInterface`_ to the `init_app`_ function.
 ``UserUtilityInterface`` contains everything *Mia! Accounting* needs.
 
 The following is an example configuration for *Mia! Accounting*.
@@ -122,8 +122,8 @@ database tables that *Mia! Accounting* uses.
 * ``accounting-init-accounts``
 * ``accounting-init-currencies``
 
-You need to run ``accounting-init-base`` first, and then the other
-two commands.
+After database tables are created, run
+``accounting-init-base`` first, and then the other two commands.
 
 ::
 
@@ -204,14 +204,16 @@ Authors
 .. _Flask: https://flask.palletsprojects.com
 .. _double-entry bookkeeping: https://en.wikipedia.org/wiki/Double-entry_bookkeeping
 .. _live demonstration: https://accounting.imacat.idv.tw
+.. _PyPI project page: https://pypi.org/project/mia-accounting
+.. _release page: https://github.com/imacat/mia-accounting/releases
+.. _Git repository: https://github.com/imacat/mia-accounting
+.. _CDN: https://en.wikipedia.org/wiki/Content_delivery_network
 .. _Bootstrap: https://getbootstrap.com
 .. _FontAwesome: https://fontawesome.com
 .. _Decimal.js: https://mikemcl.github.io/decimal.js
 .. _Tempus-Dominus: https://getdatepicker.com
-.. _CDN: https://en.wikipedia.org/wiki/Content_delivery_network
-.. _PyPI project page: https://pypi.org/project/mia-accounting
-.. _release page: https://github.com/imacat/mia-accounting/releases
-.. _Git repository: https://github.com/imacat/mia-accounting
+.. _UserUtilityInterface: https://mia-accounting.readthedocs.io/en/latest/accounting.utils.html#accounting.utils.user.UserUtilityInterface
+.. _init_app: https://mia-accounting.readthedocs.io/en/latest/accounting.html#accounting.init_app
 .. _flask_sqlalchemy.SQLAlchemy.create_all: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.create_all
 .. _Bootstrap navigation bar: https://getbootstrap.com/docs/5.3/components/navbar/
 .. _test site: https://github.com/imacat/mia-accounting/tree/main/tests/test_site
