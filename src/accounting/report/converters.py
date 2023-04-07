@@ -77,3 +77,29 @@ class CurrentAccountConverter(BaseConverter):
         :return: Its code.
         """
         return value.code
+
+
+class UnappliedAccountConverter(BaseConverter):
+    """The converter to convert the unapplied original line item account code
+    from and to the corresponding account in the routes."""
+
+    def to_python(self, value: str) -> Account:
+        """Converts an account code to an account.
+
+        :param value: The account code.
+        :return: The corresponding account.
+        """
+        account: Account | None = Account.find_by_code(value)
+        if account is None:
+            abort(404)
+        if not account.is_need_offset:
+            abort(404)
+        return account
+
+    def to_url(self, value: Account) -> str:
+        """Converts an account to account code.
+
+        :param value: The account.
+        :return: Its code.
+        """
+        return value.code

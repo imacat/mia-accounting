@@ -27,9 +27,11 @@ def init_app(app: Flask, url_prefix: str) -> None:
     :param url_prefix: The URL prefix of the accounting application.
     :return: None.
     """
-    from .converters import PeriodConverter, CurrentAccountConverter
+    from .converters import PeriodConverter, CurrentAccountConverter, \
+        UnappliedAccountConverter
     app.url_map.converters["period"] = PeriodConverter
     app.url_map.converters["currentAccount"] = CurrentAccountConverter
+    app.url_map.converters["unappliedAccount"] = UnappliedAccountConverter
 
     from .views import bp as report_bp
     app.register_blueprint(report_bp, url_prefix=url_prefix)

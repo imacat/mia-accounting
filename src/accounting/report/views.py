@@ -286,7 +286,7 @@ def __get_balance_sheet(currency: Currency, period: Period) \
     return report.html()
 
 
-@bp.get("unapplied/<account:account>", endpoint="unapplied")
+@bp.get("unapplied/<unappliedAccount:account>", endpoint="unapplied")
 @has_permission(can_view)
 def get_unapplied(account: Account) -> str | Response:
     """Returns the unapplied original line items.
