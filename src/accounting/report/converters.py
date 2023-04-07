@@ -51,9 +51,9 @@ class PeriodConverter(BaseConverter):
         return value.spec
 
 
-class IncomeExpensesAccountConverter(BaseConverter):
-    """The converter to convert the income and expenses log account code from
-    and to the corresponding account in the routes."""
+class CurrentAccountConverter(BaseConverter):
+    """The converter to convert the current account code from and to the
+    corresponding account in the routes."""
 
     def to_python(self, value: str) -> CurrentAccount:
         """Converts an account code to an account.

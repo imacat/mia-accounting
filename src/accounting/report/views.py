@@ -125,7 +125,7 @@ def __get_ledger(currency: Currency, account: Account, period: Period) \
     return report.html()
 
 
-@bp.get("income-expenses/<currency:currency>/<ieAccount:account>",
+@bp.get("income-expenses/<currency:currency>/<currentAccount:account>",
         endpoint="income-expenses-default")
 @has_permission(can_view)
 def get_default_income_expenses(currency: Currency, account: CurrentAccount) \
@@ -139,9 +139,8 @@ def get_default_income_expenses(currency: Currency, account: CurrentAccount) \
     return __get_income_expenses(currency, account, get_period())
 
 
-@bp.get(
-    "income-expenses/<currency:currency>/<ieAccount:account>/<period:period>",
-    endpoint="income-expenses")
+@bp.get("income-expenses/<currency:currency>/<currentAccount:account>/"
+        "<period:period>", endpoint="income-expenses")
 @has_permission(can_view)
 def get_income_expenses(currency: Currency, account: CurrentAccount,
                         period: Period) -> str | Response:
