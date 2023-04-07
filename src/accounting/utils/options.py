@@ -99,12 +99,12 @@ class Options:
         self.__set_option("default_currency_code", value)
 
     @property
-    def default_currency_text(self) -> str:
+    def default_currency(self) -> Currency:
         """Returns the text of the default currency code.
 
         :return: The text of the default currency code.
         """
-        return str(db.session.get(Currency, self.default_currency_code))
+        return db.session.get(Currency, self.default_currency_code)
 
     @property
     def default_ie_account_code(self) -> str:
