@@ -77,6 +77,8 @@ class CSVRow(BaseCSVRow):
         """Constructs a row in the CSV.
 
         :param journal_entry_date: The journal entry date.
+        :param currency: The currency.
+        :param account: The account.
         :param description: The description.
         :param debit: The debit amount.
         :param credit: The credit amount.
@@ -116,6 +118,7 @@ class PageParams(BasePageParams):
         """Constructs the HTML page parameters.
 
         :param period: The period.
+        :param pagination: The pagination.
         :param line_items: The line items.
         """
         self.period: Period = period
