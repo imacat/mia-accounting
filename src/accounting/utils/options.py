@@ -100,9 +100,9 @@ class Options:
 
     @property
     def default_currency(self) -> Currency:
-        """Returns the text of the default currency code.
+        """Returns the default currency.
 
-        :return: The text of the default currency code.
+        :return: The default currency.
         """
         return db.session.get(Currency, self.default_currency_code)
 
@@ -125,9 +125,9 @@ class Options:
 
     @property
     def default_ie_account(self) -> CurrentAccount:
-        """Returns the default account code for the income and expenses log.
+        """Returns the default account for the income and expenses log.
 
-        :return: The default account code for the income and expenses log.
+        :return: The default account for the income and expenses log.
         """
         if self.default_ie_account_code \
                 == CurrentAccount.CURRENT_AL_CODE:
