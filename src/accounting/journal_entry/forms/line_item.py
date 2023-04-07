@@ -350,10 +350,7 @@ class LineItemForm(FlaskForm):
                     .order_by(JournalEntry.date, JournalEntry.no,
                               JournalEntryLineItem.no)\
                     .options(selectinload(JournalEntryLineItem.journal_entry),
-                             selectinload(JournalEntryLineItem.account),
-                             selectinload(JournalEntryLineItem.offsets)
-                             .selectinload(
-                                 JournalEntryLineItem.journal_entry)).all()
+                             selectinload(JournalEntryLineItem.account)).all()
             setattr(self, "__offsets", get_offsets())
         return getattr(self, "__offsets")
 
