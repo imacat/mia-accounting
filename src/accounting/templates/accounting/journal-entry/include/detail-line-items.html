@@ -50,10 +50,10 @@ First written: 2023/3/14
                   {% endfor %}
                 </ul>
               </div>
-              {% if line_item.balance %}
+              {% if line_item.net_balance %}
                 <div class="d-flex justify-content-between">
                   <div>{{ A_("Net balance") }}</div>
-                  <div>{{ line_item.balance|accounting_format_amount }}</div>
+                  <div>{{ line_item.net_balance|accounting_format_amount }}</div>
                 </div>
               {% else %}
                 <div class="d-flex justify-content-between">
