@@ -124,17 +124,6 @@ class Options:
         self.__set_option("default_ie_account", value)
 
     @property
-    def default_ie_account_code_text(self) -> str:
-        """Returns the text of the default currency code.
-
-        :return: The text of the default currency code.
-        """
-        code: str = self.default_ie_account_code
-        if code == CurrentAccount.CURRENT_AL_CODE:
-            return str(CurrentAccount.current_assets_and_liabilities())
-        return str(CurrentAccount(Account.find_by_code(code)))
-
-    @property
     def default_ie_account(self) -> CurrentAccount:
         """Returns the default account code for the income and expenses log.
 
