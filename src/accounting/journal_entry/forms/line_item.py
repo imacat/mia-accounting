@@ -31,7 +31,7 @@ from accounting import db
 from accounting.forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
     IsCreditAccount
 from accounting.locale import lazy_gettext
-from accounting.models import Account, JournalEntryLineItem
+from accounting.models import Account, JournalEntry, JournalEntryLineItem
 from accounting.template_filters import format_amount
 from accounting.utils.cast import be
 from accounting.utils.random_id import new_id
@@ -344,9 +344,11 @@ class LineItemForm(FlaskForm):
             def get_offsets() -> list[JournalEntryLineItem]:
                 if not self.is_need_offset or self.id.data is None:
                     return []
-                return JournalEntryLineItem.query\
+                return JournalEntryLineItem.query.join(JournalEntry)\
                     .filter(JournalEntryLineItem.original_line_item_id
                             == self.id.data)\
+                    .order_by(JournalEntry.date, JournalEntry.no,
+                              JournalEntryLineItem.no)\
                     .options(selectinload(JournalEntryLineItem.journal_entry),
                              selectinload(JournalEntryLineItem.account),
                              selectinload(JournalEntryLineItem.offsets)
