@@ -30,6 +30,7 @@ from wtforms.validators import Optional
 from accounting import db
 from accounting.forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
     IsCreditAccount
+from accounting.journal_entry.utils.offset_alias import offset_alias
 from accounting.locale import lazy_gettext
 from accounting.models import Account, JournalEntry, JournalEntryLineItem
 from accounting.template_filters import format_amount
@@ -127,10 +128,8 @@ class KeepAccountWhenHavingOffset:
         assert isinstance(form, LineItemForm)
         if field.data is None or form.id.data is None:
             return
-        line_item: JournalEntryLineItem | None = db.session\
-            .query(JournalEntryLineItem)\
-            .filter(JournalEntryLineItem.id == form.id.data)\
-            .options(selectinload(JournalEntryLineItem.offsets)).first()
+        line_item: JournalEntryLineItem | None \
+            = db.session.get(JournalEntryLineItem, form.id.data)
         if line_item is None or len(line_item.offsets) == 0:
             return
         if field.data != line_item.account_code:
