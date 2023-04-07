@@ -23,6 +23,7 @@ from flask import abort
 from sqlalchemy.orm import selectinload
 from werkzeug.routing import BaseConverter
 
+from accounting import db
 from accounting.models import JournalEntry, JournalEntryLineItem
 from accounting.utils.journal_entry_types import JournalEntryType
 
@@ -37,13 +38,7 @@ class JournalEntryConverter(BaseConverter):
         :param value: The journal entry ID.
         :return: The corresponding journal entry.
         """
-        journal_entry: JournalEntry | None = JournalEntry.query\
-            .join(JournalEntryLineItem)\
-            .filter(JournalEntry.id == value)\
-            .options(selectinload(JournalEntry.line_items)
-                     .selectinload(JournalEntryLineItem.offsets)
-                     .selectinload(JournalEntryLineItem.journal_entry))\
-            .first()
+        journal_entry: JournalEntry | None = db.session.get(JournalEntry, value)
         if journal_entry is None:
             abort(404)
         return journal_entry
