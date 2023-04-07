@@ -28,8 +28,8 @@ from .period import Period, get_period
 
 
 class PeriodConverter(BaseConverter):
-    """The supplier converter to convert the period specification from and to
-    the corresponding period in the routes."""
+    """The converter to convert the period specification from and to the
+    corresponding period in the routes."""
 
     def to_python(self, value: str) -> Period:
         """Converts a period specification to a period.
@@ -52,8 +52,8 @@ class PeriodConverter(BaseConverter):
 
 
 class IncomeExpensesAccountConverter(BaseConverter):
-    """The supplier converter to convert the income and expenses log pseudo
-    account code from and to the corresponding pseudo account in the routes."""
+    """The converter to convert the income and expenses log account code from
+    and to the corresponding account in the routes."""
 
     def to_python(self, value: str) -> CurrentAccount:
         """Converts an account code to an account.
