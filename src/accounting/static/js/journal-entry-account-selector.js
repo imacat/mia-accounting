@@ -123,7 +123,7 @@ class JournalEntryAccountSelector {
                 option.setShown(false);
             }
         }
-        if (!isAnyMatched) {
+        if (!isAnyMatched && this.#isShowMore) {
             this.#optionList.classList.add("d-none");
             this.#queryNoResult.classList.remove("d-none");
         } else {
