@@ -30,7 +30,6 @@ from wtforms.validators import Optional
 from accounting import db
 from accounting.forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
     IsCreditAccount
-from accounting.journal_entry.utils.offset_alias import offset_alias
 from accounting.locale import lazy_gettext
 from accounting.models import Account, JournalEntry, JournalEntryLineItem
 from accounting.template_filters import format_amount
