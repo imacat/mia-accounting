@@ -660,12 +660,8 @@ class JournalEntryLineItem(db.Model):
                                       nullable=True)
     """The ID of the original line item."""
     original_line_item = db.relationship("JournalEntryLineItem",
-                                         back_populates="offsets",
                                          remote_side=id, passive_deletes=True)
     """The original line item."""
-    offsets = db.relationship("JournalEntryLineItem",
-                              back_populates="original_line_item")
-    """The offset items."""
     currency_code = db.Column(db.String,
                               db.ForeignKey(Currency.code, onupdate="CASCADE"),
                               nullable=False)
@@ -757,6 +753,21 @@ class JournalEntryLineItem(db.Model):
         :return: None.
         """
         setattr(self, "__net_balance", net_balance)
+
+    @property
+    def offsets(self) -> list[t.Self]:
+        """Returns the offset items.
+
+        :return: The offset items.
+        """
+        if not hasattr(self, "__offsets"):
+            cls: t.Type[t.Self] = self.__class__
+            offsets: list[t.Self] = cls.query.join(JournalEntry)\
+                .filter(JournalEntryLineItem.original_line_item_id == self.id)\
+                .order_by(JournalEntry.date, JournalEntry.no,
+                          cls.is_debit, cls.no).all()
+            setattr(self, "__offsets", offsets)
+        return getattr(self, "__offsets")
 
     @property
     def query_values(self) -> list[str]:
