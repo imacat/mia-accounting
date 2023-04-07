@@ -25,7 +25,7 @@ from sqlalchemy.orm import selectinload
 from accounting import db
 from accounting.models import Account, JournalEntry, JournalEntryLineItem
 from accounting.utils.cast import be
-from .offset_alias import offset_alias
+from accounting.utils.offset_alias import offset_alias
 
 
 def get_selectable_original_line_items(

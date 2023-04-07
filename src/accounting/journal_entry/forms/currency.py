@@ -28,13 +28,12 @@ from wtforms.validators import DataRequired
 
 from accounting import db
 from accounting.forms import CurrencyExists
-from accounting.journal_entry.utils.offset_alias import offset_alias
 from accounting.locale import lazy_gettext
 from accounting.models import JournalEntryLineItem
 from accounting.utils.cast import be
+from accounting.utils.offset_alias import offset_alias
 from accounting.utils.strip_text import strip_text
 from .line_item import LineItemForm, CreditLineItemForm, DebitLineItemForm
-
 
 CURRENCY_REQUIRED: DataRequired = DataRequired(
     lazy_gettext("Please select the currency."))

@@ -19,9 +19,9 @@
 """
 import sqlalchemy as sa
 
-from accounting.journal_entry.utils.offset_alias import offset_alias
 from accounting.models import Account, JournalEntryLineItem
 from accounting.utils.cast import be
+from accounting.utils.offset_alias import offset_alias
 
 
 def get_accounts_with_unapplied() -> list[Account]:

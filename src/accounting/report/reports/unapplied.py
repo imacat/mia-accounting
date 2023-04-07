@@ -25,7 +25,6 @@ from flask import render_template, Response
 from sqlalchemy.orm import selectinload
 
 from accounting import db
-from accounting.journal_entry.utils.offset_alias import offset_alias
 from accounting.locale import gettext
 from accounting.models import Account, JournalEntry, \
     JournalEntryLineItem
@@ -38,6 +37,7 @@ from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.unapplied import get_accounts_with_unapplied
 from accounting.report.utils.urls import unapplied_url
 from accounting.utils.cast import be
+from accounting.utils.offset_alias import offset_alias
 from accounting.utils.pagination import Pagination
 
 
