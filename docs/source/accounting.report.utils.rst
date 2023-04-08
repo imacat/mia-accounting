@@ -52,6 +52,14 @@ accounting.report.utils.report\_type module
    :undoc-members:
    :show-inheritance:
 
+accounting.report.utils.unapplied module
+----------------------------------------
+
+.. automodule:: accounting.report.utils.unapplied
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.report.utils.urls module
 -----------------------------------
 

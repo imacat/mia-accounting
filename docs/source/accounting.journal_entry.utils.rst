@@ -20,14 +20,6 @@ accounting.journal\_entry.utils.description\_editor module
    :undoc-members:
    :show-inheritance:
 
-accounting.journal\_entry.utils.offset\_alias module
-----------------------------------------------------
-
-.. automodule:: accounting.journal_entry.utils.offset_alias
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 accounting.journal\_entry.utils.operators module
 ------------------------------------------------
 

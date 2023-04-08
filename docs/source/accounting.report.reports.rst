@@ -60,6 +60,22 @@ accounting.report.reports.trial\_balance module
    :undoc-members:
    :show-inheritance:
 
+accounting.report.reports.unapplied module
+------------------------------------------
+
+.. automodule:: accounting.report.reports.unapplied
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.report.reports.unapplied\_accounts module
+----------------------------------------------------
+
+.. automodule:: accounting.report.reports.unapplied_accounts
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
