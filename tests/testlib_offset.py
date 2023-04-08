@@ -189,102 +189,102 @@ class TestData:
                 JournalEntryLineItemData(credit, description, amount)
 
         # Receivable original line items
-        self.e_r_or1d, self.e_r_or1c = couple(
+        self.l_r_or1d, self.l_r_or1c = couple(
             "Accountant", "1200", Accounts.RECEIVABLE, Accounts.SERVICE)
-        self.e_r_or2d, self.e_r_or2c = couple(
+        self.l_r_or2d, self.l_r_or2c = couple(
             "Toy", "600", Accounts.RECEIVABLE, Accounts.SALES)
-        self.e_r_or3d, self.e_r_or3c = couple(
+        self.l_r_or3d, self.l_r_or3c = couple(
             "Noodles", "100", Accounts.RECEIVABLE, Accounts.SALES)
-        self.e_r_or4d, self.e_r_or4c = couple(
+        self.l_r_or4d, self.l_r_or4c = couple(
             "Interest", "3.4", Accounts.RECEIVABLE, Accounts.INTEREST)
 
         # Payable original line items
-        self.e_p_or1d, self.e_p_or1c = couple(
+        self.l_p_or1d, self.l_p_or1c = couple(
             "Airplane", "2000", Accounts.TRAVEL, Accounts.PAYABLE)
-        self.e_p_or2d, self.e_p_or2c = couple(
+        self.l_p_or2d, self.l_p_or2c = couple(
             "Phone", "900", Accounts.OFFICE, Accounts.PAYABLE)
-        self.e_p_or3d, self.e_p_or3c = couple(
+        self.l_p_or3d, self.l_p_or3c = couple(
             "Steak", "120", Accounts.MEAL, Accounts.PAYABLE)
-        self.e_p_or4d, self.e_p_or4c = couple(
+        self.l_p_or4d, self.l_p_or4c = couple(
             "Envelop", "0.9", Accounts.OFFICE, Accounts.PAYABLE)
 
         # Original journal entries
-        self.v_r_or1: JournalEntryData = JournalEntryData(
-            50, [CurrencyData("USD", [self.e_r_or1d, self.e_r_or4d],
-                              [self.e_r_or1c, self.e_r_or4c])])
-        self.v_r_or2: JournalEntryData = JournalEntryData(
-            30, [CurrencyData("USD", [self.e_r_or2d, self.e_r_or3d],
-                              [self.e_r_or2c, self.e_r_or3c])])
-        self.v_p_or1: JournalEntryData = JournalEntryData(
-            40, [CurrencyData("USD", [self.e_p_or1d, self.e_p_or4d],
-                              [self.e_p_or1c, self.e_p_or4c])])
-        self.v_p_or2: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD", [self.e_p_or2d, self.e_p_or3d],
-                              [self.e_p_or2c, self.e_p_or3c])])
+        self.j_r_or1: JournalEntryData = JournalEntryData(
+            50, [CurrencyData("USD", [self.l_r_or1d, self.l_r_or4d],
+                              [self.l_r_or1c, self.l_r_or4c])])
+        self.j_r_or2: JournalEntryData = JournalEntryData(
+            30, [CurrencyData("USD", [self.l_r_or2d, self.l_r_or3d],
+                              [self.l_r_or2c, self.l_r_or3c])])
+        self.j_p_or1: JournalEntryData = JournalEntryData(
+            40, [CurrencyData("USD", [self.l_p_or1d, self.l_p_or4d],
+                              [self.l_p_or1c, self.l_p_or4c])])
+        self.j_p_or2: JournalEntryData = JournalEntryData(
+            20, [CurrencyData("USD", [self.l_p_or2d, self.l_p_or3d],
+                              [self.l_p_or2c, self.l_p_or3c])])
 
-        self.__add_journal_entry(self.v_r_or1)
-        self.__add_journal_entry(self.v_r_or2)
-        self.__add_journal_entry(self.v_p_or1)
-        self.__add_journal_entry(self.v_p_or2)
+        self.__add_journal_entry(self.j_r_or1)
+        self.__add_journal_entry(self.j_r_or2)
+        self.__add_journal_entry(self.j_p_or1)
+        self.__add_journal_entry(self.j_p_or2)
 
         # Receivable offset items
-        self.e_r_of1d, self.e_r_of1c = couple(
+        self.l_r_of1d, self.l_r_of1c = couple(
             "Accountant", "500", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of1c.original_line_item = self.e_r_or1d
-        self.e_r_of2d, self.e_r_of2c = couple(
+        self.l_r_of1c.original_line_item = self.l_r_or1d
+        self.l_r_of2d, self.l_r_of2c = couple(
             "Accountant", "200", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of2c.original_line_item = self.e_r_or1d
-        self.e_r_of3d, self.e_r_of3c = couple(
+        self.l_r_of2c.original_line_item = self.l_r_or1d
+        self.l_r_of3d, self.l_r_of3c = couple(
             "Accountant", "100", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of3c.original_line_item = self.e_r_or1d
-        self.e_r_of4d, self.e_r_of4c = couple(
+        self.l_r_of3c.original_line_item = self.l_r_or1d
+        self.l_r_of4d, self.l_r_of4c = couple(
             "Toy", "240", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of4c.original_line_item = self.e_r_or2d
-        self.e_r_of5d, self.e_r_of5c = couple(
+        self.l_r_of4c.original_line_item = self.l_r_or2d
+        self.l_r_of5d, self.l_r_of5c = couple(
             "Interest", "3.4", Accounts.CASH, Accounts.RECEIVABLE)
-        self.e_r_of5c.original_line_item = self.e_r_or4d
+        self.l_r_of5c.original_line_item = self.l_r_or4d
 
         # Payable offset items
-        self.e_p_of1d, self.e_p_of1c = couple(
+        self.l_p_of1d, self.l_p_of1c = couple(
             "Airplane", "800", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of1d.original_line_item = self.e_p_or1c
-        self.e_p_of2d, self.e_p_of2c = couple(
+        self.l_p_of1d.original_line_item = self.l_p_or1c
+        self.l_p_of2d, self.l_p_of2c = couple(
             "Airplane", "300", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of2d.original_line_item = self.e_p_or1c
-        self.e_p_of3d, self.e_p_of3c = couple(
+        self.l_p_of2d.original_line_item = self.l_p_or1c
+        self.l_p_of3d, self.l_p_of3c = couple(
             "Airplane", "100", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of3d.original_line_item = self.e_p_or1c
-        self.e_p_of4d, self.e_p_of4c = couple(
+        self.l_p_of3d.original_line_item = self.l_p_or1c
+        self.l_p_of4d, self.l_p_of4c = couple(
             "Phone", "400", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of4d.original_line_item = self.e_p_or2c
-        self.e_p_of5d, self.e_p_of5c = couple(
+        self.l_p_of4d.original_line_item = self.l_p_or2c
+        self.l_p_of5d, self.l_p_of5c = couple(
             "Envelop", "0.9", Accounts.PAYABLE, Accounts.CASH)
-        self.e_p_of5d.original_line_item = self.e_p_or4c
+        self.l_p_of5d.original_line_item = self.l_p_or4c
 
         # Offset journal entries
-        self.v_r_of1: JournalEntryData = JournalEntryData(
-            25, [CurrencyData("USD", [self.e_r_of1d], [self.e_r_of1c])])
-        self.v_r_of2: JournalEntryData = JournalEntryData(
+        self.j_r_of1: JournalEntryData = JournalEntryData(
+            25, [CurrencyData("USD", [self.l_r_of1d], [self.l_r_of1c])])
+        self.j_r_of2: JournalEntryData = JournalEntryData(
             20, [CurrencyData("USD",
-                              [self.e_r_of2d, self.e_r_of3d, self.e_r_of4d],
-                              [self.e_r_of2c, self.e_r_of3c, self.e_r_of4c])])
-        self.v_r_of3: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.e_r_of5d], [self.e_r_of5c])])
-        self.v_p_of1: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.e_p_of1d], [self.e_p_of1c])])
-        self.v_p_of2: JournalEntryData = JournalEntryData(
+                              [self.l_r_of2d, self.l_r_of3d, self.l_r_of4d],
+                              [self.l_r_of2c, self.l_r_of3c, self.l_r_of4c])])
+        self.j_r_of3: JournalEntryData = JournalEntryData(
+            15, [CurrencyData("USD", [self.l_r_of5d], [self.l_r_of5c])])
+        self.j_p_of1: JournalEntryData = JournalEntryData(
+            15, [CurrencyData("USD", [self.l_p_of1d], [self.l_p_of1c])])
+        self.j_p_of2: JournalEntryData = JournalEntryData(
             10, [CurrencyData("USD",
-                              [self.e_p_of2d, self.e_p_of3d, self.e_p_of4d],
-                              [self.e_p_of2c, self.e_p_of3c, self.e_p_of4c])])
-        self.v_p_of3: JournalEntryData = JournalEntryData(
-            5, [CurrencyData("USD", [self.e_p_of5d], [self.e_p_of5c])])
+                              [self.l_p_of2d, self.l_p_of3d, self.l_p_of4d],
+                              [self.l_p_of2c, self.l_p_of3c, self.l_p_of4c])])
+        self.j_p_of3: JournalEntryData = JournalEntryData(
+            5, [CurrencyData("USD", [self.l_p_of5d], [self.l_p_of5c])])
 
-        self.__add_journal_entry(self.v_r_of1)
-        self.__add_journal_entry(self.v_r_of2)
-        self.__add_journal_entry(self.v_r_of3)
-        self.__add_journal_entry(self.v_p_of1)
-        self.__add_journal_entry(self.v_p_of2)
-        self.__add_journal_entry(self.v_p_of3)
+        self.__add_journal_entry(self.j_r_of1)
+        self.__add_journal_entry(self.j_r_of2)
+        self.__add_journal_entry(self.j_r_of3)
+        self.__add_journal_entry(self.j_p_of1)
+        self.__add_journal_entry(self.j_p_of2)
+        self.__add_journal_entry(self.j_p_of3)
 
     def __add_journal_entry(self, journal_entry_data: JournalEntryData) \
             -> None:

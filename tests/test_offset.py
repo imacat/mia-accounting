@@ -81,21 +81,21 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         journal_entry_data: JournalEntryData = JournalEntryData(
-            self.data.e_r_or3d.journal_entry.days, [CurrencyData(
+            self.data.l_r_or3d.journal_entry.days, [CurrencyData(
                 "USD",
                 [],
                 [JournalEntryLineItemData(
                     Accounts.RECEIVABLE,
-                    self.data.e_r_or1d.description, "300",
-                    original_line_item=self.data.e_r_or1d),
+                    self.data.l_r_or1d.description, "300",
+                    original_line_item=self.data.l_r_or1d),
                  JournalEntryLineItemData(
                      Accounts.RECEIVABLE,
-                     self.data.e_r_or1d.description, "100",
-                     original_line_item=self.data.e_r_or1d),
+                     self.data.l_r_or1d.description, "100",
+                     original_line_item=self.data.l_r_or1d),
                  JournalEntryLineItemData(
                      Accounts.RECEIVABLE,
-                     self.data.e_r_or3d.description, "100",
-                     original_line_item=self.data.e_r_or3d)])])
+                     self.data.l_r_or3d.description, "100",
+                     original_line_item=self.data.l_r_or3d)])])
 
         # Non-existing original line item ID
         form = journal_entry_data.new_form(self.csrf_token)
@@ -107,8 +107,8 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.e_p_or1c.id
-        form["currency-1-credit-1-account_code"] = self.data.e_p_or1c.account
+            = self.data.l_p_or1c.id
+        form["currency-1-credit-1-account_code"] = self.data.l_p_or1c.account
         form["currency-1-credit-1-amount"] = "100"
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -131,8 +131,8 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.e_p_of1d.id
-        form["currency-1-credit-1-account_code"] = self.data.e_p_of1d.account
+            = self.data.l_p_of1d.id
+        form["currency-1-credit-1-account_code"] = self.data.l_p_of1d.account
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
@@ -195,13 +195,13 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        journal_entry_data: JournalEntryData = self.data.v_r_of2
+        journal_entry_data: JournalEntryData = self.data.j_r_of2
         edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
 
-        journal_entry_data.days = self.data.v_r_or2.days
+        journal_entry_data.days = self.data.j_r_or2.days
         journal_entry_data.currencies[0].debit[0].amount = Decimal("600")
         journal_entry_data.currencies[0].credit[0].amount = Decimal("600")
         journal_entry_data.currencies[0].debit[2].amount = Decimal("600")
@@ -217,8 +217,8 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.e_p_or1c.id
-        form["currency-1-credit-1-account_code"] = self.data.e_p_or1c.account
+            = self.data.l_p_or1c.id
+        form["currency-1-credit-1-account_code"] = self.data.l_p_or1c.account
         form["currency-1-debit-1-amount"] = "100"
         form["currency-1-credit-1-amount"] = "100"
         response = self.client.post(update_uri, data=form)
@@ -242,8 +242,8 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.e_p_of1d.id
-        form["currency-1-credit-1-account_code"] = self.data.e_p_of1d.account
+            = self.data.l_p_of1d.id
+        form["currency-1-credit-1-account_code"] = self.data.l_p_of1d.account
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -308,13 +308,13 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import JournalEntry
-        journal_entry_data: JournalEntryData = self.data.v_r_or1
+        journal_entry_data: JournalEntryData = self.data.j_r_or1
         edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
 
-        journal_entry_data.days = self.data.v_r_of1.days
+        journal_entry_data.days = self.data.j_r_of1.days
         journal_entry_data.currencies[0].debit[0].amount = Decimal("800")
         journal_entry_data.currencies[0].credit[0].amount = Decimal("800")
         journal_entry_data.currencies[0].debit[1].amount = Decimal("3.4")
@@ -388,7 +388,7 @@ class OffsetTestCase(unittest.TestCase):
                 JournalEntry, journal_entry_data.id)
             self.assertIsNotNone(journal_entry_or)
             journal_entry_of: JournalEntry | None = db.session.get(
-                JournalEntry, self.data.v_r_of1.id)
+                JournalEntry, self.data.j_r_of1.id)
             self.assertIsNotNone(journal_entry_of)
             self.assertEqual(journal_entry_or.date, journal_entry_of.date)
             self.assertLess(journal_entry_or.no, journal_entry_of.no)
@@ -405,20 +405,20 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         journal_entry_data: JournalEntryData = JournalEntryData(
-            self.data.e_p_or3c.journal_entry.days, [CurrencyData(
+            self.data.l_p_or3c.journal_entry.days, [CurrencyData(
                 "USD",
                 [JournalEntryLineItemData(
                     Accounts.PAYABLE,
-                    self.data.e_p_or1c.description, "500",
-                    original_line_item=self.data.e_p_or1c),
+                    self.data.l_p_or1c.description, "500",
+                    original_line_item=self.data.l_p_or1c),
                  JournalEntryLineItemData(
                      Accounts.PAYABLE,
-                     self.data.e_p_or1c.description, "300",
-                     original_line_item=self.data.e_p_or1c),
+                     self.data.l_p_or1c.description, "300",
+                     original_line_item=self.data.l_p_or1c),
                  JournalEntryLineItemData(
                      Accounts.PAYABLE,
-                     self.data.e_p_or3c.description, "120",
-                     original_line_item=self.data.e_p_or3c)],
+                     self.data.l_p_or3c.description, "120",
+                     original_line_item=self.data.l_p_or3c)],
                 [])])
 
         # Non-existing original line item ID
@@ -431,8 +431,8 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.e_r_or1d.id
-        form["currency-1-debit-1-account_code"] = self.data.e_r_or1d.account
+            = self.data.l_r_or1d.id
+        form["currency-1-debit-1-account_code"] = self.data.l_r_or1d.account
         form["currency-1-debit-1-amount"] = "100"
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -455,8 +455,8 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.e_r_of1c.id
-        form["currency-1-debit-1-account_code"] = self.data.e_r_of1c.account
+            = self.data.l_r_of1c.id
+        form["currency-1-debit-1-account_code"] = self.data.l_r_of1c.account
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
@@ -519,13 +519,13 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account, JournalEntry
-        journal_entry_data: JournalEntryData = self.data.v_p_of2
+        journal_entry_data: JournalEntryData = self.data.j_p_of2
         edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
 
-        journal_entry_data.days = self.data.v_p_or2.days
+        journal_entry_data.days = self.data.j_p_or2.days
         journal_entry_data.currencies[0].debit[0].amount = Decimal("1100")
         journal_entry_data.currencies[0].credit[0].amount = Decimal("1100")
         journal_entry_data.currencies[0].debit[2].amount = Decimal("900")
@@ -541,8 +541,8 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.e_r_or1d.id
-        form["currency-1-debit-1-account_code"] = self.data.e_r_or1d.account
+            = self.data.l_r_or1d.id
+        form["currency-1-debit-1-account_code"] = self.data.l_r_or1d.account
         form["currency-1-debit-1-amount"] = "100"
         form["currency-1-credit-1-amount"] = "100"
         response = self.client.post(update_uri, data=form)
@@ -566,8 +566,8 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.e_r_of1c.id
-        form["currency-1-debit-1-account_code"] = self.data.e_r_of1c.account
+            = self.data.l_r_of1c.id
+        form["currency-1-debit-1-account_code"] = self.data.l_r_of1c.account
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
@@ -636,13 +636,13 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import JournalEntry
-        journal_entry_data: JournalEntryData = self.data.v_p_or1
+        journal_entry_data: JournalEntryData = self.data.j_p_or1
         edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
 
-        journal_entry_data.days = self.data.v_p_of1.days
+        journal_entry_data.days = self.data.j_p_of1.days
         journal_entry_data.currencies[0].debit[0].amount = Decimal("1200")
         journal_entry_data.currencies[0].credit[0].amount = Decimal("1200")
         journal_entry_data.currencies[0].debit[1].amount = Decimal("0.9")
@@ -716,7 +716,7 @@ class OffsetTestCase(unittest.TestCase):
                 JournalEntry, journal_entry_data.id)
             self.assertIsNotNone(journal_entry_or)
             journal_entry_of: JournalEntry | None = db.session.get(
-                JournalEntry, self.data.v_p_of1.id)
+                JournalEntry, self.data.j_p_of1.id)
             self.assertIsNotNone(journal_entry_of)
             self.assertEqual(journal_entry_or.date, journal_entry_of.date)
             self.assertLess(journal_entry_or.no, journal_entry_of.no)
