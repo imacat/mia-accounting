@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: mia-accounting 1.1.0\n"
+"Project-Id-Version: mia-accounting 1.1.1\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-04-09 00:22+0800\n"
-"PO-Revision-Date: 2023-04-09 00:37+0800\n"
+"POT-Creation-Date: 2023-04-09 01:41+0800\n"
+"PO-Revision-Date: 2023-04-09 01:41+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -1250,7 +1250,7 @@ msgid "Trial Balance of %(currency)s %(period)s"
 msgstr "%(period)s%(currency)s試算表"
 
 #: src/accounting/templates/accounting/report/unapplied-accounts.html:24
-#: src/accounting/templates/accounting/report/unapplied-accounts.html:41x
+#: src/accounting/templates/accounting/report/unapplied-accounts.html:41
 msgid "Accounts with Unapplied Original Line Items"
 msgstr "有未抵銷原始分錄的科目"
 
@@ -1327,8 +1327,7 @@ msgstr "你確定要抵銷下列原始分錄與抵銷分錄嗎？結果無法復
 msgid ""
 "%(matches)s unapplied original line items out of %(total)s can match with"
 " their offsets."
-msgstr ""
-"%(total)s 筆未抵銷原始分錄中，可配對抵銷掉 %(matches)s 筆。"
+msgstr "%(total)s 筆未抵銷原始分錄中，可配對抵銷掉 %(matches)s 筆。"
 
 #: src/accounting/templates/accounting/unmatched-offset/list.html:83
 #, python-format
@@ -1355,7 +1354,7 @@ msgstr "無法自動配對抵銷。"
 #: src/accounting/unmatched_offset/views.py:77
 #, python-format
 msgid "Matches %(matches)s from %(total)s unapplied line items."
-msgstr "%(total)s 筆未抵銷原始分錄中，配對抵銷掉 %(matches) 筆。"
+msgstr "%(total)s 筆未抵銷原始分錄中，配對抵銷掉 %(matches)s 筆。"
 
 #: src/accounting/utils/current_account.py:65
 msgid "current assets and liabilities"
