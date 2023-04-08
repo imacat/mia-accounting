@@ -312,6 +312,13 @@ a.accounting-report-table-row {
 .accounting-unapplied-table .accounting-report-table-row {
     grid-template-columns: 1fr 1fr 5fr 1fr 1fr;
 }
+.accounting-unapplied-account-table .accounting-report-table-row {
+    display: flex;
+    justify-content: space-between;
+}
+.accounting-unapplied-account-table .accounting-report-table-header .accounting-report-table-row {
+    display: block;
+}
 
 /* The accounting report */
 .accounting-mobile-journal-credit {

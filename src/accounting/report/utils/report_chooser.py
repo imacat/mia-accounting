@@ -33,7 +33,6 @@ from accounting.template_globals import default_currency_code
 from accounting.utils.current_account import CurrentAccount
 from .option_link import OptionLink
 from .report_type import ReportType
-from .unapplied import get_accounts_with_unapplied
 from .urls import journal_url, ledger_url, income_expenses_url, \
     trial_balance_url, income_statement_url, balance_sheet_url, unapplied_url
 
@@ -161,7 +160,10 @@ class ReportChooser:
         """
         account: Account = self.__account
         if not account.is_need_offset:
-            account = get_accounts_with_unapplied()[0]
+            return OptionLink(gettext("Unapplied Original Line Items"),
+                              unapplied_url(None),
+                              self.__active_report == ReportType.UNAPPLIED,
+                              fa_icon="fa-solid fa-link-slash")
         return OptionLink(gettext("Unapplied Original Line Items"),
                           unapplied_url(account),
                           self.__active_report == ReportType.UNAPPLIED,

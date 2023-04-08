@@ -19,6 +19,7 @@
 """
 import sqlalchemy as sa
 
+from accounting import db
 from accounting.models import Account, JournalEntryLineItem
 from accounting.utils.cast import be
 from accounting.utils.offset_alias import offset_alias
@@ -50,12 +51,17 @@ def get_accounts_with_unapplied() -> list[Account]:
         .group_by(JournalEntryLineItem.id)\
         .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
 
-    count_func: sa.Function \
-        = sa.func.count(JournalEntryLineItem.id)
-    select: sa.Select = sa.select(Account.id)\
+    count_func: sa.Label \
+        = sa.func.count(JournalEntryLineItem.id).label("count")
+    select: sa.Select = sa.select(Account.id, count_func)\
         .join(JournalEntryLineItem, isouter=True)\
         .filter(JournalEntryLineItem.id.in_(select_unapplied))\
         .group_by(Account.id)\
         .having(count_func > 0)
-    return Account.query.filter(Account.id.in_(select))\
+    counts: dict[int, int] \
+        = {x.id: x.count for x in db.session.execute(select)}
+    accounts: list[Account] = Account.query.filter(Account.id.in_(counts))\
         .order_by(Account.base_code, Account.no).all()
+    for account in accounts:
+        account.count = counts[account.id]
+    return accounts

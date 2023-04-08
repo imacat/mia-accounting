@@ -118,10 +118,13 @@ def balance_sheet_url(currency: Currency, period: Period) -> str:
                    currency=currency, period=period)
 
 
-def unapplied_url(account: Account) -> str:
+def unapplied_url(account: Account | None) -> str:
     """Returns the URL of the unapplied original line items.
 
-    :param account: The account.
+    :param account: The account, or None to list the accounts with unapplied
+        original line items.
     :return: The URL of the unapplied original line items.
     """
+    if account is None:
+        return url_for("accounting-report.unapplied-default")
     return url_for("accounting-report.unapplied", account=account)

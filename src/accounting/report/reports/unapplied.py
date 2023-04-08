@@ -118,10 +118,14 @@ class PageParams(BasePageParams):
 
         :return: The account options.
         """
-        return [OptionLink(str(x),
-                           unapplied_url(x),
-                           x.id == self.account.id)
-                for x in get_accounts_with_unapplied()]
+        options: list[OptionLink] = [OptionLink(gettext("Accounts"),
+                                                unapplied_url(None),
+                                                False)]
+        options.extend([OptionLink(str(x),
+                                   unapplied_url(x),
+                                   x.id == self.account.id)
+                        for x in get_accounts_with_unapplied()])
+        return options
 
 
 def get_csv_rows(line_items: list[JournalEntryLineItem]) -> list[CSVRow]:
