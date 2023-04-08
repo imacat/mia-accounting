@@ -789,6 +789,25 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__offsets")
 
     @property
+    def match(self) -> t.Self | None:
+        """Returns the match of the line item.
+
+        :return: The match of the line item.
+        """
+        if not hasattr(self, "__match"):
+            setattr(self, "__match", None)
+        return getattr(self, "__match")
+
+    @match.setter
+    def match(self, match: t.Self) -> None:
+        """Sets the match of the line item.
+
+        :param match: The matcho of the line item.
+        :return: None.
+        """
+        setattr(self, "__match", match)
+
+    @property
     def query_values(self) -> list[str]:
         """Returns the values to be queried.
 
