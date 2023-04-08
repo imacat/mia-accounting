@@ -79,7 +79,7 @@ class CurrentAccountConverter(BaseConverter):
         return value.code
 
 
-class UnappliedAccountConverter(BaseConverter):
+class NeedOffsetAccountConverter(BaseConverter):
     """The converter to convert the unapplied original line item account code
     from and to the corresponding account in the routes."""
 

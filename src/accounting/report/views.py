@@ -301,7 +301,7 @@ def get_default_unapplied() -> str | Response:
     return report.html()
 
 
-@bp.get("unapplied/<unappliedAccount:account>", endpoint="unapplied")
+@bp.get("unapplied/<needOffsetAccount:account>", endpoint="unapplied")
 @has_permission(can_view)
 def get_unapplied(account: Account) -> str | Response:
     """Returns the unapplied original line items.

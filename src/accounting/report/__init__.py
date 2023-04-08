@@ -28,10 +28,10 @@ def init_app(app: Flask, url_prefix: str) -> None:
     :return: None.
     """
     from .converters import PeriodConverter, CurrentAccountConverter, \
-        UnappliedAccountConverter
+        NeedOffsetAccountConverter
     app.url_map.converters["period"] = PeriodConverter
     app.url_map.converters["currentAccount"] = CurrentAccountConverter
-    app.url_map.converters["unappliedAccount"] = UnappliedAccountConverter
+    app.url_map.converters["needOffsetAccount"] = NeedOffsetAccountConverter
 
     from .views import bp as report_bp
     app.register_blueprint(report_bp, url_prefix=url_prefix)
