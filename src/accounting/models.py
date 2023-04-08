@@ -723,14 +723,6 @@ class JournalEntryLineItem(db.Model):
         return self.account.code
 
     @property
-    def debit(self) -> Decimal | None:
-        """Returns the debit amount.
-
-        :return: The debit amount, or None if this is not a debit line item.
-        """
-        return self.amount if self.is_debit else None
-
-    @property
     def is_need_offset(self) -> bool:
         """Returns whether the line item needs offset.
 
@@ -743,6 +735,14 @@ class JournalEntryLineItem(db.Model):
         if self.account.base_code[0] == "2" and self.is_debit:
             return False
         return True
+
+    @property
+    def debit(self) -> Decimal | None:
+        """Returns the debit amount.
+
+        :return: The debit amount, or None if this is not a debit line item.
+        """
+        return self.amount if self.is_debit else None
 
     @property
     def credit(self) -> Decimal | None:
