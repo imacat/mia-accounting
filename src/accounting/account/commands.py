@@ -108,15 +108,15 @@ def __is_need_offset(base_code: str) -> bool:
     """
     # Assets
     if base_code[0] == "1":
-        if base_code[:3] in {"113", "114", "118", "184"}:
+        if base_code[:3] in {"113", "114", "118", "184", "186"}:
             return True
-        if base_code in {"1411", "1421", "1431", "1441", "1511", "1521",
-                         "1581", "1611", "1851"}:
+        if base_code in {"1286", "1411", "1421", "1431", "1441", "1511",
+                         "1521", "1581", "1611", "1851"}:
             return True
         return False
     # Liabilities
     if base_code[0] == "2":
-        if base_code in {"2111", "2114", "2284", "2293"}:
+        if base_code in {"2111", "2114", "2284", "2293", "2861"}:
             return False
         return True
     # Only assets and liabilities need offset
