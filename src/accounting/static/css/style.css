@@ -209,11 +209,14 @@ a.accounting-report-table-row {
 .accounting-report-table-body .accounting-amount {
     font-style: italic;
 }
+.accounting-report-table-body .accounting-report-table-row {
+    background-color: #f8f9fa;
+}
 .accounting-report-table-body .accounting-report-table-row:nth-child(2n+1) {
-    background-color: #f2f2f2;
+    background-color: #ecedee;
 }
 .accounting-report-table-body .accounting-report-table-row:hover {
-    background-color: rgba(0, 0, 0, 0.075);
+    background-color: #e5e6e7;
 }
 .accounting-journal-table .accounting-report-table-row {
     grid-template-columns: 1fr 1fr 2fr 4fr 1fr 1fr;
