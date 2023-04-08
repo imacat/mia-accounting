@@ -25,7 +25,7 @@ from accounting.models import JournalEntryLineItem, Account
 from accounting.utils.cast import s
 from accounting.utils.offset_matcher import OffsetMatcher
 from accounting.utils.pagination import Pagination
-from accounting.utils.permission import has_permission, can_admin
+from accounting.utils.permission import has_permission, can_edit
 from .queries import get_accounts_with_unmatched_offsets
 
 bp: Blueprint = Blueprint("unmatched-offset", __name__)
@@ -33,7 +33,7 @@ bp: Blueprint = Blueprint("unmatched-offset", __name__)
 
 
 @bp.get("", endpoint="dashboard")
-@has_permission(can_admin)
+@has_permission(can_edit)
 def show_offset_dashboard() -> str:
     """Shows the dashboard about offsets.
 
@@ -44,7 +44,7 @@ def show_offset_dashboard() -> str:
 
 
 @bp.get("<needOffsetAccount:account>", endpoint="list")
-@has_permission(can_admin)
+@has_permission(can_edit)
 def show_unmatched_offsets(account: Account) -> str:
     """Shows the unmatched offsets in an account.
 
@@ -60,7 +60,7 @@ def show_unmatched_offsets(account: Account) -> str:
 
 
 @bp.post("<needOffsetAccount:account>", endpoint="match")
-@has_permission(can_admin)
+@has_permission(can_edit)
 def match_offsets(account: Account) -> redirect:
     """Matches the original line items with their offsets.
 

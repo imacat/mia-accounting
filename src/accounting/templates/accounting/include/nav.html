@@ -51,17 +51,17 @@ First written: 2023/1/26
           {{ A_("Currencies") }}
         </a>
       </li>
+      <li>
+        <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.unmatched-offset.") %} active {% endif %}" href="{{ url_for("accounting.unmatched-offset.dashboard") }}">
+          <i class="fa-solid fa-link-slash"></i>
+          {{ A_("Unmatched Offsets") }}
+        </a>
+      </li>
       {% if accounting_can_admin() %}
         <li>
           <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.option.") %} active {% endif %}" href="{{ url_for("accounting.option.detail") }}">
             <i class="fa-solid fa-gear"></i>
             {{ A_("Settings") }}
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.unmatched-offset.") %} active {% endif %}" href="{{ url_for("accounting.unmatched-offset.dashboard") }}">
-            <i class="fa-solid fa-link-slash"></i>
-            {{ A_("Unmatched Offsets") }}
           </a>
         </li>
       {% endif %}

@@ -34,7 +34,7 @@ from accounting.report.utils.unapplied import get_accounts_with_unapplied
 from accounting.report.utils.urls import unapplied_url
 from accounting.utils.offset_matcher import OffsetMatcher
 from accounting.utils.pagination import Pagination
-from accounting.utils.permission import can_admin
+from accounting.utils.permission import can_edit
 
 
 class CSVRow(BaseCSVRow):
@@ -158,7 +158,7 @@ class UnappliedOriginalLineItems(BaseReport):
             = offset_matcher.unapplied
         """The line items."""
         self.__is_mark_matches: bool \
-            = can_admin() and len(offset_matcher.unmatched_offsets) > 0
+            = can_edit() and len(offset_matcher.unmatched_offsets) > 0
         """Whether to mark the matched offsets."""
 
     def csv(self) -> Response:
