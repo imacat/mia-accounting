@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: mia-accounting 1.0.0\n"
+"Project-Id-Version: mia-accounting 1.1.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-04-06 02:34+0800\n"
-"PO-Revision-Date: 2023-04-06 02:34+0800\n"
+"POT-Creation-Date: 2023-04-09 00:22+0800\n"
+"PO-Revision-Date: 2023-04-09 00:37+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -35,22 +35,22 @@ msgstr "沒有這個貨幣。"
 msgid "The account does not exist."
 msgstr "沒有這個科目。"
 
-#: src/accounting/models.py:562
+#: src/accounting/models.py:581
 #, python-format
 msgid "Cash Disbursement Journal Entry#%(id)s"
 msgstr "現金支出傳票#%(id)s"
 
-#: src/accounting/models.py:565
+#: src/accounting/models.py:584
 #, python-format
 msgid "Cash Receipt Journal Entry#%(id)s"
 msgstr "現金收入傳票#%(id)s"
 
-#: src/accounting/models.py:566
+#: src/accounting/models.py:585
 #, python-format
 msgid "Transfer Journal Entry#%(id)s"
 msgstr "轉帳傳票#%(id)s"
 
-#: src/accounting/models.py:699
+#: src/accounting/models.py:714
 #, python-format
 msgid "%(date)s %(description)s %(amount)s"
 msgstr "%(date)s %(description)s %(amount)s"
@@ -205,24 +205,24 @@ msgstr "傳票不可刪除。"
 msgid "The journal entry is deleted successfully."
 msgstr "傳票刪掉了"
 
-#: src/accounting/journal_entry/forms/currency.py:40
+#: src/accounting/journal_entry/forms/currency.py:39
 msgid "Please select the currency."
 msgstr "請選擇貨幣。"
 
-#: src/accounting/journal_entry/forms/currency.py:63
+#: src/accounting/journal_entry/forms/currency.py:62
 msgid "The currency must be the same as the original line item."
 msgstr "貨幣需和原始分錄相同。"
 
-#: src/accounting/journal_entry/forms/currency.py:90
+#: src/accounting/journal_entry/forms/currency.py:89
 msgid "The currency must not be changed when there is offset."
 msgstr "抵銷過不可變更貨幣。"
 
-#: src/accounting/journal_entry/forms/currency.py:99
+#: src/accounting/journal_entry/forms/currency.py:98
 #: src/accounting/static/js/journal-entry-form.js:773
 msgid "Please add some line items."
 msgstr "請加上分錄。"
 
-#: src/accounting/journal_entry/forms/currency.py:112
+#: src/accounting/journal_entry/forms/currency.py:111
 #: src/accounting/static/js/journal-entry-form.js:522
 msgid "The totals of the debit and credit amounts do not match."
 msgstr "借方貸方合計不符。 "
@@ -271,24 +271,24 @@ msgstr "原始分錄不可以是抵銷分錄。"
 msgid "The account must be the same as the original line item."
 msgstr "科目需和原始分錄相同。"
 
-#: src/accounting/journal_entry/forms/line_item.py:137
+#: src/accounting/journal_entry/forms/line_item.py:135
 msgid "The account must not be changed when there is offset."
 msgstr "抵銷過不可變更科目。"
 
-#: src/accounting/journal_entry/forms/line_item.py:153
+#: src/accounting/journal_entry/forms/line_item.py:151
 msgid "A payable line item cannot start from debit."
 msgstr "不可由借方新建應付款。"
 
-#: src/accounting/journal_entry/forms/line_item.py:169
+#: src/accounting/journal_entry/forms/line_item.py:167
 msgid "A receivable line item cannot start from credit."
 msgstr "不可由貸方新建應收款。"
 
-#: src/accounting/journal_entry/forms/line_item.py:180
+#: src/accounting/journal_entry/forms/line_item.py:178
 #: src/accounting/static/js/journal-entry-line-item-editor.js:436
 msgid "Please fill in a positive amount."
 msgstr "金額請填正數。"
 
-#: src/accounting/journal_entry/forms/line_item.py:222
+#: src/accounting/journal_entry/forms/line_item.py:220
 #: src/accounting/static/js/journal-entry-line-item-editor.js:442
 #, python-format
 msgid ""
@@ -296,17 +296,17 @@ msgid ""
 "line item."
 msgstr "金額不可超過原始分錄凈額 %(balance)s 。"
 
-#: src/accounting/journal_entry/forms/line_item.py:243
+#: src/accounting/journal_entry/forms/line_item.py:241
 #: src/accounting/static/js/journal-entry-line-item-editor.js:450
 #, python-format
 msgid "The amount must not be less than the offset total %(total)s."
 msgstr "金額不可低於抵銷總額 %(total)s 。"
 
-#: src/accounting/journal_entry/forms/line_item.py:416
+#: src/accounting/journal_entry/forms/line_item.py:413
 msgid "This account is not for debit line items."
 msgstr "科目不是借方科目。"
 
-#: src/accounting/journal_entry/forms/line_item.py:468
+#: src/accounting/journal_entry/forms/line_item.py:465
 msgid "This account is not for credit line items."
 msgstr "科目不是貸方科目。"
 
@@ -442,20 +442,23 @@ msgid "Brought forward"
 msgstr "前期轉入"
 
 #: src/accounting/report/reports/income_expenses.py:407
-#: src/accounting/report/reports/journal.py:155
+#: src/accounting/report/reports/journal.py:158
 #: src/accounting/report/reports/ledger.py:366
+#: src/accounting/report/reports/unapplied.py:137
 #: src/accounting/templates/accounting/journal-entry/include/form.html:50
 #: src/accounting/templates/accounting/report/include/period-chooser.html:111
 #: src/accounting/templates/accounting/report/income-expenses.html:55
 #: src/accounting/templates/accounting/report/journal.html:53
 #: src/accounting/templates/accounting/report/ledger.html:55
 #: src/accounting/templates/accounting/report/search.html:50
+#: src/accounting/templates/accounting/report/unapplied.html:50
 msgid "Date"
 msgstr "日期"
 
 #: src/accounting/report/reports/income_expenses.py:407
-#: src/accounting/report/reports/journal.py:156
+#: src/accounting/report/reports/journal.py:159
 #: src/accounting/report/reports/trial_balance.py:225
+#: src/accounting/report/reports/unapplied_accounts.py:109
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:57
 #: src/accounting/templates/accounting/option/include/recurring-item-editor-modal.html:39
 #: src/accounting/templates/accounting/report/include/toolbar-buttons.html:90
@@ -467,14 +470,16 @@ msgid "Account"
 msgstr "科目"
 
 #: src/accounting/report/reports/income_expenses.py:408
-#: src/accounting/report/reports/journal.py:156
+#: src/accounting/report/reports/journal.py:159
 #: src/accounting/report/reports/ledger.py:366
+#: src/accounting/report/reports/unapplied.py:138
 #: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:28
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:49
 #: src/accounting/templates/accounting/report/income-expenses.html:57
 #: src/accounting/templates/accounting/report/journal.html:56
 #: src/accounting/templates/accounting/report/ledger.html:56
 #: src/accounting/templates/accounting/report/search.html:53
+#: src/accounting/templates/accounting/report/unapplied.html:52
 msgid "Description"
 msgstr "摘要"
 
@@ -496,7 +501,7 @@ msgid "Balance"
 msgstr "餘額"
 
 #: src/accounting/report/reports/income_expenses.py:410
-#: src/accounting/report/reports/journal.py:158
+#: src/accounting/report/reports/journal.py:161
 #: src/accounting/report/reports/ledger.py:368
 #: src/accounting/templates/accounting/journal-entry/include/description-editor-modal.html:178
 #: src/accounting/templates/accounting/journal-entry/include/form.html:73
@@ -528,20 +533,24 @@ msgid "net income or loss for current period"
 msgstr "本期損益"
 
 #: src/accounting/report/reports/income_statement.py:301
+#: src/accounting/report/reports/unapplied.py:138
 #: src/accounting/templates/accounting/journal-entry/include/journal-entry-line-item-editor-modal.html:65
 #: src/accounting/templates/accounting/report/income-statement.html:55
+#: src/accounting/templates/accounting/report/unapplied.html:53
 msgid "Amount"
 msgstr "金額"
 
-#: src/accounting/report/reports/journal.py:155
+#: src/accounting/report/reports/journal.py:158
+#: src/accounting/report/reports/unapplied.py:137
 #: src/accounting/templates/accounting/journal-entry/include/form-currency.html:33
 #: src/accounting/templates/accounting/report/include/toolbar-buttons.html:73
 #: src/accounting/templates/accounting/report/journal.html:54
 #: src/accounting/templates/accounting/report/search.html:51
+#: src/accounting/templates/accounting/report/unapplied.html:51
 msgid "Currency"
 msgstr "貨幣"
 
-#: src/accounting/report/reports/journal.py:157
+#: src/accounting/report/reports/journal.py:160
 #: src/accounting/report/reports/ledger.py:367
 #: src/accounting/report/reports/trial_balance.py:225
 #: src/accounting/templates/accounting/journal-entry/transfer/detail.html:33
@@ -553,7 +562,7 @@ msgstr "貨幣"
 msgid "Debit"
 msgstr "借方"
 
-#: src/accounting/report/reports/journal.py:157
+#: src/accounting/report/reports/journal.py:160
 #: src/accounting/report/reports/ledger.py:367
 #: src/accounting/report/reports/trial_balance.py:226
 #: src/accounting/templates/accounting/journal-entry/transfer/detail.html:49
@@ -565,7 +574,23 @@ msgstr "借方"
 msgid "Credit"
 msgstr "貸方"
 
-#: src/accounting/report/utils/report_chooser.py:81
+#: src/accounting/report/reports/unapplied.py:121
+#: src/accounting/report/reports/unapplied_accounts.py:93
+#: src/accounting/templates/accounting/include/nav.html:39
+msgid "Accounts"
+msgstr "科目"
+
+#: src/accounting/report/reports/unapplied.py:139
+#: src/accounting/templates/accounting/report/unapplied.html:54
+msgid "Net Balance"
+msgstr "淨額"
+
+#: src/accounting/report/reports/unapplied_accounts.py:109
+#: src/accounting/templates/accounting/report/unapplied-accounts.html:47
+msgid "Count"
+msgstr "數量"
+
+#: src/accounting/report/utils/report_chooser.py:82
 #: src/accounting/templates/accounting/account/include/form.html:98
 #: src/accounting/templates/accounting/account/list.html:40
 #: src/accounting/templates/accounting/base-account/list.html:34
@@ -581,29 +606,34 @@ msgstr "貸方"
 msgid "Search"
 msgstr "搜尋"
 
-#: src/accounting/report/utils/report_chooser.py:92
+#: src/accounting/report/utils/report_chooser.py:93
 msgid "Income and Expenses Log"
 msgstr "收支帳"
 
-#: src/accounting/report/utils/report_chooser.py:105
+#: src/accounting/report/utils/report_chooser.py:106
 msgid "Ledger"
 msgstr "分類帳"
 
-#: src/accounting/report/utils/report_chooser.py:117
+#: src/accounting/report/utils/report_chooser.py:118
 msgid "Journal"
 msgstr "日記簿"
 
-#: src/accounting/report/utils/report_chooser.py:127
+#: src/accounting/report/utils/report_chooser.py:128
 msgid "Trial Balance"
 msgstr "試算表"
 
-#: src/accounting/report/utils/report_chooser.py:138
+#: src/accounting/report/utils/report_chooser.py:139
 msgid "Income Statement"
 msgstr "損益表"
 
-#: src/accounting/report/utils/report_chooser.py:149
+#: src/accounting/report/utils/report_chooser.py:150
 msgid "Balance Sheet"
 msgstr "資產負債表"
+
+#: src/accounting/report/utils/report_chooser.py:163
+#: src/accounting/report/utils/report_chooser.py:167
+msgid "Unapplied Original Line Items"
+msgstr "未抵銷原始分錄"
 
 #: src/accounting/static/js/account-form.js:206
 msgid "Please fill in the title."
@@ -726,6 +756,7 @@ msgstr "新增科目"
 #: src/accounting/templates/accounting/journal-entry/include/form.html:38
 #: src/accounting/templates/accounting/journal-entry/order.html:36
 #: src/accounting/templates/accounting/option/form.html:36
+#: src/accounting/templates/accounting/unmatched-offset/list.html:31
 msgid "Back"
 msgstr "回上頁"
 
@@ -766,6 +797,7 @@ msgstr "確認刪除科目"
 #: src/accounting/templates/accounting/option/include/recurring-item-editor-modal.html:28
 #: src/accounting/templates/accounting/report/include/period-chooser.html:27
 #: src/accounting/templates/accounting/report/include/search-modal.html:28
+#: src/accounting/templates/accounting/unmatched-offset/list.html:54
 msgid "Close"
 msgstr "關閉"
 
@@ -783,6 +815,7 @@ msgstr "你確定要刪掉這個科目嗎？"
 #: src/accounting/templates/accounting/option/include/recurring-account-selector-modal.html:48
 #: src/accounting/templates/accounting/option/include/recurring-item-editor-modal.html:65
 #: src/accounting/templates/accounting/report/include/search-modal.html:37
+#: src/accounting/templates/accounting/unmatched-offset/list.html:70
 msgid "Cancel"
 msgstr "取消"
 
@@ -790,6 +823,7 @@ msgstr "取消"
 #: src/accounting/templates/accounting/currency/detail.html:80
 #: src/accounting/templates/accounting/journal-entry/include/detail.html:85
 #: src/accounting/templates/accounting/report/include/period-chooser.html:141
+#: src/accounting/templates/accounting/unmatched-offset/list.html:71
 msgid "Confirm"
 msgstr "確定"
 
@@ -849,6 +883,10 @@ msgstr "新增"
 #: src/accounting/templates/accounting/report/ledger.html:116
 #: src/accounting/templates/accounting/report/search.html:100
 #: src/accounting/templates/accounting/report/trial-balance.html:82
+#: src/accounting/templates/accounting/report/unapplied-accounts.html:61
+#: src/accounting/templates/accounting/report/unapplied.html:98
+#: src/accounting/templates/accounting/unmatched-offset/dashboard.html:37
+#: src/accounting/templates/accounting/unmatched-offset/list.html:104
 msgid "There is no data."
 msgstr "沒有資料。"
 
@@ -938,10 +976,6 @@ msgstr "記帳"
 msgid "Reports"
 msgstr "報表"
 
-#: src/accounting/templates/accounting/include/nav.html:39
-msgid "Accounts"
-msgstr "科目"
-
 #: src/accounting/templates/accounting/include/nav.html:45
 msgid "Base Accounts"
 msgstr "基本科目"
@@ -950,7 +984,12 @@ msgstr "基本科目"
 msgid "Currencies"
 msgstr "貨幣"
 
-#: src/accounting/templates/accounting/include/nav.html:58
+#: src/accounting/templates/accounting/include/nav.html:57
+#: src/accounting/templates/accounting/unmatched-offset/dashboard.html:24
+msgid "Unmatched Offsets"
+msgstr "遺漏的抵銷分錄"
+
+#: src/accounting/templates/accounting/include/nav.html:64
 #: src/accounting/templates/accounting/option/detail.html:24
 #: src/accounting/templates/accounting/option/detail.html:41
 #: src/accounting/templates/accounting/option/form.html:29
@@ -1210,6 +1249,21 @@ msgstr "%(period)s%(currency)s%(account)s分類帳"
 msgid "Trial Balance of %(currency)s %(period)s"
 msgstr "%(period)s%(currency)s試算表"
 
+#: src/accounting/templates/accounting/report/unapplied-accounts.html:24
+#: src/accounting/templates/accounting/report/unapplied-accounts.html:41x
+msgid "Accounts with Unapplied Original Line Items"
+msgstr "有未抵銷原始分錄的科目"
+
+#: src/accounting/templates/accounting/report/unapplied.html:28
+#, python-format
+msgid "Unapplied Original Line Items of %(account)s"
+msgstr "%(account)s未抵銷原始分錄"
+
+#: src/accounting/templates/accounting/report/unapplied.html:65
+#, python-format
+msgid "Can match %(offset)s"
+msgstr "可抵銷 %(offset)s"
+
 #: src/accounting/templates/accounting/report/include/period-chooser.html:26
 msgid "Period Chooser"
 msgstr "選擇日期範圍"
@@ -1242,6 +1296,66 @@ msgstr "期間"
 #: src/accounting/templates/accounting/report/include/toolbar-buttons.html:117
 msgid "Download"
 msgstr "下載"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:24
+#, python-format
+msgid "Unmatched Offsets in %(account)s"
+msgstr "%(account)s遺漏的抵銷分錄"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:28
+msgid "Toolbar"
+msgstr "工具列"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:36
+#: src/accounting/templates/accounting/unmatched-offset/list.html:41
+msgid "Match"
+msgstr "抵銷"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:53
+msgid "Confirm Match Offsets"
+msgstr "確認抵銷"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:57
+msgid ""
+"Do you really want to match the following original line items with their "
+"offsets?  This cannot be undone.  Please backup your database first, and "
+"review before you confirm."
+msgstr "你確定要抵銷下列原始分錄與抵銷分錄嗎？結果無法復原。請先備份資料庫，並仔細核對抵銷分錄是否正確。"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:81
+#, python-format
+msgid ""
+"%(matches)s unapplied original line items out of %(total)s can match with"
+" their offsets."
+msgstr ""
+"%(total)s 筆未抵銷原始分錄中，可配對抵銷掉 %(matches)s 筆。"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:83
+#, python-format
+msgid "%(total)s unapplied original line items without matching offsets."
+msgstr "%(total)s 筆未抵銷原始分錄，無法自動配對抵銷。"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:85
+msgid "Go to unapplied original line items."
+msgstr "查閱未抵銷原始分錄。"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:87
+msgid "All original line items are fully offset."
+msgstr "原始分錄已全部抵銷。"
+
+#: src/accounting/templates/accounting/unmatched-offset/list.html:98
+#, python-format
+msgid "Can match %(item)s"
+msgstr "可抵銷 %(item)s"
+
+#: src/accounting/unmatched_offset/views.py:71
+msgid "No more offset to match automatically."
+msgstr "無法自動配對抵銷。"
+
+#: src/accounting/unmatched_offset/views.py:77
+#, python-format
+msgid "Matches %(matches)s from %(total)s unapplied line items."
+msgstr "%(total)s 筆未抵銷原始分錄中，配對抵銷掉 %(matches) 筆。"
 
 #: src/accounting/utils/current_account.py:65
 msgid "current assets and liabilities"
