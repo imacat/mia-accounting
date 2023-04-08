@@ -32,7 +32,7 @@ from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.unapplied import get_accounts_with_unapplied
 from accounting.report.utils.urls import unapplied_url
-from accounting.unmatched_offset.forms import OffsetMatcher
+from accounting.utils.offset_matcher import OffsetMatcher
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import can_admin
 

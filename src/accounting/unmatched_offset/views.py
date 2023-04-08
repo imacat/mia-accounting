@@ -23,9 +23,9 @@ from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import JournalEntryLineItem, Account
 from accounting.utils.cast import s
+from accounting.utils.offset_matcher import OffsetMatcher
 from accounting.utils.pagination import Pagination
 from accounting.utils.permission import has_permission, can_admin
-from .forms import OffsetMatcher
 from .queries import get_accounts_with_unmatched_offsets
 
 bp: Blueprint = Blueprint("unmatched-offset", __name__)
