@@ -309,6 +309,9 @@ a.accounting-report-table-row {
 .accounting-balance-sheet-total .accounting-amount, .accounting-balance-sheet-subtotal, .accounting-amount {
     font-style: italic;
 }
+.accounting-unapplied-table .accounting-report-table-row {
+    grid-template-columns: 1fr 1fr 5fr 1fr 1fr;
+}
 
 /* The accounting report */
 .accounting-mobile-journal-credit {

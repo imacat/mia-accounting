@@ -116,3 +116,12 @@ def balance_sheet_url(currency: Currency, period: Period) -> str:
                        currency=currency)
     return url_for("accounting-report.balance-sheet",
                    currency=currency, period=period)
+
+
+def unapplied_url(account: Account) -> str:
+    """Returns the URL of the unapplied original line items.
+
+    :param account: The account.
+    :return: The URL of the unapplied original line items.
+    """
+    return url_for("accounting-report.unapplied", account=account)

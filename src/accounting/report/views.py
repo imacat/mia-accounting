@@ -28,6 +28,7 @@ from accounting.utils.options import options
 from accounting.utils.permission import has_permission, can_view
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
+from .reports.unapplied import UnappliedOriginalLineItems
 from .template_filters import format_amount
 
 bp: Blueprint = Blueprint("accounting-report", __name__)
@@ -281,6 +282,20 @@ def __get_balance_sheet(currency: Currency, period: Period) \
     :return: The balance sheet in the period.
     """
     report: BalanceSheet = BalanceSheet(currency, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.csv()
+    return report.html()
+
+
+@bp.get("unapplied/<account:account>", endpoint="unapplied")
+@has_permission(can_view)
+def get_unapplied(account: Account) -> str | Response:
+    """Returns the unapplied original line items.
+
+    :param account: The Account.
+    :return: The unapplied original line items.
+    """
+    report: UnappliedOriginalLineItems = UnappliedOriginalLineItems(account)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()

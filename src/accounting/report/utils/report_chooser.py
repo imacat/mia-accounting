@@ -33,8 +33,9 @@ from accounting.template_globals import default_currency_code
 from accounting.utils.current_account import CurrentAccount
 from .option_link import OptionLink
 from .report_type import ReportType
+from .unapplied import get_accounts_with_unapplied
 from .urls import journal_url, ledger_url, income_expenses_url, \
-    trial_balance_url, income_statement_url, balance_sheet_url
+    trial_balance_url, income_statement_url, balance_sheet_url, unapplied_url
 
 
 class ReportChooser:
@@ -74,6 +75,7 @@ class ReportChooser:
         self.__reports.append(self.__trial_balance)
         self.__reports.append(self.__income_statement)
         self.__reports.append(self.__balance_sheet)
+        self.__reports.append(self.__unapplied)
         for report in self.__reports:
             if report.is_active:
                 self.current_report = report.title
@@ -150,6 +152,20 @@ class ReportChooser:
                           balance_sheet_url(self.__currency, self.__period),
                           self.__active_report == ReportType.BALANCE_SHEET,
                           fa_icon="fa-solid fa-scale-balanced")
+
+    @property
+    def __unapplied(self) -> OptionLink:
+        """Returns the unapplied original line items.
+
+        :return: The unapplied original line items.
+        """
+        account: Account = self.__account
+        if not account.is_need_offset:
+            account = get_accounts_with_unapplied()[0]
+        return OptionLink(gettext("Unapplied Original Line Items"),
+                          unapplied_url(account),
+                          self.__active_report == ReportType.UNAPPLIED,
+                          fa_icon="fa-solid fa-link-slash")
 
     def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.

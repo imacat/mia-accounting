@@ -34,5 +34,7 @@ class ReportType(Enum):
     """The income statement."""
     BALANCE_SHEET: str = "balance-sheet"
     """The balance sheet."""
+    UNAPPLIED: str = "unapplied"
+    """The unapplied original line items."""
     SEARCH: str = "search"
     """The search."""
