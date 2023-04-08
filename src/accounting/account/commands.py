@@ -111,7 +111,7 @@ def __is_need_offset(base_code: str) -> bool:
         if base_code[:3] in {"113", "114", "118", "184"}:
             return True
         if base_code in {"1411", "1421", "1431", "1441", "1511", "1521",
-                         "1581", "1611", "1851", ""}:
+                         "1581", "1611", "1851"}:
             return True
         return False
     # Liabilities
