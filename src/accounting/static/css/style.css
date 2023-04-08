@@ -218,6 +218,15 @@ a.accounting-report-table-row {
 .accounting-report-table-body .accounting-report-table-row:hover {
     background-color: #e5e6e7;
 }
+.accounting-report-table-body .accounting-report-table-row-danger {
+    background-color: #f8d7da;
+}
+.accounting-report-table-body .accounting-report-table-row-danger:nth-child(2n+1) {
+    background-color: #eccccf;
+}
+.accounting-report-table-body .accounting-report-table-row-danger:hover {
+    background-color: #e5c7ca;
+}
 .accounting-journal-table .accounting-report-table-row {
     grid-template-columns: 1fr 1fr 2fr 4fr 1fr 1fr;
 }

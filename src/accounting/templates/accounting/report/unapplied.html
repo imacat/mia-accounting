@@ -56,10 +56,15 @@ First written: 2023/4/7
     </div>
     <div class="accounting-report-table-body">
       {% for line_item in report.line_items %}
-        <a class="accounting-report-table-row" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
+        <a class="accounting-report-table-row {% if report.is_mark_matches and not line_item.match %} accounting-report-table-row-danger {% endif %}" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
           <div>{{ line_item.journal_entry.date|accounting_format_date }}</div>
           <div>{{ line_item.currency.name }}</div>
-          <div>{{ line_item.description|accounting_default }}</div>
+          <div>
+            {{ line_item.description|accounting_default }}
+            {% if report.is_mark_matches and line_item.match %}
+              <div>{{ A_("Can match %(offset)s", offset=line_item.match) }}</div>
+            {% endif %}
+          </div>
           <div class="accounting-amount">{{ line_item.amount|accounting_format_amount }}</div>
           <div class="accounting-amount">{{ line_item.net_balance|accounting_format_amount }}</div>
         </a>

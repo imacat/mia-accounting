@@ -90,6 +90,7 @@ class OffsetMatcher:
                 continue
             self.matched_pairs.append(
                 OffsetPair(original_item, offset_candidates[0]))
+            original_item.match = offset_candidates[0]
             offset_candidates[0].match = original_item
             remains.remove(offset_candidates[0])
         self.is_having_matches = len(self.matched_pairs) > 0

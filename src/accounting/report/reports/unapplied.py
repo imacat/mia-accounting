@@ -32,8 +32,9 @@ from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
 from accounting.report.utils.unapplied import get_accounts_with_unapplied
 from accounting.report.utils.urls import unapplied_url
+from accounting.unmatched_offset.forms import OffsetMatcher
 from accounting.utils.pagination import Pagination
-from accounting.utils.unapplied import get_unapplied_original_line_items
+from accounting.utils.permission import can_admin
 
 
 class CSVRow(BaseCSVRow):
@@ -75,11 +76,13 @@ class PageParams(BasePageParams):
     """The HTML page parameters."""
 
     def __init__(self, account: Account,
+                 is_mark_matches: bool,
                  pagination: Pagination[JournalEntryLineItem],
                  line_items: list[JournalEntryLineItem]):
         """Constructs the HTML page parameters.
 
         :param account: The account.
+        :param is_mark_matches: Whether to mark the matched offsets.
         :param pagination: The pagination.
         :param line_items: The line items.
         """
@@ -89,6 +92,8 @@ class PageParams(BasePageParams):
         """The pagination."""
         self.line_items: list[JournalEntryLineItem] = line_items
         """The line items."""
+        self.is_mark_matches: bool = is_mark_matches
+        """Whether to mark the matched offsets."""
 
     @property
     def has_data(self) -> bool:
@@ -148,9 +153,13 @@ class UnappliedOriginalLineItems(BaseReport):
         """
         self.__account: Account = account
         """The account."""
+        offset_matcher: OffsetMatcher = OffsetMatcher(self.__account)
         self.__line_items: list[JournalEntryLineItem] \
-            = get_unapplied_original_line_items(self.__account)
+            = offset_matcher.unapplied
         """The line items."""
+        self.__is_mark_matches: bool \
+            = can_admin() and len(offset_matcher.unmatched_offsets) > 0
+        """Whether to mark the matched offsets."""
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
@@ -169,6 +178,7 @@ class UnappliedOriginalLineItems(BaseReport):
             = Pagination[JournalEntryLineItem](self.__line_items,
                                                is_reversed=True)
         params: PageParams = PageParams(account=self.__account,
+                                        is_mark_matches=self.__is_mark_matches,
                                         pagination=pagination,
                                         line_items=pagination.list)
         return render_template("accounting/report/unapplied.html",
