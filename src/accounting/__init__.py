@@ -88,4 +88,7 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     from . import option
     option.init_app(bp)
 
+    from . import unmatched_offset
+    unmatched_offset.init_app(bp)
+
     app.register_blueprint(bp, url_prefix=url_prefix)

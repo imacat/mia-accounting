@@ -353,6 +353,12 @@ a.accounting-report-table-row {
     margin: 0;
 }
 
+/* The unmatched offsets */
+.accounting-unmatched-offset-pair-list {
+    height: 20rem;
+    overflow-y: scroll;
+}
+
 /* The Material Design text field (floating form control in Bootstrap) */
 .accounting-material-text-field {
     position: relative;
