@@ -215,6 +215,25 @@ class Account(db.Model):
         return not self.is_real
 
     @property
+    def count(self) -> int:
+        """Returns the number of items in the account.
+
+        :return: The number of items in the account.
+        """
+        if not hasattr(self, "__count"):
+            setattr(self, "__count", 0)
+        return getattr(self, "__count")
+
+    @count.setter
+    def count(self, count: int) -> None:
+        """Sets the number of items in the account.
+
+        :param count: The number of items in the account.
+        :return: None.
+        """
+        setattr(self, "__count", count)
+
+    @property
     def query_values(self) -> list[str]:
         """Returns the values to be queried.
 
