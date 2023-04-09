@@ -27,7 +27,6 @@ from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import NEXT_URI, Accounts, create_test_app, get_client
-from testlib_offset import TestData
 
 PREFIX: str = "/accounting/options"
 """The URL prefix for the option management."""
@@ -68,7 +67,6 @@ class OptionTestCase(unittest.TestCase):
             Option.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "admin")
-        self.data: TestData = TestData(self.app, self.client, self.csrf_token)
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
