@@ -126,6 +126,12 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}/search?q=Airplane")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/search?q=Airplane&as=csv")
+        self.assertEqual(response.status_code, 403)
+
     def test_viewer(self) -> None:
         """Test the permission as viewer.
 
@@ -203,6 +209,14 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
+        response = client.get(f"{PREFIX}/search?q=Airplane")
+        self.assertEqual(response.status_code, 200)
+
+        response = client.get(f"{PREFIX}/search?q=Airplane&as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
@@ -288,6 +302,14 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
 
+        response = self.client.get(f"{PREFIX}/search?q=Airplane")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/search?q=Airplane&as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
     def test_empty_db(self) -> None:
         """Tests the empty database.
 
@@ -364,6 +386,14 @@ class ReportTestCase(unittest.TestCase):
 
         response = self.client.get(
             f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
+        response = self.client.get(f"{PREFIX}/search?q=Airplane")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/search?q=Airplane&as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
