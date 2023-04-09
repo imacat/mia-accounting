@@ -79,6 +79,7 @@ class OffsetMatcherTestCase(unittest.TestCase):
         line_item: JournalEntryLineItem | None
         matcher: OffsetMatcher
         list_uri: str
+        match_uri: str
         response: httpx.Response
 
         # The receivables
@@ -104,7 +105,8 @@ class OffsetMatcherTestCase(unittest.TestCase):
                 self.assertIsNone(line_item.original_line_item_id)
 
         list_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
-        response = self.client.post(list_uri,
+        match_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
+        response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], list_uri)
@@ -153,7 +155,8 @@ class OffsetMatcherTestCase(unittest.TestCase):
                 self.assertIsNone(line_item.original_line_item_id)
 
         list_uri = f"{PREFIX}/{Accounts.PAYABLE}"
-        response = self.client.post(list_uri,
+        match_uri = f"{PREFIX}/{Accounts.PAYABLE}"
+        response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], list_uri)
@@ -192,6 +195,7 @@ class OffsetMatcherTestCase(unittest.TestCase):
         line_item: JournalEntryLineItem | None
         matcher: OffsetMatcher
         list_uri: str
+        match_uri: str
         response: httpx.Response
 
         # The receivables
@@ -224,7 +228,8 @@ class OffsetMatcherTestCase(unittest.TestCase):
             self.assertEqual(line_item.original_line_item_id, data.l_r_or2d.id)
 
         list_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
-        response = self.client.post(list_uri,
+        match_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
+        response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], list_uri)
@@ -289,7 +294,8 @@ class OffsetMatcherTestCase(unittest.TestCase):
             self.assertEqual(line_item.original_line_item_id, data.l_p_or2c.id)
 
         list_uri = f"{PREFIX}/{Accounts.PAYABLE}"
-        response = self.client.post(list_uri,
+        match_uri = f"{PREFIX}/{Accounts.PAYABLE}"
+        response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], list_uri)
