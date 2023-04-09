@@ -17,6 +17,7 @@
 """The common test libraries.
 
 """
+import re
 import typing as t
 
 import httpx
@@ -117,3 +118,36 @@ def set_locale(client: httpx.Client, csrf_token: str,
                                                  "next": "/next"})
     assert response.status_code == 302
     assert response.headers["Location"] == "/next"
+
+
+def add_journal_entry(client: httpx.Client, form: dict[str, str]) -> int:
+    """Adds a transfer journal entry.
+
+    :param client: The client.
+    :param form: The form data.
+    :return: The newly-added journal entry ID.
+    """
+    prefix: str = "/accounting/journal-entries"
+    journal_entry_type: str = "transfer"
+    if len({x for x in form if "-debit-" in x}) == 0:
+        journal_entry_type = "receipt"
+    elif len({x for x in form if "-credit-" in x}) == 0:
+        journal_entry_type = "disbursement"
+    store_uri = f"{prefix}/store/{journal_entry_type}"
+    response: httpx.Response = client.post(store_uri, data=form)
+    assert response.status_code == 302
+    return match_journal_entry_detail(response.headers["Location"])
+
+
+def match_journal_entry_detail(location: str) -> int:
+    """Validates if the redirect location is the journal entry detail, and
+    returns the journal entry ID on success.
+
+    :param location: The redirect location.
+    :return: The journal entry ID.
+    :raise AssertionError: When the location is not the journal entry detail.
+    """
+    m: re.Match = re.match(
+        r"^/accounting/journal-entries/(\d+)\?next=%2F_next", location)
+    assert m is not None
+    return int(m.group(1))

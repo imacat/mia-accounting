@@ -27,11 +27,12 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import db
-from testlib import NEXT_URI, Accounts, create_test_app, get_client
+from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
+    add_journal_entry, match_journal_entry_detail
 from testlib_journal_entry import NON_EMPTY_NOTE, EMPTY_NOTE, \
     get_add_form, get_unchanged_update_form, get_update_form, \
-    match_journal_entry_detail, set_negative_amount, \
-    remove_debit_in_a_currency, remove_credit_in_a_currency, add_journal_entry
+    set_negative_amount, remove_debit_in_a_currency, \
+    remove_credit_in_a_currency
 
 PREFIX: str = "/accounting/journal-entries"
 """The URL prefix for the journal entry management."""

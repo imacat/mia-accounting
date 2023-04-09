@@ -28,8 +28,8 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import db
-from testlib import Accounts, create_test_app, get_client
-from testlib_journal_entry import match_journal_entry_detail
+from testlib import Accounts, create_test_app, get_client, \
+    match_journal_entry_detail
 from testlib_offset import JournalEntryData, JournalEntryCurrencyData, \
     JournalEntryLineItemData, BaseTestData
 
