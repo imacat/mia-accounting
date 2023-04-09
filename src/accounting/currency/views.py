@@ -55,7 +55,7 @@ def list_currencies() -> str:
                            list=pagination.list, pagination=pagination)
 
 
-@bp.get("/create", endpoint="create")
+@bp.get("create", endpoint="create")
 @has_permission(can_edit)
 def show_add_currency_form() -> str:
     """Shows the form to add a currency.
@@ -72,7 +72,7 @@ def show_add_currency_form() -> str:
                            form=form)
 
 
-@bp.post("/store", endpoint="store")
+@bp.post("store", endpoint="store")
 @has_permission(can_edit)
 def add_currency() -> redirect:
     """Adds a currency.
@@ -93,7 +93,7 @@ def add_currency() -> redirect:
     return redirect(inherit_next(__get_detail_uri(currency)))
 
 
-@bp.get("/<currency:currency>", endpoint="detail")
+@bp.get("<currency:currency>", endpoint="detail")
 @has_permission(can_view)
 def show_currency_detail(currency: Currency) -> str:
     """Shows the currency detail.
@@ -104,7 +104,7 @@ def show_currency_detail(currency: Currency) -> str:
     return render_template("accounting/currency/detail.html", obj=currency)
 
 
-@bp.get("/<currency:currency>/edit", endpoint="edit")
+@bp.get("<currency:currency>/edit", endpoint="edit")
 @has_permission(can_edit)
 def show_currency_edit_form(currency: Currency) -> str:
     """Shows the form to edit a currency.
@@ -123,7 +123,7 @@ def show_currency_edit_form(currency: Currency) -> str:
                            currency=currency, form=form)
 
 
-@bp.post("/<currency:currency>/update", endpoint="update")
+@bp.post("<currency:currency>/update", endpoint="update")
 @has_permission(can_edit)
 def update_currency(currency: Currency) -> redirect:
     """Updates a currency.
@@ -151,7 +151,7 @@ def update_currency(currency: Currency) -> redirect:
     return redirect(inherit_next(__get_detail_uri(currency)))
 
 
-@bp.post("/<currency:currency>/delete", endpoint="delete")
+@bp.post("<currency:currency>/delete", endpoint="delete")
 @has_permission(can_edit)
 def delete_currency(currency: Currency) -> redirect:
     """Deletes a currency.
@@ -169,7 +169,7 @@ def delete_currency(currency: Currency) -> redirect:
     return redirect(or_next(url_for("accounting.currency.list")))
 
 
-@api_bp.get("/exists-code", endpoint="exists")
+@api_bp.get("exists-code", endpoint="exists")
 @has_permission(can_edit)
 def exists_code() -> dict[str, bool]:
     """Validates whether a currency code exists.

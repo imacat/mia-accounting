@@ -41,7 +41,7 @@ def list_accounts() -> str:
                            list=pagination.list, pagination=pagination)
 
 
-@bp.get("/<baseAccount:account>", endpoint="detail")
+@bp.get("<baseAccount:account>", endpoint="detail")
 @has_permission(can_view)
 def show_account_detail(account: BaseAccount) -> str:
     """Shows the account detail.

@@ -49,7 +49,7 @@ bp.add_app_template_filter(format_amount_input,
 bp.add_app_template_filter(text2html, "accounting_journal_entry_text2html")
 
 
-@bp.get("/create/<journalEntryType:journal_entry_type>", endpoint="create")
+@bp.get("create/<journalEntryType:journal_entry_type>", endpoint="create")
 @has_permission(can_edit)
 def show_add_journal_entry_form(journal_entry_type: JournalEntryType) -> str:
     """Shows the form to add a journal entry.
@@ -71,7 +71,7 @@ def show_add_journal_entry_form(journal_entry_type: JournalEntryType) -> str:
     return journal_entry_op.render_create_template(form)
 
 
-@bp.post("/store/<journalEntryType:journal_entry_type>", endpoint="store")
+@bp.post("store/<journalEntryType:journal_entry_type>", endpoint="store")
 @has_permission(can_edit)
 def add_journal_entry(journal_entry_type: JournalEntryType) -> redirect:
     """Adds a journal entry.
@@ -98,7 +98,7 @@ def add_journal_entry(journal_entry_type: JournalEntryType) -> redirect:
     return redirect(inherit_next(__get_detail_uri(journal_entry)))
 
 
-@bp.get("/<journalEntry:journal_entry>", endpoint="detail")
+@bp.get("<journalEntry:journal_entry>", endpoint="detail")
 @has_permission(can_view)
 def show_journal_entry_detail(journal_entry: JournalEntry) -> str:
     """Shows the journal entry detail.
@@ -111,7 +111,7 @@ def show_journal_entry_detail(journal_entry: JournalEntry) -> str:
     return journal_entry_op.render_detail_template(journal_entry)
 
 
-@bp.get("/<journalEntry:journal_entry>/edit", endpoint="edit")
+@bp.get("<journalEntry:journal_entry>/edit", endpoint="edit")
 @has_permission(can_edit)
 def show_journal_entry_edit_form(journal_entry: JournalEntry) -> str:
     """Shows the form to edit a journal entry.
@@ -133,7 +133,7 @@ def show_journal_entry_edit_form(journal_entry: JournalEntry) -> str:
     return journal_entry_op.render_edit_template(journal_entry, form)
 
 
-@bp.post("/<journalEntry:journal_entry>/update", endpoint="update")
+@bp.post("<journalEntry:journal_entry>/update", endpoint="update")
 @has_permission(can_edit)
 def update_journal_entry(journal_entry: JournalEntry) -> redirect:
     """Updates a journal entry.
@@ -166,7 +166,7 @@ def update_journal_entry(journal_entry: JournalEntry) -> redirect:
     return redirect(inherit_next(__get_detail_uri(journal_entry)))
 
 
-@bp.post("/<journalEntry:journal_entry>/delete", endpoint="delete")
+@bp.post("<journalEntry:journal_entry>/delete", endpoint="delete")
 @has_permission(can_edit)
 def delete_journal_entry(journal_entry: JournalEntry) -> redirect:
     """Deletes a journal entry.
@@ -186,7 +186,7 @@ def delete_journal_entry(journal_entry: JournalEntry) -> redirect:
     return redirect(or_next(__get_default_page_uri()))
 
 
-@bp.get("/dates/<date:journal_entry_date>", endpoint="order")
+@bp.get("dates/<date:journal_entry_date>", endpoint="order")
 @has_permission(can_view)
 def show_journal_entry_order(journal_entry_date: date) -> str:
     """Shows the order of the journal entries in a same date.
@@ -201,7 +201,7 @@ def show_journal_entry_order(journal_entry_date: date) -> str:
                            date=journal_entry_date, list=journal_entries)
 
 
-@bp.post("/dates/<date:journal_entry_date>", endpoint="sort")
+@bp.post("dates/<date:journal_entry_date>", endpoint="sort")
 @has_permission(can_edit)
 def sort_journal_entries(journal_entry_date: date) -> redirect:
     """Reorders the journal entries in a date.

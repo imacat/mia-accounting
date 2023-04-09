@@ -53,7 +53,7 @@ def list_accounts() -> str:
                            list=pagination.list, pagination=pagination)
 
 
-@bp.get("/create", endpoint="create")
+@bp.get("create", endpoint="create")
 @has_permission(can_edit)
 def show_add_account_form() -> str:
     """Shows the form to add an account.
@@ -70,7 +70,7 @@ def show_add_account_form() -> str:
                            form=form)
 
 
-@bp.post("/store", endpoint="store")
+@bp.post("store", endpoint="store")
 @has_permission(can_edit)
 def add_account() -> redirect:
     """Adds an account.
@@ -91,7 +91,7 @@ def add_account() -> redirect:
     return redirect(inherit_next(__get_detail_uri(account)))
 
 
-@bp.get("/<account:account>", endpoint="detail")
+@bp.get("<account:account>", endpoint="detail")
 @has_permission(can_view)
 def show_account_detail(account: Account) -> str:
     """Shows the account detail.
@@ -102,7 +102,7 @@ def show_account_detail(account: Account) -> str:
     return render_template("accounting/account/detail.html", obj=account)
 
 
-@bp.get("/<account:account>/edit", endpoint="edit")
+@bp.get("<account:account>/edit", endpoint="edit")
 @has_permission(can_edit)
 def show_account_edit_form(account: Account) -> str:
     """Shows the form to edit an account.
@@ -121,7 +121,7 @@ def show_account_edit_form(account: Account) -> str:
                            account=account, form=form)
 
 
-@bp.post("/<account:account>/update", endpoint="update")
+@bp.post("<account:account>/update", endpoint="update")
 @has_permission(can_edit)
 def update_account(account: Account) -> redirect:
     """Updates an account.
@@ -148,7 +148,7 @@ def update_account(account: Account) -> redirect:
     return redirect(inherit_next(__get_detail_uri(account)))
 
 
-@bp.post("/<account:account>/delete", endpoint="delete")
+@bp.post("<account:account>/delete", endpoint="delete")
 @has_permission(can_edit)
 def delete_account(account: Account) -> redirect:
     """Deletes an account.
@@ -167,7 +167,7 @@ def delete_account(account: Account) -> redirect:
     return redirect(or_next(__get_list_uri()))
 
 
-@bp.get("/bases/<baseAccount:base>", endpoint="order")
+@bp.get("bases/<baseAccount:base>", endpoint="order")
 @has_permission(can_view)
 def show_account_order(base: BaseAccount) -> str:
     """Shows the order of the accounts under a same base account.
@@ -178,7 +178,7 @@ def show_account_order(base: BaseAccount) -> str:
     return render_template("accounting/account/order.html", base=base)
 
 
-@bp.post("/bases/<baseAccount:base>", endpoint="sort")
+@bp.post("bases/<baseAccount:base>", endpoint="sort")
 @has_permission(can_edit)
 def sort_accounts(base: BaseAccount) -> redirect:
     """Reorders the accounts under a base account.
