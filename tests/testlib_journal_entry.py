@@ -18,8 +18,8 @@
 
 """
 import re
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 from secrets import randbelow
 
 import httpx
