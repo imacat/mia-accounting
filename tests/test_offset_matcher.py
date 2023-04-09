@@ -30,6 +30,9 @@ from testlib_journal_entry import match_journal_entry_detail
 from testlib_offset import JournalEntryData, CurrencyData, \
     JournalEntryLineItemData
 
+PREFIX: str = "/accounting/unmatched-offsets"
+"""The URL prefix for the unmatched offset management."""
+
 
 class OffsetMatcherTestCase(unittest.TestCase):
     """The offset matcher test case."""
@@ -100,7 +103,7 @@ class OffsetMatcherTestCase(unittest.TestCase):
                 self.assertIsNotNone(line_item)
                 self.assertIsNone(line_item.original_line_item_id)
 
-        list_uri = f"/accounting/unmatched-offsets/{Accounts.RECEIVABLE}"
+        list_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
         response = self.client.post(list_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
@@ -149,7 +152,7 @@ class OffsetMatcherTestCase(unittest.TestCase):
                 self.assertIsNotNone(line_item)
                 self.assertIsNone(line_item.original_line_item_id)
 
-        list_uri = f"/accounting/unmatched-offsets/{Accounts.PAYABLE}"
+        list_uri = f"{PREFIX}/{Accounts.PAYABLE}"
         response = self.client.post(list_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
@@ -220,7 +223,7 @@ class OffsetMatcherTestCase(unittest.TestCase):
             self.assertIsNotNone(line_item.original_line_item_id)
             self.assertEqual(line_item.original_line_item_id, data.l_r_or2d.id)
 
-        list_uri = f"/accounting/unmatched-offsets/{Accounts.RECEIVABLE}"
+        list_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
         response = self.client.post(list_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
@@ -285,7 +288,7 @@ class OffsetMatcherTestCase(unittest.TestCase):
             self.assertIsNotNone(line_item.original_line_item_id)
             self.assertEqual(line_item.original_line_item_id, data.l_p_or2c.id)
 
-        list_uri = f"/accounting/unmatched-offsets/{Accounts.PAYABLE}"
+        list_uri = f"{PREFIX}/{Accounts.PAYABLE}"
         response = self.client.post(list_uri,
                                     data={"csrf_token": self.csrf_token})
         self.assertEqual(response.status_code, 302)
