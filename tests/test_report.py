@@ -96,7 +96,7 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/unapplied")
+        response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
