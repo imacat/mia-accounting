@@ -78,25 +78,25 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/ledger/USD/{Accounts.CASH}")
+        response = client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/income-expenses/USD/0000-000")
+        response = client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/trial-balance/USD")
+        response = client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/income-statement/USD")
+        response = client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/balance-sheet/USD")
+        response = client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}")
+        response = client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -114,19 +114,19 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"{PREFIX}/ledger/USD/{Accounts.CASH}")
+        response = client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"{PREFIX}/income-expenses/USD/0000-000")
+        response = client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"{PREFIX}/trial-balance/USD")
+        response = client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"{PREFIX}/income-statement/USD")
+        response = client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"{PREFIX}/balance-sheet/USD")
+        response = client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 200)
 
         response = client.get(f"{PREFIX}/unapplied")
@@ -149,19 +149,19 @@ class ReportTestCase(unittest.TestCase):
         response = self.client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/ledger/USD/{Accounts.CASH}")
+        response = self.client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/income-expenses/USD/0000-000")
+        response = self.client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/trial-balance/USD")
+        response = self.client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/income-statement/USD")
+        response = self.client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/balance-sheet/USD")
+        response = self.client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(f"{PREFIX}/unapplied")
@@ -183,19 +183,19 @@ class ReportTestCase(unittest.TestCase):
         response = self.client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/ledger/USD/{Accounts.CASH}")
+        response = self.client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/income-expenses/USD/0000-000")
+        response = self.client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/trial-balance/USD")
+        response = self.client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/income-statement/USD")
+        response = self.client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/balance-sheet/USD")
+        response = self.client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(f"{PREFIX}/unapplied")

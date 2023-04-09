@@ -47,9 +47,10 @@ def ledger_url(currency: Currency, account: Account, period: Period) \
     :param period: The period.
     :return: The URL of the ledger.
     """
-    if period.is_default:
-        return url_for("accounting-report.ledger-default",
-                       currency=currency, account=account)
+    if currency.code == default_currency_code() \
+            and account.code == Account.CASH_CODE \
+            and period.is_default:
+        return url_for("accounting-report.ledger-default")
     return url_for("accounting-report.ledger",
                    currency=currency, account=account,
                    period=period)
@@ -68,9 +69,6 @@ def income_expenses_url(currency: Currency, account: CurrentAccount,
             and account.code == options.default_ie_account_code \
             and period.is_default:
         return url_for("accounting-report.default")
-    if period.is_default:
-        return url_for("accounting-report.income-expenses-default",
-                       currency=currency, account=account)
     return url_for("accounting-report.income-expenses",
                    currency=currency, account=account,
                    period=period)
@@ -83,9 +81,8 @@ def trial_balance_url(currency: Currency, period: Period) -> str:
     :param period: The period.
     :return: The URL of the trial balance.
     """
-    if period.is_default:
-        return url_for("accounting-report.trial-balance-default",
-                       currency=currency)
+    if currency.code == default_currency_code() and period.is_default:
+        return url_for("accounting-report.trial-balance-default")
     return url_for("accounting-report.trial-balance",
                    currency=currency, period=period)
 
@@ -97,9 +94,8 @@ def income_statement_url(currency: Currency, period: Period) -> str:
     :param period: The period.
     :return: The URL of the income statement.
     """
-    if period.is_default:
-        return url_for("accounting-report.income-statement-default",
-                       currency=currency)
+    if currency.code == default_currency_code() and period.is_default:
+        return url_for("accounting-report.income-statement-default")
     return url_for("accounting-report.income-statement",
                    currency=currency, period=period)
 
@@ -111,9 +107,8 @@ def balance_sheet_url(currency: Currency, period: Period) -> str:
     :param period: The period.
     :return: The URL of the balance sheet.
     """
-    if period.is_default:
-        return url_for("accounting-report.balance-sheet-default",
-                       currency=currency)
+    if currency.code == default_currency_code() and period.is_default:
+        return url_for("accounting-report.balance-sheet-default")
     return url_for("accounting-report.balance-sheet",
                    currency=currency, period=period)
 

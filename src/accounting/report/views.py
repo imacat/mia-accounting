@@ -44,10 +44,7 @@ def get_default_report() -> str | Response:
 
     :return: The income and expenses log in the default period.
     """
-    return __get_income_expenses(
-        db.session.get(Currency, default_currency_code()),
-        options.default_ie_account,
-        get_period())
+    return get_default_income_expenses()
 
 
 @bp.get("journal", endpoint="journal-default")
@@ -83,17 +80,15 @@ def __get_journal(period: Period) -> str | Response:
     return report.html()
 
 
-@bp.get("ledger/<currency:currency>/<account:account>",
-        endpoint="ledger-default")
+@bp.get("ledger", endpoint="ledger-default")
 @has_permission(can_view)
-def get_default_ledger(currency: Currency, account: Account) -> str | Response:
-    """Returns the ledger in the default period.
+def get_default_ledger() -> str | Response:
+    """Returns the ledger in the default currency, cash, and default period.
 
-    :param currency: The currency.
-    :param account: The account.
-    :return: The ledger in the default period.
+    :return: The ledger in the default currency, cash, and default period.
     """
-    return __get_ledger(currency, account, get_period())
+    return __get_ledger(db.session.get(Currency, default_currency_code()),
+                        Account.cash(), get_period())
 
 
 @bp.get("ledger/<currency:currency>/<account:account>/<period:period>",
@@ -126,18 +121,17 @@ def __get_ledger(currency: Currency, account: Account, period: Period) \
     return report.html()
 
 
-@bp.get("income-expenses/<currency:currency>/<currentAccount:account>",
-        endpoint="income-expenses-default")
+@bp.get("income-expenses", endpoint="income-expenses-default")
 @has_permission(can_view)
-def get_default_income_expenses(currency: Currency, account: CurrentAccount) \
-        -> str | Response:
+def get_default_income_expenses() -> str | Response:
     """Returns the income and expenses log in the default period.
 
-    :param currency: The currency.
-    :param account: The account.
     :return: The income and expenses log in the default period.
     """
-    return __get_income_expenses(currency, account, get_period())
+    return __get_income_expenses(
+        db.session.get(Currency, default_currency_code()),
+        options.default_ie_account,
+        get_period())
 
 
 @bp.get("income-expenses/<currency:currency>/<currentAccount:account>/"
@@ -170,16 +164,15 @@ def __get_income_expenses(currency: Currency, account: CurrentAccount,
     return report.html()
 
 
-@bp.get("trial-balance/<currency:currency>",
-        endpoint="trial-balance-default")
+@bp.get("trial-balance", endpoint="trial-balance-default")
 @has_permission(can_view)
-def get_default_trial_balance(currency: Currency) -> str | Response:
+def get_default_trial_balance() -> str | Response:
     """Returns the trial balance in the default period.
 
-    :param currency: The currency.
     :return: The trial balance in the default period.
     """
-    return __get_trial_balance(currency, get_period())
+    return __get_trial_balance(
+        db.session.get(Currency, default_currency_code()), get_period())
 
 
 @bp.get("trial-balance/<currency:currency>/<period:period>",
@@ -208,16 +201,15 @@ def __get_trial_balance(currency: Currency, period: Period) -> str | Response:
     return report.html()
 
 
-@bp.get("income-statement/<currency:currency>",
-        endpoint="income-statement-default")
+@bp.get("income-statement", endpoint="income-statement-default")
 @has_permission(can_view)
-def get_default_income_statement(currency: Currency) -> str | Response:
+def get_default_income_statement() -> str | Response:
     """Returns the income statement in the default period.
 
-    :param currency: The currency.
     :return: The income statement in the default period.
     """
-    return __get_income_statement(currency, get_period())
+    return __get_income_statement(
+        db.session.get(Currency, default_currency_code()), get_period())
 
 
 @bp.get("income-statement/<currency:currency>/<period:period>",
@@ -247,16 +239,15 @@ def __get_income_statement(currency: Currency, period: Period) \
     return report.html()
 
 
-@bp.get("balance-sheet/<currency:currency>",
-        endpoint="balance-sheet-default")
+@bp.get("balance-sheet", endpoint="balance-sheet-default")
 @has_permission(can_view)
-def get_default_balance_sheet(currency: Currency) -> str | Response:
+def get_default_balance_sheet() -> str | Response:
     """Returns the balance sheet in the default period.
 
-    :param currency: The currency.
     :return: The balance sheet in the default period.
     """
-    return __get_balance_sheet(currency, get_period())
+    return __get_balance_sheet(
+        db.session.get(Currency, default_currency_code()), get_period())
 
 
 @bp.get("balance-sheet/<currency:currency>/<period:period>",
