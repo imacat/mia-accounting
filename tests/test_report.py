@@ -412,12 +412,12 @@ class ReportTestData(BaseTestData):
                 break
             self._add_simple_journal_entry(
                 (j_date - today).days, "USD",
-                "Salary", "1200", Accounts.BANK, Accounts.SERVICE)
+                "Salary薪水", "1200", Accounts.BANK, Accounts.SERVICE)
             month = month + 1
             if month > 12:
                 year = year + 1
                 month = 1
         self._add_simple_journal_entry(
-            1, "USD", "Withdraw", "1000", Accounts.CASH, Accounts.BANK)
+            1, "USD", "Withdraw領錢", "1000", Accounts.CASH, Accounts.BANK)
         self._add_simple_journal_entry(
-            0, "USD", "Dinner", "40", Accounts.MEAL, Accounts.CASH)
+            0, "USD", "Dinner晚餐", "40", Accounts.MEAL, Accounts.CASH)
