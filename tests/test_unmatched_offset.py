@@ -500,16 +500,14 @@ class DifferentTestData(BaseTestData):
             5, [JournalEntryCurrencyData(
                 "USD", [self.l_p_of5d], [self.l_p_of5c])])
 
-        self._set_is_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE},
-                                 False)
+        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, False)
         self._add_journal_entry(self.j_r_of1)
         self._add_journal_entry(self.j_r_of2)
         self._add_journal_entry(self.j_r_of3)
         self._add_journal_entry(self.j_p_of1)
         self._add_journal_entry(self.j_p_of2)
         self._add_journal_entry(self.j_p_of3)
-        self._set_is_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE},
-                                 True)
+        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, True)
 
 
 class SameTestData(BaseTestData):
@@ -663,8 +661,7 @@ class SameTestData(BaseTestData):
             15, [JournalEntryCurrencyData(
                 "USD", [self.l_p_of6d], [self.l_p_of6c])])
 
-        self._set_is_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE},
-                                 False)
+        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, False)
         self._add_journal_entry(self.j_r_of1)
         self._add_journal_entry(self.j_r_of2)
         self._add_journal_entry(self.j_r_of4)
@@ -675,7 +672,6 @@ class SameTestData(BaseTestData):
         self._add_journal_entry(self.j_p_of4)
         self._add_journal_entry(self.j_p_of5)
         self._add_journal_entry(self.j_p_of6)
-        self._set_is_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE},
-                                 True)
+        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, True)
         self._add_journal_entry(self.j_r_of3)
         self._add_journal_entry(self.j_p_of3)

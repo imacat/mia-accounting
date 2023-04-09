@@ -225,8 +225,8 @@ class BaseTestData(ABC):
                     journal_entry_data.currencies[i].credit[j].id \
                         = journal_entry.currencies[i].credit[j].id
 
-    def _set_is_need_offset(self, account_codes: set[str],
-                            is_need_offset: bool) -> None:
+    def _set_need_offset(self, account_codes: set[str],
+                         is_need_offset: bool) -> None:
         """Sets whether the line items in some accounts need offset.
 
         :param account_codes: The account codes.
