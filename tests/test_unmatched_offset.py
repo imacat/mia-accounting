@@ -124,6 +124,25 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"],
                          f"{PREFIX}/{Accounts.PAYABLE}")
 
+    def test_empty_db(self) -> None:
+        """Test the empty database.
+
+        :return: None.
+        """
+        response: httpx.Response
+
+        response = self.client.get(PREFIX)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/{Accounts.PAYABLE}")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(f"{PREFIX}/{Accounts.PAYABLE}",
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{Accounts.PAYABLE}")
+
     def test_different(self) -> None:
         """Tests to match against different descriptions and amounts.
 
