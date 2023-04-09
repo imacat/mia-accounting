@@ -25,9 +25,8 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from test_site import db
-from testlib import create_test_app, get_client, Accounts
-from testlib_offset import JournalEntryData, JournalEntryCurrencyData, \
-    BaseTestData
+from testlib import create_test_app, get_client, Accounts, \
+    JournalEntryCurrencyData, JournalEntryData, BaseTestData
 
 PREFIX: str = "/accounting/unmatched-offsets"
 """The URL prefix for the unmatched offset management."""

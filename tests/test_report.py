@@ -25,8 +25,7 @@ from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
 
-from testlib import create_test_app, get_client, Accounts
-from testlib_offset import BaseTestData
+from testlib import create_test_app, get_client, Accounts, BaseTestData
 
 PREFIX: str = "/accounting"
 """The URL prefix for the reports."""

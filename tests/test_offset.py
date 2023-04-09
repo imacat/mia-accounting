@@ -29,9 +29,8 @@ from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import Accounts, create_test_app, get_client, \
-    match_journal_entry_detail
-from testlib_offset import JournalEntryData, JournalEntryCurrencyData, \
-    JournalEntryLineItemData, BaseTestData
+    match_journal_entry_detail, JournalEntryLineItemData, \
+    JournalEntryCurrencyData, JournalEntryData, BaseTestData
 
 PREFIX: str = "/accounting/journal-entries"
 """The URL prefix for the journal entry management."""
