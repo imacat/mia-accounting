@@ -225,6 +225,27 @@ class BaseTestData(ABC):
                     journal_entry_data.currencies[i].credit[j].id \
                         = journal_entry.currencies[i].credit[j].id
 
+    def _add_simple_journal_entry(
+            self, days: int, currency: str, description: str, amount: str,
+            debit: str, credit: str) \
+            -> tuple[JournalEntryLineItemData, JournalEntryLineItemData]:
+        """Adds a simple journal entry.
+
+        :param days: The number of days before today.
+        :param currency: The currency code.
+        :param description: The description.
+        :param amount: The amount.
+        :param debit: The debit account code.
+        :param credit: The credit account code.
+        :return: The debit line item and credit line item.
+        """
+        debit_item, credit_item = self._couple(
+            description, amount, debit, credit)
+        self._add_journal_entry(JournalEntryData(
+            days, [JournalEntryCurrencyData(
+                currency, [debit_item], [credit_item])]))
+        return debit_item, credit_item
+
     def _set_need_offset(self, account_codes: set[str],
                          is_need_offset: bool) -> None:
         """Sets whether the line items in some accounts need offset.
