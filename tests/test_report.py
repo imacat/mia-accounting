@@ -132,6 +132,12 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(f"{PREFIX}/search?q=Salary&as=csv")
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}/search?q=薪水")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/search?q=薪水&as=csv")
+        self.assertEqual(response.status_code, 403)
+
     def test_viewer(self) -> None:
         """Test the permission as viewer.
 
@@ -221,6 +227,14 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
 
+        response = client.get(f"{PREFIX}/search?q=薪水")
+        self.assertEqual(response.status_code, 200)
+
+        response = client.get(f"{PREFIX}/search?q=薪水&as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
     def test_editor(self) -> None:
         """Test the permission as editor.
 
@@ -306,6 +320,14 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(f"{PREFIX}/search?q=Salary&as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
+        response = self.client.get(f"{PREFIX}/search?q=薪水")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/search?q=薪水&as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")

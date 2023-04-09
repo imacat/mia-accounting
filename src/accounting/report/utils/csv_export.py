@@ -22,6 +22,7 @@ from abc import ABC, abstractmethod
 from datetime import timedelta, date
 from decimal import Decimal
 from io import StringIO
+from urllib.parse import quote
 
 from flask import Response
 
@@ -53,7 +54,7 @@ def csv_download(filename: str, rows: list[BaseCSVRow]) -> Response:
         fp.seek(0)
         response: Response = Response(fp.read(), mimetype="text/csv")
         response.headers["Content-Disposition"] \
-            = f"attachment; filename={filename}"
+            = f"attachment; filename={quote(filename)}"
         return response
 
 
