@@ -110,7 +110,7 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.l_p_or1c.id
+            = str(self.data.l_p_or1c.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_or1c.account
         form["currency-1-credit-1-amount"] = "100"
         response = self.client.post(store_uri, data=form)
@@ -134,7 +134,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.l_p_of1d.id
+            = str(self.data.l_p_of1d.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_of1d.account
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -220,7 +220,7 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.l_p_or1c.id
+            = str(self.data.l_p_or1c.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_or1c.account
         form["currency-1-debit-1-amount"] = "100"
         form["currency-1-credit-1-amount"] = "100"
@@ -245,7 +245,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-credit-1-original_line_item_id"] \
-            = self.data.l_p_of1d.id
+            = str(self.data.l_p_of1d.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_of1d.account
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -434,7 +434,7 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.l_r_or1d.id
+            = str(self.data.l_r_or1d.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_or1d.account
         form["currency-1-debit-1-amount"] = "100"
         response = self.client.post(store_uri, data=form)
@@ -458,7 +458,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.new_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.l_r_of1c.id
+            = str(self.data.l_r_of1c.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_of1c.account
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
@@ -544,7 +544,7 @@ class OffsetTestCase(unittest.TestCase):
         # The same debit or credit
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.l_r_or1d.id
+            = str(self.data.l_r_or1d.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_or1d.account
         form["currency-1-debit-1-amount"] = "100"
         form["currency-1-credit-1-amount"] = "100"
@@ -569,7 +569,7 @@ class OffsetTestCase(unittest.TestCase):
         # The original line item is also an offset
         form = journal_entry_data.update_form(self.csrf_token)
         form["currency-1-debit-1-original_line_item_id"] \
-            = self.data.l_r_of1c.id
+            = str(self.data.l_r_of1c.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_of1c.account
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
