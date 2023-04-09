@@ -76,7 +76,7 @@ class JournalEntryLineItemData:
         return form
 
 
-class CurrencyData:
+class JournalEntryCurrencyData:
     """The journal entry currency data."""
 
     def __init__(self, currency: str, debit: list[JournalEntryLineItemData],
@@ -111,7 +111,7 @@ class CurrencyData:
 class JournalEntryData:
     """The journal entry data."""
 
-    def __init__(self, days: int, currencies: list[CurrencyData]):
+    def __init__(self, days: int, currencies: list[JournalEntryCurrencyData]):
         """Constructs a journal entry.
 
         :param days: The number of days before today.
@@ -119,7 +119,7 @@ class JournalEntryData:
         """
         self.id: int = -1
         self.days: int = days
-        self.currencies: list[CurrencyData] = currencies
+        self.currencies: list[JournalEntryCurrencyData] = currencies
         self.note: str | None = None
         for currency in self.currencies:
             for line_item in currency.debit:
@@ -269,17 +269,21 @@ class TestData(BaseTestData):
 
         # Original journal entries
         self.j_r_or1: JournalEntryData = JournalEntryData(
-            50, [CurrencyData("USD", [self.l_r_or1d, self.l_r_or4d],
-                              [self.l_r_or1c, self.l_r_or4c])])
+            50, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or1d, self.l_r_or4d],
+                [self.l_r_or1c, self.l_r_or4c])])
         self.j_r_or2: JournalEntryData = JournalEntryData(
-            30, [CurrencyData("USD", [self.l_r_or2d, self.l_r_or3d],
-                              [self.l_r_or2c, self.l_r_or3c])])
+            30, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or2d, self.l_r_or3d],
+                [self.l_r_or2c, self.l_r_or3c])])
         self.j_p_or1: JournalEntryData = JournalEntryData(
-            40, [CurrencyData("USD", [self.l_p_or1d, self.l_p_or4d],
-                              [self.l_p_or1c, self.l_p_or4c])])
+            40, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or1d, self.l_p_or4d],
+                [self.l_p_or1c, self.l_p_or4c])])
         self.j_p_or2: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD", [self.l_p_or2d, self.l_p_or3d],
-                              [self.l_p_or2c, self.l_p_or3c])])
+            20, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or2d, self.l_p_or3d],
+                [self.l_p_or2c, self.l_p_or3c])])
 
         self._add_journal_entry(self.j_r_or1)
         self._add_journal_entry(self.j_r_or2)
@@ -322,21 +326,25 @@ class TestData(BaseTestData):
 
         # Offset journal entries
         self.j_r_of1: JournalEntryData = JournalEntryData(
-            25, [CurrencyData("USD", [self.l_r_of1d], [self.l_r_of1c])])
+            25, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of1d], [self.l_r_of1c])])
         self.j_r_of2: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD",
-                              [self.l_r_of2d, self.l_r_of3d, self.l_r_of4d],
-                              [self.l_r_of2c, self.l_r_of3c, self.l_r_of4c])])
+            20, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of2d, self.l_r_of3d, self.l_r_of4d],
+                [self.l_r_of2c, self.l_r_of3c, self.l_r_of4c])])
         self.j_r_of3: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.l_r_of5d], [self.l_r_of5c])])
+            15, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of5d], [self.l_r_of5c])])
         self.j_p_of1: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.l_p_of1d], [self.l_p_of1c])])
+            15, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of1d], [self.l_p_of1c])])
         self.j_p_of2: JournalEntryData = JournalEntryData(
-            10, [CurrencyData("USD",
-                              [self.l_p_of2d, self.l_p_of3d, self.l_p_of4d],
-                              [self.l_p_of2c, self.l_p_of3c, self.l_p_of4c])])
+            10, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of2d, self.l_p_of3d, self.l_p_of4d],
+                [self.l_p_of2c, self.l_p_of3c, self.l_p_of4c])])
         self.j_p_of3: JournalEntryData = JournalEntryData(
-            5, [CurrencyData("USD", [self.l_p_of5d], [self.l_p_of5c])])
+            5, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of5d], [self.l_p_of5c])])
 
         self._add_journal_entry(self.j_r_of1)
         self._add_journal_entry(self.j_r_of2)

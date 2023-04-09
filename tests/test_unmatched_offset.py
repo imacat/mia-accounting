@@ -26,7 +26,8 @@ from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import create_test_app, get_client, Accounts
-from testlib_offset import BaseTestData, JournalEntryData, CurrencyData
+from testlib_offset import JournalEntryData, JournalEntryCurrencyData, \
+    BaseTestData
 
 PREFIX: str = "/accounting/unmatched-offsets"
 """The URL prefix for the unmatched offset management."""
@@ -432,17 +433,21 @@ class DifferentTestData(BaseTestData):
 
         # Original journal entries
         self.j_r_or1: JournalEntryData = JournalEntryData(
-            50, [CurrencyData("USD", [self.l_r_or1d, self.l_r_or4d],
-                              [self.l_r_or1c, self.l_r_or4c])])
+            50, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or1d, self.l_r_or4d],
+                [self.l_r_or1c, self.l_r_or4c])])
         self.j_r_or2: JournalEntryData = JournalEntryData(
-            30, [CurrencyData("USD", [self.l_r_or2d, self.l_r_or3d],
-                              [self.l_r_or2c, self.l_r_or3c])])
+            30, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or2d, self.l_r_or3d],
+                [self.l_r_or2c, self.l_r_or3c])])
         self.j_p_or1: JournalEntryData = JournalEntryData(
-            40, [CurrencyData("USD", [self.l_p_or1d, self.l_p_or4d],
-                              [self.l_p_or1c, self.l_p_or4c])])
+            40, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or1d, self.l_p_or4d],
+                [self.l_p_or1c, self.l_p_or4c])])
         self.j_p_or2: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD", [self.l_p_or2d, self.l_p_or3d],
-                              [self.l_p_or2c, self.l_p_or3c])])
+            20, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or2d, self.l_p_or3d],
+                [self.l_p_or2c, self.l_p_or3c])])
 
         self._add_journal_entry(self.j_r_or1)
         self._add_journal_entry(self.j_r_or2)
@@ -475,21 +480,25 @@ class DifferentTestData(BaseTestData):
 
         # Offset journal entries
         self.j_r_of1: JournalEntryData = JournalEntryData(
-            25, [CurrencyData("USD", [self.l_r_of1d], [self.l_r_of1c])])
+            25, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of1d], [self.l_r_of1c])])
         self.j_r_of2: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD",
-                              [self.l_r_of2d, self.l_r_of3d, self.l_r_of4d],
-                              [self.l_r_of2c, self.l_r_of3c, self.l_r_of4c])])
+            20, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of2d, self.l_r_of3d, self.l_r_of4d],
+                [self.l_r_of2c, self.l_r_of3c, self.l_r_of4c])])
         self.j_r_of3: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.l_r_of5d], [self.l_r_of5c])])
+            15, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of5d], [self.l_r_of5c])])
         self.j_p_of1: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.l_p_of1d], [self.l_p_of1c])])
+            15, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of1d], [self.l_p_of1c])])
         self.j_p_of2: JournalEntryData = JournalEntryData(
-            10, [CurrencyData("USD",
-                              [self.l_p_of2d, self.l_p_of3d, self.l_p_of4d],
-                              [self.l_p_of2c, self.l_p_of3c, self.l_p_of4c])])
+            10, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of2d, self.l_p_of3d, self.l_p_of4d],
+                [self.l_p_of2c, self.l_p_of3c, self.l_p_of4c])])
         self.j_p_of3: JournalEntryData = JournalEntryData(
-            5, [CurrencyData("USD", [self.l_p_of5d], [self.l_p_of5c])])
+            5, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of5d], [self.l_p_of5c])])
 
         self._set_is_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE},
                                  False)
@@ -537,29 +546,41 @@ class SameTestData(BaseTestData):
 
         # Original journal entries
         self.j_r_or1: JournalEntryData = JournalEntryData(
-            60, [CurrencyData("USD", [self.l_r_or1d], [self.l_r_or1c])])
+            60, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or1d], [self.l_r_or1c])])
         self.j_r_or2: JournalEntryData = JournalEntryData(
-            50, [CurrencyData("USD", [self.l_r_or2d], [self.l_r_or2c])])
+            50, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or2d], [self.l_r_or2c])])
         self.j_r_or3: JournalEntryData = JournalEntryData(
-            40, [CurrencyData("USD", [self.l_r_or3d], [self.l_r_or3c])])
+            40, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or3d], [self.l_r_or3c])])
         self.j_r_or4: JournalEntryData = JournalEntryData(
-            30, [CurrencyData("USD", [self.l_r_or4d], [self.l_r_or4c])])
+            30, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or4d], [self.l_r_or4c])])
         self.j_r_or5: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD", [self.l_r_or5d], [self.l_r_or5c])])
+            20, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or5d], [self.l_r_or5c])])
         self.j_r_or6: JournalEntryData = JournalEntryData(
-            10, [CurrencyData("USD", [self.l_r_or6d], [self.l_r_or6c])])
+            10, [JournalEntryCurrencyData(
+                "USD", [self.l_r_or6d], [self.l_r_or6c])])
         self.j_p_or1: JournalEntryData = JournalEntryData(
-            60, [CurrencyData("USD", [self.l_p_or1d], [self.l_p_or1c])])
+            60, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or1d], [self.l_p_or1c])])
         self.j_p_or2: JournalEntryData = JournalEntryData(
-            50, [CurrencyData("USD", [self.l_p_or2d], [self.l_p_or2c])])
+            50, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or2d], [self.l_p_or2c])])
         self.j_p_or3: JournalEntryData = JournalEntryData(
-            40, [CurrencyData("USD", [self.l_p_or3d], [self.l_p_or3c])])
+            40, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or3d], [self.l_p_or3c])])
         self.j_p_or4: JournalEntryData = JournalEntryData(
-            30, [CurrencyData("USD", [self.l_p_or4d], [self.l_p_or4c])])
+            30, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or4d], [self.l_p_or4c])])
         self.j_p_or5: JournalEntryData = JournalEntryData(
-            20, [CurrencyData("USD", [self.l_p_or5d], [self.l_p_or5c])])
+            20, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or5d], [self.l_p_or5c])])
         self.j_p_or6: JournalEntryData = JournalEntryData(
-            10, [CurrencyData("USD", [self.l_p_or6d], [self.l_p_or6c])])
+            10, [JournalEntryCurrencyData(
+                "USD", [self.l_p_or6d], [self.l_p_or6c])])
 
         self._add_journal_entry(self.j_r_or1)
         self._add_journal_entry(self.j_r_or2)
@@ -606,29 +627,41 @@ class SameTestData(BaseTestData):
 
         # Offset journal entries
         self.j_r_of1: JournalEntryData = JournalEntryData(
-            65, [CurrencyData("USD", [self.l_r_of1d], [self.l_r_of1c])])
+            65, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of1d], [self.l_r_of1c])])
         self.j_r_of2: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_r_of2d], [self.l_r_of2c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of2d], [self.l_r_of2c])])
         self.j_r_of3: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_r_of3d], [self.l_r_of3c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of3d], [self.l_r_of3c])])
         self.j_r_of4: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_r_of4d], [self.l_r_of4c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of4d], [self.l_r_of4c])])
         self.j_r_of5: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_r_of5d], [self.l_r_of5c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of5d], [self.l_r_of5c])])
         self.j_r_of6: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.l_r_of6d], [self.l_r_of6c])])
+            15, [JournalEntryCurrencyData(
+                "USD", [self.l_r_of6d], [self.l_r_of6c])])
         self.j_p_of1: JournalEntryData = JournalEntryData(
-            65, [CurrencyData("USD", [self.l_p_of1d], [self.l_p_of1c])])
+            65, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of1d], [self.l_p_of1c])])
         self.j_p_of2: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_p_of2d], [self.l_p_of2c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of2d], [self.l_p_of2c])])
         self.j_p_of3: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_p_of3d], [self.l_p_of3c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of3d], [self.l_p_of3c])])
         self.j_p_of4: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_p_of4d], [self.l_p_of4c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of4d], [self.l_p_of4c])])
         self.j_p_of5: JournalEntryData = JournalEntryData(
-            35, [CurrencyData("USD", [self.l_p_of5d], [self.l_p_of5c])])
+            35, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of5d], [self.l_p_of5c])])
         self.j_p_of6: JournalEntryData = JournalEntryData(
-            15, [CurrencyData("USD", [self.l_p_of6d], [self.l_p_of6c])])
+            15, [JournalEntryCurrencyData(
+                "USD", [self.l_p_of6d], [self.l_p_of6c])])
 
         self._set_is_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE},
                                  False)

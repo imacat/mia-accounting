@@ -28,8 +28,8 @@ from flask.testing import FlaskCliRunner
 from test_site import db
 from testlib import Accounts, create_test_app, get_client
 from testlib_journal_entry import match_journal_entry_detail
-from testlib_offset import TestData, JournalEntryLineItemData, \
-    JournalEntryData, CurrencyData
+from testlib_offset import JournalEntryData, JournalEntryCurrencyData, \
+    JournalEntryLineItemData, TestData
 
 PREFIX: str = "/accounting/journal-entries"
 """The URL prefix for the journal entry management."""
@@ -81,7 +81,7 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         journal_entry_data: JournalEntryData = JournalEntryData(
-            self.data.l_r_or3d.journal_entry.days, [CurrencyData(
+            self.data.l_r_or3d.journal_entry.days, [JournalEntryCurrencyData(
                 "USD",
                 [],
                 [JournalEntryLineItemData(
@@ -405,7 +405,7 @@ class OffsetTestCase(unittest.TestCase):
         response: httpx.Response
 
         journal_entry_data: JournalEntryData = JournalEntryData(
-            self.data.l_p_or3c.journal_entry.days, [CurrencyData(
+            self.data.l_p_or3c.journal_entry.days, [JournalEntryCurrencyData(
                 "USD",
                 [JournalEntryLineItemData(
                     Accounts.PAYABLE,
