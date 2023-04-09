@@ -18,6 +18,7 @@
 
 """
 import unittest
+from datetime import date
 
 import httpx
 from click.testing import Result
@@ -25,7 +26,7 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 
 from testlib import create_test_app, get_client, Accounts
-from testlib_offset import TestData
+from testlib_offset import BaseTestData
 
 PREFIX: str = "/accounting"
 """The URL prefix for the reports."""
@@ -69,7 +70,7 @@ class ReportTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        TestData(self.app, self.client, self.csrf_token)
+        ReportTestData(self.app, self.client, self.csrf_token)
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -126,10 +127,10 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/search?q=Airplane")
+        response = client.get(f"{PREFIX}/search?q=Salary")
         self.assertEqual(response.status_code, 403)
 
-        response = client.get(f"{PREFIX}/search?q=Airplane&as=csv")
+        response = client.get(f"{PREFIX}/search?q=Salary&as=csv")
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -138,7 +139,7 @@ class ReportTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        TestData(self.app, self.client, self.csrf_token)
+        ReportTestData(self.app, self.client, self.csrf_token)
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -213,10 +214,10 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
 
-        response = client.get(f"{PREFIX}/search?q=Airplane")
+        response = client.get(f"{PREFIX}/search?q=Salary")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"{PREFIX}/search?q=Airplane&as=csv")
+        response = client.get(f"{PREFIX}/search?q=Salary&as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
@@ -226,7 +227,7 @@ class ReportTestCase(unittest.TestCase):
 
         :return: None.
         """
-        TestData(self.app, self.client, self.csrf_token)
+        ReportTestData(self.app, self.client, self.csrf_token)
         response: httpx.Response
 
         response = self.client.get(PREFIX)
@@ -302,10 +303,10 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
 
-        response = self.client.get(f"{PREFIX}/search?q=Airplane")
+        response = self.client.get(f"{PREFIX}/search?q=Salary")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/search?q=Airplane&as=csv")
+        response = self.client.get(f"{PREFIX}/search?q=Salary&as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
@@ -390,10 +391,34 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
 
-        response = self.client.get(f"{PREFIX}/search?q=Airplane")
+        response = self.client.get(f"{PREFIX}/search?q=Salary")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/search?q=Airplane&as=csv")
+        response = self.client.get(f"{PREFIX}/search?q=Salary&as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"],
                          "text/csv; charset=utf-8")
+
+
+class ReportTestData(BaseTestData):
+    """The report test data."""
+
+    def _init_data(self) -> None:
+        today: date = date.today()
+        year: int = today.year - 5
+        month: int = today.month
+        while True:
+            j_date: date = date(year, month, 5)
+            if j_date > today:
+                break
+            self._add_simple_journal_entry(
+                (j_date - today).days, "USD",
+                "Salary", "1200", Accounts.BANK, Accounts.SERVICE)
+            month = month + 1
+            if month > 12:
+                year = year + 1
+                month = 1
+        self._add_simple_journal_entry(
+            1, "USD", "Withdraw", "1000", Accounts.CASH, Accounts.BANK)
+        self._add_simple_journal_entry(
+            0, "USD", "Dinner", "40", Accounts.MEAL, Accounts.CASH)
