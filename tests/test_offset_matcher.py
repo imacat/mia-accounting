@@ -66,6 +66,64 @@ class OffsetMatcherTestCase(unittest.TestCase):
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
+    def test_nobody(self) -> None:
+        """Test the permission as nobody.
+
+        :return: None.
+        """
+        client, csrf_token = get_client(self.app, "nobody")
+        DifferentTestData(self.app, self.client, self.csrf_token)
+        response: httpx.Response
+
+        response = client.get(PREFIX)
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/{Accounts.PAYABLE}")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.post(f"{PREFIX}/{Accounts.PAYABLE}",
+                               data={"csrf_token": csrf_token})
+        self.assertEqual(response.status_code, 403)
+
+    def test_viewer(self) -> None:
+        """Test the permission as viewer.
+
+        :return: None.
+        """
+        client, csrf_token = get_client(self.app, "viewer")
+        DifferentTestData(self.app, self.client, self.csrf_token)
+        response: httpx.Response
+
+        response = client.get(PREFIX)
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/{Accounts.PAYABLE}")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.post(f"{PREFIX}/{Accounts.PAYABLE}",
+                               data={"csrf_token": csrf_token})
+        self.assertEqual(response.status_code, 403)
+
+    def test_editor(self) -> None:
+        """Test the permission as editor.
+
+        :return: None.
+        """
+        DifferentTestData(self.app, self.client, self.csrf_token)
+        response: httpx.Response
+
+        response = self.client.get(PREFIX)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/{Accounts.PAYABLE}")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(f"{PREFIX}/{Accounts.PAYABLE}",
+                                    data={"csrf_token": self.csrf_token})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         f"{PREFIX}/{Accounts.PAYABLE}")
+
     def test_different(self) -> None:
         """Tests to match against different descriptions and amounts.
 
