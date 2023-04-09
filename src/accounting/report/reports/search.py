@@ -151,6 +151,17 @@ class LineItemCollector:
                 == journal_entry_date.day))
         except ValueError:
             pass
+        try:
+            journal_entry_date = datetime.strptime(k, "%Y/%m/%d")
+            conditions.append(sa.and_(
+                sa.extract("year", JournalEntry.date)
+                == journal_entry_date.year,
+                sa.extract("month", JournalEntry.date)
+                == journal_entry_date.month,
+                sa.extract("day", JournalEntry.date)
+                == journal_entry_date.day))
+        except ValueError:
+            pass
         return sa.select(JournalEntry.id).filter(sa.or_(*conditions))
 
 
