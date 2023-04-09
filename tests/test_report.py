@@ -75,28 +75,55 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(PREFIX)
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}?as=csv")
+        self.assertEqual(response.status_code, 403)
+
         response = client.get(f"{PREFIX}/journal")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/journal?as=csv")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}/ledger?as=csv")
+        self.assertEqual(response.status_code, 403)
+
         response = client.get(f"{PREFIX}/income-expenses")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/income-expenses?as=csv")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}/trial-balance?as=csv")
+        self.assertEqual(response.status_code, 403)
+
         response = client.get(f"{PREFIX}/income-statement")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/income-statement?as=csv")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}/balance-sheet?as=csv")
+        self.assertEqual(response.status_code, 403)
+
         response = client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 403)
 
+        response = client.get(f"{PREFIX}/unapplied?as=csv")
+        self.assertEqual(response.status_code, 403)
+
         response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}")
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -111,29 +138,74 @@ class ReportTestCase(unittest.TestCase):
         response = client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
+        response = client.get(f"{PREFIX}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 200)
+
+        response = client.get(f"{PREFIX}/journal?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 200)
 
+        response = client.get(f"{PREFIX}/ledger?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 200)
+
+        response = client.get(f"{PREFIX}/income-expenses?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 200)
 
+        response = client.get(f"{PREFIX}/trial-balance?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 200)
+
+        response = client.get(f"{PREFIX}/income-statement?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 200)
 
+        response = client.get(f"{PREFIX}/balance-sheet?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 200)
 
+        response = client.get(f"{PREFIX}/unapplied?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
+
+        response = client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
     def test_editor(self) -> None:
         """Test the permission as editor.
@@ -146,29 +218,75 @@ class ReportTestCase(unittest.TestCase):
         response = self.client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/journal?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = self.client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/ledger?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/income-expenses?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = self.client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/trial-balance?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/income-statement?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = self.client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/balance-sheet?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/unapplied?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
     def test_empty_db(self) -> None:
         """Tests the empty database.
@@ -180,26 +298,72 @@ class ReportTestCase(unittest.TestCase):
         response = self.client.get(PREFIX)
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/journal")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/journal?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = self.client.get(f"{PREFIX}/ledger")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/ledger?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/income-expenses")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/income-expenses?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = self.client.get(f"{PREFIX}/trial-balance")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/trial-balance?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/income-statement")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{PREFIX}/income-statement?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
 
         response = self.client.get(f"{PREFIX}/balance-sheet")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/balance-sheet?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/unapplied")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(f"{PREFIX}/unapplied?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
+
         response = self.client.get(f"{PREFIX}/unapplied/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            f"{PREFIX}/unapplied/{Accounts.PAYABLE}?as=csv")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"],
+                         "text/csv; charset=utf-8")
