@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The test for the offset matcher.
+"""The test for the unmatched offsets.
 
 """
 import unittest
@@ -34,8 +34,8 @@ PREFIX: str = "/accounting/unmatched-offsets"
 """The URL prefix for the unmatched offset management."""
 
 
-class OffsetMatcherTestCase(unittest.TestCase):
-    """The offset matcher test case."""
+class UnmatchedOffsetTestCase(unittest.TestCase):
+    """The unmatched offset test case."""
 
     def setUp(self) -> None:
         """Sets up the test.
