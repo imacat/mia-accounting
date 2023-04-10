@@ -19,6 +19,14 @@ Subpackages
 Submodules
 ----------
 
+accounting.commands module
+--------------------------
+
+.. automodule:: accounting.commands
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.forms module
 -----------------------
 
