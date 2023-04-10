@@ -22,6 +22,7 @@ import os
 import typing as t
 
 import click
+import sqlalchemy as sa
 from flask.cli import with_appcontext
 
 from accounting import db, data_dir
@@ -77,8 +78,8 @@ def init_currencies_command(username: str) -> None:
                                         "locale": y,
                                         "name": x[f"l10n-{y}"]}
                                        for x in to_add for y in locales]
-    db.session.bulk_insert_mappings(Currency, currency_data)
-    db.session.bulk_insert_mappings(CurrencyL10n, l10n_data)
+    db.session.execute(sa.insert(Currency), currency_data)
+    db.session.execute(sa.insert(CurrencyL10n), l10n_data)
     db.session.commit()
 
     click.echo(F"{len(to_add)} added.  Currencies initialized.")

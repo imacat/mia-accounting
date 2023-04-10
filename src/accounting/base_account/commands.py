@@ -20,6 +20,7 @@
 import csv
 
 import click
+import sqlalchemy as sa
 from flask.cli import with_appcontext
 
 from accounting import data_dir
@@ -45,7 +46,7 @@ def init_base_accounts_command() -> None:
                                         "locale": y,
                                         "title": x[f"l10n-{y}"]}
                                        for x in data for y in locales]
-    db.session.bulk_insert_mappings(BaseAccount, account_data)
-    db.session.bulk_insert_mappings(BaseAccountL10n, l10n_data)
+    db.session.execute(sa.insert(BaseAccount), account_data)
+    db.session.execute(sa.insert(BaseAccountL10n), l10n_data)
     db.session.commit()
     click.echo("Base accounts initialized.")
