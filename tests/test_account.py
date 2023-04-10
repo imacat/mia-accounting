@@ -21,7 +21,6 @@ import unittest
 from datetime import timedelta, date
 
 import httpx
-import sqlalchemy as sa
 from click.testing import Result
 from flask import Flask
 from flask.testing import FlaskCliRunner
@@ -65,59 +64,6 @@ PREFIX: str = "/accounting/accounts"
 """The URL prefix for the account management."""
 
 
-class AccountCommandTestCase(unittest.TestCase):
-    """The account console command test case."""
-
-    def setUp(self) -> None:
-        """Sets up the test.
-        This is run once per test.
-
-        :return: None.
-        """
-        self.app: Flask = create_test_app()
-
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
-            from accounting.models import BaseAccount, Account, AccountL10n
-            result: Result
-            result = runner.invoke(args="init-db")
-            self.assertEqual(result.exit_code, 0)
-            if BaseAccount.query.first() is None:
-                result = runner.invoke(args="accounting-init-base")
-                self.assertEqual(result.exit_code, 0)
-            AccountL10n.query.delete()
-            Account.query.delete()
-            db.session.commit()
-
-    def test_init(self) -> None:
-        """Tests the "accounting-init-account" console command.
-
-        :return: None.
-        """
-        from accounting.models import BaseAccount, Account, AccountL10n
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
-            result: Result = runner.invoke(args=["accounting-init-accounts",
-                                                 "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
-        with self.app.app_context():
-            bases: list[BaseAccount] = BaseAccount.query\
-                .filter(sa.func.char_length(BaseAccount.code) == 4).all()
-            accounts: list[Account] = Account.query.all()
-            l10n: list[AccountL10n] = AccountL10n.query.all()
-        self.assertEqual({x.code for x in bases},
-                         {x.base_code for x in accounts})
-        self.assertEqual(len(accounts), len(bases))
-        self.assertEqual(len(l10n), len(bases) * 2)
-        base_dict: dict[str, BaseAccount] = {x.code: x for x in bases}
-        for account in accounts:
-            base: BaseAccount = base_dict[account.base_code]
-            self.assertEqual(account.no, 1)
-            self.assertEqual(account.title_l10n, base.title_l10n)
-            self.assertEqual({x.locale: x.title for x in account.l10n},
-                             {x.locale: x.title for x in base.l10n})
-
-
 class AccountTestCase(unittest.TestCase):
     """The account test case."""
 
@@ -131,13 +77,12 @@ class AccountTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.models import BaseAccount, Account, AccountL10n
+            from accounting.models import Account, AccountL10n
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
-            if BaseAccount.query.first() is None:
-                result = runner.invoke(args="accounting-init-base")
-                self.assertEqual(result.exit_code, 0)
+            result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
+            self.assertEqual(result.exit_code, 0)
             AccountL10n.query.delete()
             Account.query.delete()
             db.session.commit()
@@ -651,14 +596,6 @@ class AccountTestCase(unittest.TestCase):
                                           "title": PETTY.title})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
-
-        response = self.client.post("/accounting/currencies/store",
-                                    data={"csrf_token": self.csrf_token,
-                                          "code": "USD",
-                                          "name": "US Dollars"})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/currencies/USD")
 
         add_journal_entry(self.client,
                           form={"csrf_token": self.csrf_token,

@@ -45,19 +45,11 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.models import BaseAccount, JournalEntry, \
-                JournalEntryLineItem
+            from accounting.models import JournalEntry, JournalEntryLineItem
             result: Result
             result = runner.invoke(args="init-db")
             self.assertEqual(result.exit_code, 0)
-            if BaseAccount.query.first() is None:
-                result = runner.invoke(args="accounting-init-base")
-                self.assertEqual(result.exit_code, 0)
-            result = runner.invoke(args=["accounting-init-currencies",
-                                         "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
-            result = runner.invoke(args=["accounting-init-accounts",
-                                         "-u", "editor"])
+            result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()

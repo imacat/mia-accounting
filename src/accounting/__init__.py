@@ -61,6 +61,9 @@ def init_app(app: Flask, user_utils: UserUtilityInterface,
     bp.add_app_template_global(default_currency_code,
                                "accounting_default_currency_code")
 
+    from .commands import init_db_command
+    app.cli.add_command(init_db_command)
+
     from . import locale
     locale.init_app(app, bp)
 

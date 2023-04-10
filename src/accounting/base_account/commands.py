@@ -19,22 +19,17 @@
 """
 import csv
 
-import click
 import sqlalchemy as sa
-from flask.cli import with_appcontext
 
 from accounting import data_dir
 from accounting import db
 from accounting.models import BaseAccount, BaseAccountL10n
 
 
-@click.command("accounting-init-base")
-@with_appcontext
 def init_base_accounts_command() -> None:
     """Initializes the base accounts."""
     if BaseAccount.query.first() is not None:
-        click.echo("Base accounts already exist.")
-        raise click.Abort
+        return
 
     with open(data_dir / "base_accounts.csv") as fp:
         data: list[dict[str, str]] = [x for x in csv.DictReader(fp)]
@@ -48,5 +43,3 @@ def init_base_accounts_command() -> None:
                                        for x in data for y in locales]
     db.session.execute(sa.insert(BaseAccount), account_data)
     db.session.execute(sa.insert(BaseAccountL10n), l10n_data)
-    db.session.commit()
-    click.echo("Base accounts initialized.")

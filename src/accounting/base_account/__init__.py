@@ -19,6 +19,8 @@
 """
 from flask import Flask, Blueprint
 
+from .commands import init_base_accounts_command
+
 
 def init_app(app: Flask, bp: Blueprint) -> None:
     """Initialize the application.
@@ -32,6 +34,3 @@ def init_app(app: Flask, bp: Blueprint) -> None:
 
     from .views import bp as base_account_bp
     bp.register_blueprint(base_account_bp, url_prefix="/base-accounts")
-
-    from .commands import init_base_accounts_command
-    app.cli.add_command(init_base_accounts_command)

@@ -19,6 +19,8 @@
 """
 from flask import Flask, Blueprint
 
+from .commands import init_currencies_command
+
 
 def init_app(app: Flask, bp: Blueprint) -> None:
     """Initialize the application.
@@ -33,6 +35,3 @@ def init_app(app: Flask, bp: Blueprint) -> None:
     from .views import bp as currency_bp, api_bp as currency_api_bp
     bp.register_blueprint(currency_bp, url_prefix="/currencies")
     bp.register_blueprint(currency_api_bp, url_prefix="/api/currencies")
-
-    from .commands import init_currencies_command
-    app.cli.add_command(init_currencies_command)

@@ -17,44 +17,19 @@
 """The console commands for the account management.
 
 """
-import os
 from secrets import randbelow
 
 import click
-from flask.cli import with_appcontext
 
 from accounting import db
 from accounting.models import BaseAccount, Account, AccountL10n
-from accounting.utils.user import has_user, get_user_pk
+from accounting.utils.user import get_user_pk
 
 AccountData = tuple[int, str, int, str, str, str, bool]
 """The format of the account data, as a list of (ID, base account code, number,
 English, Traditional Chinese, Simplified Chinese, is-need-offset) tuples."""
 
 
-def __validate_username(ctx: click.core.Context, param: click.core.Option,
-                        value: str) -> str:
-    """Validates the username for the click console command.
-
-    :param ctx: The console command context.
-    :param param: The console command option.
-    :param value: The username.
-    :raise click.BadParameter: When validation fails.
-    :return: The username.
-    """
-    value = value.strip()
-    if value == "":
-        raise click.BadParameter("Username empty.")
-    if not has_user(value):
-        raise click.BadParameter(f"User {value} does not exist.")
-    return value
-
-
-@click.command("accounting-init-accounts")
-@click.option("-u", "--username", metavar="USERNAME", prompt=True,
-              help="The username.", callback=__validate_username,
-              default=lambda: os.getlogin())
-@with_appcontext
 def init_accounts_command(username: str) -> None:
     """Initializes the accounts."""
     creator_pk: int = get_user_pk(username)
@@ -63,8 +38,6 @@ def init_accounts_command(username: str) -> None:
         .filter(db.func.length(BaseAccount.code) == 4)\
         .order_by(BaseAccount.code).all()
     if len(bases) == 0:
-        click.echo("Please initialize the base accounts with "
-                   "\"flask accounting-init-base\" first.")
         raise click.Abort
 
     existing: list[Account] = Account.query.all()
@@ -73,7 +46,6 @@ def init_accounts_command(username: str) -> None:
     bases_to_add: list[BaseAccount] = [x for x in bases
                                        if x.code not in existing_base_code]
     if len(bases_to_add) == 0:
-        click.echo("No more account to import.")
         return
 
     existing_id: set[int] = {x.id for x in existing}
@@ -96,7 +68,6 @@ def init_accounts_command(username: str) -> None:
         data.append((get_new_id(), base.code, 1, base.title_l10n,
                      l10n["zh_Hant"], l10n["zh_Hans"], is_need_offset))
     __add_accounting_accounts(data, creator_pk)
-    click.echo(F"{len(data)} added.  Accounting accounts initialized.")
 
 
 def __is_need_offset(base_code: str) -> bool:
@@ -146,4 +117,3 @@ def __add_accounting_accounts(data: list[AccountData], creator_pk: int)\
                                for y in (("zh_Hant", x[4]), ("zh_Hans", x[5]))]
     db.session.bulk_save_objects(accounts)
     db.session.bulk_save_objects(l10n)
-    db.session.commit()

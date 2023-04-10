@@ -18,41 +18,15 @@
 
 """
 import csv
-import os
 import typing as t
 
-import click
 import sqlalchemy as sa
-from flask.cli import with_appcontext
 
 from accounting import db, data_dir
 from accounting.models import Currency, CurrencyL10n
-from accounting.utils.user import has_user, get_user_pk
+from accounting.utils.user import get_user_pk
 
 
-def __validate_username(ctx: click.core.Context, param: click.core.Option,
-                        value: str) -> str:
-    """Validates the username for the click console command.
-
-    :param ctx: The console command context.
-    :param param: The console command option.
-    :param value: The username.
-    :raise click.BadParameter: When validation fails.
-    :return: The username.
-    """
-    value = value.strip()
-    if value == "":
-        raise click.BadParameter("Username empty.")
-    if not has_user(value):
-        raise click.BadParameter(f"User {value} does not exist.")
-    return value
-
-
-@click.command("accounting-init-currencies")
-@click.option("-u", "--username", metavar="USERNAME", prompt=True,
-              help="The username.", callback=__validate_username,
-              default=lambda: os.getlogin())
-@with_appcontext
 def init_currencies_command(username: str) -> None:
     """Initializes the currencies."""
     existing_codes: set[str] = {x.code for x in Currency.query.all()}
@@ -62,7 +36,6 @@ def init_currencies_command(username: str) -> None:
     to_add: list[dict[str, str]] = [x for x in data
                                     if x["code"] not in existing_codes]
     if len(to_add) == 0:
-        click.echo("No more currency to add.")
         return
 
     creator_pk: int = get_user_pk(username)
@@ -78,6 +51,3 @@ def init_currencies_command(username: str) -> None:
                                        for x in to_add for y in locales]
     db.session.execute(sa.insert(Currency), currency_data)
     db.session.execute(sa.insert(CurrencyL10n), l10n_data)
-    db.session.commit()
-
-    click.echo(F"{len(to_add)} added.  Currencies initialized.")

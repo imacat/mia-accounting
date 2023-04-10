@@ -17,8 +17,6 @@
 """The test for the currency management.
 
 """
-import csv
-import typing as t
 import unittest
 from datetime import timedelta, date
 
@@ -59,62 +57,6 @@ PREFIX: str = "/accounting/currencies"
 """The URL prefix for the currency management."""
 
 
-class CurrencyCommandTestCase(unittest.TestCase):
-    """The account console command test case."""
-
-    def setUp(self) -> None:
-        """Sets up the test.
-        This is run once per test.
-
-        :return: None.
-        """
-        self.app: Flask = create_test_app()
-
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
-            from accounting.models import Currency, CurrencyL10n
-            result: Result
-            result = runner.invoke(args="init-db")
-            self.assertEqual(result.exit_code, 0)
-            CurrencyL10n.query.delete()
-            Currency.query.delete()
-            db.session.commit()
-
-    def test_init(self) -> None:
-        """Tests the "accounting-init-currencies" console command.
-
-        :return: None.
-        """
-        from accounting import data_dir
-        from accounting.models import Currency
-
-        with open(data_dir / "currencies.csv") as fp:
-            data: dict[dict[str, t.Any]] \
-                = {x["code"]: {"code": x["code"],
-                               "name": x["name"],
-                               "l10n": {y[5:]: x[y]
-                                        for y in x if y.startswith("l10n-")}}
-                   for x in csv.DictReader(fp)}
-
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
-            result: Result = runner.invoke(
-                args=["accounting-init-currencies", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
-            currencies: list[Currency] = Currency.query.all()
-
-        self.assertEqual(len(currencies), len(data))
-        for currency in currencies:
-            self.assertIn(currency.code, data)
-            self.assertEqual(currency.name_l10n, data[currency.code]["name"])
-            l10n: dict[str, str] = {x.locale: x.name for x in currency.l10n}
-            self.assertEqual(len(l10n), len(data[currency.code]["l10n"]))
-            for locale in l10n:
-                self.assertIn(locale, data[currency.code]["l10n"])
-                self.assertEqual(l10n[locale],
-                                 data[currency.code]["l10n"][locale])
-
-
 class CurrencyTestCase(unittest.TestCase):
     """The currency test case."""
 
@@ -131,6 +73,8 @@ class CurrencyTestCase(unittest.TestCase):
             from accounting.models import Currency, CurrencyL10n
             result: Result
             result = runner.invoke(args="init-db")
+            self.assertEqual(result.exit_code, 0)
+            result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             CurrencyL10n.query.delete()
             Currency.query.delete()
@@ -587,21 +531,6 @@ class CurrencyTestCase(unittest.TestCase):
         delete_uri: str = f"{PREFIX}/{JPY.code}/delete"
         list_uri: str = PREFIX
         response: httpx.Response
-
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
-            from accounting.models import BaseAccount
-            if BaseAccount.query.first() is None:
-                result = runner.invoke(args="accounting-init-base")
-                self.assertEqual(result.exit_code, 0)
-
-        response = self.client.post("/accounting/accounts/store",
-                                    data={"csrf_token": self.csrf_token,
-                                          "base_code": "1111",
-                                          "title": "Cash"})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/accounts/1111-001")
 
         response = self.client.post(f"{PREFIX}/store",
                                     data={"csrf_token": self.csrf_token,

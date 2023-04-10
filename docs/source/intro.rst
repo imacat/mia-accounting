@@ -42,7 +42,8 @@ Prerequisites
 -------------
 
 You need a running Flask application with database user login.
-The primary key of the user data model must be integer.
+The primary key of the user data model must be integer.  You also
+need at least one user.
 
 The following front-end JavaScript libraries must be loaded.  You may
 download it locally or use CDN_.
@@ -67,24 +68,13 @@ See an example in :ref:`example-userutils`.
 Database Initialization
 -----------------------
 
-After the configuration, you need to run
-`flask_sqlalchemy.SQLAlchemy.create_all`_ to create the
-database tables that *Mia! Accounting* uses.
-
-*Mia! Accounting* adds three console commands:
-
-* ``accounting-init-base``
-* ``accounting-init-accounts``
-* ``accounting-init-currencies``
-
-After database tables are created, run
-``accounting-init-base`` first, and then the other two commands.
+After the configuration, run the ``accounting-init-db`` console
+command to initialize the accounting database.  You need to specify
+the username of a user as the data creator.
 
 ::
 
-    % flask --app myapp accounting-init-base
-    % flask --app myapp accounting-init-accounts
-    % flask --app myapp accounting-init-currencies
+    % flask --app myapp accounting-init-db -u username
 
 
 Navigation Menu
