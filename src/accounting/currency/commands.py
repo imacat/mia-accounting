@@ -29,8 +29,6 @@ from accounting import db, data_dir
 from accounting.models import Currency, CurrencyL10n
 from accounting.utils.user import has_user, get_user_pk
 
-CurrencyData = tuple[str, str, str, str]
-
 
 def __validate_username(ctx: click.core.Context, param: click.core.Option,
                         value: str) -> str:
