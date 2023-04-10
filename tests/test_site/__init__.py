@@ -21,9 +21,7 @@ import os
 import typing as t
 from secrets import token_urlsafe
 
-import click
 from flask import Flask, Blueprint, render_template, redirect, Response
-from flask.cli import with_appcontext
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -63,7 +61,6 @@ def create_app(is_testing: bool = False) -> Flask:
     db.init_app(app)
 
     app.register_blueprint(bp, url_prefix="/")
-    app.cli.add_command(init_db_command)
 
     from . import locale
     locale.init_app(app)
@@ -110,20 +107,23 @@ def create_app(is_testing: bool = False) -> Flask:
 
     accounting.init_app(app, user_utils=UserUtilities())
 
+    with app.app_context():
+        init_db()
+
     return app
 
 
-@click.command("init-db")
-@with_appcontext
-def init_db_command() -> None:
-    """Initializes the database."""
+def init_db() -> None:
+    """Initializes the database.
+
+    :return: None.
+    """
     db.create_all()
     from .auth import User
     for username in ["viewer", "editor", "admin", "nobody"]:
         if User.query.filter(User.username == username).first() is None:
             db.session.add(User(username=username))
     db.session.commit()
-    click.echo("Database initialized successfully.")
 
 
 @bp.get("/", endpoint="home")

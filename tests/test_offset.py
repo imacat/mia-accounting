@@ -50,10 +50,8 @@ class OffsetTestCase(unittest.TestCase):
         runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
-            result: Result
-            result = runner.invoke(args="init-db")
-            self.assertEqual(result.exit_code, 0)
-            result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
+            result: Result = runner.invoke(
+                args=["accounting-init-db", "-u", "editor"])
             self.assertEqual(result.exit_code, 0)
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()

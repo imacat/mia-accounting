@@ -42,11 +42,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            result: Result = runner.invoke(args="init-db")
-            self.assertEqual(result.exit_code, 0,
-                             result.output + str(result.exception))
             # Drop every accounting table, to see if accounting-init recreates
             # them correctly.
             tables: list[sa.Table] \
