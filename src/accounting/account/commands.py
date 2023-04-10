@@ -17,6 +17,7 @@
 """The console commands for the account management.
 
 """
+import typing as t
 from secrets import randbelow
 
 import click
@@ -24,6 +25,7 @@ import click
 from accounting import db
 from accounting.models import BaseAccount, Account, AccountL10n
 from accounting.utils.user import get_user_pk
+import sqlalchemy as sa
 
 AccountData = tuple[int, str, int, str, str, str, bool]
 """The format of the account data, as a list of (ID, base account code, number,
@@ -61,13 +63,24 @@ def init_accounts_command(username: str) -> None:
                 existing_id.add(new_id)
                 return new_id
 
-    data: list[AccountData] = []
+    data: list[dict[str, t.Any]] = []
+    l10n_data: list[dict[str, t.Any]] = []
     for base in bases_to_add:
         l10n: dict[str, str] = {x.locale: x.title for x in base.l10n}
-        is_need_offset: bool = __is_need_offset(base.code)
-        data.append((get_new_id(), base.code, 1, base.title_l10n,
-                     l10n["zh_Hant"], l10n["zh_Hans"], is_need_offset))
-    __add_accounting_accounts(data, creator_pk)
+        account_id: int = get_new_id()
+        data.append({"id": account_id,
+                     "base_code": base.code,
+                     "no": 1,
+                     "title_l10n": base.title_l10n,
+                     "is_need_offset": __is_need_offset(base.code),
+                     "created_by_id": creator_pk,
+                     "updated_by_id": creator_pk})
+        for locale in {"zh_Hant", "zh_Hans"}:
+            l10n_data.append({"account_id": account_id,
+                              "locale": locale,
+                              "title": l10n[locale]})
+    db.session.execute(sa.insert(Account), data)
+    db.session.execute(sa.insert(AccountL10n), l10n_data)
 
 
 def __is_need_offset(base_code: str) -> bool:
@@ -92,28 +105,3 @@ def __is_need_offset(base_code: str) -> bool:
         return True
     # Only assets and liabilities need offset
     return False
-
-
-def __add_accounting_accounts(data: list[AccountData], creator_pk: int)\
-        -> None:
-    """Adds the accounts.
-
-    :param data: A list of (base code, number, title) tuples.
-    :param creator_pk: The primary key of the creator.
-    :return: None.
-    """
-    accounts: list[Account] = [Account(id=x[0],
-                                       base_code=x[1],
-                                       no=x[2],
-                                       title_l10n=x[3],
-                                       is_need_offset=x[6],
-                                       created_by_id=creator_pk,
-                                       updated_by_id=creator_pk)
-                               for x in data]
-    l10n: list[AccountL10n] = [AccountL10n(account_id=x[0],
-                                           locale=y[0],
-                                           title=y[1])
-                               for x in data
-                               for y in (("zh_Hant", x[4]), ("zh_Hans", x[5]))]
-    db.session.bulk_save_objects(accounts)
-    db.session.bulk_save_objects(l10n)
