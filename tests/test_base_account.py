@@ -20,9 +20,7 @@
 import unittest
 
 import httpx
-from click.testing import Result
 from flask import Flask
-from flask.testing import FlaskCliRunner
 
 from testlib import create_test_app, get_client
 
@@ -42,12 +40,6 @@ class BaseAccountTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
-
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.

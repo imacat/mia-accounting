@@ -21,9 +21,7 @@ import unittest
 from datetime import timedelta, date
 
 import httpx
-from click.testing import Result
 from flask import Flask
-from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import NEXT_URI, create_test_app, get_client, set_locale, \
@@ -75,12 +73,8 @@ class AccountTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import Account, AccountL10n
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
             AccountL10n.query.delete()
             Account.query.delete()
             db.session.commit()

@@ -20,9 +20,7 @@
 import unittest
 from datetime import date
 
-from click.testing import Result
 from flask import Flask
-from flask.testing import FlaskCliRunner
 
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
     add_journal_entry
@@ -39,12 +37,8 @@ class DescriptionEditorTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
 

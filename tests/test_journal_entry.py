@@ -22,9 +22,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 import httpx
-from click.testing import Result
 from flask import Flask
-from flask.testing import FlaskCliRunner
 
 from test_site import db
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
@@ -51,13 +49,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.models import BaseAccount, JournalEntry, \
-                JournalEntryLineItem
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
+            from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
 
@@ -661,13 +654,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
 
@@ -1247,14 +1235,9 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
-            from accounting.models import BaseAccount, JournalEntry, \
+            from accounting.models import JournalEntry, \
                 JournalEntryLineItem
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
 
@@ -2113,12 +2096,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         """
         self.app: Flask = create_test_app()
 
-        runner: FlaskCliRunner = self.app.test_cli_runner()
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
-            result: Result = runner.invoke(
-                args=["accounting-init-db", "-u", "editor"])
-            self.assertEqual(result.exit_code, 0)
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
 

@@ -21,7 +21,9 @@ import os
 import typing as t
 from secrets import token_urlsafe
 
+from click.testing import Result
 from flask import Flask, Blueprint, render_template, redirect, Response
+from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -108,14 +110,15 @@ def create_app(is_testing: bool = False) -> Flask:
     accounting.init_app(app, user_utils=UserUtilities())
 
     with app.app_context():
-        init_db()
+        init_db(app)
 
     return app
 
 
-def init_db() -> None:
+def init_db(app: Flask) -> None:
     """Initializes the database.
 
+    :param app: The Flask application.
     :return: None.
     """
     db.create_all()
@@ -124,6 +127,9 @@ def init_db() -> None:
         if User.query.filter(User.username == username).first() is None:
             db.session.add(User(username=username))
     db.session.commit()
+    runner: FlaskCliRunner = app.test_cli_runner()
+    result: Result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
+    assert result.exit_code == 0, result.output + str(result.exception)
 
 
 @bp.get("/", endpoint="home")
