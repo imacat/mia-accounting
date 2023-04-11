@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-accounting-test-site 1.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-04-06 02:34+0800\n"
-"PO-Revision-Date: 2023-04-06 02:34+0800\n"
+"POT-Creation-Date: 2023-04-11 22:18+0800\n"
+"PO-Revision-Date: 2023-04-11 22:18+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -25,7 +25,6 @@ msgid "en"
 msgstr "zh-Hant"
 
 #: tests/test_site/templates/base.html:46
-#: tests/test_site/templates/home.html:24
 msgid "Home"
 msgstr "首頁"
 
@@ -42,19 +41,39 @@ msgstr "登入"
 msgid "Error:"
 msgstr "錯誤："
 
-#: tests/test_site/templates/login.html:30
+#: tests/test_site/templates/home.html:24
+msgid "Mia! Accounting Live Demonstration"
+msgstr "Mia! Accounting 示範站"
+
+#: tests/test_site/templates/home.html:28
+#, python-format
+msgid ""
+"This is the live demonstration of the Mia! Accounting project.  Please <a"
+" href=\"/login?next=%%2Faccounting\">log in</a> to continue."
+msgstr "這是 Mia! Accounting 專案的示範站。請先<a href=\"/login?next=%%2Faccounting\">登入</a>。"
+
+#: tests/test_site/templates/home.html:30
+msgid ""
+"You may also want to check the <a href=\"https://mia-"
+"accounting.readthedocs.io\">full documentation</a> and the <a "
+"href=\"https://github.com/imacat/mia-accounting\">Github repository</a>."
+msgstr ""
+"詳情請參閱<a href=\"https://mia-accounting.readthedocs.io\">完整說明文件</a>與<a "
+"href=\"https://github.com/imacat/mia-accounting\">Github 專案庫</a>。"
+
+#: tests/test_site/templates/login.html:33
 msgid "Viewer"
 msgstr "讀報表者"
 
-#: tests/test_site/templates/login.html:31
+#: tests/test_site/templates/login.html:34
 msgid "Editor"
 msgstr "記帳者"
 
-#: tests/test_site/templates/login.html:32
+#: tests/test_site/templates/login.html:35
 msgid "Administrator"
 msgstr "管理者"
 
-#: tests/test_site/templates/login.html:33
+#: tests/test_site/templates/login.html:36
 msgid "Nobody"
 msgstr "沒有權限者"
 
