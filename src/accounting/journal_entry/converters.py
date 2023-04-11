@@ -20,11 +20,10 @@
 from datetime import date
 
 from flask import abort
-from sqlalchemy.orm import selectinload
 from werkzeug.routing import BaseConverter
 
 from accounting import db
-from accounting.models import JournalEntry, JournalEntryLineItem
+from accounting.models import JournalEntry
 from accounting.utils.journal_entry_types import JournalEntryType
 
 
