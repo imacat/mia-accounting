@@ -21,4 +21,12 @@ First written: 2023/1/27
 #}
 {% extends "base.html" %}
 
-{% block header %}{% block title %}{{ _("Home") }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ _("Mia! Accounting Live Demonstration") }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<p>{{ _("This is the live demonstration of the Mia! Accounting project.  Please <a href=\"/login?next=%%2Faccounting\">log in</a> to continue.") }}</p>
+
+<p>{{ _("You may also want to check the <a href=\"https://mia-accounting.readthedocs.io\">full documentation</a> and the <a href=\"https://github.com/imacat/mia-accounting\">Github repository</a>.") }}</p>
+
+{% endblock %}
