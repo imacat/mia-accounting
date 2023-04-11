@@ -7,7 +7,8 @@ Description
 ===========
 
 *Mia! Accounting* is an accounting module for Flask_ applications.
-It implements `double-entry bookkeeping`_, and generates the following
+It is designed both for mobile and desktop environments.  It
+implements `double-entry bookkeeping`_.  It generates the following
 accounting reports:
 
 * Trial balance
@@ -16,6 +17,18 @@ accounting reports:
 
 In addition, *Mia! Accounting* tracks offsets for unpaid payables and
 receivables.
+
+
+Live Demonstration and Test Site
+================================
+
+There is a `live demonstration`_ for *Mia! Accounting*.  It runs the
+same code as the `test site`_ in the `source distribution`_.  It is
+the simplest website that works with *Mia! Accounting*.  It is also
+used in the automatic tests.
+
+If you do not have a running Flask application or do not know how to
+start one, you may start with the test site.
 
 
 Installation
@@ -27,20 +40,8 @@ Install *Mia! Accounting* with ``pip``:
 
     pip install mia-accounting
 
-You may also download the from the `PyPI project page`_ or the
+You may also download from the `PyPI project page`_ or the
 `release page`_ on the `Git repository`_.
-
-
-Test Site and Live Demonstration
-================================
-
-You may find a working example in the `test site`_ in the
-`source distribution`_.  It is the simplest website that works with
-*Mia! Accounting*.  It is used in the automatic tests.  It is the same
-code run for `live demonstration`_.
-
-If you do not have a running Flask application or do not know how to
-start one, you may start with the test site.
 
 
 Prerequisites
@@ -191,9 +192,9 @@ Authors
 
 .. _Flask: https://flask.palletsprojects.com
 .. _double-entry bookkeeping: https://en.wikipedia.org/wiki/Double-entry_bookkeeping
+.. _live demonstration: https://accounting.imacat.idv.tw
 .. _test site: https://github.com/imacat/mia-accounting/tree/main/tests/test_site
 .. _source distribution: https://pypi.org/project/mia-accounting/#files
-.. _live demonstration: https://accounting.imacat.idv.tw
 .. _PyPI project page: https://pypi.org/project/mia-accounting
 .. _release page: https://github.com/imacat/mia-accounting/releases
 .. _Git repository: https://github.com/imacat/mia-accounting
@@ -204,6 +205,5 @@ Authors
 .. _Tempus-Dominus: https://getdatepicker.com
 .. _UserUtilityInterface: https://mia-accounting.readthedocs.io/en/latest/accounting.utils.html#accounting.utils.user.UserUtilityInterface
 .. _init_app: https://mia-accounting.readthedocs.io/en/latest/accounting.html#accounting.init_app
-.. _flask_sqlalchemy.SQLAlchemy.create_all: https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.create_all
 .. _Bootstrap navigation bar: https://getbootstrap.com/docs/5.3/components/navbar/
 .. _documentation on Read the Docs: https://mia-accounting.readthedocs.io
