@@ -18,7 +18,7 @@
 
 """
 from flask import Blueprint, render_template, Flask, redirect, url_for, \
-    session, request, g
+    session, request, g, Response
 
 from . import db
 
@@ -44,11 +44,13 @@ class User(db.Model):
 
 
 @bp.get("login", endpoint="login-form")
-def show_login_form() -> str:
+def show_login_form() -> str | Response:
     """Shows the login form.
 
     :return: The login form.
     """
+    if "user" in session:
+        return redirect(url_for("accounting-report.default"))
     return render_template("login.html")
 
 
@@ -58,11 +60,12 @@ def login() -> redirect:
 
     :return: The redirection to the home page.
     """
+    from accounting.utils.next_uri import inherit_next, or_next
     if request.form.get("username") not in {"viewer", "editor", "admin",
                                             "nobody"}:
-        return redirect(url_for("auth.login"))
+        return redirect(inherit_next(url_for("auth.login")))
     session["user"] = request.form.get("username")
-    return redirect(url_for("home.home"))
+    return redirect(or_next(url_for("accounting-report.default")))
 
 
 @bp.post("logout", endpoint="logout")

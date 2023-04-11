@@ -22,7 +22,8 @@ import typing as t
 from secrets import token_urlsafe
 
 from click.testing import Result
-from flask import Flask, Blueprint, render_template, redirect, Response
+from flask import Flask, Blueprint, render_template, redirect, Response, \
+    url_for
 from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
@@ -86,7 +87,8 @@ def create_app(is_testing: bool = False) -> Flask:
                 and auth.current_user().username == "admin"
 
         def unauthorized(self) -> Response:
-            return redirect("/login")
+            from accounting.utils.next_uri import append_next
+            return redirect(append_next(url_for("auth.login-form")))
 
         @property
         def cls(self) -> t.Type[auth.User]:

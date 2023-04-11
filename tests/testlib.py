@@ -103,6 +103,7 @@ def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
     csrf_token: str = get_csrf_token(client)
     response: httpx.Response = client.post("/login",
                                            data={"csrf_token": csrf_token,
+                                                 "next": "/",
                                                  "username": username})
     assert response.status_code == 302
     assert response.headers["Location"] == "/"

@@ -27,6 +27,9 @@ First written: 2023/1/27
 
 <form action="{{ url_for("auth.login") }}" method="post">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
+  {% endif %}
   <button class="btn btn-primary" type="submit" name="username" value="viewer">{{ _("Viewer") }}</button>
   <button class="btn btn-primary" type="submit" name="username" value="editor">{{ _("Editor") }}</button>
   <button class="btn btn-primary" type="submit" name="username" value="admin">{{ _("Administrator") }}</button>
