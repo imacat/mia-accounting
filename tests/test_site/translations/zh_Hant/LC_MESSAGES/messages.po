@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-accounting-test-site 1.0.0\n"
 "Report-Msgid-Bugs-To: imacat@mail.imacat.idv.tw\n"
-"POT-Creation-Date: 2023-04-11 22:18+0800\n"
-"PO-Revision-Date: 2023-04-11 22:18+0800\n"
+"POT-Creation-Date: 2023-04-12 17:59+0800\n"
+"PO-Revision-Date: 2023-04-12 18:00+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language: zh_Hant\n"
 "Language-Team: zh_Hant <imacat@mail.imacat.idv.tw>\n"
@@ -19,6 +19,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
+
+#: tests/test_site/reset.py:55
+msgid "The sample data are emptied and reset successfully."
+msgstr "範例資料已清空重設。"
+
+#: tests/test_site/reset.py:68
+msgid "The database is emptied successfully."
+msgstr "資料庫已清空。"
 
 #: tests/test_site/templates/base.html:23
 msgid "en"
@@ -32,12 +40,16 @@ msgstr "首頁"
 msgid "Log Out"
 msgstr "登出"
 
-#: tests/test_site/templates/base.html:81
+#: tests/test_site/templates/base.html:79
+msgid "Reset"
+msgstr "重設"
+
+#: tests/test_site/templates/base.html:89
 #: tests/test_site/templates/login.html:24
 msgid "Log In"
 msgstr "登入"
 
-#: tests/test_site/templates/base.html:122
+#: tests/test_site/templates/base.html:130
 msgid "Error:"
 msgstr "錯誤："
 
@@ -76,4 +88,28 @@ msgstr "管理者"
 #: tests/test_site/templates/login.html:36
 msgid "Nobody"
 msgstr "沒有權限者"
+
+#: tests/test_site/templates/reset.html:24
+msgid "Reset Database"
+msgstr "資料庫重設"
+
+#: tests/test_site/templates/reset.html:28
+msgid ""
+"Warning: All the current accounting data will be deleted.  This cannot be"
+" undone.  Please backup your database first."
+msgstr "警告：現有資料會全部刪除，無法復原。請先備份您的資料。"
+
+#: tests/test_site/templates/reset.html:30
+msgid ""
+"Database reset is provided by the live demonstration.  This is not part "
+"of the Mia! Accounting project."
+msgstr "資料庫重設是示範站的功能，不是 Mia! Accounting 的功能。"
+
+#: tests/test_site/templates/reset.html:37
+msgid "Empty the Database"
+msgstr "清空資料庫"
+
+#: tests/test_site/templates/reset.html:45
+msgid "Empty and reset the Sample Data"
+msgstr "清空並重設範例資料"
 
