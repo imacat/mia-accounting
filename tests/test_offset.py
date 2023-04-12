@@ -52,6 +52,7 @@ class OffsetTestCase(unittest.TestCase):
 
         self.client, self.csrf_token = get_client(self.app, "editor")
         self.data: OffsetTestData = OffsetTestData(self.app, "editor")
+        self.data.populate()
 
     def test_add_receivable_offset(self) -> None:
         """Tests to add the receivable offset.

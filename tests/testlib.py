@@ -303,8 +303,8 @@ class BaseTestData(ABC):
         :param app: The Flask application.
         :param username: The username.
         """
-        from accounting.models import JournalEntry, JournalEntryLineItem
-        with app.app_context():
+        self.__app: Flask = app
+        with self.__app.app_context():
             current_user: User | None = User.query\
                 .filter(User.username == username).first()
             assert current_user is not None
@@ -312,10 +312,6 @@ class BaseTestData(ABC):
             self.__journal_entries: list[dict[str, t.Any]] = []
             self.__line_items: list[dict[str, t.Any]] = []
             self._init_data()
-            db.session.execute(sa.insert(JournalEntry), self.__journal_entries)
-            db.session.execute(sa.insert(JournalEntryLineItem),
-                               self.__line_items)
-            db.session.commit()
 
     @abstractmethod
     def _init_data(self) -> None:
@@ -323,6 +319,18 @@ class BaseTestData(ABC):
 
         :return: None
         """
+
+    def populate(self) -> None:
+        """Populates the data into the database.
+
+        :return: None
+        """
+        from accounting.models import JournalEntry, JournalEntryLineItem
+        with self.__app.app_context():
+            db.session.execute(sa.insert(JournalEntry), self.__journal_entries)
+            db.session.execute(sa.insert(JournalEntryLineItem),
+                               self.__line_items)
+            db.session.commit()
 
     @staticmethod
     def _couple(description: str, amount: str, debit: str, credit: str) \

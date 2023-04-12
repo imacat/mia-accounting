@@ -54,7 +54,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        DifferentTestData(self.app, "nobody")
+        DifferentTestData(self.app, "nobody").populate()
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -73,7 +73,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        DifferentTestData(self.app, "viewer")
+        DifferentTestData(self.app, "viewer").populate()
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -91,7 +91,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        DifferentTestData(self.app, "editor")
+        DifferentTestData(self.app, "editor").populate()
         response: httpx.Response
 
         response = self.client.get(PREFIX)
@@ -133,6 +133,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         from accounting.models import Account, JournalEntryLineItem
         from accounting.utils.offset_matcher import OffsetMatcher
         data: DifferentTestData = DifferentTestData(self.app, "editor")
+        data.populate()
         account: Account | None
         line_item: JournalEntryLineItem | None
         matcher: OffsetMatcher
@@ -248,6 +249,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         from accounting.models import Account, JournalEntryLineItem
         from accounting.utils.offset_matcher import OffsetMatcher
         data: SameTestData = SameTestData(self.app, "editor")
+        data.populate()
         account: Account | None
         line_item: JournalEntryLineItem | None
         matcher: OffsetMatcher
