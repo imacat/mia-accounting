@@ -1,0 +1,48 @@
+{#
+The Mia! Accounting Demonstration Website
+reset.html: The reset page.
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/4/12
+#}
+{% extends "base.html" %}
+
+{% block header %}{% block title %}{{ _("Reset Database") }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<p>{{ _("Warning: All the current accounting data will be deleted.  This cannot be undone.  Please backup your database first.") }}</p>
+
+<p>{{ _("Database reset is provided by the live demonstration.  This is not part of the Mia! Accounting project.") }}</p>
+
+<form class="mb-2" action="{{ url_for("reset.clean-up") }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
+  {% endif %}
+  <button class="btn btn-primary" type="submit">{{ _("Empty the Database") }}</button>
+</form>
+
+<form class="mb-2" action="{{ url_for("reset.sample") }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if request.args.next %}
+    <input type="hidden" name="next" value="{{ request.args.next }}">
+  {% endif %}
+  <button class="btn btn-primary" type="submit">{{ _("Empty and reset the Sample Data") }}</button>
+</form>
+
+{% endblock %}

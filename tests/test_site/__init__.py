@@ -71,6 +71,9 @@ def create_app(is_testing: bool = False) -> Flask:
     from . import auth
     auth.init_app(app)
 
+    from . import reset
+    reset.init_app(app)
+
     class UserUtilities(accounting.UserUtilityInterface[auth.User]):
 
         def can_view(self) -> bool:

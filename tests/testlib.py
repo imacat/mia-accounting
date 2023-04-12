@@ -19,6 +19,7 @@
 """
 from __future__ import annotations
 
+import json
 import re
 import typing as t
 from abc import ABC, abstractmethod
@@ -47,6 +48,7 @@ class Accounts:
     BANK: str = "1113-001"
     NOTES_RECEIVABLE: str = "1131-001"
     RECEIVABLE: str = "1141-001"
+    MACHINERY: str = "1441-001"
     PREPAID: str = "1258-001"
     NOTES_PAYABLE: str = "2131-001"
     PAYABLE: str = "2141-001"
@@ -166,7 +168,7 @@ def match_journal_entry_detail(location: str) -> int:
 class JournalEntryLineItemData:
     """The journal entry line item data."""
 
-    def __init__(self, account: str, description: str, amount: str,
+    def __init__(self, account: str, description: str | None, amount: str,
                  original_line_item: JournalEntryLineItemData | None = None):
         """Constructs the journal entry line item data.
 
@@ -181,7 +183,7 @@ class JournalEntryLineItemData:
         self.original_line_item: JournalEntryLineItemData | None \
             = original_line_item
         self.account: str = account
-        self.description: str = description
+        self.description: str | None = description
         self.amount: Decimal = Decimal(amount)
 
     def form(self, prefix: str, debit_credit: str, index: int,
@@ -331,6 +333,49 @@ class BaseTestData(ABC):
             db.session.execute(sa.insert(JournalEntryLineItem),
                                self.__line_items)
             db.session.commit()
+
+    def json(self) -> str:
+        """Returns the data as JSON.
+
+        :return: The JSON string.
+        """
+        from accounting.models import Account
+        today: date = date.today()
+
+        def filter_journal_entry(data: dict[str, t.Any]) -> list[t.Any]:
+            """Filters the journal entry data for JSON encoding.
+
+            :param data: The journal entry data.
+            :return: The journal entry data for JSON encoding.
+            """
+            data = data.copy()
+            data["date"] = (today - data["date"]).days
+            del data["created_by_id"]
+            del data["updated_by_id"]
+            return [data[x] for x in ["id", "date", "no", "note"]]
+
+        def filter_line_item(data: dict[str, t.Any]) -> list[t.Any]:
+            """Filters the journal entry line item data for JSON encoding.
+
+            :param data: The journal entry line item data.
+            :return: The journal entry line item data for JSON encoding.
+            """
+            data = data.copy()
+            with self.__app.app_context():
+                data["account_id"] \
+                    = db.session.get(Account, data["account_id"]).code
+            data["amount"] = str(data["amount"])
+            if "original_line_item_id" not in data:
+                data["original_line_item_id"] = None
+            return [data[x] for x in ["id", "journal_entry_id",
+                                      "original_line_item_id", "is_debit",
+                                      "no", "account_id", "currency_code",
+                                      "description", "amount"]]
+
+        return json.dumps(
+            [[filter_journal_entry(x) for x in self.__journal_entries],
+             [filter_line_item(x) for x in self.__line_items]],
+            ensure_ascii=False, separators=(",", ":"))
 
     @staticmethod
     def _couple(description: str, amount: str, debit: str, credit: str) \

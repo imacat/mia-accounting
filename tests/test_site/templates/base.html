@@ -72,6 +72,14 @@ First written: 2023/1/27
                   </button>
                 </form>
               </li>
+              {% if current_user().username == "admin" %}
+                <li>
+                  <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("reset.") %} active {% endif %}" href="{{ url_for("reset.reset-page") }}">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    {{ _("Reset") }}
+                  </a>
+                </li>
+              {% endif %}
             </ul>
           </li>
         {% else %}
