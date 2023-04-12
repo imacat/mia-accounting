@@ -129,5 +129,5 @@ def __update_file_rev_date(file: Path) -> None:
 main.add_command(babel_extract)
 main.add_command(babel_compile)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
