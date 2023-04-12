@@ -17,7 +17,7 @@
 """The data reset for the Mia! Accounting demonstration website.
 
 """
-import json
+import csv
 import typing as t
 from datetime import date, timedelta
 from decimal import Decimal
@@ -75,46 +75,72 @@ def __populate_sample_data() -> None:
     :return: None.
     """
     from accounting.models import Account, JournalEntry, JournalEntryLineItem
-    file: Path = Path(__file__).parent / "data" / "sample.json"
-    with open(file) as fp:
-        json_data = json.load(fp)
+    data_dir: Path = Path(__file__).parent / "data"
     today: date = date.today()
     user: User | None = current_user()
     assert user is not None
 
-    def filter_journal_entry(data: list[t.Any]) -> dict[str, t.Any]:
+    def filter_journal_entry(data: dict[str, t.Any]) -> dict[str, t.Any]:
         """Filters the journal entry data from JSON.
 
         :param data: The journal entry data.
         :return: The journal entry data from JSON.
         """
-        return {"id": data[0],
-                "date": today - timedelta(days=data[1]),
-                "no": data[2],
-                "note": data[3],
-                "created_by_id": user.id,
-                "updated_by_id": user.id}
+        data = data.copy()
+        data["id"] = int(data["id"])
+        data["date"] = today - timedelta(days=int(data["date"]))
+        data["no"] = int(data["no"])
+        if data["note"] == "":
+            data["note"] = None
+        data["created_by_id"] = user.id
+        data["updated_by_id"] = user.id
+        return data
 
-    def filter_line_item(data: list[t.Any]) -> dict[str, t.Any]:
+    def filter_line_item(data: dict[str, t.Any]) -> dict[str, t.Any]:
         """Filters the journal entry line item data from JSON.
 
         :param data: The journal entry line item data.
         :return: The journal entry line item data from JSON.
         """
-        return {"id": data[0],
-                "journal_entry_id": data[1],
-                "original_line_item_id": data[2],
-                "is_debit": data[3],
-                "no": data[4],
-                "account_id": Account.find_by_code(data[5]).id,
-                "currency_code": data[6],
-                "description": data[7],
-                "amount": Decimal(data[8])}
+        data = data.copy()
+        data["id"] = int(data["id"])
+        data["journal_entry_id"] = int(data["journal_entry_id"])
+        if data["original_line_item_id"] == "":
+            data["original_line_item_id"] = None
+        else:
+            data["original_line_item_id"] = int(data["original_line_item_id"])
+        data["is_debit"] = bool(data["is_debit"])
+        data["no"] = int(data["no"])
+        data["account_id"] = Account.find_by_code(data["account_id"]).id
+        if data["description"] == "":
+            data["description"] = None
+        data["amount"] = Decimal(data["amount"])
+        return data
 
-    db.session.execute(sa.insert(JournalEntry),
-                       [filter_journal_entry(x) for x in json_data[0]])
-    db.session.execute(sa.insert(JournalEntryLineItem),
-                       [filter_line_item(x) for x in json_data[1]])
+    def import_journal_entries(file: Path) -> None:
+        """Imports the journal entries.
+
+        :param file: The CSV file.
+        :return: None.
+        """
+        with open(file) as fp:
+            reader: csv.DictReader = csv.DictReader(fp)
+            db.session.execute(sa.insert(JournalEntry),
+                               [filter_journal_entry(x) for x in reader])
+
+    def import_line_items(file: Path) -> None:
+        """Imports the journal entry line items.
+
+        :param file: The CSV file.
+        :return: None.
+        """
+        with open(file) as fp:
+            reader: csv.DictReader = csv.DictReader(fp)
+            db.session.execute(sa.insert(JournalEntryLineItem),
+                               [filter_line_item(x) for x in reader])
+
+    import_journal_entries(data_dir / "sample-journal_entries.csv")
+    import_line_items(data_dir / "sample-journal_entry_line_items.csv")
     db.session.commit()
 
 
@@ -150,4 +176,3 @@ def init_app(app: Flask) -> None:
     :return: None.
     """
     app.register_blueprint(bp)
-

@@ -18,7 +18,10 @@
 """The sample data generation.
 
 """
+import csv
+import typing as t
 from datetime import date, timedelta
+from pathlib import Path
 
 import click
 
@@ -28,12 +31,12 @@ from testlib import Accounts, create_test_app, JournalEntryLineItemData, \
 
 
 @click.command()
-@click.argument("file")
-def main(file) -> None:
+def main() -> None:
     """Creates the sample data and output to a file."""
     data: SampleData = SampleData(create_test_app(), "editor")
-    with open(file, "wt") as fp:
-        fp.write(data.json())
+    data_dir: Path = Path(__file__).parent / "test_site" / "data"
+    data.write_journal_entries(data_dir / "sample-journal_entries.csv")
+    data.write_line_items(data_dir / "sample-journal_entry_line_items.csv")
 
 
 class SampleData(BaseTestData):
@@ -300,6 +303,65 @@ class SampleData(BaseTestData):
                     debit_account, debit_description, amount)],
                 [JournalEntryLineItemData(
                     credit_account, credit_description, amount)])]))
+
+    def write_journal_entries(self, file: Path) -> None:
+        """Writes the journal entries to the CSV file.
+
+        :param file: The CSV file.
+        :return: None.
+        """
+        today: date = date.today()
+
+        def filter_data(data: dict[str, t.Any]) -> dict[str, t.Any]:
+            """Filters the journal entry data for JSON encoding.
+
+            :param data: The journal entry data.
+            :return: The journal entry data for JSON encoding.
+            """
+            data = data.copy()
+            data["date"] = (today - data["date"]).days
+            del data["created_by_id"]
+            del data["updated_by_id"]
+            return data
+
+        with open(file, "wt") as fp:
+            writer: csv.DictWriter = csv.DictWriter(
+                fp, fieldnames=["id", "date", "no", "note"])
+            writer.writeheader()
+            writer.writerows([filter_data(x) for x in self._journal_entries])
+
+    def write_line_items(self, file: Path) -> None:
+        """Writes the journal entries to the CSV file.
+
+        :param file: The CSV file.
+        :return: None.
+        """
+        from accounting import db
+        from accounting.models import Account
+
+        def filter_data(data: dict[str, t.Any]) -> dict[str, t.Any]:
+            """Filters the journal entry line item data for JSON encoding.
+
+            :param data: The journal entry line item data.
+            :return: The journal entry line item data for JSON encoding.
+            """
+            data = data.copy()
+            with self._app.app_context():
+                data["account_id"] \
+                    = db.session.get(Account, data["account_id"]).code
+            if "original_line_item_id" not in data:
+                data["original_line_item_id"] = None
+            data["is_debit"] = "1" if data["is_debit"] else ""
+            return data
+
+        with open(file, "wt") as fp:
+            writer: csv.DictWriter = csv.DictWriter(
+                fp, fieldnames=["id", "journal_entry_id",
+                                "original_line_item_id", "is_debit", "no",
+                                "account_id", "currency_code", "description",
+                                "amount"])
+            writer.writeheader()
+            writer.writerows([filter_data(x) for x in self._line_items])
 
 
 if __name__ == "__main__":
