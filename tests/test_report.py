@@ -55,7 +55,7 @@ class ReportTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        ReportTestData(self.app, self.client, self.csrf_token)
+        ReportTestData(self.app, "editor")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -130,7 +130,7 @@ class ReportTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        ReportTestData(self.app, self.client, self.csrf_token)
+        ReportTestData(self.app, "editor")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -215,7 +215,7 @@ class ReportTestCase(unittest.TestCase):
 
         :return: None.
         """
-        ReportTestData(self.app, self.client, self.csrf_token)
+        ReportTestData(self.app, "editor")
         response: httpx.Response
 
         response = self.client.get(PREFIX)

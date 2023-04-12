@@ -54,7 +54,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "nobody")
-        DifferentTestData(self.app, self.client, self.csrf_token)
+        DifferentTestData(self.app, "nobody")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -73,7 +73,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         :return: None.
         """
         client, csrf_token = get_client(self.app, "viewer")
-        DifferentTestData(self.app, self.client, self.csrf_token)
+        DifferentTestData(self.app, "viewer")
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -91,7 +91,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        DifferentTestData(self.app, self.client, self.csrf_token)
+        DifferentTestData(self.app, "editor")
         response: httpx.Response
 
         response = self.client.get(PREFIX)
@@ -132,8 +132,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         """
         from accounting.models import Account, JournalEntryLineItem
         from accounting.utils.offset_matcher import OffsetMatcher
-        data: DifferentTestData \
-            = DifferentTestData(self.app, self.client, self.csrf_token)
+        data: DifferentTestData = DifferentTestData(self.app, "editor")
         account: Account | None
         line_item: JournalEntryLineItem | None
         matcher: OffsetMatcher
@@ -248,8 +247,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         """
         from accounting.models import Account, JournalEntryLineItem
         from accounting.utils.offset_matcher import OffsetMatcher
-        data: SameTestData \
-            = SameTestData(self.app, self.client, self.csrf_token)
+        data: SameTestData = SameTestData(self.app, "editor")
         account: Account | None
         line_item: JournalEntryLineItem | None
         matcher: OffsetMatcher
@@ -483,14 +481,12 @@ class DifferentTestData(BaseTestData):
             5, [JournalEntryCurrencyData(
                 "USD", [self.l_p_of5d], [self.l_p_of5c])])
 
-        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, False)
         self._add_journal_entry(self.j_r_of1)
         self._add_journal_entry(self.j_r_of2)
         self._add_journal_entry(self.j_r_of3)
         self._add_journal_entry(self.j_p_of1)
         self._add_journal_entry(self.j_p_of2)
         self._add_journal_entry(self.j_p_of3)
-        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, True)
 
 
 class SameTestData(BaseTestData):
@@ -524,8 +520,6 @@ class SameTestData(BaseTestData):
             20, "USD", "Steak", "120", Accounts.MEAL, Accounts.PAYABLE)
         self.l_p_or6d, self.l_p_or6c = self._add_simple_journal_entry(
             10, "USD", "Steak", "120", Accounts.MEAL, Accounts.PAYABLE)
-
-        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, False)
 
         # Receivable offset items
         self.l_r_of1d, self.l_r_of1c = self._add_simple_journal_entry(
@@ -563,6 +557,5 @@ class SameTestData(BaseTestData):
         self.l_p_of6d, self.l_p_of6c = self._add_simple_journal_entry(
             15, "USD", "Steak", "120", Accounts.PAYABLE, Accounts.CASH)
 
-        self._set_need_offset({Accounts.RECEIVABLE, Accounts.PAYABLE}, True)
         self._add_journal_entry(j_r_of3)
         self._add_journal_entry(j_p_of3)

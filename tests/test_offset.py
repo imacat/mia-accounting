@@ -51,8 +51,7 @@ class OffsetTestCase(unittest.TestCase):
             JournalEntryLineItem.query.delete()
 
         self.client, self.csrf_token = get_client(self.app, "editor")
-        self.data: OffsetTestData = OffsetTestData(
-            self.app, self.client, self.csrf_token)
+        self.data: OffsetTestData = OffsetTestData(self.app, "editor")
 
     def test_add_receivable_offset(self) -> None:
         """Tests to add the receivable offset.

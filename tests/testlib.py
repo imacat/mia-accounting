@@ -23,13 +23,16 @@ import re
 import typing as t
 from abc import ABC, abstractmethod
 from datetime import date, timedelta
+from secrets import randbelow
 
-from _decimal import Decimal
+from decimal import Decimal
+import sqlalchemy as sa
 
 import httpx
 from flask import Flask, render_template_string
 
 from test_site import create_app, db
+from test_site.auth import User
 
 TEST_SERVER: str = "https://testserver"
 """The test server URI."""
@@ -294,17 +297,25 @@ class JournalEntryData:
 class BaseTestData(ABC):
     """The base test data."""
 
-    def __init__(self, app: Flask, client: httpx.Client, csrf_token: str):
+    def __init__(self, app: Flask, username: str):
         """Constructs the test data.
 
         :param app: The Flask application.
-        :param client: The client.
-        :param csrf_token: The CSRF token.
+        :param username: The username.
         """
-        self.app: Flask = app
-        self.client: httpx.Client = client
-        self.csrf_token: str = csrf_token
-        self._init_data()
+        from accounting.models import JournalEntry, JournalEntryLineItem
+        with app.app_context():
+            current_user: User | None = User.query\
+                .filter(User.username == username).first()
+            assert current_user is not None
+            self.__current_user_id: int = current_user.id
+            self.__journal_entries: list[dict[str, t.Any]] = []
+            self.__line_items: list[dict[str, t.Any]] = []
+            self._init_data()
+            db.session.execute(sa.insert(JournalEntry), self.__journal_entries)
+            db.session.execute(sa.insert(JournalEntryLineItem),
+                               self.__line_items)
+            db.session.commit()
 
     @abstractmethod
     def _init_data(self) -> None:
@@ -333,26 +344,82 @@ class BaseTestData(ABC):
         :param journal_entry_data: The journal entry data.
         :return: None.
         """
-        from accounting.models import JournalEntry
-        store_uri: str = "/accounting/journal-entries/store/transfer"
+        from accounting.models import Account
+        existing_j_id: set[int] = {x["id"] for x in self.__journal_entries}
+        existing_l_id: set[int] = {x["id"] for x in self.__line_items}
+        journal_entry_data.id = self.__new_id(existing_j_id)
+        j_date: date = date.today() - timedelta(days=journal_entry_data.days)
+        self.__journal_entries.append(
+            {"id": journal_entry_data.id,
+             "date": j_date,
+             "no": self.__next_j_no(j_date),
+             "note": journal_entry_data.note,
+             "created_by_id": self.__current_user_id,
+             "updated_by_id": self.__current_user_id})
+        debit_no: int = 0
+        credit_no: int = 0
+        for currency in journal_entry_data.currencies:
+            for line_item in currency.debit:
+                account: Account | None \
+                    = Account.find_by_code(line_item.account)
+                assert account is not None
+                debit_no = debit_no + 1
+                line_item.id = self.__new_id(existing_l_id)
+                data: dict[str, t.Any] \
+                    = {"id": line_item.id,
+                       "journal_entry_id": journal_entry_data.id,
+                       "is_debit": True,
+                       "no": debit_no,
+                       "account_id": account.id,
+                       "currency_code": currency.code,
+                       "description": line_item.description,
+                       "amount": line_item.amount}
+                if line_item.original_line_item is not None:
+                    data["original_line_item_id"] \
+                        = line_item.original_line_item.id
+                self.__line_items.append(data)
+            for line_item in currency.credit:
+                account: Account | None \
+                    = Account.find_by_code(line_item.account)
+                assert account is not None
+                credit_no = credit_no + 1
+                line_item.id = self.__new_id(existing_l_id)
+                data: dict[str, t.Any] \
+                    = {"id": line_item.id,
+                       "journal_entry_id": journal_entry_data.id,
+                       "is_debit": False,
+                       "no": credit_no,
+                       "account_id": account.id,
+                       "currency_code": currency.code,
+                       "description": line_item.description,
+                       "amount": line_item.amount}
+                if line_item.original_line_item is not None:
+                    data["original_line_item_id"] \
+                        = line_item.original_line_item.id
+                self.__line_items.append(data)
 
-        response: httpx.Response = self.client.post(
-            store_uri, data=journal_entry_data.new_form(self.csrf_token))
-        assert response.status_code == 302
-        journal_entry_id: int \
-            = match_journal_entry_detail(response.headers["Location"])
-        journal_entry_data.id = journal_entry_id
-        with self.app.app_context():
-            journal_entry: JournalEntry | None \
-                = db.session.get(JournalEntry, journal_entry_id)
-            assert journal_entry is not None
-            for i in range(len(journal_entry.currencies)):
-                for j in range(len(journal_entry.currencies[i].debit)):
-                    journal_entry_data.currencies[i].debit[j].id \
-                        = journal_entry.currencies[i].debit[j].id
-                for j in range(len(journal_entry.currencies[i].credit)):
-                    journal_entry_data.currencies[i].credit[j].id \
-                        = journal_entry.currencies[i].credit[j].id
+    @staticmethod
+    def __new_id(existing_id: set[int]) -> int:
+        """Generates and returns a new random unique ID.
+
+        :param existing_id: The existing ID.
+        :return: The newly-generated random unique ID.
+        """
+        while True:
+            obj_id: int = 100000000 + randbelow(900000000)
+            if obj_id not in existing_id:
+                existing_id.add(obj_id)
+                return obj_id
+
+    def __next_j_no(self, j_date: date) -> int:
+        """Returns the next journal entry number in a day.
+
+        :param j_date: The journal entry date.
+        :return: The next journal entry number.
+        """
+        existing: set[int] = {x["no"] for x in self.__journal_entries
+                              if x["date"] == j_date}
+        return 1 if len(existing) == 0 else max(existing) + 1
 
     def _add_simple_journal_entry(
             self, days: int, currency: str, description: str, amount: str,
@@ -374,20 +441,3 @@ class BaseTestData(ABC):
             days, [JournalEntryCurrencyData(
                 currency, [debit_item], [credit_item])]))
         return debit_item, credit_item
-
-    def _set_need_offset(self, account_codes: set[str],
-                         is_need_offset: bool) -> None:
-        """Sets whether the line items in some accounts need offset.
-
-        :param account_codes: The account codes.
-        :param is_need_offset: True if the line items in the accounts need
-            offset, or False otherwise.
-        :return:
-        """
-        from accounting.models import Account
-        with self.app.app_context():
-            for code in account_codes:
-                account: Account | None = Account.find_by_code(code)
-                assert account is not None
-                account.is_need_offset = is_need_offset
-            db.session.commit()
