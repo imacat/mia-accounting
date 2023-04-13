@@ -26,9 +26,10 @@ import httpx
 from flask import Flask
 
 from test_site import db
+from test_site.lib import JournalEntryLineItemData, JournalEntryCurrencyData, \
+    JournalEntryData, BaseTestData
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
-    match_journal_entry_detail, JournalEntryLineItemData, \
-    JournalEntryCurrencyData, JournalEntryData, BaseTestData
+    match_journal_entry_detail
 
 PREFIX: str = "/accounting/journal-entries"
 """The URL prefix for the journal entry management."""

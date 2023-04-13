@@ -23,7 +23,8 @@ from datetime import date
 import httpx
 from flask import Flask
 
-from testlib import create_test_app, get_client, Accounts, BaseTestData
+from test_site.lib import BaseTestData
+from testlib import create_test_app, get_client, Accounts
 
 PREFIX: str = "/accounting"
 """The URL prefix for the reports."""

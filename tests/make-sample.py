@@ -25,9 +25,9 @@ from pathlib import Path
 
 import click
 
-from testlib import Accounts, create_test_app, JournalEntryLineItemData, \
-    JournalEntryCurrencyData, JournalEntryData, \
-    BaseTestData
+from test_site.lib import JournalEntryLineItemData, JournalEntryCurrencyData, \
+    JournalEntryData, BaseTestData
+from testlib import Accounts, create_test_app
 
 
 @click.command()

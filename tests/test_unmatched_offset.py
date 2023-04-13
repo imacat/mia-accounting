@@ -23,8 +23,9 @@ import httpx
 from flask import Flask
 
 from test_site import db
-from testlib import create_test_app, get_client, Accounts, \
-    JournalEntryCurrencyData, JournalEntryData, BaseTestData
+from test_site.lib import JournalEntryCurrencyData, JournalEntryData, \
+    BaseTestData
+from testlib import create_test_app, get_client, Accounts
 
 PREFIX: str = "/accounting/unmatched-offsets"
 """The URL prefix for the unmatched offset management."""
