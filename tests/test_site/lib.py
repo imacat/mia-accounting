@@ -216,45 +216,6 @@ class BaseTestData(ABC):
                                self._line_items)
             db.session.commit()
 
-    @property
-    def csv_data(self) -> tuple[list[dict[str, t.Any]],
-                                list[dict[str, t.Any]]]:
-        """Returns the data for CSV.
-
-        :return: The data for CSV.
-        """
-        from accounting.models import Account
-        today: date = date.today()
-
-        def filter_journal_entry(data: dict[str, t.Any]) -> dict[str, t.Any]:
-            """Filters the journal entry data for JSON encoding.
-
-            :param data: The journal entry data.
-            :return: The journal entry data for JSON encoding.
-            """
-            data = data.copy()
-            data["date"] = (today - data["date"]).days
-            del data["created_by_id"]
-            del data["updated_by_id"]
-            return data
-
-        def filter_line_item(data: dict[str, t.Any]) -> dict[str, t.Any]:
-            """Filters the journal entry line item data for JSON encoding.
-
-            :param data: The journal entry line item data.
-            :return: The journal entry line item data for JSON encoding.
-            """
-            data = data.copy()
-            with self._app.app_context():
-                data["account_id"] \
-                    = db.session.get(Account, data["account_id"]).code
-            if "original_line_item_id" not in data:
-                data["original_line_item_id"] = None
-            return data
-
-        return [filter_journal_entry(x) for x in self._journal_entries], \
-            [filter_line_item(x) for x in self._line_items]
-
     @staticmethod
     def _couple(description: str, amount: str, debit: str, credit: str) \
             -> tuple[JournalEntryLineItemData, JournalEntryLineItemData]:
