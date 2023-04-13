@@ -17,8 +17,10 @@
 """The authentication for the Mia! Accounting demonstration website.
 
 """
+import typing as t
+
 from flask import Blueprint, render_template, Flask, redirect, url_for, \
-    session, request, g, Response
+    session, request, g, Response, abort
 
 from . import db
 
@@ -91,6 +93,31 @@ def current_user() -> User | None:
             g.user = User.query.filter(
                 User.username == session["user"]).first()
     return g.user
+
+
+def admin_required(view: t.Callable) -> t.Callable:
+    """The view decorator to require the user to be an administrator.
+
+    :param view: The view.
+    :return: The decorated view.
+    """
+
+    def decorated_view(*args, **kwargs):
+        """The decorated view that tests against a permission rule.
+
+        :param args: The arguments of the view.
+        :param kwargs: The keyword arguments of the view.
+        :return: The response of the view.
+        :raise Forbidden: When the user is denied.
+        """
+        from accounting.utils.next_uri import append_next
+        if "user" not in session:
+            return redirect(append_next(url_for("auth.login")))
+        if session["user"] != "admin":
+            abort(403)
+        return view(*args, **kwargs)
+
+    return decorated_view
 
 
 def init_app(app: Flask) -> None:

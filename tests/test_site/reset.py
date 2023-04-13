@@ -23,8 +23,8 @@ from flask import Flask, Blueprint, url_for, flash, redirect, session, \
     render_template, current_app
 from flask_babel import lazy_gettext
 
-from accounting.utils.cast import s
 from . import db
+from .auth import admin_required
 from .lib import Accounts, JournalEntryLineItemData, JournalEntryData, \
     JournalEntryCurrencyData, BaseTestData
 
@@ -32,6 +32,7 @@ bp: Blueprint = Blueprint("reset", __name__, url_prefix="/")
 
 
 @bp.get("reset", endpoint="reset-page")
+@admin_required
 def reset() -> str:
     """Resets the sample data.
 
@@ -41,11 +42,13 @@ def reset() -> str:
 
 
 @bp.post("sample", endpoint="sample")
+@admin_required
 def reset_sample() -> redirect:
     """Resets the sample data.
 
     :return: Redirection to the accounting application.
     """
+    from accounting.utils.cast import s
     __reset_database()
     SampleData(current_app, "editor").populate()
     flash(s(lazy_gettext(
@@ -54,11 +57,13 @@ def reset_sample() -> redirect:
 
 
 @bp.post("reset", endpoint="clean-up")
+@admin_required
 def clean_up() -> redirect:
     """Clean-up the database data.
 
     :return: Redirection to the accounting application.
     """
+    from accounting.utils.cast import s
     __reset_database()
     flash(s(lazy_gettext("The database is emptied successfully.")), "success")
     return redirect(url_for("accounting-report.default"))
