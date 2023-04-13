@@ -17,20 +17,16 @@
 """The data reset for the Mia! Accounting demonstration website.
 
 """
-import csv
-import typing as t
 from datetime import date, timedelta
-from decimal import Decimal
-from pathlib import Path
 
-import sqlalchemy as sa
 from flask import Flask, Blueprint, url_for, flash, redirect, session, \
-    render_template
+    render_template, current_app
 from flask_babel import lazy_gettext
 
 from accounting.utils.cast import s
 from . import db
-from .auth import User, current_user
+from .lib import Accounts, JournalEntryLineItemData, JournalEntryData, \
+    JournalEntryCurrencyData, BaseTestData
 
 bp: Blueprint = Blueprint("reset", __name__, url_prefix="/")
 
@@ -51,7 +47,7 @@ def reset_sample() -> redirect:
     :return: Redirection to the accounting application.
     """
     __reset_database()
-    __populate_sample_data()
+    SampleData(current_app, "editor").populate()
     flash(s(lazy_gettext(
         "The sample data are emptied and reset successfully.")), "success")
     return redirect(url_for("accounting-report.default"))
@@ -64,84 +60,8 @@ def clean_up() -> redirect:
     :return: Redirection to the accounting application.
     """
     __reset_database()
-    db.session.commit()
     flash(s(lazy_gettext("The database is emptied successfully.")), "success")
     return redirect(url_for("accounting-report.default"))
-
-
-def __populate_sample_data() -> None:
-    """Populates the sample data.
-
-    :return: None.
-    """
-    from accounting.models import Account, JournalEntry, JournalEntryLineItem
-    data_dir: Path = Path(__file__).parent / "data"
-    today: date = date.today()
-    user: User | None = current_user()
-    assert user is not None
-
-    def filter_journal_entry(data: dict[str, t.Any]) -> dict[str, t.Any]:
-        """Filters the journal entry data from JSON.
-
-        :param data: The journal entry data.
-        :return: The journal entry data from JSON.
-        """
-        data = data.copy()
-        data["id"] = int(data["id"])
-        data["date"] = today - timedelta(days=int(data["date"]))
-        data["no"] = int(data["no"])
-        if data["note"] == "":
-            data["note"] = None
-        data["created_by_id"] = user.id
-        data["updated_by_id"] = user.id
-        return data
-
-    def filter_line_item(data: dict[str, t.Any]) -> dict[str, t.Any]:
-        """Filters the journal entry line item data from JSON.
-
-        :param data: The journal entry line item data.
-        :return: The journal entry line item data from JSON.
-        """
-        data = data.copy()
-        data["id"] = int(data["id"])
-        data["journal_entry_id"] = int(data["journal_entry_id"])
-        if data["original_line_item_id"] == "":
-            data["original_line_item_id"] = None
-        else:
-            data["original_line_item_id"] = int(data["original_line_item_id"])
-        data["is_debit"] = bool(data["is_debit"])
-        data["no"] = int(data["no"])
-        data["account_id"] = Account.find_by_code(data["account_id"]).id
-        if data["description"] == "":
-            data["description"] = None
-        data["amount"] = Decimal(data["amount"])
-        return data
-
-    def import_journal_entries(file: Path) -> None:
-        """Imports the journal entries.
-
-        :param file: The CSV file.
-        :return: None.
-        """
-        with open(file) as fp:
-            reader: csv.DictReader = csv.DictReader(fp)
-            db.session.execute(sa.insert(JournalEntry),
-                               [filter_journal_entry(x) for x in reader])
-
-    def import_line_items(file: Path) -> None:
-        """Imports the journal entry line items.
-
-        :param file: The CSV file.
-        :return: None.
-        """
-        with open(file) as fp:
-            reader: csv.DictReader = csv.DictReader(fp)
-            db.session.execute(sa.insert(JournalEntryLineItem),
-                               [filter_line_item(x) for x in reader])
-
-    import_journal_entries(data_dir / "sample-journal_entries.csv")
-    import_line_items(data_dir / "sample-journal_entry_line_items.csv")
-    db.session.commit()
 
 
 def __reset_database() -> None:
@@ -167,6 +87,273 @@ def __reset_database() -> None:
     init_base_accounts_command()
     init_accounts_command(session["user"])
     init_currencies_command(session["user"])
+    db.session.commit()
+
+
+class SampleData(BaseTestData):
+    """The sample data."""
+
+    def _init_data(self) -> None:
+        self.__add_recurring()
+        self.__add_offsets()
+        self.__add_meals()
+
+    def __add_recurring(self) -> None:
+        """Adds the recurring data.
+
+        :return: None.
+        """
+        self.__add_usd_recurring()
+        self.__add_twd_recurring()
+
+    def __add_usd_recurring(self) -> None:
+        """Adds the recurring data in USD.
+
+        :return: None.
+        """
+        today: date = date.today()
+        days: int
+        year: int
+        month: int
+
+        # Recurring in USD
+        j_date: date = date(today.year - 5, today.month, today.day)
+        j_date = j_date + timedelta(days=(4 - j_date.weekday()))
+        days = (today - j_date).days
+        while True:
+            if days < 0:
+                break
+            self.__add_journal_entry(
+                days, "USD", "2600",
+                Accounts.BANK, "Transfer", Accounts.SERVICE, "Payroll")
+
+            days = days - 1
+            if days < 0:
+                break
+            self.__add_journal_entry(
+                days, "USD", "1200",
+                Accounts.CASH, None, Accounts.BANK, "Withdraw")
+            days = days - 13
+
+        year = today.year - 5
+        month = today.month
+        while True:
+            month = month + 1
+            if month > 12:
+                year = year + 1
+                month = 1
+            days = (today - date(year, month, 1)).days
+            if days < 0:
+                break
+            self.__add_journal_entry(
+                days, "USD", "1800",
+                Accounts.RENT_EXPENSE, "Rent", Accounts.BANK, "Transfer")
+
+    def __add_twd_recurring(self) -> None:
+        """Adds the recurring data in TWD.
+
+        :return: None.
+        """
+        today: date = date.today()
+
+        year: int = today.year - 5
+        month: int = today.month
+        while True:
+            days: int = (today - date(year, month, 5)).days
+            if days < 0:
+                break
+            self.__add_journal_entry(
+                days, "TWD", "50000",
+                Accounts.BANK, "薪資轉帳", Accounts.SERVICE, "薪水")
+
+            days = days - 1
+            if days < 0:
+                break
+            self.__add_journal_entry(
+                days, "TWD", "25000",
+                Accounts.CASH, None, Accounts.BANK, "提款")
+
+            days = days - 4
+            if days < 0:
+                break
+            self.__add_journal_entry(
+                days, "TWD", "18000",
+                Accounts.RENT_EXPENSE, "房租", Accounts.BANK, "轉帳")
+
+            month = month + 1
+            if month > 12:
+                year = year + 1
+                month = 1
+
+    def __add_offsets(self) -> None:
+        """Adds the offset data.
+
+        :return: None.
+        """
+        days: int
+        year: int
+        month: int
+        description: str
+        line_item_or: JournalEntryLineItemData
+        line_item_of: JournalEntryLineItemData
+
+        # Full offset and unmatched in USD
+        description = "Speaking—Institute"
+        line_item_or = JournalEntryLineItemData(
+            Accounts.RECEIVABLE, description, "120")
+        self._add_journal_entry(JournalEntryData(
+            40, [JournalEntryCurrencyData(
+                "USD", [line_item_or], [JournalEntryLineItemData(
+                    Accounts.SERVICE, description, "120")])]))
+        line_item_of = JournalEntryLineItemData(
+            Accounts.RECEIVABLE, description, "120",
+            original_line_item=line_item_or)
+        self._add_journal_entry(JournalEntryData(
+            5, [JournalEntryCurrencyData(
+                "USD", [JournalEntryLineItemData(
+                    Accounts.BANK, description, "120")],
+                [line_item_of])]))
+        self.__add_journal_entry(
+            30, "USD", "120",
+            Accounts.BANK, description, Accounts.SERVICE, description)
+
+        # Partial offset in USD
+        line_item_or = JournalEntryLineItemData(
+            Accounts.PAYABLE, "Computer", "1600")
+        self._add_journal_entry(JournalEntryData(
+            60, [JournalEntryCurrencyData(
+                "USD", [JournalEntryLineItemData(
+                    Accounts.MACHINERY, "Computer", "1600")],
+                [line_item_or])]))
+        line_item_of = JournalEntryLineItemData(
+            Accounts.PAYABLE, "Computer", "800",
+            original_line_item=line_item_or)
+        self._add_journal_entry(JournalEntryData(
+            35, [JournalEntryCurrencyData(
+                "USD", [line_item_of], [JournalEntryLineItemData(
+                    Accounts.BANK, "Computer", "800")])]))
+        line_item_of = JournalEntryLineItemData(
+            Accounts.PAYABLE, "Computer", "400",
+            original_line_item=line_item_or)
+        self._add_journal_entry(JournalEntryData(
+            10, [JournalEntryCurrencyData(
+                "USD", [line_item_of], [JournalEntryLineItemData(
+                    Accounts.CASH, "Computer", "400")])]))
+
+        # Full offset and unmatched in TWD
+        description = "演講費—母校"
+        line_item_or = JournalEntryLineItemData(
+            Accounts.RECEIVABLE, description, "3000")
+        self._add_journal_entry(JournalEntryData(
+            45, [JournalEntryCurrencyData(
+                "TWD", [line_item_or], [JournalEntryLineItemData(
+                    Accounts.SERVICE, description, "3000")])]))
+        line_item_of = JournalEntryLineItemData(
+            Accounts.RECEIVABLE, description, "3000",
+            original_line_item=line_item_or)
+        self._add_journal_entry(JournalEntryData(
+            6, [JournalEntryCurrencyData(
+                "TWD", [JournalEntryLineItemData(
+                    Accounts.BANK, description, "3000")],
+                [line_item_of])]))
+        self.__add_journal_entry(
+            25, "TWD", "3000",
+            Accounts.BANK, description, Accounts.SERVICE, description)
+
+        # Partial offset in TWD
+        line_item_or = JournalEntryLineItemData(
+            Accounts.PAYABLE, "手機", "30000")
+        self._add_journal_entry(JournalEntryData(
+            55, [JournalEntryCurrencyData(
+                "TWD", [JournalEntryLineItemData(
+                    Accounts.MACHINERY, "手機", "30000")],
+                [line_item_or])]))
+        line_item_of = JournalEntryLineItemData(
+            Accounts.PAYABLE, "手機", "16000",
+            original_line_item=line_item_or)
+        self._add_journal_entry(JournalEntryData(
+            27, [JournalEntryCurrencyData(
+                "TWD", [line_item_of], [JournalEntryLineItemData(
+                    Accounts.BANK, "手機", "16000")])]))
+        line_item_of = JournalEntryLineItemData(
+            Accounts.PAYABLE, "手機", "6000",
+            original_line_item=line_item_or)
+        self._add_journal_entry(JournalEntryData(
+            8, [JournalEntryCurrencyData(
+                "TWD", [line_item_of], [JournalEntryLineItemData(
+                    Accounts.CASH, "手機", "6000")])]))
+
+    def __add_meals(self) -> None:
+        """Adds the meal data.
+
+        :return: None.
+        """
+        days = 60
+        while days >= 0:
+            # Meals in USD
+            if days % 4 == 2:
+                self.__add_journal_entry(
+                    days, "USD", "2.9",
+                    Accounts.MEAL, "Lunch—Coffee", Accounts.CASH, None)
+            else:
+                self.__add_journal_entry(
+                    days, "USD", "3.9",
+                    Accounts.MEAL, "Lunch—Coffee", Accounts.CASH, None)
+
+            if days % 15 == 3:
+                self.__add_journal_entry(
+                    days, "USD", "5.45",
+                    Accounts.MEAL, "Dinner—Pizza",
+                    Accounts.PAYABLE, "Dinner—Pizza")
+            else:
+                self.__add_journal_entry(
+                    days, "USD", "5.9",
+                    Accounts.MEAL, "Dinner—Pasta", Accounts.CASH, None)
+
+            # Meals in TWD
+            if days % 5 == 3:
+                self.__add_journal_entry(
+                    days, "TWD", "125",
+                    Accounts.MEAL, "午餐—鄰家咖啡", Accounts.CASH, None)
+            else:
+                self.__add_journal_entry(
+                    days, "TWD", "80",
+                    Accounts.MEAL, "午餐—便當", Accounts.CASH, None)
+
+            if days % 15 == 3:
+                self.__add_journal_entry(
+                    days, "TWD", "320",
+                    Accounts.MEAL, "晚餐—牛排", Accounts.PAYABLE, "晚餐—牛排")
+            else:
+                self.__add_journal_entry(
+                    days, "TWD", "100",
+                    Accounts.MEAL, "晚餐—自助餐", Accounts.CASH, None)
+
+            days = days - 1
+
+    def __add_journal_entry(
+            self, days: int, currency: str, amount: str,
+            debit_account: str, debit_description: str | None,
+            credit_account: str, credit_description: str | None) -> None:
+        """Adds a simple journal entry.
+
+        :param days: The number of days before today.
+        :param currency: The currency code.
+        :param amount: The amount.
+        :param debit_account: The debit account code.
+        :param debit_description: The debit description.
+        :param credit_account: The credit account code.
+        :param credit_description: The credit description.
+        :return: None.
+        """
+        self._add_journal_entry(JournalEntryData(
+            days,
+            [JournalEntryCurrencyData(
+                currency,
+                [JournalEntryLineItemData(
+                    debit_account, debit_description, amount)],
+                [JournalEntryLineItemData(
+                    credit_account, credit_description, amount)])]))
 
 
 def init_app(app: Flask) -> None:

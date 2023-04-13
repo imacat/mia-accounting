@@ -32,6 +32,18 @@ from . import db
 from .auth import User
 
 
+class Accounts:
+    """The shortcuts to the common accounts."""
+    CASH: str = "1111-001"
+    BANK: str = "1113-001"
+    RECEIVABLE: str = "1141-001"
+    MACHINERY: str = "1441-001"
+    PAYABLE: str = "2141-001"
+    SERVICE: str = "4611-001"
+    RENT_EXPENSE: str = "6252-001"
+    MEAL: str = "6272-001"
+
+
 class JournalEntryLineItemData:
     """The journal entry line item data."""
 
