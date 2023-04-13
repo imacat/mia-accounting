@@ -259,33 +259,36 @@ class JournalEntryData:
             for line_item in currency.credit:
                 line_item.journal_entry = self
 
-    def new_form(self, csrf_token: str) -> dict[str, str]:
+    def new_form(self, csrf_token: str, next_uri: str) -> dict[str, str]:
         """Returns the journal entry as a creation form.
 
         :param csrf_token: The CSRF token.
+        :param next_uri: The next URI.
         :return: The journal entry as a creation form.
         """
-        return self.__form(csrf_token, is_update=False)
+        return self.__form(csrf_token, next_uri, is_update=False)
 
-    def update_form(self, csrf_token: str) -> dict[str, str]:
+    def update_form(self, csrf_token: str, next_uri: str) -> dict[str, str]:
         """Returns the journal entry as an update form.
 
         :param csrf_token: The CSRF token.
+        :param next_uri: The next URI.
         :return: The journal entry as an update form.
         """
-        return self.__form(csrf_token, is_update=True)
+        return self.__form(csrf_token, next_uri, is_update=True)
 
-    def __form(self, csrf_token: str, is_update: bool = False) \
+    def __form(self, csrf_token: str, next_uri: str, is_update: bool = False) \
             -> dict[str, str]:
         """Returns the journal entry as a form.
 
         :param csrf_token: The CSRF token.
+        :param next_uri: The next URI.
         :param is_update: True for an update operation, or False otherwise
         :return: The journal entry as a form.
         """
         journal_entry_date: date = date.today() - timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
-                                "next": NEXT_URI,
+                                "next": next_uri,
                                 "date": journal_entry_date.isoformat()}
         for i in range(len(self.currencies)):
             form.update(self.currencies[i].form(i + 1, is_update))
