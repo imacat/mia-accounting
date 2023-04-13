@@ -193,8 +193,8 @@ class BaseTestData(ABC):
                 .filter(User.username == username).first()
             assert current_user is not None
             self.__current_user_id: int = current_user.id
-            self._journal_entries: list[dict[str, t.Any]] = []
-            self._line_items: list[dict[str, t.Any]] = []
+            self.__journal_entries: list[dict[str, t.Any]] = []
+            self.__line_items: list[dict[str, t.Any]] = []
             self._init_data()
 
     @abstractmethod
@@ -211,9 +211,9 @@ class BaseTestData(ABC):
         """
         from accounting.models import JournalEntry, JournalEntryLineItem
         with self._app.app_context():
-            db.session.execute(sa.insert(JournalEntry), self._journal_entries)
+            db.session.execute(sa.insert(JournalEntry), self.__journal_entries)
             db.session.execute(sa.insert(JournalEntryLineItem),
-                               self._line_items)
+                               self.__line_items)
             db.session.commit()
 
     @staticmethod
@@ -237,11 +237,11 @@ class BaseTestData(ABC):
         :return: None.
         """
         from accounting.models import Account
-        existing_j_id: set[int] = {x["id"] for x in self._journal_entries}
-        existing_l_id: set[int] = {x["id"] for x in self._line_items}
+        existing_j_id: set[int] = {x["id"] for x in self.__journal_entries}
+        existing_l_id: set[int] = {x["id"] for x in self.__line_items}
         journal_entry_data.id = self.__new_id(existing_j_id)
         j_date: date = date.today() - timedelta(days=journal_entry_data.days)
-        self._journal_entries.append(
+        self.__journal_entries.append(
             {"id": journal_entry_data.id,
              "date": j_date,
              "no": self.__next_j_no(j_date),
@@ -269,7 +269,7 @@ class BaseTestData(ABC):
                 if line_item.original_line_item is not None:
                     data["original_line_item_id"] \
                         = line_item.original_line_item.id
-                self._line_items.append(data)
+                self.__line_items.append(data)
             for line_item in currency.credit:
                 account: Account | None \
                     = Account.find_by_code(line_item.account)
@@ -288,7 +288,7 @@ class BaseTestData(ABC):
                 if line_item.original_line_item is not None:
                     data["original_line_item_id"] \
                         = line_item.original_line_item.id
-                self._line_items.append(data)
+                self.__line_items.append(data)
 
     @staticmethod
     def __new_id(existing_id: set[int]) -> int:
@@ -309,7 +309,7 @@ class BaseTestData(ABC):
         :param j_date: The journal entry date.
         :return: The next journal entry number.
         """
-        existing: set[int] = {x["no"] for x in self._journal_entries
+        existing: set[int] = {x["no"] for x in self.__journal_entries
                               if x["date"] == j_date}
         return 1 if len(existing) == 0 else max(existing) + 1
 
