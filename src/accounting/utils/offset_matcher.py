@@ -17,11 +17,15 @@
 """The forms for the unmatched offset management.
 
 """
+from decimal import Decimal
+
 import sqlalchemy as sa
 from sqlalchemy.orm import selectinload
 
+from accounting import db
 from accounting.models import Account, JournalEntry, JournalEntryLineItem
-from accounting.utils.unapplied import get_unapplied_original_line_items
+from accounting.utils.cast import be
+from accounting.utils.offset_alias import offset_alias
 
 
 class OffsetPair:
@@ -67,8 +71,7 @@ class OffsetMatcher:
 
         :return: None.
         """
-        self.unapplied: list[JournalEntryLineItem] \
-            = get_unapplied_original_line_items(self.account)
+        self.unapplied: list[JournalEntryLineItem] = self.__get_unapplied()
         self.total = len(self.unapplied)
         if self.total == 0:
             self.is_having_matches = False
@@ -94,6 +97,47 @@ class OffsetMatcher:
             offset_candidates[0].match = original_item
             remains.remove(offset_candidates[0])
         self.is_having_matches = len(self.matched_pairs) > 0
+
+    def __get_unapplied(self) -> list[JournalEntryLineItem]:
+        """Returns the unapplied original line items of the account.
+
+        :return: The unapplied original line items of the account.
+        """
+        offset: sa.Alias = offset_alias()
+        net_balance: sa.Label \
+            = (JournalEntryLineItem.amount
+               + sa.func.sum(sa.case(
+                    (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
+                     offset.c.amount),
+                    else_=-offset.c.amount))).label("net_balance")
+        select_net_balances: sa.Select \
+            = sa.select(JournalEntryLineItem.id, net_balance) \
+            .join(Account) \
+            .join(offset, be(JournalEntryLineItem.id
+                             == offset.c.original_line_item_id),
+                  isouter=True) \
+            .filter(be(Account.id == self.account.id),
+                    sa.or_(sa.and_(Account.base_code.startswith("2"),
+                                   sa.not_(JournalEntryLineItem.is_debit)),
+                           sa.and_(Account.base_code.startswith("1"),
+                                   JournalEntryLineItem.is_debit))) \
+            .group_by(JournalEntryLineItem.id) \
+            .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
+        net_balances: dict[int, Decimal] \
+            = {x.id: x.net_balance
+               for x in db.session.execute(select_net_balances).all()}
+        line_items: list[JournalEntryLineItem] = JournalEntryLineItem.query \
+            .filter(JournalEntryLineItem.id.in_({x for x in net_balances})) \
+            .join(JournalEntry) \
+            .order_by(JournalEntry.date, JournalEntry.no,
+                      JournalEntryLineItem.is_debit, JournalEntryLineItem.no) \
+            .options(selectinload(JournalEntryLineItem.currency),
+                     selectinload(JournalEntryLineItem.journal_entry)).all()
+        for line_item in line_items:
+            line_item.net_balance = line_item.amount \
+                if net_balances[line_item.id] is None \
+                else net_balances[line_item.id]
+        return line_items
 
     def __get_unmatched_offsets(self) -> list[JournalEntryLineItem]:
         """Returns the unmatched offsets of an account.
