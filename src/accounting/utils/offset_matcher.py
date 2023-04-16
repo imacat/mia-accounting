@@ -140,7 +140,7 @@ class OffsetMatcher:
         return line_items
 
     def __get_unmatched_offsets(self) -> list[JournalEntryLineItem]:
-        """Returns the unmatched offsets of an account.
+        """Returns the unmatched offsets of the account.
 
         :return: The unmatched offsets of the account.
         """
