@@ -23,13 +23,11 @@ import sqlalchemy as sa
 from flask_babel import LazyString
 from sqlalchemy.orm import selectinload
 
-from accounting import db
 from accounting.locale import lazy_gettext
 from accounting.models import Currency, Account, JournalEntry, \
     JournalEntryLineItem
 from accounting.report.period import Period
-from accounting.utils.cast import be
-from accounting.utils.offset_alias import offset_alias
+from accounting.report.utils.unapplied import get_net_balances
 
 
 class OffsetPair:
@@ -118,7 +116,8 @@ class OffsetMatcher:
         :return: The unapplied original line items and unmatched offsets of the
             account.
         """
-        net_balances: dict[int, Decimal | None] = self.__get_net_balances()
+        net_balances: dict[int, Decimal | None] \
+            = get_net_balances(self.__currency, self.__account, None)
         unmatched_offset_condition: sa.BinaryExpression \
             = sa.and_(Account.id == self.__account.id,
                       JournalEntryLineItem.currency_code
@@ -147,36 +146,6 @@ class OffsetMatcher:
         self.__all_unmatched = [x for x in self.__all_line_items
                                 if not x.is_offset]
         self.__populate_accumulated_balances()
-
-    def __get_net_balances(self) -> dict[int, Decimal | None]:
-        """Returns the net balances of the unapplied line items of the account.
-
-        :return: The net balances of the unapplied line items of the account.
-        """
-        offset: sa.Alias = offset_alias()
-        net_balance: sa.Label \
-            = (JournalEntryLineItem.amount
-               + sa.func.sum(sa.case(
-                    (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
-                     offset.c.amount),
-                    else_=-offset.c.amount))).label("net_balance")
-        select_net_balances: sa.Select \
-            = sa.select(JournalEntryLineItem.id, net_balance) \
-            .join(Account) \
-            .join(offset, be(JournalEntryLineItem.id
-                             == offset.c.original_line_item_id),
-                  isouter=True) \
-            .filter(be(Account.id == self.__account.id),
-                    be(JournalEntryLineItem.currency_code
-                       == self.__currency.code),
-                    sa.or_(sa.and_(Account.base_code.startswith("2"),
-                                   sa.not_(JournalEntryLineItem.is_debit)),
-                           sa.and_(Account.base_code.startswith("1"),
-                                   JournalEntryLineItem.is_debit))) \
-            .group_by(JournalEntryLineItem.id) \
-            .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
-        return {x.id: x.net_balance
-                for x in db.session.execute(select_net_balances).all()}
 
     def __populate_accumulated_balances(self) -> None:
         """Populates the accumulated balances of the line items.

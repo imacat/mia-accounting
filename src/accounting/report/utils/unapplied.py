@@ -17,6 +17,8 @@
 """The unapplied original line item utilities.
 
 """
+from decimal import Decimal
+
 import sqlalchemy as sa
 
 from accounting import db
@@ -77,3 +79,44 @@ def get_accounts_with_unapplied(currency: Currency,
     for account in accounts:
         account.count = counts[account.id]
     return accounts
+
+
+def get_net_balances(currency: Currency, account: Account,
+                     period: Period | None) -> dict[int, Decimal | None]:
+    """Returns the net balances of the unapplied line items of the account.
+
+    :param currency: The currency.
+    :param account: The account.
+    :param period: The period, or None for all time.
+    :return: The net balances of the unapplied line items of the account.
+    """
+    offset: sa.Alias = offset_alias()
+    net_balance: sa.Label \
+        = (JournalEntryLineItem.amount
+           + sa.func.sum(sa.case(
+                (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
+                 offset.c.amount),
+                else_=-offset.c.amount))).label("net_balance")
+    conditions: list[sa.BinaryExpression] \
+        = [be(Account.id == account.id),
+           be(JournalEntryLineItem.currency_code == currency.code),
+           sa.or_(sa.and_(Account.base_code.startswith("2"),
+                          sa.not_(JournalEntryLineItem.is_debit)),
+                  sa.and_(Account.base_code.startswith("1"),
+                          JournalEntryLineItem.is_debit))]
+    if period is not None:
+        if period.start is not None:
+            conditions.append(be(JournalEntry.date >= period.start))
+        if period.end is not None:
+            conditions.append(be(JournalEntry.date <= period.end))
+    select_net_balances: sa.Select \
+        = sa.select(JournalEntryLineItem.id, net_balance) \
+        .join(JournalEntry).join(Account) \
+        .join(offset, be(JournalEntryLineItem.id
+                         == offset.c.original_line_item_id),
+              isouter=True) \
+        .filter(*conditions) \
+        .group_by(JournalEntryLineItem.id) \
+        .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
+    return {x.id: x.net_balance
+            for x in db.session.execute(select_net_balances).all()}
