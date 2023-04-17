@@ -792,6 +792,12 @@ class JournalEntryAccount {
     code;
 
     /**
+     * The account title
+     * @type {string}
+     */
+    title;
+
+    /**
      * The account text
      * @type {string}
      */
@@ -807,11 +813,13 @@ class JournalEntryAccount {
      * Constructs a journal entry account.
      *
      * @param code {string} the account code
+     * @param title {string} the account title
      * @param text {string} the account text
      * @param isNeedOffset {boolean} true if the line items in the account needs offset, or false otherwise
      */
-    constructor(code, text, isNeedOffset) {
+    constructor(code, title, text, isNeedOffset) {
         this.code = code;
+        this.title = title;
         this.text = text;
         this.isNeedOffset = isNeedOffset;
     }
@@ -822,7 +830,7 @@ class JournalEntryAccount {
      * @return {JournalEntryAccount} the copy of the account
      */
     copy() {
-        return new JournalEntryAccount(this.code, this.text, this.isNeedOffset);
+        return new JournalEntryAccount(this.code, this.title, this.text, this.isNeedOffset);
     }
 }
 
@@ -887,10 +895,16 @@ class LineItemSubForm {
     #accountCode;
 
     /**
-     * The text display of the account
-     * @type {HTMLDivElement}
+     * The code part of the text display of the account
+     * @type {HTMLSpanElement}
      */
-    #accountText;
+    #accountTextCode;
+
+    /**
+     * The title part of the text display of the account
+     * @type {HTMLSpanElement}
+     */
+    #accountTextTitle;
 
     /**
      * The description
@@ -957,7 +971,8 @@ class LineItemSubForm {
         this.#error = document.getElementById(`${prefix}-error`);
         this.#no = document.getElementById(`${prefix}-no`);
         this.#accountCode = document.getElementById(`${prefix}-account-code`);
-        this.#accountText = document.getElementById(`${prefix}-account-text`);
+        this.#accountTextCode = document.getElementById(`${prefix}-account-text-code`);
+        this.#accountTextTitle = document.getElementById(`${prefix}-account-text-title`);
         this.#description = document.getElementById(`${prefix}-description`);
         this.#descriptionText = document.getElementById(`${prefix}-description-text`);
         this.#originalLineItemId = document.getElementById(`${prefix}-original-line-item-id`);
@@ -1024,7 +1039,7 @@ class LineItemSubForm {
      * @return {JournalEntryAccount|null} the account
      */
     get account() {
-        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.text, this.#accountCode.classList.contains("accounting-account-is-need-offset"));
+        return this.#accountCode.value === null? null: new JournalEntryAccount(this.#accountCode.value, this.#accountCode.dataset.title, this.#accountCode.dataset.text, this.#accountCode.classList.contains("accounting-account-is-need-offset"));
     }
 
     /**
@@ -1092,13 +1107,15 @@ class LineItemSubForm {
             this.#originalLineItemText.innerText = A_("Offset %(item)s", {item: editor.originalLineItemText});
         }
         this.#accountCode.value = editor.account.code;
+        this.#accountCode.dataset.title = editor.account.title;
         this.#accountCode.dataset.text = editor.account.text;
         if (editor.account.isNeedOffset) {
             this.#accountCode.classList.add("accounting-account-is-need-offset");
         } else {
             this.#accountCode.classList.remove("accounting-account-is-need-offset");
         }
-        this.#accountText.innerText = editor.account.text;
+        this.#accountTextCode.innerText = editor.account.code
+        this.#accountTextTitle.innerText = editor.account.title
         this.#description.value = editor.description === null? "": editor.description;
         this.#descriptionText.innerText = editor.description === null? "": editor.description;
         this.#amount.value = editor.amount;

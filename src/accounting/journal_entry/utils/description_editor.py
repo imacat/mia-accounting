@@ -54,6 +54,14 @@ class DescriptionAccount:
         """
         return str(self.__account)
 
+    @property
+    def title(self) -> str:
+        """Returns the account title.
+
+        :return: The account title.
+        """
+        return self.__account.title
+
     def add_freq(self, freq: int) -> None:
         """Adds the frequency of an account.
 

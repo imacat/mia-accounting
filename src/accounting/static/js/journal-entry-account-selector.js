@@ -203,6 +203,12 @@ class JournalEntryAccountOption {
     code;
 
     /**
+     * The account title
+     * @type {string}
+     */
+    title;
+
+    /**
      * The account text
      * @type {string}
      */
@@ -235,6 +241,7 @@ class JournalEntryAccountOption {
     constructor(selector, element) {
         this.#element = element;
         this.code = element.dataset.code;
+        this.title = element.dataset.title;
         this.text = element.dataset.text;
         this.#isInUse = element.classList.contains("accounting-account-is-in-use");
         this.isNeedOffset = element.classList.contains("accounting-account-is-need-offset");

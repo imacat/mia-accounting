@@ -284,7 +284,7 @@ class OriginalLineItem {
         this.date = element.dataset.date;
         this.#debitCredit = element.dataset.debitCredit;
         this.#currencyCode = element.dataset.currencyCode;
-        this.account = new JournalEntryAccount(element.dataset.accountCode, element.dataset.accountText, false);
+        this.account = new JournalEntryAccount(element.dataset.accountCode, element.dataset.accountTitle, element.dataset.accountText, false);
         this.description = element.dataset.description;
         this.bareNetBalance = new Decimal(element.dataset.netBalance);
         this.netBalance = this.bareNetBalance;

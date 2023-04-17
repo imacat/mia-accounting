@@ -268,6 +268,19 @@ class LineItemForm(FlaskForm):
         """The source journal entry form."""
 
     @property
+    def account_title(self) -> str:
+        """Returns the title of the account.
+
+        :return: The title of the account.
+        """
+        if self.account_code.data is None:
+            return ""
+        account: Account | None = Account.find_by_code(self.account_code.data)
+        if account is None:
+            return ""
+        return account.title
+
+    @property
     def account_text(self) -> str:
         """Returns the text representation of the account.
 

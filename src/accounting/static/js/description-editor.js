@@ -364,12 +364,13 @@ class DescriptionEditorAccount extends JournalEntryAccount {
      *
      * @param editor {DescriptionEditor} the description editor
      * @param code {string} the account code
+     * @param title {string} the account title
      * @param text {string} the account text
      * @param isNeedOffset {boolean} true if the line items in the account needs offset, or false otherwise
      * @param button {HTMLButtonElement} the account button
      */
-    constructor(editor, code, text, isNeedOffset, button) {
-        super(code, text, isNeedOffset);
+    constructor(editor, code, title, text, isNeedOffset, button) {
+        super(code, title, text, isNeedOffset);
         this.#element = button;
         this.#element.onclick = () => editor.selectAccount(this);
     }
@@ -424,7 +425,7 @@ class DescriptionEditorSuggestedAccount extends DescriptionEditorAccount {
      * @param button {HTMLButtonElement} the account button
      */
     constructor(editor, button) {
-        super(editor, button.dataset.code, button.dataset.text, button.classList.contains("accounting-account-is-need-offset"), button);
+        super(editor, button.dataset.code, button.dataset.title, button.dataset.text, button.classList.contains("accounting-account-is-need-offset"), button);
     }
 }
 
@@ -441,7 +442,7 @@ class DescriptionEditorConfirmedAccount extends DescriptionEditorAccount {
      * @param button {HTMLButtonElement} the account button
      */
     constructor(editor, button) {
-        super(editor, "", "", false, button);
+        super(editor, "", "", "", false, button);
         this.isConfirmedAccount = true;
     }
 

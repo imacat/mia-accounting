@@ -356,7 +356,7 @@ class JournalEntryLineItemEditor {
      */
     saveAccount(account) {
         this.#accountControl.classList.add("accounting-not-empty");
-        this.account = new JournalEntryAccount(account.code, account.text, account.isNeedOffset);
+        this.account = new JournalEntryAccount(account.code, account.title, account.text, account.isNeedOffset);
         this.isAccountConfirmed = true;
         this.#accountText.innerText = account.text;
         this.#validateAccount();

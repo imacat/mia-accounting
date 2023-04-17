@@ -32,6 +32,8 @@ class AccountOption:
         """The account ID."""
         self.code: str = account.code
         """The account code."""
+        self.title: str = account.title
+        """The account title."""
         self.query_values: list[str] = account.query_values
         """The values to be queried."""
         self.__str: str = str(account)
