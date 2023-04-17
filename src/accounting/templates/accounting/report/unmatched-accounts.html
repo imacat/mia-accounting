@@ -1,6 +1,6 @@
 {#
 The Mia! Accounting Project
-unapplied-accounts.html: The account list with unapplied original line items
+unmatched-accounts.html: The account list with unmatched offsets
 
  Copyright (c) 2023 imacat.
 
@@ -17,7 +17,7 @@ unapplied-accounts.html: The account list with unapplied original line items
  limitations under the License.
 
 Author: imacat@mail.imacat.idv.tw (imacat)
-First written: 2023/4/8
+First written: 2023/4/17
 #}
 {% extends "accounting/base.html" %}
 
@@ -26,7 +26,7 @@ First written: 2023/4/8
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ A_("Accounts with Unapplied Items in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Accounts with Unmatched Offsets in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -47,7 +47,7 @@ First written: 2023/4/8
 {% if report.has_data %}
   <div class="accounting-sheet">
     <div class="d-none d-sm-flex justify-content-center mb-3">
-      <h2 class="text-center">{{ A_("Accounts with Unapplied Items in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
+      <h2 class="text-center">{{ A_("Accounts with Unmatched Offsets in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
     </div>
 
     <div class="accounting-report-table accounting-unapplied-account-table">
@@ -58,7 +58,7 @@ First written: 2023/4/8
         </div>
       <div class="accounting-report-table-body">
         {% for account in report.accounts %}
-          <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unapplied", currency=report.currency, account=account, period=report.period) }}">
+          <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unmatched", currency=report.currency, account=account, period=report.period) }}">
             <div>{{ account }}</div>
             <div class="accounting-amount">{{ account.count }}</div>
           </a>

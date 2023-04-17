@@ -20,14 +20,19 @@
 import sqlalchemy as sa
 
 from accounting import db
-from accounting.models import Account, JournalEntryLineItem
+from accounting.models import Currency, Account, JournalEntry, \
+    JournalEntryLineItem
+from accounting.report.period import Period
 from accounting.utils.cast import be
 from accounting.utils.offset_alias import offset_alias
 
 
-def get_accounts_with_unapplied() -> list[Account]:
+def get_accounts_with_unapplied(currency: Currency,
+                                period: Period) -> list[Account]:
     """Returns the accounts with unapplied original line items.
 
+    :param currency: The currency.
+    :param period: The period.
     :return: The accounts with unapplied original line items.
     """
     offset: sa.Alias = offset_alias()
@@ -37,17 +42,24 @@ def get_accounts_with_unapplied() -> list[Account]:
                 (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
                  offset.c.amount),
                 else_=-offset.c.amount))).label("net_balance")
+    conditions: list[sa.BinaryExpression] \
+        = [Account.is_need_offset,
+           be(JournalEntryLineItem.currency_code == currency.code),
+           sa.or_(sa.and_(Account.base_code.startswith("2"),
+                          sa.not_(JournalEntryLineItem.is_debit)),
+                  sa.and_(Account.base_code.startswith("1"),
+                          JournalEntryLineItem.is_debit))]
+    if period.start is not None:
+        conditions.append(JournalEntry.date >= period.start)
+    if period.end is not None:
+        conditions.append(JournalEntry.date <= period.end)
     select_unapplied: sa.Select \
         = sa.select(JournalEntryLineItem.id)\
-        .join(Account)\
+        .join(JournalEntry).join(Account)\
         .join(offset, be(JournalEntryLineItem.id
                          == offset.c.original_line_item_id),
               isouter=True)\
-        .filter(Account.is_need_offset,
-                sa.or_(sa.and_(Account.base_code.startswith("2"),
-                               sa.not_(JournalEntryLineItem.is_debit)),
-                       sa.and_(Account.base_code.startswith("1"),
-                               JournalEntryLineItem.is_debit)))\
+        .filter(*conditions)\
         .group_by(JournalEntryLineItem.id)\
         .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
 

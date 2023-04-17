@@ -742,7 +742,18 @@ class JournalEntryLineItem(db.Model):
 
         :return: The debit amount, or None if this is not a debit line item.
         """
-        return self.amount if self.is_debit else None
+        if not hasattr(self, "__debit"):
+            setattr(self, "__debit", self.amount if self.is_debit else None)
+        return getattr(self, "__debit")
+
+    @debit.setter
+    def debit(self, debit: Decimal | None) -> None:
+        """Sets the debit amount.
+
+        :param debit: The debit amount.
+        :return: None.
+        """
+        setattr(self, "__debit", debit)
 
     @property
     def credit(self) -> Decimal | None:
@@ -750,7 +761,18 @@ class JournalEntryLineItem(db.Model):
 
         :return: The credit amount, or None if this is not a credit line item.
         """
-        return None if self.is_debit else self.amount
+        if not hasattr(self, "__credit"):
+            setattr(self, "__credit", None if self.is_debit else self.amount)
+        return getattr(self, "__credit")
+
+    @credit.setter
+    def credit(self, credit: Decimal | None) -> None:
+        """Sets the credit amount.
+
+        :param credit: The credit amount.
+        :return: None.
+        """
+        setattr(self, "__credit", credit)
 
     @property
     def net_balance(self) -> Decimal:
@@ -774,6 +796,25 @@ class JournalEntryLineItem(db.Model):
         setattr(self, "__net_balance", net_balance)
 
     @property
+    def balance(self) -> Decimal:
+        """Returns the net balance.
+
+        :return: The net balance.
+        """
+        if not hasattr(self, "__balance"):
+            setattr(self, "__balance", Decimal("0"))
+        return getattr(self, "__balance")
+
+    @balance.setter
+    def balance(self, balance: Decimal) -> None:
+        """Sets the net balance.
+
+        :param balance: The net balance.
+        :return: None.
+        """
+        setattr(self, "__balance", balance)
+
+    @property
     def offsets(self) -> list[t.Self]:
         """Returns the offset items.
 
@@ -787,6 +828,26 @@ class JournalEntryLineItem(db.Model):
                           cls.is_debit, cls.no).all()
             setattr(self, "__offsets", offsets)
         return getattr(self, "__offsets")
+
+    @property
+    def is_offset(self) -> bool:
+        """Returns whether the line item is an offset.
+
+        :return: True if the line item is an offset, or False otherwise.
+        """
+        if not hasattr(self, "__is_offset"):
+            setattr(self, "__is_offset", False)
+        return getattr(self, "__is_offset")
+
+    @is_offset.setter
+    def is_offset(self, is_offset: bool) -> None:
+        """Sets whether the line item is an offset.
+
+        :param is_offset: True if the line item is an offset, or False
+            otherwise.
+        :return: None.
+        """
+        setattr(self, "__is_offset", is_offset)
 
     @property
     def match(self) -> t.Self | None:

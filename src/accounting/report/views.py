@@ -17,20 +17,27 @@
 """The views for the report management.
 
 """
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, Response, redirect, flash
 
 from accounting import db
+from accounting.locale import lazy_gettext
 from accounting.models import Currency, Account
-from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
+from accounting.utils.cast import s
 from accounting.utils.current_account import CurrentAccount
+from accounting.utils.next_uri import or_next
 from accounting.utils.options import options
-from accounting.utils.permission import has_permission, can_view
+from accounting.utils.permission import has_permission, can_view, can_edit
+from .period import Period, get_period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
 from .reports.unapplied import UnappliedOriginalLineItems
 from .reports.unapplied_accounts import AccountsWithUnappliedOriginalLineItems
+from .reports.unmatched import UnmatchedOffsets
+from .reports.unmatched_accounts import AccountsWithUnmatchedOffsets
 from .template_filters import format_amount
+from .utils.offset_matcher import OffsetMatcher
+from .utils.urls import unmatched_url
 
 bp: Blueprint = Blueprint("accounting-report", __name__)
 """The view blueprint for the reports."""
@@ -278,32 +285,142 @@ def __get_balance_sheet(currency: Currency, period: Period) \
     return report.html()
 
 
-@bp.get("unapplied", endpoint="unapplied-default")
+@bp.get("unapplied", endpoint="unapplied-accounts-default")
 @has_permission(can_view)
-def get_default_unapplied() -> str | Response:
+def get_default_unapplied_accounts() -> str | Response:
     """Returns the accounts with unapplied original line items.
 
     :return: The accounts with unapplied original line items.
     """
+    return __get_unapplied_accounts(
+        db.session.get(Currency, default_currency_code()), get_period())
+
+
+@bp.get("unapplied/<currency:currency>/<period:period>",
+        endpoint="unapplied-accounts")
+@has_permission(can_view)
+def get_unapplied_accounts(currency: Currency,
+                           period: Period) -> str | Response:
+    """Returns the accounts with unapplied original line items.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The accounts with unapplied original line items.
+    """
+    return __get_unapplied_accounts(currency, period)
+
+
+def __get_unapplied_accounts(currency: Currency,
+                             period: Period) -> str | Response:
+    """Returns the accounts with unapplied original line items.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The accounts with unapplied original line items.
+    """
     report: AccountsWithUnappliedOriginalLineItems \
-        = AccountsWithUnappliedOriginalLineItems()
+        = AccountsWithUnappliedOriginalLineItems(currency, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
 
 
-@bp.get("unapplied/<needOffsetAccount:account>", endpoint="unapplied")
+@bp.get("unapplied/<currency:currency>/<needOffsetAccount:account>/"
+        "<period:period>", endpoint="unapplied")
 @has_permission(can_view)
-def get_unapplied(account: Account) -> str | Response:
+def get_unapplied(currency: Currency, account: Account,
+                  period: Period) -> str | Response:
     """Returns the unapplied original line items.
 
+    :param currency: The currency.
     :param account: The Account.
-    :return: The unapplied original line items.
+    :param period: The period.
+    :return: The unapplied original line items in the period.
     """
-    report: UnappliedOriginalLineItems = UnappliedOriginalLineItems(account)
+    report: UnappliedOriginalLineItems \
+        = UnappliedOriginalLineItems(currency, account, period)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
+
+
+@bp.get("unmatched", endpoint="unmatched-accounts-default")
+@has_permission(can_edit)
+def get_default_unmatched_accounts() -> str | Response:
+    """Returns the accounts with unmatched offsets.
+
+    :return: The accounts with unmatched offsets.
+    """
+    return __get_unmatched_accounts(
+        db.session.get(Currency, default_currency_code()), get_period())
+
+
+@bp.get("unmatched/<currency:currency>/<period:period>",
+        endpoint="unmatched-accounts")
+@has_permission(can_edit)
+def get_unmatched_accounts(currency: Currency,
+                           period: Period) -> str | Response:
+    """Returns the accounts with unmatched offsets.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The accounts with unmatched offsets.
+    """
+    return __get_unmatched_accounts(currency, period)
+
+
+def __get_unmatched_accounts(currency: Currency,
+                             period: Period) -> str | Response:
+    """Returns the accounts with unmatched offsets.
+
+    :param currency: The currency.
+    :param period: The period.
+    :return: The accounts with unmatched offsets.
+    """
+    report: AccountsWithUnmatchedOffsets \
+        = AccountsWithUnmatchedOffsets(currency, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.csv()
+    return report.html()
+
+
+@bp.get("unmatched/<currency:currency>/<needOffsetAccount:account>/"
+        "<period:period>", endpoint="unmatched")
+@has_permission(can_edit)
+def get_unmatched(currency: Currency, account: Account,
+                  period: Period) -> str | Response:
+    """Returns the unmatched offsets.
+
+    :param currency: The currency.
+    :param account: The Account.
+    :param period: The period.
+    :return: The unmatched offsets in the period.
+    """
+    report: UnmatchedOffsets = UnmatchedOffsets(currency, account, period)
+    if "as" in request.args and request.args["as"] == "csv":
+        return report.csv()
+    return report.html()
+
+
+@bp.post("match-offsets/<currency:currency>/<needOffsetAccount:account>",
+         endpoint="match-offsets")
+@has_permission(can_edit)
+def match_offsets(currency: Currency, account: Account) -> redirect:
+    """Matches the original line items with their offsets.
+
+    :return: Redirection to the view of the unmatched offsets.
+    """
+    matcher: OffsetMatcher = OffsetMatcher(currency, account, None)
+    if len(matcher.matched_pairs) == 0:
+        flash(s(lazy_gettext("No more offset to match automatically.")),
+              "success")
+        return redirect(or_next(
+            unmatched_url(currency, account, get_period())))
+    matcher.match()
+    db.session.commit()
+    flash(s(lazy_gettext("Matched %(matches)s offsets.",
+                         matches=len(matcher.matched_pairs))), "success")
+    return redirect(or_next(unmatched_url(currency, account, get_period())))
 
 
 @bp.get("search", endpoint="search")

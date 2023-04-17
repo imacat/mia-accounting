@@ -31,10 +31,12 @@ from accounting.models import Currency, Account
 from accounting.report.period import Period, get_period
 from accounting.template_globals import default_currency_code
 from accounting.utils.current_account import CurrentAccount
+from accounting.utils.permission import can_edit
 from .option_link import OptionLink
 from .report_type import ReportType
 from .urls import journal_url, ledger_url, income_expenses_url, \
-    trial_balance_url, income_statement_url, balance_sheet_url, unapplied_url
+    trial_balance_url, income_statement_url, balance_sheet_url, \
+    unapplied_url, unmatched_url
 
 
 class ReportChooser:
@@ -75,6 +77,8 @@ class ReportChooser:
         self.__reports.append(self.__income_statement)
         self.__reports.append(self.__balance_sheet)
         self.__reports.append(self.__unapplied)
+        if can_edit():
+            self.__reports.append(self.__unmatched)
         for report in self.__reports:
             if report.is_active:
                 self.current_report = report.title
@@ -160,13 +164,34 @@ class ReportChooser:
         """
         account: Account = self.__account
         if not account.is_need_offset:
-            return OptionLink(gettext("Unapplied Original Line Items"),
-                              unapplied_url(None),
+            return OptionLink(gettext("Unapplied Items"),
+                              unapplied_url(self.__currency, None,
+                                            self.__period),
                               self.__active_report == ReportType.UNAPPLIED,
                               fa_icon="fa-solid fa-link-slash")
-        return OptionLink(gettext("Unapplied Original Line Items"),
-                          unapplied_url(account),
+        return OptionLink(gettext("Unapplied Items"),
+                          unapplied_url(self.__currency, self.__account,
+                                        self.__period),
                           self.__active_report == ReportType.UNAPPLIED,
+                          fa_icon="fa-solid fa-link-slash")
+
+    @property
+    def __unmatched(self) -> OptionLink:
+        """Returns the unmatched offsets.
+
+        :return: The unmatched offsets.
+        """
+        account: Account = self.__account
+        if not account.is_need_offset:
+            return OptionLink(gettext("Unmatched Offsets"),
+                              unmatched_url(self.__currency, None,
+                                            self.__period),
+                              self.__active_report == ReportType.UNMATCHED,
+                              fa_icon="fa-solid fa-link-slash")
+        return OptionLink(gettext("Unmatched Offsets"),
+                          unmatched_url(self.__currency, self.__account,
+                                        self.__period),
+                          self.__active_report == ReportType.UNMATCHED,
                           fa_icon="fa-solid fa-link-slash")
 
     def __iter__(self) -> t.Iterator[OptionLink]:

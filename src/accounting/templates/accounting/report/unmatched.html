@@ -1,0 +1,153 @@
+{#
+The Mia! Accounting Project
+unmatched.html: The unmatched offsets
+
+ Copyright (c) 2023 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2023/4/17
+#}
+{% extends "accounting/base.html" %}
+
+{% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/material-fab-speed-dial.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
+{% endblock %}
+
+{% block header %}{% block title %}{{ A_("Unmatched Offsets of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account.title|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+
+{% block content %}
+
+<div class="mb-3 accounting-toolbar">
+  {% with use_currency_chooser = true,
+          use_account_chooser = true,
+          use_period_chooser = true %}
+    {% include "accounting/report/include/toolbar-buttons.html" %}
+  {% endwith %}
+</div>
+
+{% include "accounting/report/include/add-journal-entry-material-fab.html" %}
+
+{% include "accounting/report/include/period-chooser.html" %}
+
+{% include "accounting/report/include/search-modal.html" %}
+
+{% if report.matched_pairs %}
+  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#accounting-match-modal">
+    <i class="fa-solid fa-link"></i>
+    {{ A_("Match") }}
+  </button>
+
+  <form action="{{ url_for("accounting-report.match-offsets", currency=report.currency, account=report.account) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+    <div class="modal fade" id="accounting-match-modal" tabindex="-1" aria-labelledby="accounting-match-modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="accounting-match-modal-label">{{ A_("Confirm Match Offsets") }}</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ A_("Close") }}"></button>
+          </div>
+          <div class="modal-body">
+            <p>{{ A_("Do you really want to match the following original line items with their offsets?  This cannot be undone.  Please backup your database first, and review before you confirm.") }}</p>
+
+            <ul class="list-group accounting-list-group-stripped accounting-list-group-hover accounting-unmatched-offset-pair-list">
+              {% for pair in report.matched_pairs %}
+                <li class="list-group-item">
+                  {{ pair.offset.description|accounting_default }}
+                  <span class="badge bg-info">{{ pair.offset.amount|accounting_format_amount }}</span>
+                  {{ pair.original_line_item.journal_entry.date|accounting_format_date }} &rarr; {{ pair.offset.journal_entry.date|accounting_format_date }}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>
+            <button type="submit" class="btn btn-danger">{{ A_("Confirm") }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+{% endif %}
+
+<p>{{ report.match_status }}</p>
+
+{% if report.has_data %}
+  {% with pagination = report.pagination %}
+    {% include "accounting/include/pagination.html" %}
+  {% endwith %}
+
+  <div class="d-none d-md-block accounting-report-table accounting-unmatched-table">
+    <div class="accounting-report-table-header">
+      <div class="accounting-report-table-row">
+        <div>{{ A_("Date") }}</div>
+        <div>{{ A_("Description") }}</div>
+        <div class="accounting-amount">{{ A_("Debit") }}</div>
+        <div class="accounting-amount">{{ A_("Credit") }}</div>
+        <div class="accounting-amount">{{ A_("Balance") }}</div>
+      </div>
+    </div>
+    <div class="accounting-report-table-body">
+      {% for line_item in report.line_items %}
+        <a class="accounting-report-table-row {% if not line_item.match %} accounting-report-table-row-danger {% endif %}" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
+          <div>{{ line_item.journal_entry.date|accounting_format_date }}</div>
+          <div>
+            {{ line_item.description|accounting_default }}
+            {% if line_item.match %}
+              <div class="small">{{ A_("Can match %(item)s", item=line_item.match) }}</div>
+            {% endif %}
+          </div>
+          <div class="accounting-amount">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}">{{ line_item.balance|accounting_report_format_amount }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="list-group d-md-none">
+  {% for line_item in report.line_items %}
+    <a class="list-group-item list-group-item-action d-flex justify-content-between" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
+      <div>
+        <div class="text-muted small">
+          {{ line_item.journal_entry.date|accounting_format_date }}
+        </div>
+        {% if line_item.description is not none %}
+          <div>{{ line_item.description }}</div>
+        {% endif %}
+      </div>
+
+      <div>
+        {% if line_item.debit %}
+          <span class="badge rounded-pill bg-success">+{{ line_item.debit|accounting_format_amount }}</span>
+        {% endif %}
+        {% if line_item.credit %}
+          <span class="badge rounded-pill bg-warning">-{{ line_item.credit|accounting_format_amount }}</span>
+        {% endif %}
+        {% if line_item.balance < 0 %}
+          <span class="badge rounded-pill bg-danger">{{ line_item.balance|accounting_format_amount }}</span>
+        {% else %}
+          <span class="badge rounded-pill bg-primary">{{ line_item.balance|accounting_format_amount }}</span>
+        {% endif %}
+      </div>
+    </a>
+  {% endfor %}
+  </div>
+{% else %}
+  <p>{{ A_("There is no data.") }}</p>
+{% endif %}
+
+{% endblock %}

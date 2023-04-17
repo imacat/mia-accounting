@@ -1,5 +1,5 @@
 # The Mia! Accounting Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/7
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/17
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,13 +14,14 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The unapplied original line items.
+"""The unmatched offsets.
 
 """
 from datetime import date
 from decimal import Decimal
 
 from flask import render_template, Response
+from flask_babel import LazyString
 
 from accounting.locale import gettext
 from accounting.models import Currency, Account, JournalEntryLineItem
@@ -29,12 +30,12 @@ from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
     period_spec
-from accounting.report.utils.offset_matcher import OffsetMatcher
 from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
-from accounting.report.utils.unapplied import get_accounts_with_unapplied
-from accounting.report.utils.urls import unapplied_url
+from accounting.report.utils.unmatched import get_accounts_with_unmatched
+from accounting.report.utils.urls import unmatched_url
+from accounting.report.utils.offset_matcher import OffsetMatcher, OffsetPair
 from accounting.utils.pagination import Pagination
 
 
@@ -42,15 +43,16 @@ class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
     def __init__(self, journal_entry_date: str | date, currency: str,
-                 description: str | None, amount: str | Decimal,
-                 net_balance: str | Decimal):
+                 description: str | None, debit: str | Decimal,
+                 credit: str | Decimal, balance: str | Decimal):
         """Constructs a row in the CSV.
 
         :param journal_entry_date: The journal entry date.
         :param currency: The currency.
         :param description: The description.
-        :param amount: The amount.
-        :param net_balance: The net balance.
+        :param debit: The debit amount.
+        :param credit: The credit amount.
+        :param balance: The balance.
         """
         self.date: str | date = journal_entry_date
         """The date."""
@@ -58,10 +60,12 @@ class CSVRow(BaseCSVRow):
         """The currency."""
         self.description: str | None = description
         """The description."""
-        self.amount: str | Decimal = amount
-        """The amount."""
-        self.net_balance: str | Decimal = net_balance
-        """The net balance."""
+        self.debit: str | Decimal | None = debit
+        """The debit amount."""
+        self.credit: str | Decimal | None = credit
+        """The credit amount."""
+        self.balance: str | Decimal = balance
+        """The balance."""
 
     @property
     def values(self) -> list[str | date | Decimal | None]:
@@ -69,8 +73,8 @@ class CSVRow(BaseCSVRow):
 
         :return: The values of the row.
         """
-        return [self.date, self.currency, self.description, self.amount,
-                self.net_balance]
+        return [self.date, self.currency, self.description, self.debit,
+                self.credit, self.balance]
 
 
 class PageParams(BasePageParams):
@@ -79,6 +83,8 @@ class PageParams(BasePageParams):
     def __init__(self, currency: Currency,
                  account: Account,
                  period: Period,
+                 match_status: str | LazyString,
+                 matched_pairs: list[OffsetPair],
                  pagination: Pagination[JournalEntryLineItem],
                  line_items: list[JournalEntryLineItem]):
         """Constructs the HTML page parameters.
@@ -86,6 +92,8 @@ class PageParams(BasePageParams):
         :param currency: The currency.
         :param account: The account.
         :param period: The period.
+        :param match_status: The match status message.
+        :param matched_pairs: A list of matched pairs.
         :param pagination: The pagination.
         :param line_items: The line items.
         """
@@ -95,12 +103,16 @@ class PageParams(BasePageParams):
         """The account."""
         self.period: Period = period
         """The period."""
+        self.match_status: str | LazyString = match_status
+        """The match status message."""
+        self.matched_pairs: list[OffsetPair] = matched_pairs
+        """A list of matched pairs."""
         self.pagination: Pagination[JournalEntryLineItem] = pagination
         """The pagination."""
         self.line_items: list[JournalEntryLineItem] = line_items
         """The line items."""
         self.period_chooser: PeriodChooser = PeriodChooser(
-            lambda x: unapplied_url(currency, account, x))
+            lambda x: unmatched_url(currency, account, x))
         """The period chooser."""
 
     @property
@@ -117,8 +129,8 @@ class PageParams(BasePageParams):
 
         :return: The report chooser.
         """
-        return ReportChooser(ReportType.UNAPPLIED, currency=self.currency,
-                             account=self.account, period=self.period)
+        return ReportChooser(ReportType.UNMATCHED, currency=self.currency,
+                             account=self.account)
 
     @property
     def currency_options(self) -> list[OptionLink]:
@@ -127,7 +139,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: unapplied_url(x, self.account, self.period),
+            lambda x: unmatched_url(x, self.account, self.period),
             self.currency)
 
     @property
@@ -138,13 +150,13 @@ class PageParams(BasePageParams):
         """
         options: list[OptionLink] \
             = [OptionLink(gettext("Accounts"),
-                          unapplied_url(self.currency, None, self.period),
+                          unmatched_url(self.currency, None, self.period),
                           False)]
         options.extend(
             [OptionLink(str(x),
-                        unapplied_url(self.currency, x, self.period),
+                        unmatched_url(self.currency, x, self.period),
                         x.id == self.account.id)
-             for x in get_accounts_with_unapplied(self.currency, self.period)])
+             for x in get_accounts_with_unmatched(self.currency, self.period)])
         return options
 
 
@@ -155,19 +167,19 @@ def get_csv_rows(line_items: list[JournalEntryLineItem]) -> list[CSVRow]:
     :return: The CSV rows.
     """
     rows: list[CSVRow] = [CSVRow(gettext("Date"), gettext("Currency"),
-                                 gettext("Description"), gettext("Amount"),
-                                 gettext("Net Balance"))]
+                                 gettext("Description"), gettext("Debit"),
+                                 gettext("Credit"), gettext("Balance"))]
     rows.extend([CSVRow(x.journal_entry.date, x.currency.code,
-                        x.description, x.amount, x.net_balance)
+                        x.description, x.debit, x.credit, x.balance)
                  for x in line_items])
     return rows
 
 
-class UnappliedOriginalLineItems(BaseReport):
-    """The unapplied original line items."""
+class UnmatchedOffsets(BaseReport):
+    """The unmatched offsets."""
 
     def __init__(self, currency: Currency, account: Account, period: Period):
-        """Constructs the unapplied original line items.
+        """Constructs the unmatched offsets.
 
         :param currency: The currency.
         :param account: The account.
@@ -182,15 +194,19 @@ class UnappliedOriginalLineItems(BaseReport):
         offset_matcher: OffsetMatcher \
             = OffsetMatcher(self.__currency, self.__account, self.__period)
         self.__line_items: list[JournalEntryLineItem] \
-            = offset_matcher.unapplied
+            = offset_matcher.line_items
         """The line items."""
+        self.__match_status: str | LazyString = offset_matcher.status
+        """The match status message."""
+        self.__matched_pairs: list[OffsetPair] = offset_matcher.matched_pairs
+        """A list of matched pairs."""
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.
 
         :return: The response of the report for download.
         """
-        filename: str = "unapplied-{currency}-{account}-{period}.csv"\
+        filename: str = "unmatched-{currency}-{account}-{period}.csv"\
             .format(currency=self.__currency.code, account=self.__account.code,
                     period=period_spec(self.__period))
         return csv_download(filename, get_csv_rows(self.__line_items))
@@ -206,7 +222,9 @@ class UnappliedOriginalLineItems(BaseReport):
         params: PageParams = PageParams(currency=self.__currency,
                                         account=self.__account,
                                         period=self.__period,
+                                        match_status=self.__match_status,
+                                        matched_pairs=self.__matched_pairs,
                                         pagination=pagination,
                                         line_items=pagination.list)
-        return render_template("accounting/report/unapplied.html",
+        return render_template("accounting/report/unmatched.html",
                                report=params)

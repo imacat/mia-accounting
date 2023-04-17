@@ -36,5 +36,7 @@ class ReportType(Enum):
     """The balance sheet."""
     UNAPPLIED: str = "unapplied"
     """The unapplied original line items."""
+    UNMATCHED: str = "unmatched"
+    """The unmatched offsets."""
     SEARCH: str = "search"
     """The search."""

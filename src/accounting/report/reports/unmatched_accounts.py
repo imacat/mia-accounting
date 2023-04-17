@@ -1,5 +1,5 @@
 # The Mia! Accounting Project.
-# Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/7
+# Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/17
 
 #  Copyright (c) 2023 imacat.
 #
@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The accounts with unapplied original line items.
+"""The accounts with unmatched offsets.
 
 """
 from datetime import date
@@ -31,8 +31,8 @@ from accounting.report.utils.csv_export import BaseCSVRow, csv_download
 from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
-from accounting.report.utils.unapplied import get_accounts_with_unapplied
-from accounting.report.utils.urls import unapplied_url
+from accounting.report.utils.unmatched import get_accounts_with_unmatched
+from accounting.report.utils.urls import unmatched_url
 
 
 class CSVRow(BaseCSVRow):
@@ -77,7 +77,7 @@ class PageParams(BasePageParams):
         self.accounts: list[Account] = accounts
         """The accounts."""
         self.period_chooser: PeriodChooser = PeriodChooser(
-            lambda x: unapplied_url(currency, None, x))
+            lambda x: unmatched_url(currency, None, x))
         """The period chooser."""
 
     @property
@@ -94,7 +94,7 @@ class PageParams(BasePageParams):
 
         :return: The report chooser.
         """
-        return ReportChooser(ReportType.UNAPPLIED, currency=self.currency,
+        return ReportChooser(ReportType.UNMATCHED, currency=self.currency,
                              account=None, period=self.period)
 
     @property
@@ -104,7 +104,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: unapplied_url(x, None, self.period),
+            lambda x: unmatched_url(x, None, self.period),
             self.currency)
 
     @property
@@ -115,11 +115,11 @@ class PageParams(BasePageParams):
         """
         options: list[OptionLink] \
             = [OptionLink(gettext("Accounts"),
-                          unapplied_url(self.currency, None, self.period),
+                          unmatched_url(self.currency, None, self.period),
                           True)]
         options.extend(
             [OptionLink(str(x),
-                        unapplied_url(self.currency, x, self.period),
+                        unmatched_url(self.currency, x, self.period),
                         False)
              for x in self.accounts])
         return options
@@ -137,8 +137,8 @@ def get_csv_rows(accounts: list[Account]) -> list[CSVRow]:
     return rows
 
 
-class AccountsWithUnappliedOriginalLineItems(BaseReport):
-    """The accounts with unapplied original line items."""
+class AccountsWithUnmatchedOffsets(BaseReport):
+    """The accounts with unmatched offsets."""
 
     def __init__(self, currency: Currency, period: Period):
         """Constructs the outstanding balances.
@@ -151,7 +151,7 @@ class AccountsWithUnappliedOriginalLineItems(BaseReport):
         self.__period: Period = period
         """The period."""
         self.__accounts: list[Account] \
-            = get_accounts_with_unapplied(currency, period)
+            = get_accounts_with_unmatched(currency, period)
         """The accounts."""
 
     def csv(self) -> Response:
@@ -167,7 +167,7 @@ class AccountsWithUnappliedOriginalLineItems(BaseReport):
 
         :return: The report as HTML.
         """
-        return render_template("accounting/report/unapplied-accounts.html",
+        return render_template("accounting/report/unmatched-accounts.html",
                                report=PageParams(currency=self.__currency,
                                                  period=self.__period,
                                                  accounts=self.__accounts))

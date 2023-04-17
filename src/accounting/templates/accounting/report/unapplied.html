@@ -23,19 +23,24 @@ First written: 2023/4/7
 
 {% block accounting_scripts %}
   <script src="{{ url_for("accounting.static", filename="js/material-fab-speed-dial.js") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ A_("Unapplied Original Line Items of %(account)s", account=report.account.title|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{{ A_("Unapplied Items of %(account)s in %(currency)s %(period)s", currency=report.currency.name|title, account=report.account.title|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
 
 {% block content %}
 
 <div class="mb-3 accounting-toolbar">
-  {% with use_account_chooser = true %}
+  {% with use_currency_chooser = true,
+          use_account_chooser = true,
+          use_period_chooser = true %}
     {% include "accounting/report/include/toolbar-buttons.html" %}
   {% endwith %}
 </div>
 
 {% include "accounting/report/include/add-journal-entry-material-fab.html" %}
+
+{% include "accounting/report/include/period-chooser.html" %}
 
 {% include "accounting/report/include/search-modal.html" %}
 
@@ -48,7 +53,6 @@ First written: 2023/4/7
     <div class="accounting-report-table-header">
       <div class="accounting-report-table-row">
         <div>{{ A_("Date") }}</div>
-        <div>{{ A_("Currency") }}</div>
         <div>{{ A_("Description") }}</div>
         <div class="accounting-amount">{{ A_("Amount") }}</div>
         <div class="accounting-amount">{{ A_("Net Balance") }}</div>
@@ -56,15 +60,9 @@ First written: 2023/4/7
     </div>
     <div class="accounting-report-table-body">
       {% for line_item in report.line_items %}
-        <a class="accounting-report-table-row {% if report.is_mark_matches and not line_item.match %} accounting-report-table-row-danger {% endif %}" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
+        <a class="accounting-report-table-row" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
           <div>{{ line_item.journal_entry.date|accounting_format_date }}</div>
-          <div>{{ line_item.currency.name }}</div>
-          <div>
-            {{ line_item.description|accounting_default }}
-            {% if report.is_mark_matches and line_item.match %}
-              <div>{{ A_("Can match %(offset)s", offset=line_item.match) }}</div>
-            {% endif %}
-          </div>
+          <div>{{ line_item.description|accounting_default }}</div>
           <div class="accounting-amount">{{ line_item.amount|accounting_format_amount }}</div>
           <div class="accounting-amount">{{ line_item.net_balance|accounting_format_amount }}</div>
         </a>
@@ -78,9 +76,6 @@ First written: 2023/4/7
       <div>
         <div class="text-muted small">
           {{ line_item.journal_entry.date|accounting_format_date }}
-          {% if line_item.currency.code != accounting_default_currency_code() %}
-            <span class="badge rounded-pill bg-info">{{ line_item.currency.code }}</span>
-          {% endif %}
         </div>
         {% if line_item.description is not none %}
           <div>{{ line_item.description }}</div>
