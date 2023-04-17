@@ -24,7 +24,10 @@ First written: 2023/3/14
   <li class="list-group-item accounting-journal-entry-line-item">
     <div class="d-flex justify-content-between">
       <div>
-        <div class="small">{{ line_item.account }}</div>
+        <div class="small">
+          <span class="d-none d-md-inline">{{ line_item.account.code }}</span>
+          {{ line_item.account.title|title }}
+        </div>
         {% if line_item.description is not none %}
           <div>{{ line_item.description }}</div>
         {% endif %}
