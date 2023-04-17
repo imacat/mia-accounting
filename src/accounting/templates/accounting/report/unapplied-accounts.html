@@ -59,7 +59,10 @@ First written: 2023/4/8
       <div class="accounting-report-table-body">
         {% for account in report.accounts %}
           <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unapplied", currency=report.currency, account=account, period=report.period) }}">
-            <div>{{ account }}</div>
+            <div>
+              <span class="d-none d-md-inline">{{ account.code }}</span>
+              {{ account.title|title }}
+            </div>
             <div class="accounting-amount">{{ account.count }}</div>
           </a>
         {% endfor %}
