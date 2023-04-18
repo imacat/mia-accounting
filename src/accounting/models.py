@@ -883,6 +883,7 @@ class JournalEntryLineItem(db.Model):
                                   self.journal_entry.date.month,
                                   self.journal_entry.date.day),
                 "" if self.description is None else self.description,
+                str(self.account),
                 format_amount(self.amount)]
 
 
