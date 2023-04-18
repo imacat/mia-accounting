@@ -187,12 +187,12 @@ class ReportChooser:
                               unmatched_url(self.__currency, None,
                                             self.__period),
                               self.__active_report == ReportType.UNMATCHED,
-                              fa_icon="fa-solid fa-link-slash")
+                              fa_icon="fa-solid fa-file-circle-question")
         return OptionLink(gettext("Unmatched Offsets"),
                           unmatched_url(self.__currency, self.__account,
                                         self.__period),
                           self.__active_report == ReportType.UNMATCHED,
-                          fa_icon="fa-solid fa-link-slash")
+                          fa_icon="fa-solid fa-file-circle-question")
 
     def __iter__(self) -> t.Iterator[OptionLink]:
         """Returns the iteration of the reports.
