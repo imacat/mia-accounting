@@ -39,6 +39,10 @@
 .accounting-toolbar {
     display: flex;
 }
+.accounting-toolbar-accounts {
+    max-height: 20rem;
+    overflow-y: scroll;
+}
 .accounting-toolbar .input-group > .input-group-text {
     padding: 0;
     background-color: transparent;

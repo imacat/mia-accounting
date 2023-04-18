@@ -89,7 +89,7 @@ First written: 2023/3/8
       <i class="fa-solid fa-clipboard"></i>
       <span class="d-none d-md-inline">{{ A_("Account") }}</span>
     </button>
-    <ul class="dropdown-menu" aria-labelledby="accounting-choose-account">
+    <ul class="dropdown-menu accounting-toolbar-accounts" aria-labelledby="accounting-choose-account">
       {% for account in report.account_options %}
         <li>
           <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
