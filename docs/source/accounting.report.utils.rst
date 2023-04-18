@@ -28,6 +28,14 @@ accounting.report.utils.csv\_export module
    :undoc-members:
    :show-inheritance:
 
+accounting.report.utils.offset\_matcher module
+----------------------------------------------
+
+.. automodule:: accounting.report.utils.offset_matcher
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.report.utils.option\_link module
 -------------------------------------------
 
@@ -56,6 +64,14 @@ accounting.report.utils.unapplied module
 ----------------------------------------
 
 .. automodule:: accounting.report.utils.unapplied
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.report.utils.unmatched module
+----------------------------------------
+
+.. automodule:: accounting.report.utils.unmatched
    :members:
    :undoc-members:
    :show-inheritance:

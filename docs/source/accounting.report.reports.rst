@@ -76,6 +76,22 @@ accounting.report.reports.unapplied\_accounts module
    :undoc-members:
    :show-inheritance:
 
+accounting.report.reports.unmatched module
+------------------------------------------
+
+.. automodule:: accounting.report.reports.unmatched
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+accounting.report.reports.unmatched\_accounts module
+----------------------------------------------------
+
+.. automodule:: accounting.report.reports.unmatched_accounts
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

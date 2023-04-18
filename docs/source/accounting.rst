@@ -13,7 +13,6 @@ Subpackages
    accounting.journal_entry
    accounting.option
    accounting.report
-   accounting.unmatched_offset
    accounting.utils
 
 Submodules

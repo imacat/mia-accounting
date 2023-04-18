@@ -52,14 +52,6 @@ accounting.utils.offset\_alias module
    :undoc-members:
    :show-inheritance:
 
-accounting.utils.offset\_matcher module
----------------------------------------
-
-.. automodule:: accounting.utils.offset_matcher
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 accounting.utils.options module
 -------------------------------
 
@@ -104,14 +96,6 @@ accounting.utils.strip\_text module
 -----------------------------------
 
 .. automodule:: accounting.utils.strip_text
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-accounting.utils.unapplied module
----------------------------------
-
-.. automodule:: accounting.utils.unapplied
    :members:
    :undoc-members:
    :show-inheritance:
