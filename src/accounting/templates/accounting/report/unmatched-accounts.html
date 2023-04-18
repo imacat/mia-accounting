@@ -26,7 +26,7 @@ First written: 2023/4/17
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{{ A_("Accounts with Unmatched Offsets in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts with Unmatched Offsets %(period)s", period=report.period.desc|title) }}{% else %}{{ A_("Accounts with Unmatched Offsets in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -47,7 +47,13 @@ First written: 2023/4/17
 {% if report.has_data %}
   <div class="accounting-sheet">
     <div class="d-none d-sm-flex justify-content-center mb-3">
-      <h2 class="text-center">{{ A_("Accounts with Unmatched Offsets in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}</h2>
+      <h2 class="text-center">
+        {% if report.currency.code == accounting_default_currency_code() %}
+          {{ A_("Accounts with Unmatched Offsets %(period)s", period=report.period.desc|title) }}
+        {% else %}
+          {{ A_("Accounts with Unmatched Offsets in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}
+        {% endif %}
+      </h2>
     </div>
 
     <div class="accounting-report-table accounting-unapplied-account-table">
