@@ -25,11 +25,9 @@ from flask_babel import LazyString
 
 from accounting.locale import gettext
 from accounting.models import Currency, Account, JournalEntryLineItem
-from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
-from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
-    period_spec
+from accounting.report.utils.csv_export import BaseCSVRow, csv_download
 from accounting.report.utils.offset_matcher import OffsetMatcher, OffsetPair
 from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
@@ -82,7 +80,6 @@ class PageParams(BasePageParams):
 
     def __init__(self, currency: Currency,
                  account: Account,
-                 period: Period,
                  match_status: str | LazyString,
                  matched_pairs: list[OffsetPair],
                  pagination: Pagination[JournalEntryLineItem],
@@ -91,7 +88,6 @@ class PageParams(BasePageParams):
 
         :param currency: The currency.
         :param account: The account.
-        :param period: The period.
         :param match_status: The match status message.
         :param matched_pairs: A list of matched pairs.
         :param pagination: The pagination.
@@ -101,8 +97,6 @@ class PageParams(BasePageParams):
         """The currency."""
         self.account: Account = account
         """The account."""
-        self.period: Period = period
-        """The period."""
         self.match_status: str | LazyString = match_status
         """The match status message."""
         self.matched_pairs: list[OffsetPair] = matched_pairs
@@ -111,9 +105,6 @@ class PageParams(BasePageParams):
         """The pagination."""
         self.line_items: list[JournalEntryLineItem] = line_items
         """The line items."""
-        self.period_chooser: PeriodChooser = PeriodChooser(
-            lambda x: unmatched_url(currency, account, x))
-        """The period chooser."""
 
     @property
     def has_data(self) -> bool:
@@ -139,8 +130,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: unmatched_url(x, self.account, self.period),
-            self.currency)
+            lambda x: unmatched_url(x, self.account), self.currency)
 
     @property
     def account_options(self) -> list[OptionLink]:
@@ -150,13 +140,12 @@ class PageParams(BasePageParams):
         """
         options: list[OptionLink] \
             = [OptionLink(gettext("Accounts"),
-                          unmatched_url(self.currency, None, self.period),
+                          unmatched_url(self.currency, None),
                           False)]
         options.extend(
-            [OptionLink(str(x),
-                        unmatched_url(self.currency, x, self.period),
+            [OptionLink(str(x), unmatched_url(self.currency, x),
                         x.id == self.account.id)
-             for x in get_accounts_with_unmatched(self.currency, self.period)])
+             for x in get_accounts_with_unmatched(self.currency)])
         return options
 
 
@@ -178,21 +167,18 @@ def get_csv_rows(line_items: list[JournalEntryLineItem]) -> list[CSVRow]:
 class UnmatchedOffsets(BaseReport):
     """The unmatched offsets."""
 
-    def __init__(self, currency: Currency, account: Account, period: Period):
+    def __init__(self, currency: Currency, account: Account):
         """Constructs the unmatched offsets.
 
         :param currency: The currency.
         :param account: The account.
-        :param period: The period.
         """
         self.__currency: Currency = currency
         """The currency."""
         self.__account: Account = account
         """The account."""
-        self.__period: Period = period
-        """The period."""
         offset_matcher: OffsetMatcher \
-            = OffsetMatcher(self.__currency, self.__account, self.__period)
+            = OffsetMatcher(self.__currency, self.__account)
         self.__line_items: list[JournalEntryLineItem] \
             = offset_matcher.line_items
         """The line items."""
@@ -206,9 +192,8 @@ class UnmatchedOffsets(BaseReport):
 
         :return: The response of the report for download.
         """
-        filename: str = "unmatched-{currency}-{account}-{period}.csv"\
-            .format(currency=self.__currency.code, account=self.__account.code,
-                    period=period_spec(self.__period))
+        filename: str = "unmatched-{currency}-{account}.csv"\
+            .format(currency=self.__currency.code, account=self.__account.code)
         return csv_download(filename, get_csv_rows(self.__line_items))
 
     def html(self) -> str:
@@ -221,7 +206,6 @@ class UnmatchedOffsets(BaseReport):
                                                is_reversed=True)
         params: PageParams = PageParams(currency=self.__currency,
                                         account=self.__account,
-                                        period=self.__period,
                                         match_status=self.__match_status,
                                         matched_pairs=self.__matched_pairs,
                                         pagination=pagination,

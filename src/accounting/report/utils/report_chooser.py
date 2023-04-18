@@ -165,13 +165,11 @@ class ReportChooser:
         account: Account = self.__account
         if not account.is_need_offset:
             return OptionLink(gettext("Unapplied Items"),
-                              unapplied_url(self.__currency, None,
-                                            self.__period),
+                              unapplied_url(self.__currency, None),
                               self.__active_report == ReportType.UNAPPLIED,
                               fa_icon="fa-solid fa-link-slash")
         return OptionLink(gettext("Unapplied Items"),
-                          unapplied_url(self.__currency, self.__account,
-                                        self.__period),
+                          unapplied_url(self.__currency, self.__account),
                           self.__active_report == ReportType.UNAPPLIED,
                           fa_icon="fa-solid fa-link-slash")
 
@@ -184,13 +182,11 @@ class ReportChooser:
         account: Account = self.__account
         if not account.is_need_offset:
             return OptionLink(gettext("Unmatched Offsets"),
-                              unmatched_url(self.__currency, None,
-                                            self.__period),
+                              unmatched_url(self.__currency, None),
                               self.__active_report == ReportType.UNMATCHED,
                               fa_icon="fa-solid fa-file-circle-question")
         return OptionLink(gettext("Unmatched Offsets"),
-                          unmatched_url(self.__currency, self.__account,
-                                        self.__period),
+                          unmatched_url(self.__currency, self.__account),
                           self.__active_report == ReportType.UNMATCHED,
                           fa_icon="fa-solid fa-file-circle-question")
 

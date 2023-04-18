@@ -24,7 +24,6 @@ from flask import render_template, Response
 
 from accounting.locale import gettext
 from accounting.models import Currency, Account
-from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import BaseCSVRow, csv_download
@@ -61,24 +60,16 @@ class CSVRow(BaseCSVRow):
 class PageParams(BasePageParams):
     """The HTML page parameters."""
 
-    def __init__(self, currency: Currency,
-                 period: Period,
-                 accounts: list[Account]):
+    def __init__(self, currency: Currency, accounts: list[Account]):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
-        :param period: The period.
         :param accounts: The accounts.
         """
         self.currency: Currency = currency
         """The currency."""
-        self.period: Period = period
-        """The period."""
         self.accounts: list[Account] = accounts
         """The accounts."""
-        self.period_chooser: PeriodChooser = PeriodChooser(
-            lambda x: unmatched_url(currency, None, x))
-        """The period chooser."""
 
     @property
     def has_data(self) -> bool:
@@ -95,7 +86,7 @@ class PageParams(BasePageParams):
         :return: The report chooser.
         """
         return ReportChooser(ReportType.UNMATCHED, currency=self.currency,
-                             account=None, period=self.period)
+                             account=None)
 
     @property
     def currency_options(self) -> list[OptionLink]:
@@ -103,9 +94,8 @@ class PageParams(BasePageParams):
 
         :return: The currency options.
         """
-        return self._get_currency_options(
-            lambda x: unmatched_url(x, None, self.period),
-            self.currency)
+        return self._get_currency_options(lambda x: unmatched_url(x, None),
+                                          self.currency)
 
     @property
     def account_options(self) -> list[OptionLink]:
@@ -115,12 +105,10 @@ class PageParams(BasePageParams):
         """
         options: list[OptionLink] \
             = [OptionLink(gettext("Accounts"),
-                          unmatched_url(self.currency, None, self.period),
+                          unmatched_url(self.currency, None),
                           True)]
         options.extend(
-            [OptionLink(str(x),
-                        unmatched_url(self.currency, x, self.period),
-                        False)
+            [OptionLink(str(x), unmatched_url(self.currency, x), False)
              for x in self.accounts])
         return options
 
@@ -140,18 +128,15 @@ def get_csv_rows(accounts: list[Account]) -> list[CSVRow]:
 class AccountsWithUnmatchedOffsets(BaseReport):
     """The accounts with unmatched offsets."""
 
-    def __init__(self, currency: Currency, period: Period):
+    def __init__(self, currency: Currency):
         """Constructs the outstanding balances.
 
         :param currency: The currency.
-        :param period: The period.
         """
         self.__currency: Currency = currency
         """The currency."""
-        self.__period: Period = period
-        """The period."""
         self.__accounts: list[Account] \
-            = get_accounts_with_unmatched(currency, period)
+            = get_accounts_with_unmatched(currency)
         """The accounts."""
 
     def csv(self) -> Response:
@@ -169,5 +154,4 @@ class AccountsWithUnmatchedOffsets(BaseReport):
         """
         return render_template("accounting/report/unmatched-accounts.html",
                                report=PageParams(currency=self.__currency,
-                                                 period=self.__period,
                                                  accounts=self.__accounts))

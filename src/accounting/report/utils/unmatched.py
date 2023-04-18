@@ -22,37 +22,28 @@ import sqlalchemy as sa
 from accounting import db
 from accounting.models import Currency, Account, JournalEntry, \
     JournalEntryLineItem
-from accounting.report.period import Period
 from accounting.utils.cast import be
 
 
-def get_accounts_with_unmatched(currency: Currency,
-                                period: Period) -> list[Account]:
+def get_accounts_with_unmatched(currency: Currency) -> list[Account]:
     """Returns the accounts with unmatched offsets.
 
     :param currency: The currency.
-    :param period: The period.
     :return: The accounts with unmatched offsets, with the "count" property set
         to the number of unmatched offsets.
     """
     count_func: sa.Label \
         = sa.func.count(JournalEntryLineItem.id).label("count")
-    conditions: list[sa.BinaryExpression] \
-        = [Account.is_need_offset,
-           be(JournalEntryLineItem.currency_code == currency.code),
-           JournalEntryLineItem.original_line_item_id.is_(None),
-           sa.or_(sa.and_(Account.base_code.startswith("2"),
-                          JournalEntryLineItem.is_debit),
-                  sa.and_(Account.base_code.startswith("1"),
-                          sa.not_(JournalEntryLineItem.is_debit)))]
-    if period.start is not None:
-        conditions.append(JournalEntry.date >= period.start)
-    if period.end is not None:
-        conditions.append(JournalEntry.date <= period.end)
     select: sa.Select = sa.select(Account.id, count_func)\
         .select_from(Account)\
         .join(JournalEntryLineItem, isouter=True).join(JournalEntry)\
-        .filter(*conditions)\
+        .filter(Account.is_need_offset,
+                be(JournalEntryLineItem.currency_code == currency.code),
+                JournalEntryLineItem.original_line_item_id.is_(None),
+                sa.or_(sa.and_(Account.base_code.startswith("2"),
+                               JournalEntryLineItem.is_debit),
+                       sa.and_(Account.base_code.startswith("1"),
+                               sa.not_(JournalEntryLineItem.is_debit))))\
         .group_by(Account.id)\
         .having(count_func > 0)
     counts: dict[int, int] \

@@ -293,52 +293,45 @@ def get_default_unapplied_accounts() -> str | Response:
     :return: The accounts with unapplied original line items.
     """
     return __get_unapplied_accounts(
-        db.session.get(Currency, default_currency_code()), get_period())
+        db.session.get(Currency, default_currency_code()))
 
 
-@bp.get("unapplied/<currency:currency>/<period:period>",
-        endpoint="unapplied-accounts")
+@bp.get("unapplied/<currency:currency>", endpoint="unapplied-accounts")
 @has_permission(can_view)
-def get_unapplied_accounts(currency: Currency,
-                           period: Period) -> str | Response:
+def get_unapplied_accounts(currency: Currency) -> str | Response:
     """Returns the accounts with unapplied original line items.
 
     :param currency: The currency.
-    :param period: The period.
     :return: The accounts with unapplied original line items.
     """
-    return __get_unapplied_accounts(currency, period)
+    return __get_unapplied_accounts(currency)
 
 
-def __get_unapplied_accounts(currency: Currency,
-                             period: Period) -> str | Response:
+def __get_unapplied_accounts(currency: Currency) -> str | Response:
     """Returns the accounts with unapplied original line items.
 
     :param currency: The currency.
-    :param period: The period.
     :return: The accounts with unapplied original line items.
     """
     report: AccountsWithUnappliedOriginalLineItems \
-        = AccountsWithUnappliedOriginalLineItems(currency, period)
+        = AccountsWithUnappliedOriginalLineItems(currency)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
 
 
-@bp.get("unapplied/<currency:currency>/<needOffsetAccount:account>/"
-        "<period:period>", endpoint="unapplied")
+@bp.get("unapplied/<currency:currency>/<needOffsetAccount:account>",
+        endpoint="unapplied")
 @has_permission(can_view)
-def get_unapplied(currency: Currency, account: Account,
-                  period: Period) -> str | Response:
+def get_unapplied(currency: Currency, account: Account) -> str | Response:
     """Returns the unapplied original line items.
 
     :param currency: The currency.
     :param account: The Account.
-    :param period: The period.
     :return: The unapplied original line items in the period.
     """
     report: UnappliedOriginalLineItems \
-        = UnappliedOriginalLineItems(currency, account, period)
+        = UnappliedOriginalLineItems(currency, account)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
@@ -352,51 +345,44 @@ def get_default_unmatched_accounts() -> str | Response:
     :return: The accounts with unmatched offsets.
     """
     return __get_unmatched_accounts(
-        db.session.get(Currency, default_currency_code()), get_period())
+        db.session.get(Currency, default_currency_code()))
 
 
-@bp.get("unmatched/<currency:currency>/<period:period>",
-        endpoint="unmatched-accounts")
+@bp.get("unmatched/<currency:currency>", endpoint="unmatched-accounts")
 @has_permission(can_edit)
-def get_unmatched_accounts(currency: Currency,
-                           period: Period) -> str | Response:
+def get_unmatched_accounts(currency: Currency) -> str | Response:
     """Returns the accounts with unmatched offsets.
 
     :param currency: The currency.
-    :param period: The period.
     :return: The accounts with unmatched offsets.
     """
-    return __get_unmatched_accounts(currency, period)
+    return __get_unmatched_accounts(currency)
 
 
-def __get_unmatched_accounts(currency: Currency,
-                             period: Period) -> str | Response:
+def __get_unmatched_accounts(currency: Currency) -> str | Response:
     """Returns the accounts with unmatched offsets.
 
     :param currency: The currency.
-    :param period: The period.
     :return: The accounts with unmatched offsets.
     """
     report: AccountsWithUnmatchedOffsets \
-        = AccountsWithUnmatchedOffsets(currency, period)
+        = AccountsWithUnmatchedOffsets(currency)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
 
 
-@bp.get("unmatched/<currency:currency>/<needOffsetAccount:account>/"
-        "<period:period>", endpoint="unmatched")
+@bp.get("unmatched/<currency:currency>/<needOffsetAccount:account>",
+        endpoint="unmatched")
 @has_permission(can_edit)
-def get_unmatched(currency: Currency, account: Account,
-                  period: Period) -> str | Response:
+def get_unmatched(currency: Currency, account: Account) -> str | Response:
     """Returns the unmatched offsets.
 
     :param currency: The currency.
     :param account: The Account.
-    :param period: The period.
     :return: The unmatched offsets in the period.
     """
-    report: UnmatchedOffsets = UnmatchedOffsets(currency, account, period)
+    report: UnmatchedOffsets = UnmatchedOffsets(currency, account)
     if "as" in request.args and request.args["as"] == "csv":
         return report.csv()
     return report.html()
@@ -410,17 +396,17 @@ def match_offsets(currency: Currency, account: Account) -> redirect:
 
     :return: Redirection to the view of the unmatched offsets.
     """
-    matcher: OffsetMatcher = OffsetMatcher(currency, account, None)
+    matcher: OffsetMatcher = OffsetMatcher(currency, account)
     if len(matcher.matched_pairs) == 0:
         flash(s(lazy_gettext("No more offset to match automatically.")),
               "success")
         return redirect(or_next(
-            unmatched_url(currency, account, get_period())))
+            unmatched_url(currency, account)))
     matcher.match()
     db.session.commit()
     flash(s(lazy_gettext("Matched %(matches)s offsets.",
                          matches=len(matcher.matched_pairs))), "success")
-    return redirect(or_next(unmatched_url(currency, account, get_period())))
+    return redirect(or_next(unmatched_url(currency, account)))
 
 
 @bp.get("search", endpoint="search")

@@ -26,21 +26,18 @@ First written: 2023/4/8
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts with Unapplied Items %(period)s", period=report.period.desc|title) }}{% else %}{{ A_("Accounts with Unapplied Items in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}{% endif %}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts with Unapplied Items") }}{% else %}{{ A_("Accounts with Unapplied Items in %(currency)s", currency=report.currency.name|title) }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
 <div class="mb-3 accounting-toolbar">
   {% with use_currency_chooser = true,
-          use_account_chooser = true,
-          use_period_chooser = true %}
+          use_account_chooser = true %}
     {% include "accounting/report/include/toolbar-buttons.html" %}
   {% endwith %}
 </div>
 
 {% include "accounting/report/include/add-journal-entry-material-fab.html" %}
-
-{% include "accounting/report/include/period-chooser.html" %}
 
 {% include "accounting/report/include/search-modal.html" %}
 
@@ -49,9 +46,9 @@ First written: 2023/4/8
     <div class="d-none d-sm-flex justify-content-center mb-3">
       <h2 class="text-center">
         {% if report.currency.code == accounting_default_currency_code() %}
-          {{ A_("Accounts with Unapplied Items %(period)s", period=report.period.desc|title) }}
+          {{ A_("Accounts with Unapplied Items") }}
         {% else %}
-          {{ A_("Accounts with Unapplied Items in %(currency)s %(period)s", currency=report.currency.name|title, period=report.period.desc|title) }}
+          {{ A_("Accounts with Unapplied Items in %(currency)s", currency=report.currency.name|title) }}
         {% endif %}
       </h2>
     </div>

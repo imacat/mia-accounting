@@ -129,7 +129,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_r_or1d.id, data.l_r_or2d.id,
                               data.l_r_or3d.id, data.l_r_or4d.id})
@@ -157,7 +157,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_r_or1d.id, data.l_r_or2d.id,
                               data.l_r_or3d.id})
@@ -179,7 +179,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_p_or1c.id, data.l_p_or2c.id,
                               data.l_p_or3c.id, data.l_p_or4c.id})
@@ -207,7 +207,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_p_or1c.id, data.l_p_or2c.id,
                               data.l_p_or3c.id})
@@ -250,7 +250,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_r_or1d.id, data.l_r_or3d.id,
                               data.l_r_or4d.id, data.l_r_or5d.id,
@@ -285,7 +285,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_r_or5d.id, data.l_r_or6d.id})
             self.assertEqual({x.id for x in matcher.unmatched},
@@ -316,7 +316,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_p_or1c.id, data.l_p_or3c.id,
                               data.l_p_or4c.id, data.l_p_or5c.id,
@@ -351,7 +351,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         with self.app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
-            matcher = OffsetMatcher(currency, account, None)
+            matcher = OffsetMatcher(currency, account)
             self.assertEqual({x.id for x in matcher.unapplied},
                              {data.l_p_or5c.id, data.l_p_or6c.id})
             self.assertEqual({x.id for x in matcher.unmatched},

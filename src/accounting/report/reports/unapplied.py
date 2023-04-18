@@ -26,11 +26,9 @@ from sqlalchemy.orm import selectinload
 from accounting.locale import gettext
 from accounting.models import Currency, Account, JournalEntry, \
     JournalEntryLineItem
-from accounting.report.period import Period, PeriodChooser
 from accounting.report.utils.base_page_params import BasePageParams
 from accounting.report.utils.base_report import BaseReport
-from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
-    period_spec
+from accounting.report.utils.csv_export import BaseCSVRow, csv_download
 from accounting.report.utils.option_link import OptionLink
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
@@ -80,14 +78,12 @@ class PageParams(BasePageParams):
 
     def __init__(self, currency: Currency,
                  account: Account,
-                 period: Period,
                  pagination: Pagination[JournalEntryLineItem],
                  line_items: list[JournalEntryLineItem]):
         """Constructs the HTML page parameters.
 
         :param currency: The currency.
         :param account: The account.
-        :param period: The period.
         :param pagination: The pagination.
         :param line_items: The line items.
         """
@@ -95,15 +91,10 @@ class PageParams(BasePageParams):
         """The currency."""
         self.account: Account = account
         """The account."""
-        self.period: Period = period
-        """The period."""
         self.pagination: Pagination[JournalEntryLineItem] = pagination
         """The pagination."""
         self.line_items: list[JournalEntryLineItem] = line_items
         """The line items."""
-        self.period_chooser: PeriodChooser = PeriodChooser(
-            lambda x: unapplied_url(currency, account, x))
-        """The period chooser."""
 
     @property
     def has_data(self) -> bool:
@@ -120,7 +111,7 @@ class PageParams(BasePageParams):
         :return: The report chooser.
         """
         return ReportChooser(ReportType.UNAPPLIED, currency=self.currency,
-                             account=self.account, period=self.period)
+                             account=self.account)
 
     @property
     def currency_options(self) -> list[OptionLink]:
@@ -129,8 +120,7 @@ class PageParams(BasePageParams):
         :return: The currency options.
         """
         return self._get_currency_options(
-            lambda x: unapplied_url(x, self.account, self.period),
-            self.currency)
+            lambda x: unapplied_url(x, self.account), self.currency)
 
     @property
     def account_options(self) -> list[OptionLink]:
@@ -140,13 +130,12 @@ class PageParams(BasePageParams):
         """
         options: list[OptionLink] \
             = [OptionLink(gettext("Accounts"),
-                          unapplied_url(self.currency, None, self.period),
+                          unapplied_url(self.currency, None),
                           False)]
         options.extend(
-            [OptionLink(str(x),
-                        unapplied_url(self.currency, x, self.period),
+            [OptionLink(str(x), unapplied_url(self.currency, x),
                         x.id == self.account.id)
-             for x in get_accounts_with_unapplied(self.currency, self.period)])
+             for x in get_accounts_with_unapplied(self.currency)])
         return options
 
 
@@ -168,19 +157,16 @@ def get_csv_rows(line_items: list[JournalEntryLineItem]) -> list[CSVRow]:
 class UnappliedOriginalLineItems(BaseReport):
     """The unapplied original line items."""
 
-    def __init__(self, currency: Currency, account: Account, period: Period):
+    def __init__(self, currency: Currency, account: Account):
         """Constructs the unapplied original line items.
 
         :param currency: The currency.
         :param account: The account.
-        :param period: The period.
         """
         self.__currency: Currency = currency
         """The currency."""
         self.__account: Account = account
         """The account."""
-        self.__period: Period = period
-        """The period."""
         self.__line_items: list[JournalEntryLineItem] \
             = self.__query_line_items()
         """The line items."""
@@ -191,7 +177,7 @@ class UnappliedOriginalLineItems(BaseReport):
         :return: The line items.
         """
         net_balances: dict[int, Decimal | None] \
-            = get_net_balances(self.__currency, self.__account, self.__period)
+            = get_net_balances(self.__currency, self.__account)
         line_items: list[JournalEntryLineItem] = JournalEntryLineItem.query \
             .join(Account).join(JournalEntry) \
             .filter(JournalEntryLineItem.id.in_(net_balances)) \
@@ -210,9 +196,8 @@ class UnappliedOriginalLineItems(BaseReport):
 
         :return: The response of the report for download.
         """
-        filename: str = "unapplied-{currency}-{account}-{period}.csv"\
-            .format(currency=self.__currency.code, account=self.__account.code,
-                    period=period_spec(self.__period))
+        filename: str = "unapplied-{currency}-{account}.csv"\
+            .format(currency=self.__currency.code, account=self.__account.code)
         return csv_download(filename, get_csv_rows(self.__line_items))
 
     def html(self) -> str:
@@ -225,7 +210,6 @@ class UnappliedOriginalLineItems(BaseReport):
                                                is_reversed=True)
         params: PageParams = PageParams(currency=self.__currency,
                                         account=self.__account,
-                                        period=self.__period,
                                         pagination=pagination,
                                         line_items=pagination.list)
         return render_template("accounting/report/unapplied.html",

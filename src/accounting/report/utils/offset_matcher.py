@@ -26,7 +26,6 @@ from sqlalchemy.orm import selectinload
 from accounting.locale import lazy_gettext
 from accounting.models import Currency, Account, JournalEntry, \
     JournalEntryLineItem
-from accounting.report.period import Period
 from accounting.report.utils.unapplied import get_net_balances
 
 
@@ -49,37 +48,25 @@ class OffsetPair:
 class OffsetMatcher:
     """The offset matcher."""
 
-    def __init__(self, currency: Currency, account: Account,
-                 period: Period | None):
+    def __init__(self, currency: Currency, account: Account):
         """Constructs the offset matcher.
 
         :param currency: The currency.
         :param account: The account.
-        :param period: The period, or None for all time.
         """
         self.__currency: Account = currency
         """The currency."""
         self.__account: Account = account
         """The account."""
-        self.__period: Period | None = period
-        """The period."""
         self.matched_pairs: list[OffsetPair] = []
         """A list of matched pairs."""
-        self.__all_line_items: list[JournalEntryLineItem] = []
-        """The unapplied debits or credits and unmatched offsets."""
         self.line_items: list[JournalEntryLineItem] = []
-        """The unapplied debits or credits and unmatched offsets in the
-        period."""
-        self.__all_unapplied: list[JournalEntryLineItem] = []
-        """The unapplied debits or credits."""
+        """The unapplied debits or credits and unmatched offsets."""
         self.unapplied: list[JournalEntryLineItem] = []
-        """The unapplied debits or credits in the period."""
-        self.__all_unmatched: list[JournalEntryLineItem] = []
-        """The unmatched offsets."""
+        """The unapplied debits or credits."""
         self.unmatched: list[JournalEntryLineItem] = []
-        """The unmatched offsets in the period."""
+        """The unmatched offsets."""
         self.__find_matches()
-        self.__filter_by_period()
 
     def __find_matches(self) -> None:
         """Finds the matched original line items and their offsets.
@@ -87,10 +74,10 @@ class OffsetMatcher:
         :return: None.
         """
         self.__get_line_items()
-        if len(self.__all_unapplied) == 0 or len(self.__all_unmatched) == 0:
+        if len(self.unapplied) == 0 or len(self.unmatched) == 0:
             return
-        remains: list[JournalEntryLineItem] = self.__all_unmatched.copy()
-        for original_item in self.__all_unapplied:
+        remains: list[JournalEntryLineItem] = self.unmatched.copy()
+        for original_item in self.unapplied:
             offset_candidates: list[JournalEntryLineItem] \
                 = [x for x in remains
                    if (x.journal_entry.date > original_item.journal_entry.date
@@ -117,7 +104,7 @@ class OffsetMatcher:
             account.
         """
         net_balances: dict[int, Decimal | None] \
-            = get_net_balances(self.__currency, self.__account, None)
+            = get_net_balances(self.__currency, self.__account)
         unmatched_offset_condition: sa.BinaryExpression \
             = sa.and_(Account.id == self.__account.id,
                       JournalEntryLineItem.currency_code
@@ -127,7 +114,7 @@ class OffsetMatcher:
                                      JournalEntryLineItem.is_debit),
                              sa.and_(Account.base_code.startswith("1"),
                                      sa.not_(JournalEntryLineItem.is_debit))))
-        self.__all_line_items = JournalEntryLineItem.query \
+        self.line_items = JournalEntryLineItem.query \
             .join(Account).join(JournalEntry) \
             .filter(sa.or_(JournalEntryLineItem.id.in_(net_balances),
                            unmatched_offset_condition)) \
@@ -135,16 +122,16 @@ class OffsetMatcher:
                       JournalEntryLineItem.is_debit, JournalEntryLineItem.no) \
             .options(selectinload(JournalEntryLineItem.currency),
                      selectinload(JournalEntryLineItem.journal_entry)).all()
-        for line_item in self.__all_line_items:
+        for line_item in self.line_items:
             line_item.is_offset = line_item.id in net_balances
-        self.__all_unapplied = [x for x in self.__all_line_items
-                                if x.is_offset]
-        for line_item in self.__all_unapplied:
+        self.unapplied = [x for x in self.line_items
+                          if x.is_offset]
+        for line_item in self.unapplied:
             line_item.net_balance = line_item.amount \
                 if net_balances[line_item.id] is None \
                 else net_balances[line_item.id]
-        self.__all_unmatched = [x for x in self.__all_line_items
-                                if not x.is_offset]
+        self.unmatched = [x for x in self.line_items
+                          if not x.is_offset]
         self.__populate_accumulated_balances()
 
     def __populate_accumulated_balances(self) -> None:
@@ -153,7 +140,7 @@ class OffsetMatcher:
         :return: None.
         """
         balance: Decimal = Decimal("0")
-        for line_item in self.__all_line_items:
+        for line_item in self.line_items:
             amount: Decimal = line_item.amount if line_item.is_offset \
                 else line_item.net_balance
             if line_item.is_debit:
@@ -166,41 +153,23 @@ class OffsetMatcher:
                 balance = balance - amount
             line_item.balance = balance
 
-    def __filter_by_period(self) -> None:
-        """Filters the line items by the period.
-
-        :return: None.
-        """
-        self.line_items = self.__all_line_items.copy()
-        if self.__period is not None:
-            if self.__period.start is not None:
-                self.line_items \
-                    = [x for x in self.line_items
-                       if x.journal_entry.date >= self.__period.start]
-            if self.__period.end is not None:
-                self.line_items \
-                    = [x for x in self.line_items
-                       if x.journal_entry.date <= self.__period.end]
-        self.unapplied = [x for x in self.line_items if x.is_offset]
-        self.unmatched = [x for x in self.line_items if not x.is_offset]
-
     @property
     def status(self) -> str | LazyString:
         """Returns the match status message.
 
         :return: The match status message.
         """
-        if len(self.__all_unmatched) == 0:
+        if len(self.unmatched) == 0:
             return lazy_gettext("There is no unmatched offset.")
         if len(self.matched_pairs) == 0:
             return lazy_gettext(
                     "%(total)s unmatched offsets without original items.",
-                    total=len(self.__all_unmatched))
+                    total=len(self.unmatched))
         return lazy_gettext(
             "%(matches)s unmatched offsets out of %(total)s"
             " can match with their original items.",
             matches=len(self.matched_pairs),
-            total=len(self.__all_unmatched))
+            total=len(self.unmatched))
 
     def match(self) -> None:
         """Matches the original line items with offsets.

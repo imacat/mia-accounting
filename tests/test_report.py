@@ -108,11 +108,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
 
         response = client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/unmatched")
@@ -122,11 +122,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
 
         response = client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/search?q=Salary")
@@ -207,11 +207,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
         response = client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
 
         response = client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
@@ -222,11 +222,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
 
         response = client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 403)
 
         response = client.get(f"{PREFIX}/search?q=Salary")
@@ -308,11 +308,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
         response = self.client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
@@ -324,11 +324,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
         response = self.client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
@@ -410,11 +410,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
         response = self.client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unapplied/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
@@ -426,11 +426,11 @@ class ReportTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 
         response = self.client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}/all-time?as=csv")
+            f"{PREFIX}/unmatched/USD/{Accounts.PAYABLE}?as=csv")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], CSV_MIME)
 

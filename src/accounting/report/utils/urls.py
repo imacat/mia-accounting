@@ -113,39 +113,35 @@ def balance_sheet_url(currency: Currency, period: Period) -> str:
                    currency=currency, period=period)
 
 
-def unapplied_url(currency: Currency, account: Account | None,
-                  period: Period) -> str:
+def unapplied_url(currency: Currency, account: Account | None) -> str:
     """Returns the URL of the unapplied original line items.
 
     :param currency: The currency.
     :param account: The account, or None to list the accounts with unapplied
         original line items.
-    :param period: The period.
     :return: The URL of the unapplied original line items.
     """
     if account is None:
-        if currency.code == default_currency_code() and period.is_default:
+        if currency.code == default_currency_code():
             return url_for("accounting-report.unapplied-accounts-default")
         return url_for("accounting-report.unapplied-accounts",
-                       currency=currency, period=period)
+                       currency=currency)
     return url_for("accounting-report.unapplied",
-                   currency=currency, account=account, period=period)
+                   currency=currency, account=account)
 
 
-def unmatched_url(currency: Currency, account: Account | None,
-                  period: Period) -> str:
+def unmatched_url(currency: Currency, account: Account | None) -> str:
     """Returns the URL of the unmatched offset line items.
 
     :param currency: The currency.
     :param account: The account, or None to list the accounts with unmatched
         offset line items.
-    :param period: The period.
     :return: The URL of the unmatched offset line items.
     """
     if account is None:
-        if currency.code == default_currency_code() and period.is_default:
+        if currency.code == default_currency_code():
             return url_for("accounting-report.unmatched-accounts-default")
         return url_for("accounting-report.unmatched-accounts",
-                       currency=currency, period=period)
+                       currency=currency)
     return url_for("accounting-report.unmatched",
-                   currency=currency, account=account, period=period)
+                   currency=currency, account=account)
