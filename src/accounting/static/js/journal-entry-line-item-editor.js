@@ -277,10 +277,14 @@ class JournalEntryLineItemEditor {
         this.originalLineItemText = originalLineItem.text;
         this.#originalLineItemText.innerText = originalLineItem.text;
         this.#setEnableDescriptionAccount(false);
-        if (originalLineItem.description === "") {
-            this.#descriptionControl.classList.remove("accounting-not-empty");
-        } else {
-            this.#descriptionControl.classList.add("accounting-not-empty");
+        if (this.description === null) {
+            if (originalLineItem.description === "") {
+                this.#descriptionControl.classList.remove("accounting-not-empty");
+            } else {
+                this.#descriptionControl.classList.add("accounting-not-empty");
+            }
+            this.description = originalLineItem.description === ""? null: originalLineItem.description;
+            this.#descriptionText.innerText = originalLineItem.description;
         }
         this.#setEnableAccount(false);
         this.#accountControl.classList.add("accounting-not-empty");
