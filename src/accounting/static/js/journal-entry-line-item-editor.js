@@ -282,8 +282,7 @@ class JournalEntryLineItemEditor {
         } else {
             this.#descriptionControl.classList.add("accounting-not-empty");
         }
-        this.description = originalLineItem.description === ""? null: originalLineItem.description;
-        this.#descriptionText.innerText = originalLineItem.description;
+        this.#setEnableAccount(false);
         this.#accountControl.classList.add("accounting-not-empty");
         this.account = originalLineItem.account.copy();
         this.isAccountConfirmed = false;
@@ -305,7 +304,7 @@ class JournalEntryLineItemEditor {
         this.originalLineItemDate = null;
         this.originalLineItemText = null;
         this.#originalLineItemText.innerText = "";
-        this.#setEnableDescriptionAccount(true);
+        this.#setEnableAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
         this.account = null;
         this.isAccountConfirmed = false;
@@ -472,12 +471,13 @@ class JournalEntryLineItemEditor {
         this.originalLineItemDate = null;
         this.originalLineItemText = null;
         this.#originalLineItemText.innerText = "";
-        this.#setEnableDescriptionAccount(true);
+        this.#descriptionControl.dataset.bsTarget = `#accounting-description-editor-${this.#debitCreditSubForm.debitCredit}-modal`;
         this.#descriptionControl.classList.remove("accounting-not-empty");
         this.#descriptionControl.classList.remove("is-invalid");
         this.description = null;
         this.#descriptionText.innerText = ""
         this.#descriptionError.innerText = ""
+        this.#setEnableAccount(true);
         this.#accountControl.classList.remove("accounting-not-empty");
         this.#accountControl.classList.remove("is-invalid");
         this.account = null;
@@ -511,7 +511,7 @@ class JournalEntryLineItemEditor {
             this.#originalLineItemContainer.classList.remove("d-none");
             this.#originalLineItemControl.classList.add("accounting-not-empty");
         }
-        this.#setEnableDescriptionAccount(!lineItem.isMatched && this.originalLineItemId === null);
+        this.#descriptionControl.dataset.bsTarget = `#accounting-description-editor-${this.#debitCreditSubForm.debitCredit}-modal`;
         this.description = lineItem.description;
         if (this.description === null) {
             this.#descriptionControl.classList.remove("accounting-not-empty");
@@ -519,6 +519,7 @@ class JournalEntryLineItemEditor {
             this.#descriptionControl.classList.add("accounting-not-empty");
         }
         this.#descriptionText.innerText = this.description === null? "": this.description;
+        this.#setEnableAccount(!lineItem.isMatched && this.originalLineItemId === null);
         this.account = lineItem.account;
         this.isAccountConfirmed = true;
         if (this.account === null) {
@@ -547,25 +548,17 @@ class JournalEntryLineItemEditor {
     }
 
     /**
-     * Sets the enable status of the description and account.
+     * Sets the enable status of the account.
      *
      * @param isEnabled {boolean} true to enable, or false otherwise
      */
-    #setEnableDescriptionAccount(isEnabled) {
+    #setEnableAccount(isEnabled) {
         if (isEnabled) {
-            this.#descriptionControl.dataset.bsToggle = "modal";
-            this.#descriptionControl.dataset.bsTarget = `#accounting-description-editor-${this.#debitCreditSubForm.debitCredit}-modal`;
-            this.#descriptionControl.classList.remove("accounting-disabled");
-            this.#descriptionControl.classList.add("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "modal";
             this.#accountControl.dataset.bsTarget = `#accounting-account-selector-${this.#debitCreditSubForm.debitCredit}-modal`;
             this.#accountControl.classList.remove("accounting-disabled");
             this.#accountControl.classList.add("accounting-clickable");
         } else {
-            this.#descriptionControl.dataset.bsToggle = "";
-            this.#descriptionControl.dataset.bsTarget = "";
-            this.#descriptionControl.classList.add("accounting-disabled");
-            this.#descriptionControl.classList.remove("accounting-clickable");
             this.#accountControl.dataset.bsToggle = "";
             this.#accountControl.dataset.bsTarget = "";
             this.#accountControl.classList.add("accounting-disabled");
