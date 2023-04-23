@@ -44,124 +44,16 @@ You may also download from the `PyPI project page`_ or the
 `release page`_ on the `Git repository`_.
 
 
-Prerequisites
-=============
-
-You need a running Flask application with database user login.
-The primary key of the user data model must be integer.  You also
-need at least one user.
-
-The following front-end JavaScript libraries must be loaded.  You may
-download it locally or use CDN_.
-
-* Bootstrap_ 5.2.3 or above
-* FontAwesome_ 6.2.1 or above
-* `Decimal.js`_ 6.4.3 or above
-* `Tempus-Dominus`_ 6.4.3 or above
-
-
-Configuration
-=============
-
-You need to pass the Flask *app* and an implementation of
-`UserUtilityInterface`_ to the `init_app`_ function.
-``UserUtilityInterface`` contains everything *Mia! Accounting* needs.
-
-The following is an example configuration for *Mia! Accounting*.
-
-::
-
-    from flask import Response, redirect
-    from .auth import current_user()
-    from .modules import User
-
-    def create_app(test_config=None) -> Flask:
-        app: Flask = Flask(__name__)
-
-        ... (Configuration of SQLAlchemy, CSRF, Babel_JS, ... etc) ...
-
-        import accounting
-
-        class UserUtils(accounting.UserUtilityInterface[User]):
-
-            def can_view(self) -> bool:
-                return True
-
-            def can_edit(self) -> bool:
-                return "editor" in current_user().roles
-
-            def can_admin(self) -> bool:
-                return current_user().is_admin
-
-            def unauthorized(self) -> Response:
-                return redirect("/login")
-
-            @property
-            def cls(self) -> t.Type[User]:
-                return User
-
-            @property
-            def pk_column(self) -> Column:
-                return User.id
-
-            @property
-            def current_user(self) -> User | None:
-                return current_user()
-
-            def get_by_username(self, username: str) -> User | None:
-                return User.query.filter(User.username == username).first()
-
-            def get_pk(self, user: User) -> int:
-                return user.id
-
-        accounting.init_app(app, UserUtils())
-
-        ... (Any other configuration) ...
-
-        return app
-
-
-Database Initialization
-=======================
-
-After the configuration, run the ``accounting-init-db`` console
-command to initialize the accounting database.  You need to specify
-the username of a user as the data creator.
-
-::
-
-    % flask --app myapp accounting-init-db -u username
-
-
-Navigation Menu
-===============
-
-Include the navigation menu in the `Bootstrap navigation bar`_ in your
-base template:
-
-::
-
-    <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark navbar-dark">
-      <div class="container-fluid">
-        ...
-        <div id="collapsible-navbar" class="collapse navbar-collapse">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            ...
-            {% include "accounting/include/nav.html" %}
-            ...
-          </ul>
-          ...
-        </div>
-      </div>
-    </nav>
-
-Check your Flask application and see how it works.
-
-
 Documentation
 =============
 
 Refer to the `documentation on Read the Docs`_.
+
+
+Change Log
+==========
+
+Refer to the `change log`_.
 
 
 Copyright
@@ -198,12 +90,5 @@ Authors
 .. _PyPI project page: https://pypi.org/project/mia-accounting
 .. _release page: https://github.com/imacat/mia-accounting/releases
 .. _Git repository: https://github.com/imacat/mia-accounting
-.. _CDN: https://en.wikipedia.org/wiki/Content_delivery_network
-.. _Bootstrap: https://getbootstrap.com
-.. _FontAwesome: https://fontawesome.com
-.. _Decimal.js: https://mikemcl.github.io/decimal.js
-.. _Tempus-Dominus: https://getdatepicker.com
-.. _UserUtilityInterface: https://mia-accounting.readthedocs.io/en/latest/accounting.utils.html#accounting.utils.user.UserUtilityInterface
-.. _init_app: https://mia-accounting.readthedocs.io/en/latest/accounting.html#accounting.init_app
-.. _Bootstrap navigation bar: https://getbootstrap.com/docs/5.3/components/navbar/
 .. _documentation on Read the Docs: https://mia-accounting.readthedocs.io
+.. _change log: https://mia-accounting.readthedocs.io/en/latest/changelog.html
