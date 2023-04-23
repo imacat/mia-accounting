@@ -34,6 +34,18 @@ from accounting import db
 from accounting.locale import gettext
 from accounting.utils.user import user_cls, user_pk_column
 
+timestamp: t.Type[dt.datetime] \
+    = t.Annotated[dt.datetime, mapped_column(db.DateTime(timezone=True),
+                                             server_default=db.func.now())]
+"""The timestamp."""
+user_pk: t.Type[int] \
+    = t.Annotated[int, mapped_column(db.ForeignKey(user_pk_column,
+                                                   onupdate="CASCADE"))]
+"""The user primary key."""
+random_id: t.Type[int] \
+    = t.Annotated[int, mapped_column(primary_key=True, autoincrement=False)]
+"""The random ID."""
+
 
 class BaseAccount(db.Model):
     """A base account."""
@@ -100,7 +112,7 @@ class Account(db.Model):
     """An account."""
     __tablename__ = "accounting_accounts"
     """The table name."""
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    id: Mapped[random_id]
     """The account ID."""
     base_code: Mapped[str] \
         = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
@@ -114,21 +126,15 @@ class Account(db.Model):
     """The title."""
     is_need_offset: Mapped[bool] = mapped_column(default=False)
     """Whether the journal entry line items of this account need offset."""
-    created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    created_at: Mapped[timestamp]
     """The time of creation."""
-    created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    created_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the creator."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    updated_at: Mapped[timestamp]
     """The time of last update."""
-    updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    updated_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the updator."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
@@ -370,21 +376,15 @@ class Currency(db.Model):
     """The code."""
     name_l10n: Mapped[str] = mapped_column("name")
     """The name."""
-    created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    created_at: Mapped[timestamp]
     """The time of creation."""
-    created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    created_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the creator."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    updated_at: Mapped[timestamp]
     """The time of last update."""
-    updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    updated_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the updator."""
     updated_by: Mapped[user_cls] \
         = db.relationship(foreign_keys=updated_by_id)
@@ -535,7 +535,7 @@ class JournalEntry(db.Model):
     """A journal entry."""
     __tablename__ = "accounting_journal_entries"
     """The table name."""
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    id: Mapped[random_id]
     """The journal entry ID."""
     date: Mapped[dt.date]
     """The date."""
@@ -543,21 +543,15 @@ class JournalEntry(db.Model):
     """The account number under the date."""
     note: Mapped[str | None]
     """The note."""
-    created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    created_at: Mapped[timestamp]
     """The time of creation."""
-    created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    created_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the creator."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    updated_at: Mapped[timestamp]
     """The time of last update."""
-    updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    updated_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the updator."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
@@ -652,7 +646,7 @@ class JournalEntryLineItem(db.Model):
     """A line item in the journal entry."""
     __tablename__ = "accounting_journal_entry_line_items"
     """The table name."""
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    id: Mapped[random_id] = mapped_column()
     """The line item ID."""
     journal_entry_id: Mapped[int] \
         = mapped_column(db.ForeignKey(JournalEntry.id, onupdate="CASCADE",
@@ -883,21 +877,15 @@ class Option(db.Model):
     """The name."""
     value: Mapped[str] = mapped_column(db.Text)
     """The option value."""
-    created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    created_at: Mapped[timestamp]
     """The time of creation."""
-    created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    created_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the creator."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+    updated_at: Mapped[timestamp]
     """The time of last update."""
-    updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+    updated_by_id: Mapped[user_pk] = mapped_column()
     """The ID of the updator."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
