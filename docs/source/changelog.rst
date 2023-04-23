@@ -2,6 +2,18 @@ Changes
 =======
 
 
+Version 1.5.0
+-------------
+
+Released 2023/4/23
+
+* Updated to require ``SQLAlchemy >= 2``.
+* Added the change log.
+* Added the ``VERSION`` constant to the ``accounting`` module for
+  the package version, and revised ``pyproject.toml`` and ``conf.py``
+  to read the version from it.
+
+
 Version 1.4.1
 -------------
 
