@@ -14,6 +14,7 @@ Welcome to Mia! Accounting's documentation!
    accounting
    examples
    history
+   changelog
 
 
 

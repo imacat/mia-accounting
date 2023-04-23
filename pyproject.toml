@@ -50,6 +50,7 @@ test = [
 
 [project.urls]
 "Documentation" = "https://mia-accounting.readthedocs.io"
+"Change Log" = "https://mia-accounting.readthedocs.io/en/latest/changelog.html"
 "Repository" = "https://github.com/imacat/mia-accounting"
 "Bug Tracker" = "https://github.com/imacat/mia-accounting/issues"
 "Demonstration" = "https://accounting.imacat.idv.tw"
