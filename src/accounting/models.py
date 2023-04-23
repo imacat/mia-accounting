@@ -19,6 +19,7 @@
 """
 from __future__ import annotations
 
+import datetime as dt
 import re
 import typing as t
 from decimal import Decimal
@@ -27,6 +28,7 @@ import sqlalchemy as sa
 from babel import Locale
 from flask_babel import get_locale, get_babel
 from sqlalchemy import text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from accounting import db
 from accounting.locale import gettext
@@ -37,14 +39,14 @@ class BaseAccount(db.Model):
     """A base account."""
     __tablename__ = "accounting_base_accounts"
     """The table name."""
-    code = db.Column(db.String, nullable=False, primary_key=True)
+    code: Mapped[str] = mapped_column(primary_key=True)
     """The code."""
-    title_l10n = db.Column("title", db.String, nullable=False)
+    title_l10n: Mapped[str] = mapped_column("title")
     """The title."""
-    l10n = db.relationship("BaseAccountL10n", back_populates="account",
-                           lazy=False)
+    l10n: Mapped[list[BaseAccountL10n]] \
+        = db.relationship(back_populates="account", lazy=False)
     """The localized titles."""
-    accounts = db.relationship("Account", back_populates="base")
+    accounts: Mapped[list[Account]] = db.relationship(back_populates="base")
     """The descendant accounts under the base account."""
 
     def __str__(self) -> str:
@@ -81,17 +83,16 @@ class BaseAccountL10n(db.Model):
     """A localized base account title."""
     __tablename__ = "accounting_base_accounts_l10n"
     """The table name."""
-    account_code = db.Column(db.String,
-                             db.ForeignKey(BaseAccount.code,
-                                           onupdate="CASCADE",
-                                           ondelete="CASCADE"),
-                             nullable=False, primary_key=True)
+    account_code: Mapped[str] \
+        = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
+                                      ondelete="CASCADE"),
+                        primary_key=True)
     """The code of the account."""
-    account = db.relationship(BaseAccount, back_populates="l10n")
+    account: Mapped[BaseAccount] = db.relationship(back_populates="l10n")
     """The account."""
-    locale = db.Column(db.String, nullable=False, primary_key=True)
+    locale: Mapped[str] = mapped_column(primary_key=True)
     """The locale."""
-    title = db.Column(db.String, nullable=False)
+    title: Mapped[str]
     """The localized title."""
 
 
@@ -99,47 +100,43 @@ class Account(db.Model):
     """An account."""
     __tablename__ = "accounting_accounts"
     """The table name."""
-    id = db.Column(db.Integer, nullable=False, primary_key=True,
-                   autoincrement=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     """The account ID."""
-    base_code = db.Column(db.String,
-                          db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
-                                        ondelete="CASCADE"),
-                          nullable=False)
+    base_code: Mapped[str] \
+        = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
+                                      ondelete="CASCADE"))
     """The code of the base account."""
-    base = db.relationship(BaseAccount, back_populates="accounts")
+    base: Mapped[BaseAccount] = db.relationship(back_populates="accounts")
     """The base account."""
-    no = db.Column(db.Integer, nullable=False, default=text("1"))
+    no: Mapped[int] = mapped_column(default=text("1"))
     """The account number under the base account."""
-    title_l10n = db.Column("title", db.String, nullable=False)
+    title_l10n: Mapped[str] = mapped_column("title")
     """The title."""
-    is_need_offset = db.Column(db.Boolean, nullable=False, default=False)
+    is_need_offset: Mapped[bool] = mapped_column(default=False)
     """Whether the journal entry line items of this account need offset."""
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of creation."""
-    created_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the creator."""
-    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of last update."""
-    updated_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the updator."""
-    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
-    l10n = db.relationship("AccountL10n", back_populates="account",
-                           lazy=False)
+    l10n: Mapped[list[AccountL10n]] \
+        = db.relationship(back_populates="account", lazy=False)
     """The localized titles."""
-    line_items = db.relationship("JournalEntryLineItem",
-                                 back_populates="account")
+    line_items: Mapped[list[JournalEntryLineItem]] \
+        = db.relationship(back_populates="account")
     """The journal entry line items."""
 
     CASH_CODE: str = "1111-001"
@@ -352,16 +349,16 @@ class AccountL10n(db.Model):
     """A localized account title."""
     __tablename__ = "accounting_accounts_l10n"
     """The table name."""
-    account_id = db.Column(db.Integer,
-                           db.ForeignKey(Account.id, onupdate="CASCADE",
-                                         ondelete="CASCADE"),
-                           nullable=False, primary_key=True)
+    account_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(Account.id, onupdate="CASCADE",
+                                      ondelete="CASCADE"),
+                        primary_key=True)
     """The account ID."""
-    account = db.relationship(Account, back_populates="l10n")
+    account: Mapped[Account] = db.relationship(back_populates="l10n")
     """The account."""
-    locale = db.Column(db.String, nullable=False, primary_key=True)
+    locale: Mapped[str] = mapped_column(primary_key=True)
     """The locale."""
-    title = db.Column(db.String, nullable=False)
+    title: Mapped[str]
     """The localized title."""
 
 
@@ -369,35 +366,34 @@ class Currency(db.Model):
     """A currency."""
     __tablename__ = "accounting_currencies"
     """The table name."""
-    code = db.Column(db.String, nullable=False, primary_key=True)
+    code: Mapped[str] = mapped_column(primary_key=True)
     """The code."""
-    name_l10n = db.Column("name", db.String, nullable=False)
+    name_l10n: Mapped[str] = mapped_column("name")
     """The name."""
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of creation."""
-    created_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the creator."""
-    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of last update."""
-    updated_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the updator."""
-    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] \
+        = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
-    l10n = db.relationship("CurrencyL10n", back_populates="currency",
-                           lazy=False)
+    l10n: Mapped[list[CurrencyL10n]] \
+        = db.relationship(back_populates="currency", lazy=False)
     """The localized names."""
-    line_items = db.relationship("JournalEntryLineItem",
-                                 back_populates="currency")
+    line_items: Mapped[list[JournalEntryLineItem]] \
+        = db.relationship(back_populates="currency")
     """The journal entry line items."""
 
     def __str__(self) -> str:
@@ -479,16 +475,16 @@ class CurrencyL10n(db.Model):
     """A localized currency name."""
     __tablename__ = "accounting_currencies_l10n"
     """The table name."""
-    currency_code = db.Column(db.String,
-                              db.ForeignKey(Currency.code, onupdate="CASCADE",
-                                            ondelete="CASCADE"),
-                              nullable=False, primary_key=True)
+    currency_code: Mapped[str] \
+        = mapped_column(db.ForeignKey(Currency.code, onupdate="CASCADE",
+                                      ondelete="CASCADE"),
+                        primary_key=True)
     """The currency code."""
-    currency = db.relationship(Currency, back_populates="l10n")
+    currency: Mapped[Currency] = db.relationship(back_populates="l10n")
     """The currency."""
-    locale = db.Column(db.String, nullable=False, primary_key=True)
+    locale: Mapped[str] = mapped_column(primary_key=True)
     """The locale."""
-    name = db.Column(db.String, nullable=False)
+    name: Mapped[str]
     """The localized name."""
 
 
@@ -539,37 +535,34 @@ class JournalEntry(db.Model):
     """A journal entry."""
     __tablename__ = "accounting_journal_entries"
     """The table name."""
-    id = db.Column(db.Integer, nullable=False, primary_key=True,
-                   autoincrement=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     """The journal entry ID."""
-    date = db.Column(db.Date, nullable=False)
+    date: Mapped[dt.date]
     """The date."""
-    no = db.Column(db.Integer, nullable=False, default=text("1"))
+    no: Mapped[int] = mapped_column(default=text("1"))
     """The account number under the date."""
-    note = db.Column(db.String)
+    note: Mapped[str | None]
     """The note."""
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of creation."""
-    created_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the creator."""
-    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of last update."""
-    updated_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the updator."""
-    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
-    line_items = db.relationship("JournalEntryLineItem",
-                                 back_populates="journal_entry")
+    line_items: Mapped[list[JournalEntryLineItem]] \
+        = db.relationship(back_populates="journal_entry")
     """The line items."""
 
     def __str__(self) -> str:
@@ -659,44 +652,39 @@ class JournalEntryLineItem(db.Model):
     """A line item in the journal entry."""
     __tablename__ = "accounting_journal_entry_line_items"
     """The table name."""
-    id = db.Column(db.Integer, nullable=False, primary_key=True,
-                   autoincrement=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     """The line item ID."""
-    journal_entry_id = db.Column(db.Integer,
-                                 db.ForeignKey(JournalEntry.id,
-                                               onupdate="CASCADE",
-                                               ondelete="CASCADE"),
-                                 nullable=False)
+    journal_entry_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(JournalEntry.id, onupdate="CASCADE",
+                                      ondelete="CASCADE"))
     """The journal entry ID."""
-    journal_entry = db.relationship(JournalEntry, back_populates="line_items")
+    journal_entry: Mapped[JournalEntry] \
+        = db.relationship(back_populates="line_items")
     """The journal entry."""
-    is_debit = db.Column(db.Boolean, nullable=False)
+    is_debit: Mapped[bool]
     """True for a debit line item, or False for a credit line item."""
-    no = db.Column(db.Integer, nullable=False)
+    no: Mapped[int]
     """The line item number under the journal entry and debit or credit."""
-    original_line_item_id = db.Column(db.Integer,
-                                      db.ForeignKey(id, onupdate="CASCADE"),
-                                      nullable=True)
+    original_line_item_id: Mapped[int | None] \
+        = mapped_column(db.ForeignKey(id, onupdate="CASCADE"))
     """The ID of the original line item."""
-    original_line_item = db.relationship("JournalEntryLineItem",
-                                         remote_side=id, passive_deletes=True)
+    original_line_item: Mapped[JournalEntryLineItem | None] \
+        = db.relationship(remote_side=id, passive_deletes=True)
     """The original line item."""
-    currency_code = db.Column(db.String,
-                              db.ForeignKey(Currency.code, onupdate="CASCADE"),
-                              nullable=False)
+    currency_code: Mapped[str] \
+        = mapped_column(db.ForeignKey(Currency.code, onupdate="CASCADE"))
     """The currency code."""
-    currency = db.relationship(Currency, back_populates="line_items")
+    currency: Mapped[Currency] = db.relationship(back_populates="line_items")
     """The currency."""
-    account_id = db.Column(db.Integer,
-                           db.ForeignKey(Account.id,
-                                         onupdate="CASCADE"),
-                           nullable=False)
+    account_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(Account.id, onupdate="CASCADE"))
     """The account ID."""
-    account = db.relationship(Account, back_populates="line_items", lazy=False)
+    account: Mapped[Account] \
+        = db.relationship(back_populates="line_items", lazy=False)
     """The account."""
-    description = db.Column(db.String, nullable=True)
+    description: Mapped[str | None]
     """The description."""
-    amount = db.Column(db.Numeric(14, 2), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(db.Numeric(14, 2))
     """The amount."""
 
     def __str__(self) -> str:
@@ -891,27 +879,25 @@ class Option(db.Model):
     """An option."""
     __tablename__ = "accounting_options"
     """The table name."""
-    name = db.Column(db.String, nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
     """The name."""
-    value = db.Column(db.Text, nullable=False)
+    value: Mapped[str] = mapped_column(db.Text)
     """The option value."""
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of creation."""
-    created_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the creator."""
-    created_by = db.relationship(user_cls, foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The creator."""
-    updated_at = db.Column(db.DateTime(timezone=True), nullable=False,
-                           server_default=db.func.now())
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The time of last update."""
-    updated_by_id = db.Column(db.Integer,
-                              db.ForeignKey(user_pk_column,
-                                            onupdate="CASCADE"),
-                              nullable=False)
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the updator."""
-    updated_by = db.relationship(user_cls, foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The updator."""
