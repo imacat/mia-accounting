@@ -33,7 +33,6 @@ from accounting.forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
 from accounting.locale import lazy_gettext
 from accounting.models import Account, JournalEntry, JournalEntryLineItem
 from accounting.template_filters import format_amount
-from accounting.utils.cast import be
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_text
 from accounting.utils.user import get_current_user_pk
@@ -198,13 +197,13 @@ class NotExceedingOriginalLineItemNetBalance:
             existing_line_item_id \
                 = {x.id for x in form.journal_entry_form.obj.line_items}
         offset_total_func: sa.Function = sa.func.sum(sa.case(
-            (be(JournalEntryLineItem.is_debit == is_debit),
+            (JournalEntryLineItem.is_debit == is_debit,
              JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
         offset_total_but_form: Decimal | None = db.session.scalar(
             sa.select(offset_total_func)
-            .filter(be(JournalEntryLineItem.original_line_item_id
-                       == original_line_item.id),
+            .filter(JournalEntryLineItem.original_line_item_id
+                    == original_line_item.id,
                     JournalEntryLineItem.id.not_in(existing_line_item_id)))
         if offset_total_but_form is None:
             offset_total_but_form = Decimal("0")
@@ -232,8 +231,7 @@ class NotLessThanOffsetTotal:
             (JournalEntryLineItem.is_debit != is_debit,
              JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount)))\
-            .filter(be(JournalEntryLineItem.original_line_item_id
-                       == form.id.data))
+            .filter(JournalEntryLineItem.original_line_item_id == form.id.data)
         offset_total: Decimal | None = db.session.scalar(select_offset_total)
         if offset_total is not None and field.data < offset_total:
             raise ValidationError(lazy_gettext(

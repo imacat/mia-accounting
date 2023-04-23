@@ -24,7 +24,6 @@ import sqlalchemy as sa
 from accounting import db
 from accounting.models import Currency, Account, JournalEntry, \
     JournalEntryLineItem
-from accounting.utils.cast import be
 from accounting.utils.offset_alias import offset_alias
 
 
@@ -38,17 +37,17 @@ def get_accounts_with_unapplied(currency: Currency) -> list[Account]:
     net_balance: sa.Label \
         = (JournalEntryLineItem.amount
            + sa.func.sum(sa.case(
-                (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
+                (offset.c.is_debit == JournalEntryLineItem.is_debit,
                  offset.c.amount),
                 else_=-offset.c.amount))).label("net_balance")
     select_unapplied: sa.Select \
         = sa.select(JournalEntryLineItem.id)\
         .join(JournalEntry).join(Account)\
-        .join(offset, be(JournalEntryLineItem.id
-                         == offset.c.original_line_item_id),
+        .join(offset,
+              JournalEntryLineItem.id == offset.c.original_line_item_id,
               isouter=True)\
         .filter(Account.is_need_offset,
-                be(JournalEntryLineItem.currency_code == currency.code),
+                JournalEntryLineItem.currency_code == currency.code,
                 sa.or_(sa.and_(Account.base_code.startswith("2"),
                                sa.not_(JournalEntryLineItem.is_debit)),
                        sa.and_(Account.base_code.startswith("1"),
@@ -84,17 +83,17 @@ def get_net_balances(currency: Currency, account: Account) \
     net_balance: sa.Label \
         = (JournalEntryLineItem.amount
            + sa.func.sum(sa.case(
-                (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
+                (offset.c.is_debit == JournalEntryLineItem.is_debit,
                  offset.c.amount),
                 else_=-offset.c.amount))).label("net_balance")
     select_net_balances: sa.Select \
         = sa.select(JournalEntryLineItem.id, net_balance) \
         .join(JournalEntry).join(Account) \
-        .join(offset, be(JournalEntryLineItem.id
-                         == offset.c.original_line_item_id),
+        .join(offset,
+              JournalEntryLineItem.id == offset.c.original_line_item_id,
               isouter=True) \
-        .filter(be(Account.id == account.id),
-                be(JournalEntryLineItem.currency_code == currency.code),
+        .filter(Account.id == account.id,
+                JournalEntryLineItem.currency_code == currency.code,
                 sa.or_(sa.and_(Account.base_code.startswith("2"),
                                sa.not_(JournalEntryLineItem.is_debit)),
                        sa.and_(Account.base_code.startswith("1"),

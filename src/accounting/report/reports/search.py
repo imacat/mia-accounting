@@ -32,7 +32,6 @@ from accounting.report.utils.base_report import BaseReport
 from accounting.report.utils.csv_export import csv_download
 from accounting.report.utils.report_chooser import ReportChooser
 from accounting.report.utils.report_type import ReportType
-from accounting.utils.cast import be
 from accounting.utils.pagination import Pagination
 from accounting.utils.query import parse_query_keywords
 from .journal import get_csv_rows
@@ -128,9 +127,8 @@ class LineItemCollector:
         journal_entry_date: datetime
         try:
             journal_entry_date = datetime.strptime(k, "%Y")
-            conditions.append(
-                be(sa.extract("year", JournalEntry.date)
-                   == journal_entry_date.year))
+            conditions.append(sa.extract("year", JournalEntry.date)
+                              == journal_entry_date.year)
         except ValueError:
             pass
         try:

@@ -30,7 +30,6 @@ from accounting import db
 from accounting.forms import CurrencyExists
 from accounting.locale import lazy_gettext
 from accounting.models import JournalEntryLineItem
-from accounting.utils.cast import be
 from accounting.utils.offset_alias import offset_alias
 from accounting.utils.strip_text import strip_text
 from .line_item import LineItemForm, CreditLineItemForm, DebitLineItemForm
@@ -75,8 +74,8 @@ class KeepCurrencyWhenHavingOffset:
         offset: sa.Alias = offset_alias()
         original_line_items: list[JournalEntryLineItem]\
             = JournalEntryLineItem.query\
-            .join(offset, be(JournalEntryLineItem.id
-                             == offset.c.original_line_item_id),
+            .join(offset,
+                  JournalEntryLineItem.id == offset.c.original_line_item_id,
                   isouter=True)\
             .filter(JournalEntryLineItem.id
                     .in_({x.id.data for x in form.line_items

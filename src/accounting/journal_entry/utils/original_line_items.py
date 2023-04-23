@@ -24,7 +24,6 @@ from sqlalchemy.orm import selectinload
 
 from accounting import db
 from accounting.models import Account, JournalEntry, JournalEntryLineItem
-from accounting.utils.cast import be
 from accounting.utils.offset_alias import offset_alias
 
 
@@ -45,8 +44,7 @@ def get_selectable_original_line_items(
     offset: sa.Alias = offset_alias()
     net_balance: sa.Label = (JournalEntryLineItem.amount + sa.func.sum(sa.case(
         (offset.c.id.in_(line_item_id_on_form), 0),
-        (be(offset.c.is_debit == JournalEntryLineItem.is_debit),
-         offset.c.amount),
+        (offset.c.is_debit == JournalEntryLineItem.is_debit, offset.c.amount),
         else_=-offset.c.amount))).label("net_balance")
     conditions: list[sa.BinaryExpression] = [Account.is_need_offset]
     sub_conditions: list[sa.BinaryExpression] = []
@@ -60,8 +58,8 @@ def get_selectable_original_line_items(
     select_net_balances: sa.Select \
         = sa.select(JournalEntryLineItem.id, net_balance)\
         .join(Account)\
-        .join(offset, be(JournalEntryLineItem.id
-                         == offset.c.original_line_item_id),
+        .join(offset,
+              JournalEntryLineItem.id == offset.c.original_line_item_id,
               isouter=True)\
         .filter(*conditions)\
         .group_by(JournalEntryLineItem.id)\

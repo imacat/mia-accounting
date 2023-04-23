@@ -22,7 +22,6 @@ import sqlalchemy as sa
 from accounting import db
 from accounting.models import Currency, Account, JournalEntry, \
     JournalEntryLineItem
-from accounting.utils.cast import be
 
 
 def get_accounts_with_unmatched(currency: Currency) -> list[Account]:
@@ -38,7 +37,7 @@ def get_accounts_with_unmatched(currency: Currency) -> list[Account]:
         .select_from(Account)\
         .join(JournalEntryLineItem, isouter=True).join(JournalEntry)\
         .filter(Account.is_need_offset,
-                be(JournalEntryLineItem.currency_code == currency.code),
+                JournalEntryLineItem.currency_code == currency.code,
                 JournalEntryLineItem.original_line_item_id.is_(None),
                 sa.or_(sa.and_(Account.base_code.startswith("2"),
                                JournalEntryLineItem.is_debit),

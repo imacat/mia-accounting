@@ -25,16 +25,6 @@ import typing as t
 import sqlalchemy as sa
 
 
-def be(expression: t.Any) -> sa.BinaryExpression:
-    """Casts the SQLAlchemy binary expression to the binary expression type.
-
-    :param expression: The binary expression.
-    :return: The binary expression itself.
-    """
-    assert isinstance(expression, sa.BinaryExpression)
-    return expression
-
-
 def s(message: t.Any) -> str:
     """Casts the LazyString message to the string type.
 
