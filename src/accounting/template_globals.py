@@ -21,7 +21,7 @@ from accounting.models import Currency
 from accounting.utils.options import options
 
 
-def currency_options() -> str:
+def currency_options() -> list[Currency]:
     """Returns the currency options.
 
     :return: The currency options.
