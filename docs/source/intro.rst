@@ -103,12 +103,6 @@ base template:
 Check your Flask application and see how it works.
 
 
-Documentation
--------------
-
-Refer to the `documentation on Read the Docs`_.
-
-
 .. _Flask: https://flask.palletsprojects.com
 .. _double-entry bookkeeping: https://en.wikipedia.org/wiki/Double-entry_bookkeeping
 .. _live demonstration: https://accounting.imacat.idv.tw
@@ -123,4 +117,3 @@ Refer to the `documentation on Read the Docs`_.
 .. _Decimal.js: https://mikemcl.github.io/decimal.js
 .. _Tempus-Dominus: https://getdatepicker.com
 .. _Bootstrap navigation bar: https://getbootstrap.com/docs/5.3/components/navbar/
-.. _documentation on Read the Docs: https://mia-accounting.readthedocs.io
