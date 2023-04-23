@@ -17,7 +17,7 @@
 
 [project]
 name = "mia-accounting"
-version = "1.4.1"
+dynamic = ["version"]
 description = "A Flask accounting module."
 readme = "README.rst"
 requires-python = ">=3.11"
@@ -58,6 +58,9 @@ test = [
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "accounting.VERSION"}
 
 [tool.setuptools.exclude-package-data]
 "*" = [

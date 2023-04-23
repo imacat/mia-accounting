@@ -6,6 +6,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('../../src/'))
+import accounting
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -13,7 +14,7 @@ sys.path.insert(0, os.path.abspath('../../src/'))
 project = 'Mia! Accounting'
 copyright = '2023, imacat'
 author = 'imacat'
-release = '1.4.1'
+release = accounting.VERSION
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
