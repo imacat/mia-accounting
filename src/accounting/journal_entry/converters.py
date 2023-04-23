@@ -37,7 +37,8 @@ class JournalEntryConverter(BaseConverter):
         :param value: The journal entry ID.
         :return: The corresponding journal entry.
         """
-        journal_entry: JournalEntry | None = db.session.get(JournalEntry, value)
+        journal_entry: JournalEntry | None \
+            = db.session.get(JournalEntry, value)
         if journal_entry is None:
             abort(404)
         return journal_entry
