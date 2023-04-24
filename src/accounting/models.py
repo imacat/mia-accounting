@@ -42,9 +42,9 @@ user_pk: t.Type[int] \
     = t.Annotated[int, mapped_column(db.ForeignKey(user_pk_column,
                                                    onupdate="CASCADE"))]
 """The user primary key."""
-random_id: t.Type[int] \
+random_pk: t.Type[int] \
     = t.Annotated[int, mapped_column(primary_key=True, autoincrement=False)]
-"""The random ID."""
+"""The random primary key."""
 
 
 class BaseAccount(db.Model):
@@ -112,7 +112,7 @@ class Account(db.Model):
     """An account."""
     __tablename__ = "accounting_accounts"
     """The table name."""
-    id: Mapped[random_id]
+    id: Mapped[random_pk]
     """The account ID."""
     base_code: Mapped[str] \
         = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
@@ -535,7 +535,7 @@ class JournalEntry(db.Model):
     """A journal entry."""
     __tablename__ = "accounting_journal_entries"
     """The table name."""
-    id: Mapped[random_id]
+    id: Mapped[random_pk]
     """The journal entry ID."""
     date: Mapped[dt.date]
     """The date."""
@@ -646,7 +646,7 @@ class JournalEntryLineItem(db.Model):
     """A line item in the journal entry."""
     __tablename__ = "accounting_journal_entry_line_items"
     """The table name."""
-    id: Mapped[random_id] = mapped_column()
+    id: Mapped[random_pk] = mapped_column()
     """The line item ID."""
     journal_entry_id: Mapped[int] \
         = mapped_column(db.ForeignKey(JournalEntry.id, onupdate="CASCADE",
