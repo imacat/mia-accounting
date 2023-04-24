@@ -21,6 +21,7 @@ import typing as t
 
 from flask import Blueprint, render_template, Flask, redirect, url_for, \
     session, request, g, Response, abort
+from sqlalchemy.orm import Mapped, mapped_column
 
 from . import db
 
@@ -32,10 +33,9 @@ class User(db.Model):
     """A user."""
     __tablename__ = "users"
     """The table name."""
-    id = db.Column(db.Integer, nullable=False, primary_key=True,
-                   autoincrement=True)
-    """The ID"""
-    username = db.Column(db.String, nullable=False, unique=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    """The ID."""
+    username: Mapped[str] = mapped_column(unique=True)
     """The username."""
 
     def __str__(self) -> str:
