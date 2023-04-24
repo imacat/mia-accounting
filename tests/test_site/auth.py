@@ -25,6 +25,7 @@ from flask import Blueprint, render_template, Flask, redirect, url_for, \
 from . import db
 
 bp: Blueprint = Blueprint("auth", __name__, url_prefix="/")
+"""The authentication blueprint."""
 
 
 class User(db.Model):
