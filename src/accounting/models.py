@@ -841,13 +841,13 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__match")
 
     @match.setter
-    def match(self, match: t.Self) -> None:
+    def match(self, value: t.Self) -> None:
         """Sets the match of the line item.
 
-        :param match: The matcho of the line item.
+        :param value: The matcho of the line item.
         :return: None.
         """
-        setattr(self, "__match", match)
+        setattr(self, "__match", value)
 
     @property
     def query_values(self) -> list[str]:
