@@ -2176,11 +2176,10 @@ class JournalEntryReorderTestCase(unittest.TestCase):
                                       self.__get_add_disbursement_form())
 
         with self.app.app_context():
-            journal_entry_date: dt.date \
-                = db.session.get(JournalEntry, id_1).date
+            date: dt.date = db.session.get(JournalEntry, id_1).date
 
         response = self.client.post(
-            f"{PREFIX}/dates/{journal_entry_date.isoformat()}",
+            f"{PREFIX}/dates/{date.isoformat()}",
             data={"csrf_token": self.csrf_token,
                   "next": "/next",
                   f"{id_1}-no": "4",
@@ -2208,7 +2207,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             db.session.commit()
 
         response = self.client.post(
-            f"{PREFIX}/dates/{journal_entry_date.isoformat()}",
+            f"{PREFIX}/dates/{date.isoformat()}",
             data={"csrf_token": self.csrf_token,
                   "next": "/next",
                   f"{id_2}-no": "3a",
