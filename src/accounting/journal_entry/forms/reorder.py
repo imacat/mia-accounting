@@ -26,17 +26,15 @@ from accounting import db
 from accounting.models import JournalEntry
 
 
-def sort_journal_entries_in(journal_entry_date: dt.date,
-                            exclude: int | None = None) -> None:
+def sort_journal_entries_in(date: dt.date, exclude: int | None = None) -> None:
     """Sorts the journal entries under a date after changing the date or
     deleting a journal entry.
 
-    :param journal_entry_date: The date of the journal entry.
+    :param date: The date of the journal entry.
     :param exclude: The journal entry ID to exclude.
     :return: None.
     """
-    conditions: list[sa.BinaryExpression] \
-        = [JournalEntry.date == journal_entry_date]
+    conditions: list[sa.BinaryExpression] = [JournalEntry.date == date]
     if exclude is not None:
         conditions.append(JournalEntry.id != exclude)
     journal_entries: list[JournalEntry] = JournalEntry.query\
