@@ -124,40 +124,33 @@ class LineItemCollector:
         """
         conditions: list[sa.BinaryExpression] \
             = [JournalEntry.note.icontains(k)]
-        journal_entry_date: dt.datetime
+        date: dt.datetime
         try:
-            journal_entry_date = dt.datetime.strptime(k, "%Y")
-            conditions.append(sa.extract("year", JournalEntry.date)
-                              == journal_entry_date.year)
+            date = dt.datetime.strptime(k, "%Y")
+            conditions.append(
+                sa.extract("year", JournalEntry.date) == date.year)
         except ValueError:
             pass
         try:
-            journal_entry_date = dt.datetime.strptime(k, "%Y/%m")
+            date = dt.datetime.strptime(k, "%Y/%m")
             conditions.append(sa.and_(
-                sa.extract("year", JournalEntry.date)
-                == journal_entry_date.year,
-                sa.extract("month", JournalEntry.date)
-                == journal_entry_date.month))
+                sa.extract("year", JournalEntry.date) == date.year,
+                sa.extract("month", JournalEntry.date) == date.month))
         except ValueError:
             pass
         try:
-            journal_entry_date = dt.datetime.strptime(f"2000/{k}", "%Y/%m/%d")
+            date = dt.datetime.strptime(f"2000/{k}", "%Y/%m/%d")
             conditions.append(sa.and_(
-                sa.extract("month", JournalEntry.date)
-                == journal_entry_date.month,
-                sa.extract("day", JournalEntry.date)
-                == journal_entry_date.day))
+                sa.extract("month", JournalEntry.date) == date.month,
+                sa.extract("day", JournalEntry.date) == date.day))
         except ValueError:
             pass
         try:
-            journal_entry_date = dt.datetime.strptime(k, "%Y/%m/%d")
+            date = dt.datetime.strptime(k, "%Y/%m/%d")
             conditions.append(sa.and_(
-                sa.extract("year", JournalEntry.date)
-                == journal_entry_date.year,
-                sa.extract("month", JournalEntry.date)
-                == journal_entry_date.month,
-                sa.extract("day", JournalEntry.date)
-                == journal_entry_date.day))
+                sa.extract("year", JournalEntry.date) == date.year,
+                sa.extract("month", JournalEntry.date) == date.month,
+                sa.extract("day", JournalEntry.date) == date.day))
         except ValueError:
             pass
         return sa.select(JournalEntry.id).filter(sa.or_(*conditions))
