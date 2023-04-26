@@ -17,7 +17,7 @@
 """The income and expenses log.
 
 """
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -53,7 +53,7 @@ class ReportLineItem:
         """Whether this is the brought-forward line item."""
         self.is_total: bool = False
         """Whether this is the total line item."""
-        self.date: date | None = None
+        self.date: dt.date | None = None
         """The date."""
         self.account: Account | None = None
         """The account."""
@@ -213,7 +213,7 @@ class LineItemCollector:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, journal_entry_date: date | str | None,
+    def __init__(self, journal_entry_date: dt.date | str | None,
                  account: str | None,
                  description: str | None,
                  income: str | Decimal | None,
@@ -230,7 +230,7 @@ class CSVRow(BaseCSVRow):
         :param balance: The balance.
         :param note: The note.
         """
-        self.date: date | str | None = journal_entry_date
+        self.date: dt.date | str | None = journal_entry_date
         """The date."""
         self.account: str | None = account
         """The account."""

@@ -17,8 +17,8 @@
 """The test for the journal entry management.
 
 """
+import datetime as dt
 import unittest
-from datetime import date, timedelta
 from decimal import Decimal
 
 import httpx
@@ -500,7 +500,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             journal_entry.created_at \
-                = journal_entry.created_at - timedelta(seconds=5)
+                = journal_entry.created_at - dt.timedelta(seconds=5)
             journal_entry.updated_at = journal_entry.created_at
             db.session.commit()
 
@@ -576,7 +576,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             self.client,
             form={"csrf_token": self.csrf_token,
                   "next": NEXT_URI,
-                  "date": date.today().isoformat(),
+                  "date": dt.date.today().isoformat(),
                   "currency-1-code": line_item.currency_code,
                   "currency-1-debit-1-original_line_item_id": line_item.id,
                   "currency-1-debit-1-account_code": line_item.account_code,
@@ -1112,7 +1112,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             journal_entry.created_at \
-                = journal_entry.created_at - timedelta(seconds=5)
+                = journal_entry.created_at - dt.timedelta(seconds=5)
             journal_entry.updated_at = journal_entry.created_at
             db.session.commit()
 
@@ -1773,7 +1773,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             journal_entry.created_at \
-                = journal_entry.created_at - timedelta(seconds=5)
+                = journal_entry.created_at - dt.timedelta(seconds=5)
             journal_entry.updated_at = journal_entry.created_at
             db.session.commit()
 
@@ -2124,9 +2124,9 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         with self.app.app_context():
             journal_entry_1: JournalEntry = db.session.get(JournalEntry, id_1)
-            journal_entry_date_2: date = journal_entry_1.date
-            journal_entry_date_1: date \
-                = journal_entry_date_2 - timedelta(days=1)
+            journal_entry_date_2: dt.date = journal_entry_1.date
+            journal_entry_date_1: dt.date \
+                = journal_entry_date_2 - dt.timedelta(days=1)
             journal_entry_1.date = journal_entry_date_1
             journal_entry_1.no = 3
             journal_entry_2: JournalEntry = db.session.get(JournalEntry, id_2)
@@ -2176,7 +2176,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
                                       self.__get_add_disbursement_form())
 
         with self.app.app_context():
-            journal_entry_date: date = db.session.get(JournalEntry, id_1).date
+            journal_entry_date: dt.date \
+                = db.session.get(JournalEntry, id_1).date
 
         response = self.client.post(
             f"{PREFIX}/dates/{journal_entry_date.isoformat()}",

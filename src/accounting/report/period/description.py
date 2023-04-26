@@ -17,12 +17,12 @@
 """The period description composer.
 
 """
-from datetime import date, timedelta
+import datetime as dt
 
 from accounting.locale import gettext
 
 
-def get_desc(start: date | None, end: date | None) -> str:
+def get_desc(start: dt.date | None, end: dt.date | None) -> str:
     """Returns the period description.
 
     :param start: The start of the period.
@@ -46,7 +46,7 @@ def get_desc(start: date | None, end: date | None) -> str:
     return __get_day_desc(start, end)
 
 
-def __get_since_desc(start: date) -> str:
+def __get_since_desc(start: dt.date) -> str:
     """Returns the description without the end day.
 
     :param start: The start of the period.
@@ -67,7 +67,7 @@ def __get_since_desc(start: date) -> str:
     return gettext("since %(start)s", start=get_start_desc())
 
 
-def __get_until_desc(end: date) -> str:
+def __get_until_desc(end: dt.date) -> str:
     """Returns the description without the start day.
 
     :param end: The end of the period.
@@ -81,14 +81,14 @@ def __get_until_desc(end: date) -> str:
         """
         if end.month == 12 and end.day == 31:
             return str(end.year)
-        if (end + timedelta(days=1)).day == 1:
+        if (end + dt.timedelta(days=1)).day == 1:
             return __format_month(end)
         return __format_day(end)
 
     return gettext("until %(end)s", end=get_end_desc())
 
 
-def __get_year_desc(start: date, end: date) -> str:
+def __get_year_desc(start: dt.date, end: dt.date) -> str:
     """Returns the description as a year range.
 
     :param start: The start of the period.
@@ -105,7 +105,7 @@ def __get_year_desc(start: date, end: date) -> str:
     return __get_from_to_desc(start_text, str(end.year))
 
 
-def __get_month_desc(start: date, end: date) -> str:
+def __get_month_desc(start: dt.date, end: dt.date) -> str:
     """Returns the description as a month range.
 
     :param start: The start of the period.
@@ -113,7 +113,7 @@ def __get_month_desc(start: date, end: date) -> str:
     :return: The description as a month range.
     :raise ValueError: The period is not a month range.
     """
-    if start.day != 1 or (end + timedelta(days=1)).day != 1:
+    if start.day != 1 or (end + dt.timedelta(days=1)).day != 1:
         raise ValueError
     start_text: str = __format_month(start)
     if start.year == end.year and start.month == end.month:
@@ -123,7 +123,7 @@ def __get_month_desc(start: date, end: date) -> str:
     return __get_from_to_desc(start_text, __format_month(end))
 
 
-def __get_day_desc(start: date, end: date) -> str:
+def __get_day_desc(start: dt.date, end: dt.date) -> str:
     """Returns the description as a day range.
 
     :param start: The start of the period.
@@ -142,7 +142,7 @@ def __get_day_desc(start: date, end: date) -> str:
     return __get_from_to_desc(start_text, __format_day(end))
 
 
-def __format_month(month: date) -> str:
+def __format_month(month: dt.date) -> str:
     """Formats a month.
 
     :param month: The month.
@@ -151,7 +151,7 @@ def __format_month(month: date) -> str:
     return f"{month.year}/{month.month}"
 
 
-def __format_day(day: date) -> str:
+def __format_day(day: dt.date) -> str:
     """Formats a day.
 
     :param day: The day.

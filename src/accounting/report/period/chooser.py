@@ -20,8 +20,8 @@ This file is largely taken from the NanoParma ERP project, first written in
 2021/9/16 by imacat (imacat@nanoparma.com).
 
 """
+import datetime as dt
 import typing as t
-from datetime import date
 
 from accounting.models import JournalEntry
 from .period import Period
@@ -63,10 +63,10 @@ class PeriodChooser:
 
         first: JournalEntry | None \
             = JournalEntry.query.order_by(JournalEntry.date).first()
-        start: date | None = None if first is None else first.date
+        start: dt.date | None = None if first is None else first.date
 
         # Attributes
-        self.data_start: date | None = start
+        self.data_start: dt.date | None = start
         """The start of the data."""
         self.has_data: bool = start is not None
         """Whether there is any data."""
@@ -80,8 +80,8 @@ class PeriodChooser:
         """The available years."""
 
         if self.has_data:
-            today: date = date.today()
-            self.has_last_month = start < date(today.year, today.month, 1)
+            today: dt.date = dt.date.today()
+            self.has_last_month = start < dt.date(today.year, today.month, 1)
             self.has_last_year = start.year < today.year
             self.has_yesterday = start < today
             if start.year < today.year - 1:

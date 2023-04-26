@@ -17,7 +17,7 @@
 """The views for the journal entry management.
 
 """
-from datetime import date
+import datetime as dt
 from urllib.parse import parse_qsl, urlencode
 
 import sqlalchemy as sa
@@ -30,9 +30,9 @@ from accounting.locale import lazy_gettext
 from accounting.models import JournalEntry
 from accounting.utils.cast import s
 from accounting.utils.flash_errors import flash_form_errors
+from accounting.utils.journal_entry_types import JournalEntryType
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.permission import has_permission, can_view, can_edit
-from accounting.utils.journal_entry_types import JournalEntryType
 from accounting.utils.user import get_current_user_pk
 from .forms import sort_journal_entries_in, JournalEntryReorderForm
 from .template_filters import with_type, to_transfer, format_amount_input, \
@@ -67,7 +67,7 @@ def show_add_journal_entry_form(journal_entry_type: JournalEntryType) -> str:
         form.validate()
     else:
         form = journal_entry_op.form()
-        form.date.data = date.today()
+        form.date.data = dt.date.today()
     return journal_entry_op.render_create_template(form)
 
 
@@ -188,7 +188,7 @@ def delete_journal_entry(journal_entry: JournalEntry) -> redirect:
 
 @bp.get("dates/<date:journal_entry_date>", endpoint="order")
 @has_permission(can_view)
-def show_journal_entry_order(journal_entry_date: date) -> str:
+def show_journal_entry_order(journal_entry_date: dt.date) -> str:
     """Shows the order of the journal entries in a same date.
 
     :param journal_entry_date: The date.
@@ -203,7 +203,7 @@ def show_journal_entry_order(journal_entry_date: date) -> str:
 
 @bp.post("dates/<date:journal_entry_date>", endpoint="sort")
 @has_permission(can_edit)
-def sort_journal_entries(journal_entry_date: date) -> redirect:
+def sort_journal_entries(journal_entry_date: dt.date) -> redirect:
     """Reorders the journal entries in a date.
 
     :param journal_entry_date: The date.

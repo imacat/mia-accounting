@@ -17,8 +17,8 @@
 """The test for the reports.
 
 """
+import datetime as dt
 import unittest
-from datetime import date
 
 import httpx
 from flask import Flask
@@ -446,11 +446,11 @@ class ReportTestData(BaseTestData):
     """The report test data."""
 
     def _init_data(self) -> None:
-        today: date = date.today()
+        today: dt.date = dt.date.today()
         year: int = today.year - 5
         month: int = today.month
         while True:
-            j_date: date = date(year, month, 5)
+            j_date: dt.date = dt.date(year, month, 5)
             if j_date > today:
                 break
             self._add_simple_journal_entry(

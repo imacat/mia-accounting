@@ -19,9 +19,9 @@
 """
 from __future__ import annotations
 
+import datetime as dt
 import typing as t
 from abc import ABC, abstractmethod
-from datetime import date, timedelta
 from decimal import Decimal
 from secrets import randbelow
 
@@ -167,7 +167,8 @@ class JournalEntryData:
         :param is_update: True for an update operation, or False otherwise
         :return: The journal entry as a form.
         """
-        journal_entry_date: date = date.today() - timedelta(days=self.days)
+        journal_entry_date: dt.date \
+            = dt.date.today() - dt.timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
                                 "next": next_uri,
                                 "date": journal_entry_date.isoformat()}
@@ -240,7 +241,8 @@ class BaseTestData(ABC):
         existing_j_id: set[int] = {x["id"] for x in self.__journal_entries}
         existing_l_id: set[int] = {x["id"] for x in self.__line_items}
         journal_entry_data.id = self.__new_id(existing_j_id)
-        j_date: date = date.today() - timedelta(days=journal_entry_data.days)
+        j_date: dt.date \
+            = dt.date.today() - dt.timedelta(days=journal_entry_data.days)
         self.__journal_entries.append(
             {"id": journal_entry_data.id,
              "date": j_date,
@@ -303,7 +305,7 @@ class BaseTestData(ABC):
                 existing_id.add(obj_id)
                 return obj_id
 
-    def __next_j_no(self, j_date: date) -> int:
+    def __next_j_no(self, j_date: dt.date) -> int:
         """Returns the next journal entry number in a day.
 
         :param j_date: The journal entry date.

@@ -17,7 +17,7 @@
 """The line item sub-forms for the journal entry management.
 
 """
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -307,7 +307,7 @@ class LineItemForm(FlaskForm):
         return getattr(self, "____original_line_item")
 
     @property
-    def original_line_item_date(self) -> date | None:
+    def original_line_item_date(self) -> dt.date | None:
         """Returns the text representation of the original line item.
 
         :return: The text representation of the original line item.

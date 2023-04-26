@@ -17,7 +17,7 @@
 """The journal.
 
 """
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -67,7 +67,7 @@ class ReportLineItem:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, journal_entry_date: str | date,
+    def __init__(self, journal_entry_date: str | dt.date,
                  currency: str,
                  account: str,
                  description: str | None,
@@ -84,7 +84,7 @@ class CSVRow(BaseCSVRow):
         :param credit: The credit amount.
         :param note: The note.
         """
-        self.date: str | date = journal_entry_date
+        self.date: str | dt.date = journal_entry_date
         """The date."""
         self.currency: str = currency
         """The currency."""

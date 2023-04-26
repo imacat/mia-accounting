@@ -17,8 +17,8 @@
 """The common test libraries for the journal entry test cases.
 
 """
+import datetime as dt
 import re
-from datetime import date
 from decimal import Decimal
 from secrets import randbelow
 
@@ -41,7 +41,7 @@ def get_add_form(csrf_token: str) -> dict[str, str]:
     """
     return {"csrf_token": csrf_token,
             "next": NEXT_URI,
-            "date": date.today().isoformat(),
+            "date": dt.date.today().isoformat(),
             "currency-0-code": "USD",
             "currency-0-debit-0-no": "16",
             "currency-0-debit-0-account_code": Accounts.CASH,

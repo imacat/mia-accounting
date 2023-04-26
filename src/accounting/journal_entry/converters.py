@@ -17,7 +17,7 @@
 """The path converters for the journal entry management.
 
 """
-from datetime import date
+import datetime as dt
 
 from flask import abort
 from werkzeug.routing import BaseConverter
@@ -82,18 +82,18 @@ class DateConverter(BaseConverter):
     """The date converter to convert the ISO date from and to the
     corresponding date in the routes."""
 
-    def to_python(self, value: str) -> date:
+    def to_python(self, value: str) -> dt.date:
         """Converts an ISO date to a date.
 
         :param value: The ISO date.
         :return: The corresponding date.
         """
         try:
-            return date.fromisoformat(value)
+            return dt.date.fromisoformat(value)
         except ValueError:
             abort(404)
 
-    def to_url(self, value: date) -> str:
+    def to_url(self, value: dt.date) -> str:
         """Converts a date to its ISO date.
 
         :param value: The date.

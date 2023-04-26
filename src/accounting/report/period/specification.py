@@ -17,10 +17,10 @@
 """The period specification composer.
 
 """
-from datetime import date, timedelta
+import datetime as dt
 
 
-def get_spec(start: date | None, end: date | None) -> str:
+def get_spec(start: dt.date | None, end: dt.date | None) -> str:
     """Returns the period specification.
 
     :param start: The start of the period.
@@ -44,7 +44,7 @@ def get_spec(start: date | None, end: date | None) -> str:
     return __get_day_spec(start, end)
 
 
-def __get_since_spec(start: date) -> str:
+def __get_since_spec(start: dt.date) -> str:
     """Returns the period specification without the end day.
 
     :param start: The start of the period.
@@ -57,7 +57,7 @@ def __get_since_spec(start: date) -> str:
     return start.strftime("%Y-%m-%d-")
 
 
-def __get_until_spec(end: date) -> str:
+def __get_until_spec(end: dt.date) -> str:
     """Returns the period specification without the start day.
 
     :param end: The end of the period.
@@ -65,12 +65,12 @@ def __get_until_spec(end: date) -> str:
     """
     if end.month == 12 and end.day == 31:
         return end.strftime("-%Y")
-    if (end + timedelta(days=1)).day == 1:
+    if (end + dt.timedelta(days=1)).day == 1:
         return end.strftime("-%Y-%m")
     return end.strftime("-%Y-%m-%d")
 
 
-def __get_year_spec(start: date, end: date) -> str:
+def __get_year_spec(start: dt.date, end: dt.date) -> str:
     """Returns the period specification as a year range.
 
     :param start: The start of the period.
@@ -88,7 +88,7 @@ def __get_year_spec(start: date, end: date) -> str:
     return f"{start_spec}-{end_spec}"
 
 
-def __get_month_spec(start: date, end: date) -> str:
+def __get_month_spec(start: dt.date, end: dt.date) -> str:
     """Returns the period specification as a month range.
 
     :param start: The start of the period.
@@ -96,7 +96,7 @@ def __get_month_spec(start: date, end: date) -> str:
     :return: The period specification as a month range.
     :raise ValueError: The period is not a month range.
     """
-    if start.day != 1 or (end + timedelta(days=1)).day != 1:
+    if start.day != 1 or (end + dt.timedelta(days=1)).day != 1:
         raise ValueError
     start_spec: str = start.strftime("%Y-%m")
     if start.year == end.year and start.month == end.month:
@@ -105,7 +105,7 @@ def __get_month_spec(start: date, end: date) -> str:
     return f"{start_spec}-{end_spec}"
 
 
-def __get_day_spec(start: date, end: date) -> str:
+def __get_day_spec(start: dt.date, end: dt.date) -> str:
     """Returns the period specification as a day range.
 
     :param start: The start of the period.

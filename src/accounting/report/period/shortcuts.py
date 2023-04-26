@@ -17,7 +17,7 @@
 """The named shortcut periods.
 
 """
-from datetime import date, timedelta
+import datetime as dt
 
 from accounting.locale import gettext
 from .month_end import month_end
@@ -27,8 +27,8 @@ from .period import Period
 class ThisMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: date = date.today()
-        this_month_start: date = date(today.year, today.month, 1)
+        today: dt.date = dt.date.today()
+        this_month_start: dt.date = dt.date(today.year, today.month, 1)
         super().__init__(this_month_start, month_end(today))
         self.is_default = True
         self.is_this_month = True
@@ -43,13 +43,13 @@ class ThisMonth(Period):
 class LastMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: date = date.today()
+        today: dt.date = dt.date.today()
         year: int = today.year
         month: int = today.month - 1
         if month < 1:
             year = year - 1
             month = 12
-        start: date = date(year, month, 1)
+        start: dt.date = dt.date(year, month, 1)
         super().__init__(start, month_end(start))
         self.is_last_month = True
 
@@ -63,13 +63,13 @@ class LastMonth(Period):
 class SinceLastMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: date = date.today()
+        today: dt.date = dt.date.today()
         year: int = today.year
         month: int = today.month - 1
         if month < 1:
             year = year - 1
             month = 12
-        start: date = date(year, month, 1)
+        start: dt.date = dt.date(year, month, 1)
         super().__init__(start, None)
         self.is_since_last_month = True
 
@@ -82,9 +82,9 @@ class SinceLastMonth(Period):
 class ThisYear(Period):
     """The period of this year."""
     def __init__(self):
-        year: int = date.today().year
-        start: date = date(year, 1, 1)
-        end: date = date(year, 12, 31)
+        year: int = dt.date.today().year
+        start: dt.date = dt.date(year, 1, 1)
+        end: dt.date = dt.date(year, 12, 31)
         super().__init__(start, end)
         self.is_this_year = True
 
@@ -97,9 +97,9 @@ class ThisYear(Period):
 class LastYear(Period):
     """The period of last year."""
     def __init__(self):
-        year: int = date.today().year
-        start: date = date(year - 1, 1, 1)
-        end: date = date(year - 1, 12, 31)
+        year: int = dt.date.today().year
+        start: dt.date = dt.date(year - 1, 1, 1)
+        end: dt.date = dt.date(year - 1, 12, 31)
         super().__init__(start, end)
         self.is_last_year = True
 
@@ -112,7 +112,7 @@ class LastYear(Period):
 class Today(Period):
     """The period of today."""
     def __init__(self):
-        today: date = date.today()
+        today: dt.date = dt.date.today()
         super().__init__(today, today)
         self.is_today = True
 
@@ -125,7 +125,7 @@ class Today(Period):
 class Yesterday(Period):
     """The period of yesterday."""
     def __init__(self):
-        yesterday: date = date.today() - timedelta(days=1)
+        yesterday: dt.date = dt.date.today() - dt.timedelta(days=1)
         super().__init__(yesterday, yesterday)
         self.is_yesterday = True
 
@@ -163,6 +163,6 @@ class YearPeriod(Period):
 
         :param year: The year.
         """
-        start: date = date(year, 1, 1)
-        end: date = date(year, 12, 31)
+        start: dt.date = dt.date(year, 1, 1)
+        end: dt.date = dt.date(year, 12, 31)
         super().__init__(start, end)

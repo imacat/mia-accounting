@@ -18,14 +18,14 @@
 
 """
 import calendar
-from datetime import date
+import datetime as dt
 
 
-def month_end(day: date) -> date:
+def month_end(day: dt.date) -> dt.date:
     """Returns the end day of month for a date.
 
     :param day: The date.
     :return: The end day of the month of that day.
     """
     last_day: int = calendar.monthrange(day.year, day.month)[1]
-    return date(day.year, day.month, last_day)
+    return dt.date(day.year, day.month, last_day)

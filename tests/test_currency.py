@@ -17,8 +17,8 @@
 """The test for the currency management.
 
 """
+import datetime as dt
 import unittest
-from datetime import timedelta, date
 
 import httpx
 from flask import Flask
@@ -384,7 +384,7 @@ class CurrencyTestCase(unittest.TestCase):
             currency = db.session.get(Currency, USD.code)
             self.assertIsNotNone(currency)
             currency.created_at \
-                = currency.created_at - timedelta(seconds=5)
+                = currency.created_at - dt.timedelta(seconds=5)
             currency.updated_at = currency.created_at
             db.session.commit()
 
@@ -534,7 +534,7 @@ class CurrencyTestCase(unittest.TestCase):
         add_journal_entry(self.client,
                           form={"csrf_token": self.csrf_token,
                                 "next": NEXT_URI,
-                                "date": date.today().isoformat(),
+                                "date": dt.date.today().isoformat(),
                                 "currency-1-code": EUR.code,
                                 "currency-1-credit-1-account_code": "1111-001",
                                 "currency-1-credit-1-amount": "20"})

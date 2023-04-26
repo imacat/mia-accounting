@@ -17,7 +17,7 @@
 """The accounts with unmatched offsets.
 
 """
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 from flask import render_template, Response
@@ -49,7 +49,7 @@ class CSVRow(BaseCSVRow):
         """The number of unapplied original line items."""
 
     @property
-    def values(self) -> list[str | date | Decimal | None]:
+    def values(self) -> list[str | dt.date | Decimal | None]:
         """Returns the values of the row.
 
         :return: The values of the row.

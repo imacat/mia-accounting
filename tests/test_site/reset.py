@@ -17,7 +17,7 @@
 """The data reset for the Mia! Accounting demonstration website.
 
 """
-from datetime import date, timedelta
+import datetime as dt
 
 from flask import Flask, Blueprint, url_for, flash, redirect, session, \
     render_template, current_app
@@ -116,14 +116,14 @@ class SampleData(BaseTestData):
 
         :return: None.
         """
-        today: date = date.today()
+        today: dt.date = dt.date.today()
         days: int
         year: int
         month: int
 
         # Recurring in USD
-        j_date: date = date(today.year - 5, today.month, today.day)
-        j_date = j_date + timedelta(days=(4 - j_date.weekday()))
+        j_date: dt.date = dt.date(today.year - 5, today.month, today.day)
+        j_date = j_date + dt.timedelta(days=(4 - j_date.weekday()))
         days = (today - j_date).days
         while True:
             if days < 0:
@@ -147,7 +147,7 @@ class SampleData(BaseTestData):
             if month > 12:
                 year = year + 1
                 month = 1
-            days = (today - date(year, month, 1)).days
+            days = (today - dt.date(year, month, 1)).days
             if days < 0:
                 break
             self.__add_journal_entry(
@@ -159,12 +159,12 @@ class SampleData(BaseTestData):
 
         :return: None.
         """
-        today: date = date.today()
+        today: dt.date = dt.date.today()
 
         year: int = today.year - 5
         month: int = today.month
         while True:
-            days: int = (today - date(year, month, 5)).days
+            days: int = (today - dt.date(year, month, 5)).days
             if days < 0:
                 break
             self.__add_journal_entry(

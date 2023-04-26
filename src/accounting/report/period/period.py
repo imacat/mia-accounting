@@ -20,8 +20,8 @@ This file is largely taken from the NanoParma ERP project, first written in
 2021/9/16 by imacat (imacat@nanoparma.com).
 
 """
+import datetime as dt
 import typing as t
-from datetime import date, timedelta
 
 from .description import get_desc
 from .month_end import month_end
@@ -31,15 +31,15 @@ from .specification import get_spec
 class Period:
     """A date period."""
 
-    def __init__(self, start: date | None, end: date | None):
+    def __init__(self, start: dt.date | None, end: dt.date | None):
         """Constructs a new date period.
 
         :param start: The start date, or None from the very beginning.
         :param end: The end date, or None till no end.
         """
-        self.start: date | None = start
+        self.start: dt.date | None = start
         """The start of the period."""
-        self.end: date | None = end
+        self.end: dt.date | None = end
         """The end of the period."""
         self.is_default: bool = False
         """Whether the is the default period."""
@@ -95,8 +95,8 @@ class Period:
         self.is_a_month = self.start.day == 1 \
             and self.end == month_end(self.start)
         self.is_type_month = self.is_a_month
-        self.is_a_year = self.start == date(self.start.year, 1, 1) \
-            and self.end == date(self.start.year, 12, 31)
+        self.is_a_year = self.start == dt.date(self.start.year, 1, 1) \
+            and self.end == dt.date(self.start.year, 12, 31)
         self.is_a_day = self.start == self.end
 
     def is_year(self, year: int) -> bool:
@@ -126,4 +126,4 @@ class Period:
         """
         if self.start is None:
             return None
-        return Period(None, self.start - timedelta(days=1))
+        return Period(None, self.start - dt.timedelta(days=1))

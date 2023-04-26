@@ -17,7 +17,7 @@
 """The unapplied original line items.
 
 """
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 from flask import render_template, Response
@@ -41,7 +41,7 @@ from accounting.utils.pagination import Pagination
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, journal_entry_date: str | date, currency: str,
+    def __init__(self, journal_entry_date: str | dt.date, currency: str,
                  description: str | None, amount: str | Decimal,
                  net_balance: str | Decimal):
         """Constructs a row in the CSV.
@@ -52,7 +52,7 @@ class CSVRow(BaseCSVRow):
         :param amount: The amount.
         :param net_balance: The net balance.
         """
-        self.date: str | date = journal_entry_date
+        self.date: str | dt.date = journal_entry_date
         """The date."""
         self.currency: str = currency
         """The currency."""
@@ -64,7 +64,7 @@ class CSVRow(BaseCSVRow):
         """The net balance."""
 
     @property
-    def values(self) -> list[str | date | Decimal | None]:
+    def values(self) -> list[str | dt.date | Decimal | None]:
         """Returns the values of the row.
 
         :return: The values of the row.

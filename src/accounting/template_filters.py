@@ -17,8 +17,8 @@
 """The template filters.
 
 """
+import datetime as dt
 import typing as t
-from datetime import date, timedelta
 from decimal import Decimal
 
 from flask_babel import get_locale
@@ -41,24 +41,24 @@ def format_amount(value: Decimal | None) -> str | None:
     return "{:,}".format(whole) + str(abs(frac))[1:]
 
 
-def format_date(value: date) -> str:
+def format_date(value: dt.date) -> str:
     """Formats a date to be human-friendly.
 
     :param value: The date.
     :return: The human-friendly date text.
     """
-    today: date = date.today()
+    today: dt.date = dt.date.today()
     if value == today:
         return gettext("Today")
-    if value == today - timedelta(days=1):
+    if value == today - dt.timedelta(days=1):
         return gettext("Yesterday")
-    if value == today + timedelta(days=1):
+    if value == today + dt.timedelta(days=1):
         return gettext("Tomorrow")
     locale = str(get_locale())
     if locale == "zh" or locale.startswith("zh_"):
-        if value == today - timedelta(days=2):
+        if value == today - dt.timedelta(days=2):
             return gettext("The day before yesterday")
-        if value == today + timedelta(days=2):
+        if value == today + dt.timedelta(days=2):
             return gettext("The day after tomorrow")
     if locale == "zh" or locale.startswith("zh_"):
         weekdays = ["一", "二", "三", "四", "五", "六", "日"]

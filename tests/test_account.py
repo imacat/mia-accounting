@@ -17,8 +17,8 @@
 """The test for the account management.
 
 """
+import datetime as dt
 import unittest
-from datetime import timedelta, date
 
 import httpx
 from flask import Flask
@@ -461,7 +461,7 @@ class AccountTestCase(unittest.TestCase):
             account = Account.find_by_code(CASH.code)
             self.assertIsNotNone(account)
             account.created_at \
-                = account.created_at - timedelta(seconds=5)
+                = account.created_at - dt.timedelta(seconds=5)
             account.updated_at = account.created_at
             db.session.commit()
 
@@ -592,7 +592,7 @@ class AccountTestCase(unittest.TestCase):
         add_journal_entry(self.client,
                           form={"csrf_token": self.csrf_token,
                                 "next": NEXT_URI,
-                                "date": date.today().isoformat(),
+                                "date": dt.date.today().isoformat(),
                                 "currency-1-code": "USD",
                                 "currency-1-credit-1-account_code": BANK.code,
                                 "currency-1-credit-1-amount": "20"})

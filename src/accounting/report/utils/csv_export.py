@@ -18,8 +18,8 @@
 
 """
 import csv
+import datetime as dt
 from abc import ABC, abstractmethod
-from datetime import timedelta, date
 from decimal import Decimal
 from io import StringIO
 from urllib.parse import quote
@@ -77,7 +77,7 @@ def period_spec(period: Period) -> str:
     return f"{start}-{end}"
 
 
-def __get_start_str(start: date | None) -> str | None:
+def __get_start_str(start: dt.date | None) -> str | None:
     """Returns the string representation of the start date.
 
     :param start: The start date.
@@ -93,7 +93,7 @@ def __get_start_str(start: date | None) -> str | None:
     return start.strftime("%Y%m%d")
 
 
-def __get_end_str(end: date | None) -> str | None:
+def __get_end_str(end: dt.date | None) -> str | None:
     """Returns the string representation of the end date.
 
     :param end: The end date.
@@ -104,6 +104,6 @@ def __get_end_str(end: date | None) -> str | None:
         return None
     if end.month == 12 and end.day == 31:
         return str(end.year)
-    if (end + timedelta(days=1)).day == 1:
+    if (end + dt.timedelta(days=1)).day == 1:
         return end.strftime("%Y%m")
     return end.strftime("%Y%m%d")

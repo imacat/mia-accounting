@@ -18,9 +18,9 @@
 
 """
 import calendar
+import datetime as dt
 import re
 import typing as t
-from datetime import date
 
 from .period import Period
 from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
@@ -57,7 +57,7 @@ def get_period(spec: str | None = None) -> Period:
     return Period(start, end)
 
 
-def __parse_spec(text: str) -> tuple[date | None, date | None]:
+def __parse_spec(text: str) -> tuple[dt.date | None, dt.date | None]:
     """Parses the period specification.
 
     :param text: The period specification.
@@ -84,7 +84,7 @@ def __parse_spec(text: str) -> tuple[date | None, date | None]:
     raise ValueError
 
 
-def __get_start(year: str, month: str | None, day: str | None) -> date:
+def __get_start(year: str, month: str | None, day: str | None) -> dt.date:
     """Returns the start of the period from the date representation.
 
     :param year: The year.
@@ -94,13 +94,13 @@ def __get_start(year: str, month: str | None, day: str | None) -> date:
     :raise ValueError: When the date is invalid.
     """
     if day is not None:
-        return date(int(year), int(month), int(day))
+        return dt.date(int(year), int(month), int(day))
     if month is not None:
-        return date(int(year), int(month), 1)
-    return date(int(year), 1, 1)
+        return dt.date(int(year), int(month), 1)
+    return dt.date(int(year), 1, 1)
 
 
-def __get_end(year: str, month: str | None, day: str | None) -> date:
+def __get_end(year: str, month: str | None, day: str | None) -> dt.date:
     """Returns the end of the period from the date representation.
 
     :param year: The year.
@@ -110,10 +110,10 @@ def __get_end(year: str, month: str | None, day: str | None) -> date:
     :raise ValueError: When the date is invalid.
     """
     if day is not None:
-        return date(int(year), int(month), int(day))
+        return dt.date(int(year), int(month), int(day))
     if month is not None:
         year_n: int = int(year)
         month_n: int = int(month)
         day_n: int = calendar.monthrange(year_n, month_n)[1]
-        return date(year_n, month_n, day_n)
-    return date(int(year), 12, 31)
+        return dt.date(year_n, month_n, day_n)
+    return dt.date(int(year), 12, 31)

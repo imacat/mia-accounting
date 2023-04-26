@@ -17,8 +17,8 @@
 """The test for the options.
 
 """
+import datetime as dt
 import unittest
-from datetime import datetime, timedelta
 
 import httpx
 from flask import Flask
@@ -286,7 +286,8 @@ class OptionTestCase(unittest.TestCase):
         with self.app.app_context():
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
-            timestamp: datetime = option.created_at - timedelta(seconds=5)
+            timestamp: dt.datetime \
+                = option.created_at - dt.timedelta(seconds=5)
             option.created_at = timestamp
             option.updated_at = timestamp
             db.session.commit()

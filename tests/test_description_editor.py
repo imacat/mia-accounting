@@ -17,8 +17,8 @@
 """The test for the description editor.
 
 """
+import datetime as dt
 import unittest
-from datetime import date
 
 from flask import Flask
 
@@ -149,7 +149,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
     :param csrf_token: The CSRF token.
     :return: A list of the form data.
     """
-    journal_entry_date: str = date.today().isoformat()
+    journal_entry_date: str = dt.date.today().isoformat()
     return [{"csrf_token": csrf_token,
              "next": NEXT_URI,
              "date": journal_entry_date,

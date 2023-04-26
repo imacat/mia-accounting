@@ -17,7 +17,7 @@
 """The search.
 
 """
-from datetime import datetime
+import datetime as dt
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -124,15 +124,15 @@ class LineItemCollector:
         """
         conditions: list[sa.BinaryExpression] \
             = [JournalEntry.note.icontains(k)]
-        journal_entry_date: datetime
+        journal_entry_date: dt.datetime
         try:
-            journal_entry_date = datetime.strptime(k, "%Y")
+            journal_entry_date = dt.datetime.strptime(k, "%Y")
             conditions.append(sa.extract("year", JournalEntry.date)
                               == journal_entry_date.year)
         except ValueError:
             pass
         try:
-            journal_entry_date = datetime.strptime(k, "%Y/%m")
+            journal_entry_date = dt.datetime.strptime(k, "%Y/%m")
             conditions.append(sa.and_(
                 sa.extract("year", JournalEntry.date)
                 == journal_entry_date.year,
@@ -141,7 +141,7 @@ class LineItemCollector:
         except ValueError:
             pass
         try:
-            journal_entry_date = datetime.strptime(f"2000/{k}", "%Y/%m/%d")
+            journal_entry_date = dt.datetime.strptime(f"2000/{k}", "%Y/%m/%d")
             conditions.append(sa.and_(
                 sa.extract("month", JournalEntry.date)
                 == journal_entry_date.month,
@@ -150,7 +150,7 @@ class LineItemCollector:
         except ValueError:
             pass
         try:
-            journal_entry_date = datetime.strptime(k, "%Y/%m/%d")
+            journal_entry_date = dt.datetime.strptime(k, "%Y/%m/%d")
             conditions.append(sa.and_(
                 sa.extract("year", JournalEntry.date)
                 == journal_entry_date.year,
