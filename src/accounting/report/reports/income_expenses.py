@@ -213,7 +213,7 @@ class LineItemCollector:
 class CSVRow(BaseCSVRow):
     """A row in the CSV."""
 
-    def __init__(self, journal_entry_date: dt.date | str | None,
+    def __init__(self, date: dt.date | str | None,
                  account: str | None,
                  description: str | None,
                  income: str | Decimal | None,
@@ -222,7 +222,7 @@ class CSVRow(BaseCSVRow):
                  note: str | None):
         """Constructs a row in the CSV.
 
-        :param journal_entry_date: The journal entry date.
+        :param date: The journal entry date.
         :param account: The account.
         :param description: The description.
         :param income: The income.
@@ -230,7 +230,7 @@ class CSVRow(BaseCSVRow):
         :param balance: The balance.
         :param note: The note.
         """
-        self.date: dt.date | str | None = journal_entry_date
+        self.date: dt.date | str | None = date
         """The date."""
         self.account: str | None = account
         """The account."""
