@@ -305,14 +305,14 @@ class BaseTestData(ABC):
                 existing_id.add(obj_id)
                 return obj_id
 
-    def __next_j_no(self, j_date: dt.date) -> int:
+    def __next_j_no(self, date: dt.date) -> int:
         """Returns the next journal entry number in a day.
 
-        :param j_date: The journal entry date.
+        :param date: The journal entry date.
         :return: The next journal entry number.
         """
         existing: set[int] = {x["no"] for x in self.__journal_entries
-                              if x["date"] == j_date}
+                              if x["date"] == date}
         return 1 if len(existing) == 0 else max(existing) + 1
 
     def _add_simple_journal_entry(
