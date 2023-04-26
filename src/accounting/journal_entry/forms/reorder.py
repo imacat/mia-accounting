@@ -48,12 +48,12 @@ def sort_journal_entries_in(date: dt.date, exclude: int | None = None) -> None:
 class JournalEntryReorderForm:
     """The form to reorder the journal entries."""
 
-    def __init__(self, journal_entry_date: dt.date):
+    def __init__(self, date: dt.date):
         """Constructs the form to reorder the journal entries in a day.
 
-        :param journal_entry_date: The date.
+        :param date: The date.
         """
-        self.date: dt.date = journal_entry_date
+        self.date: dt.date = date
         self.is_modified: bool = False
 
     def save_order(self) -> None:
