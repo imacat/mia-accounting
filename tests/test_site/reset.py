@@ -122,9 +122,9 @@ class SampleData(BaseTestData):
         month: int
 
         # Recurring in USD
-        j_date: dt.date = dt.date(today.year - 5, today.month, today.day)
-        j_date = j_date + dt.timedelta(days=(4 - j_date.weekday()))
-        days = (today - j_date).days
+        date: dt.date = dt.date(today.year - 5, today.month, today.day)
+        date = date + dt.timedelta(days=(4 - date.weekday()))
+        days = (today - date).days
         while True:
             if days < 0:
                 break
