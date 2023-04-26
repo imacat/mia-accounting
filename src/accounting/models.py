@@ -788,13 +788,13 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__balance")
 
     @balance.setter
-    def balance(self, balance: Decimal) -> None:
+    def balance(self, value: Decimal) -> None:
         """Sets the net balance.
 
-        :param balance: The net balance.
+        :param value: The net balance.
         :return: None.
         """
-        setattr(self, "__balance", balance)
+        setattr(self, "__balance", value)
 
     @property
     def offsets(self) -> list[t.Self]:
