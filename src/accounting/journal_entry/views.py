@@ -186,19 +186,19 @@ def delete_journal_entry(journal_entry: JournalEntry) -> redirect:
     return redirect(or_next(__get_default_page_uri()))
 
 
-@bp.get("dates/<date:journal_entry_date>", endpoint="order")
+@bp.get("dates/<date:date>", endpoint="order")
 @has_permission(can_view)
-def show_journal_entry_order(journal_entry_date: dt.date) -> str:
+def show_journal_entry_order(date: dt.date) -> str:
     """Shows the order of the journal entries in a same date.
 
-    :param journal_entry_date: The date.
+    :param date: The date.
     :return: The order of the journal entries in the date.
     """
     journal_entries: list[JournalEntry] = JournalEntry.query \
-        .filter(JournalEntry.date == journal_entry_date) \
+        .filter(JournalEntry.date == date) \
         .order_by(JournalEntry.no).all()
     return render_template("accounting/journal-entry/order.html",
-                           date=journal_entry_date, list=journal_entries)
+                           date=date, list=journal_entries)
 
 
 @bp.post("dates/<date:date>", endpoint="sort")

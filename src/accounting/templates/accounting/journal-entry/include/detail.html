@@ -36,7 +36,7 @@ First written: 2023/2/26
       {{ A_("Edit") }}
     </a>
   {% endif %}
-  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.journal-entry.order", journal_entry_date=obj.date)|accounting_append_next }}">
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.journal-entry.order", date=obj.date)|accounting_append_next }}">
     <i class="fa-solid fa-bars-staggered"></i>
     <span class="d-none d-md-inline">{{ A_("Order") }}</span>
   </a>
