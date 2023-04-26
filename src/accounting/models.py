@@ -228,13 +228,13 @@ class Account(db.Model):
         return getattr(self, "__count")
 
     @count.setter
-    def count(self, count: int) -> None:
+    def count(self, value: int) -> None:
         """Sets the number of items in the account.
 
-        :param count: The number of items in the account.
+        :param value: The number of items in the account.
         :return: None.
         """
-        setattr(self, "__count", count)
+        setattr(self, "__count", value)
 
     @property
     def query_values(self) -> list[str]:
