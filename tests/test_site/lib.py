@@ -241,12 +241,12 @@ class BaseTestData(ABC):
         existing_j_id: set[int] = {x["id"] for x in self.__journal_entries}
         existing_l_id: set[int] = {x["id"] for x in self.__line_items}
         journal_entry_data.id = self.__new_id(existing_j_id)
-        j_date: dt.date \
+        date: dt.date \
             = dt.date.today() - dt.timedelta(days=journal_entry_data.days)
         self.__journal_entries.append(
             {"id": journal_entry_data.id,
-             "date": j_date,
-             "no": self.__next_j_no(j_date),
+             "date": date,
+             "no": self.__next_j_no(date),
              "note": journal_entry_data.note,
              "created_by_id": self.__current_user_id,
              "updated_by_id": self.__current_user_id})
