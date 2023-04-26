@@ -26,10 +26,10 @@ from accounting import db
 
 
 def new_id(cls: Type[db.Model]):
-    """Returns a new random ID for the data model.
+    """Generates and returns a new, unused random ID for the data model.
 
     :param cls: The data model.
-    :return: The generated new random ID.
+    :return: The newly-generated, unused random ID.
     """
     while True:
         obj_id: int = 100000000 + randbelow(900000000)
