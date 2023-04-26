@@ -201,16 +201,16 @@ def show_journal_entry_order(journal_entry_date: dt.date) -> str:
                            date=journal_entry_date, list=journal_entries)
 
 
-@bp.post("dates/<date:journal_entry_date>", endpoint="sort")
+@bp.post("dates/<date:date>", endpoint="sort")
 @has_permission(can_edit)
-def sort_journal_entries(journal_entry_date: dt.date) -> redirect:
+def sort_journal_entries(date: dt.date) -> redirect:
     """Reorders the journal entries in a date.
 
-    :param journal_entry_date: The date.
+    :param date: The date.
     :return: The redirection to the incoming account or the account list.  The
         reordering operation does not fail.
     """
-    form: JournalEntryReorderForm = JournalEntryReorderForm(journal_entry_date)
+    form: JournalEntryReorderForm = JournalEntryReorderForm(date)
     form.save_order()
     if not form.is_modified:
         flash(s(lazy_gettext("The order was not modified.")), "success")

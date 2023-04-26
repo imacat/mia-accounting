@@ -38,7 +38,7 @@ First written: 2023/2/26
 </div>
 
 {% if list|length > 1 and accounting_can_edit() %}
-  <form action="{{ url_for("accounting.journal-entry.sort", journal_entry_date=date) }}" method="post">
+  <form action="{{ url_for("accounting.journal-entry.sort", date=date) }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if request.args.next %}
       <input type="hidden" name="next" value="{{ request.args.next }}">
