@@ -167,11 +167,10 @@ class JournalEntryData:
         :param is_update: True for an update operation, or False otherwise
         :return: The journal entry as a form.
         """
-        journal_entry_date: dt.date \
-            = dt.date.today() - dt.timedelta(days=self.days)
+        date: dt.date = dt.date.today() - dt.timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
                                 "next": next_uri,
-                                "date": journal_entry_date.isoformat()}
+                                "date": date.isoformat()}
         for i in range(len(self.currencies)):
             form.update(self.currencies[i].form(i + 1, is_update))
         if self.note is not None:
