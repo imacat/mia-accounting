@@ -19,21 +19,21 @@
 This module should not import any other module from the application.
 
 """
-import typing as t
+from collections.abc import Callable
 
 from flask import abort, Blueprint, Response
 
 from accounting.utils.user import get_current_user, UserUtilityInterface
 
 
-def has_permission(rule: t.Callable[[], bool]) -> t.Callable:
+def has_permission(rule: Callable[[], bool]) -> Callable:
     """The permission decorator to check whether the current user is allowed.
 
     :param rule: The permission rule.
     :return: The view decorator.
     """
 
-    def decorator(view: t.Callable) -> t.Callable:
+    def decorator(view: Callable) -> Callable:
         """The view decorator to decorate a view with permission tests.
 
         :param view: The view.
@@ -61,16 +61,16 @@ def has_permission(rule: t.Callable[[], bool]) -> t.Callable:
     return decorator
 
 
-__can_view_func: t.Callable[[], bool] = lambda: True
+__can_view_func: Callable[[], bool] = lambda: True
 """The callback that returns whether the current user can view the accounting
 data."""
-__can_edit_func: t.Callable[[], bool] = lambda: True
+__can_edit_func: Callable[[], bool] = lambda: True
 """The callback that returns whether the current user can edit the accounting
 data."""
-__can_admin_func: t.Callable[[], bool] = lambda: True
+__can_admin_func: Callable[[], bool] = lambda: True
 """The callback that returns whether the current user can administrate the
 accounting settings."""
-_unauthorized_func: t.Callable[[], Response | None] \
+_unauthorized_func: Callable[[], Response | None] \
     = lambda: Response(status=403)
 """The callback that returns the response to require the user to log in."""
 

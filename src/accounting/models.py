@@ -21,8 +21,8 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-import typing as t
 from decimal import Decimal
+from typing import Type, Annotated, Self
 
 import sqlalchemy as sa
 from babel import Locale
@@ -34,16 +34,16 @@ from accounting import db
 from accounting.locale import gettext
 from accounting.utils.user import user_cls, user_pk_column
 
-timestamp: t.Type[dt.datetime] \
-    = t.Annotated[dt.datetime, mapped_column(db.DateTime(timezone=True),
-                                             server_default=db.func.now())]
+timestamp: Type[dt.datetime] \
+    = Annotated[dt.datetime, mapped_column(db.DateTime(timezone=True),
+                                           server_default=db.func.now())]
 """The timestamp."""
-user_pk: t.Type[int] \
-    = t.Annotated[int, mapped_column(db.ForeignKey(user_pk_column,
-                                                   onupdate="CASCADE"))]
+user_pk: Type[int] \
+    = Annotated[int, mapped_column(db.ForeignKey(user_pk_column,
+                                                 onupdate="CASCADE"))]
 """The user primary key."""
-random_pk: t.Type[int] \
-    = t.Annotated[int, mapped_column(primary_key=True, autoincrement=False)]
+random_pk: Type[int] \
+    = Annotated[int, mapped_column(primary_key=True, autoincrement=False)]
 """The random primary key."""
 
 
@@ -273,11 +273,11 @@ class Account(db.Model):
         :return: None.
         """
         AccountL10n.query.filter(AccountL10n.account == self).delete()
-        cls: t.Type[t.Self] = self.__class__
+        cls: Type[Self] = self.__class__
         cls.query.filter(cls.id == self.id).delete()
 
     @classmethod
-    def find_by_code(cls, code: str) -> t.Self | None:
+    def find_by_code(cls, code: str) -> Self | None:
         """Finds an account by its code.
 
         :param code: The code.
@@ -290,7 +290,7 @@ class Account(db.Model):
                                 cls.no == int(m.group(2))).first()
 
     @classmethod
-    def selectable_debit(cls) -> list[t.Self]:
+    def selectable_debit(cls) -> list[Self]:
         """Returns the selectable debit accounts.
         Payable line items can not start from debit.
 
@@ -313,7 +313,7 @@ class Account(db.Model):
             .order_by(cls.base_code, cls.no).all()
 
     @classmethod
-    def selectable_credit(cls) -> list[t.Self]:
+    def selectable_credit(cls) -> list[Self]:
         """Returns the selectable debit accounts.
         Receivable line items can not start from credit.
 
@@ -335,7 +335,7 @@ class Account(db.Model):
             .order_by(cls.base_code, cls.no).all()
 
     @classmethod
-    def cash(cls) -> t.Self:
+    def cash(cls) -> Self:
         """Returns the cash account.
 
         :return: The cash account
@@ -343,7 +343,7 @@ class Account(db.Model):
         return cls.find_by_code(cls.CASH_CODE)
 
     @classmethod
-    def accumulated_change(cls) -> t.Self:
+    def accumulated_change(cls) -> Self:
         """Returns the accumulated-change account.
 
         :return: The accumulated-change account
@@ -467,7 +467,7 @@ class Currency(db.Model):
         :return: None.
         """
         CurrencyL10n.query.filter(CurrencyL10n.currency == self).delete()
-        cls: t.Type[t.Self] = self.__class__
+        cls: Type[Self] = self.__class__
         cls.query.filter(cls.code == self.code).delete()
 
 
@@ -797,14 +797,14 @@ class JournalEntryLineItem(db.Model):
         setattr(self, "__balance", value)
 
     @property
-    def offsets(self) -> list[t.Self]:
+    def offsets(self) -> list[Self]:
         """Returns the offset items.
 
         :return: The offset items.
         """
         if not hasattr(self, "__offsets"):
-            cls: t.Type[t.Self] = self.__class__
-            offsets: list[t.Self] = cls.query.join(JournalEntry)\
+            cls: Type[Self] = self.__class__
+            offsets: list[Self] = cls.query.join(JournalEntry)\
                 .filter(JournalEntryLineItem.original_line_item_id == self.id)\
                 .order_by(JournalEntry.date, JournalEntry.no,
                           cls.is_debit, cls.no).all()
@@ -831,7 +831,7 @@ class JournalEntryLineItem(db.Model):
         setattr(self, "__is_offset", value)
 
     @property
-    def match(self) -> t.Self | None:
+    def match(self) -> Self | None:
         """Returns the match of the line item.
 
         :return: The match of the line item.
@@ -841,7 +841,7 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__match")
 
     @match.setter
-    def match(self, value: t.Self) -> None:
+    def match(self, value: Self) -> None:
         """Sets the match of the line item.
 
         :param value: The matcho of the line item.

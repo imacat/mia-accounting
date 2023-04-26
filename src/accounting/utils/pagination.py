@@ -19,7 +19,7 @@
 This module should not import any other module from the application.
 
 """
-import typing as t
+from typing import TypeVar, Generic
 from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
     ParseResult
 
@@ -62,10 +62,10 @@ class Redirection(RequestRedirect):
 DEFAULT_PAGE_SIZE: int = 10
 """The default page size."""
 
-T = t.TypeVar("T")
+T = TypeVar("T")
 
 
-class Pagination(t.Generic[T]):
+class Pagination(Generic[T]):
     """The pagination utility."""
 
     def __init__(self, items: list[T], is_reversed: bool = False):
@@ -91,7 +91,7 @@ class Pagination(t.Generic[T]):
         """The options to the number of items in a page."""
 
 
-class AbstractPagination(t.Generic[T]):
+class AbstractPagination(Generic[T]):
     """An abstract pagination."""
 
     def __init__(self):

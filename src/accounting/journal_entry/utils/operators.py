@@ -17,19 +17,19 @@
 """The operators for different journal entry types.
 
 """
-import typing as t
 from abc import ABC, abstractmethod
+from typing import Type
 
 from flask import render_template, request, abort
 from flask_wtf import FlaskForm
 
-from accounting.models import JournalEntry
-from accounting.template_globals import default_currency_code
-from accounting.utils.journal_entry_types import JournalEntryType
 from accounting.journal_entry.forms import JournalEntryForm, \
     CashReceiptJournalEntryForm, CashDisbursementJournalEntryForm, \
     TransferJournalEntryForm
 from accounting.journal_entry.forms.line_item import LineItemForm
+from accounting.models import JournalEntry
+from accounting.template_globals import default_currency_code
+from accounting.utils.journal_entry_types import JournalEntryType
 
 
 class JournalEntryOperator(ABC):
@@ -39,7 +39,7 @@ class JournalEntryOperator(ABC):
 
     @property
     @abstractmethod
-    def form(self) -> t.Type[JournalEntryForm]:
+    def form(self) -> Type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
@@ -100,7 +100,7 @@ class CashReceiptJournalEntry(JournalEntryOperator):
     """The order when checking the journal entry operator."""
 
     @property
-    def form(self) -> t.Type[JournalEntryForm]:
+    def form(self) -> Type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
@@ -170,7 +170,7 @@ class CashDisbursementJournalEntry(JournalEntryOperator):
     """The order when checking the journal entry operator."""
 
     @property
-    def form(self) -> t.Type[JournalEntryForm]:
+    def form(self) -> Type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
@@ -243,7 +243,7 @@ class TransferJournalEntry(JournalEntryOperator):
     """The order when checking the journal entry operator."""
 
     @property
-    def form(self) -> t.Type[JournalEntryForm]:
+    def form(self) -> Type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.

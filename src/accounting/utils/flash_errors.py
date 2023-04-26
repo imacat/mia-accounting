@@ -19,7 +19,7 @@
 This module should not import any other module from the application.
 
 """
-import typing as t
+from typing import Any
 
 from flask import flash
 from flask_wtf import FlaskForm
@@ -34,7 +34,7 @@ def flash_form_errors(form: FlaskForm) -> None:
     __flash_errors(form.errors)
 
 
-def __flash_errors(error: t.Any) -> None:
+def __flash_errors(error: Any) -> None:
     """Flash all errors recursively.
 
     :param error: The errors.

@@ -17,15 +17,15 @@
 """The console commands for the account management.
 
 """
-import typing as t
 from secrets import randbelow
+from typing import Any
 
 import click
+import sqlalchemy as sa
 
 from accounting import db
 from accounting.models import BaseAccount, Account, AccountL10n
 from accounting.utils.user import get_user_pk
-import sqlalchemy as sa
 
 AccountData = tuple[int, str, int, str, str, str, bool]
 """The format of the account data, as a list of (ID, base account code, number,
@@ -63,8 +63,8 @@ def init_accounts_command(username: str) -> None:
                 existing_id.add(new_id)
                 return new_id
 
-    data: list[dict[str, t.Any]] = []
-    l10n_data: list[dict[str, t.Any]] = []
+    data: list[dict[str, Any]] = []
+    l10n_data: list[dict[str, Any]] = []
     for base in bases_to_add:
         l10n: dict[str, str] = {x.locale: x.title for x in base.l10n}
         account_id: int = get_new_id()

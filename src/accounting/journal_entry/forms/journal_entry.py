@@ -18,8 +18,8 @@
 
 """
 import datetime as dt
-import typing as t
 from abc import ABC, abstractmethod
+from typing import TypeVar, Generic, Type
 
 import sqlalchemy as sa
 from flask_babel import LazyString
@@ -29,13 +29,13 @@ from wtforms import DateField, FieldList, FormField, TextAreaField, \
 from wtforms.validators import DataRequired, ValidationError
 
 from accounting import db
+from accounting.journal_entry.utils.account_option import AccountOption
+from accounting.journal_entry.utils.description_editor import DescriptionEditor
+from accounting.journal_entry.utils.original_line_items import \
+    get_selectable_original_line_items
 from accounting.locale import lazy_gettext
 from accounting.models import JournalEntry, Account, JournalEntryLineItem, \
     JournalEntryCurrency
-from accounting.journal_entry.utils.account_option import AccountOption
-from accounting.journal_entry.utils.original_line_items import \
-    get_selectable_original_line_items
-from accounting.journal_entry.utils.description_editor import DescriptionEditor
 from accounting.utils.random_id import new_id
 from accounting.utils.strip_text import strip_multiline_text
 from accounting.utils.user import get_current_user_pk
@@ -123,7 +123,7 @@ class JournalEntryForm(FlaskForm):
         super().__init__(*args, **kwargs)
         self.is_modified: bool = False
         """Whether the journal entry is modified during populate_obj()."""
-        self.collector: t.Type[LineItemCollector] = LineItemCollector
+        self.collector: Type[LineItemCollector] = LineItemCollector
         """The line item collector.  The default is the base abstract
         collector only to provide the correct type.  The subclass forms should
         provide their own collectors."""
@@ -155,7 +155,7 @@ class JournalEntryForm(FlaskForm):
         self.__set_date(obj, self.date.data)
         obj.note = self.note.data
 
-        collector_cls: t.Type[LineItemCollector] = self.collector
+        collector_cls: Type[LineItemCollector] = self.collector
         collector: collector_cls = collector_cls(self, obj)
         collector.collect()
 
@@ -309,11 +309,11 @@ class JournalEntryForm(FlaskForm):
         return db.session.scalar(select)
 
 
-T = t.TypeVar("T", bound=JournalEntryForm)
+T = TypeVar("T", bound=JournalEntryForm)
 """A journal entry form variant."""
 
 
-class LineItemCollector(t.Generic[T], ABC):
+class LineItemCollector(Generic[T], ABC):
     """The line item collector."""
 
     def __init__(self, form: T, obj: JournalEntry):

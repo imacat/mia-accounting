@@ -18,8 +18,8 @@
 
 """
 import datetime as dt
-import typing as t
 from decimal import Decimal
+from typing import Any
 
 from flask_babel import get_locale
 
@@ -71,7 +71,7 @@ def format_date(value: dt.date) -> str:
     return "{}/{}({})".format(value.month, value.day, weekday)
 
 
-def default(value: t.Any, default_value: t.Any = "") -> t.Any:
+def default(value: Any, default_value: Any = "") -> Any:
     """Returns the default value if the given value is None.
 
     :param value: The value.

@@ -17,8 +17,9 @@
 """The page parameters of a report.
 
 """
-import typing as t
 from abc import ABC, abstractmethod
+from collections.abc import Callable
+from typing import Type
 from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
     urlunparse
 
@@ -52,7 +53,7 @@ class BasePageParams(ABC):
         """
 
     @property
-    def journal_entry_types(self) -> t.Type[JournalEntryType]:
+    def journal_entry_types(self) -> Type[JournalEntryType]:
         """Returns the journal entry types.
 
         :return: The journal entry types.
@@ -72,7 +73,7 @@ class BasePageParams(ABC):
         return urlunparse(parts)
 
     @staticmethod
-    def _get_currency_options(get_url: t.Callable[[Currency], str],
+    def _get_currency_options(get_url: Callable[[Currency], str],
                               active_currency: Currency) -> list[OptionLink]:
         """Returns the currency options.
 

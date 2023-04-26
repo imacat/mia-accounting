@@ -21,7 +21,7 @@ This file is largely taken from the NanoParma ERP project, first written in
 
 """
 import datetime as dt
-import typing as t
+from typing import Self
 
 from .description import get_desc
 from .month_end import month_end
@@ -119,7 +119,7 @@ class Period:
             and not self.is_a_day
 
     @property
-    def before(self) -> t.Self | None:
+    def before(self) -> Self | None:
         """Returns the period before this period.
 
         :return: The period before this period.

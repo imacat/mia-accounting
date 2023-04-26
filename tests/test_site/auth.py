@@ -17,7 +17,7 @@
 """The authentication for the Mia! Accounting demonstration website.
 
 """
-import typing as t
+from collections.abc import Callable
 
 from flask import Blueprint, render_template, Flask, redirect, url_for, \
     session, request, g, Response, abort
@@ -96,7 +96,7 @@ def current_user() -> User | None:
     return g.user
 
 
-def admin_required(view: t.Callable) -> t.Callable:
+def admin_required(view: Callable) -> Callable:
     """The view decorator to require the user to be an administrator.
 
     :param view: The view.

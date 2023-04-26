@@ -19,13 +19,13 @@
 This module should not import any other module from the application.
 
 """
-import typing as t
 from secrets import randbelow
+from typing import Type
 
 from accounting import db
 
 
-def new_id(cls: t.Type):
+def new_id(cls: Type):
     """Returns a new random ID for the data model.
 
     :param cls: The data model.

@@ -18,8 +18,8 @@
 
 """
 import csv
-import typing as t
 import unittest
+from typing import Any
 
 import sqlalchemy as sa
 from click.testing import Result
@@ -80,7 +80,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         from accounting.models import BaseAccount
 
         with open(data_dir / "base_accounts.csv") as fp:
-            data: dict[dict[str, t.Any]] \
+            data: dict[dict[str, Any]] \
                 = {x["code"]: {"code": x["code"],
                                "title": x["title"],
                                "l10n": {y[5:]: x[y]
@@ -135,7 +135,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         from accounting.models import Currency
 
         with open(data_dir / "currencies.csv") as fp:
-            data: dict[dict[str, t.Any]] \
+            data: dict[dict[str, Any]] \
                 = {x["code"]: {"code": x["code"],
                                "name": x["name"],
                                "l10n": {y[5:]: x[y]

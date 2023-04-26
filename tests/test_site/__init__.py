@@ -18,8 +18,8 @@
 
 """
 import os
-import typing as t
 from secrets import token_urlsafe
+from typing import Type
 
 from click.testing import Result
 from flask import Flask, Blueprint, render_template, redirect, Response, \
@@ -94,7 +94,7 @@ def create_app(is_testing: bool = False) -> Flask:
             return redirect(append_next(url_for("auth.login-form")))
 
         @property
-        def cls(self) -> t.Type[auth.User]:
+        def cls(self) -> Type[auth.User]:
             return auth.User
 
         @property

@@ -20,7 +20,7 @@
 from __future__ import annotations
 
 import re
-import typing as t
+from typing import Literal
 
 import httpx
 from flask import Flask, render_template_string
@@ -108,7 +108,7 @@ def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
 
 
 def set_locale(client: httpx.Client, csrf_token: str,
-               locale: t.Literal["en", "zh_Hant", "zh_Hans"]) -> None:
+               locale: Literal["en", "zh_Hant", "zh_Hans"]) -> None:
     """Sets the current locale.
 
     :param client: The test client.

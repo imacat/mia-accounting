@@ -20,10 +20,10 @@
 from __future__ import annotations
 
 import datetime as dt
-import typing as t
 from abc import ABC, abstractmethod
 from decimal import Decimal
 from secrets import randbelow
+from typing import Any
 
 import sqlalchemy as sa
 from flask import Flask
@@ -193,8 +193,8 @@ class BaseTestData(ABC):
                 .filter(User.username == username).first()
             assert current_user is not None
             self.__current_user_id: int = current_user.id
-            self.__journal_entries: list[dict[str, t.Any]] = []
-            self.__line_items: list[dict[str, t.Any]] = []
+            self.__journal_entries: list[dict[str, Any]] = []
+            self.__line_items: list[dict[str, Any]] = []
             self._init_data()
 
     @abstractmethod
@@ -258,7 +258,7 @@ class BaseTestData(ABC):
                 assert account is not None
                 debit_no = debit_no + 1
                 line_item.id = self.__new_id(existing_l_id)
-                data: dict[str, t.Any] \
+                data: dict[str, Any] \
                     = {"id": line_item.id,
                        "journal_entry_id": journal_entry_data.id,
                        "is_debit": True,
@@ -277,7 +277,7 @@ class BaseTestData(ABC):
                 assert account is not None
                 credit_no = credit_no + 1
                 line_item.id = self.__new_id(existing_l_id)
-                data: dict[str, t.Any] \
+                data: dict[str, Any] \
                     = {"id": line_item.id,
                        "journal_entry_id": journal_entry_data.id,
                        "is_debit": False,

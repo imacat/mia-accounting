@@ -18,7 +18,7 @@
 
 """
 import re
-import typing as t
+from typing import Literal
 
 import sqlalchemy as sa
 
@@ -124,12 +124,12 @@ class DescriptionTag:
 class DescriptionType:
     """A description type"""
 
-    def __init__(self, type_id: t.Literal["general", "travel", "bus"]):
+    def __init__(self, type_id: Literal["general", "travel", "bus"]):
         """Constructs a description type.
 
         :param type_id: The type ID, either "general", "travel", or "bus".
         """
-        self.id: t.Literal["general", "travel", "bus"] = type_id
+        self.id: Literal["general", "travel", "bus"] = type_id
         """The type ID."""
         self.__tag_dict: dict[str, DescriptionTag] = {}
         """A dictionary from the tag name to their corresponding tag."""
@@ -181,12 +181,12 @@ class DescriptionRecurring:
 class DescriptionDebitCredit:
     """The description on debit or credit."""
 
-    def __init__(self, debit_credit: t.Literal["debit", "credit"]):
+    def __init__(self, debit_credit: Literal["debit", "credit"]):
         """Constructs the description on debit or credit.
 
         :param debit_credit: Either "debit" or "credit".
         """
-        self.debit_credit: t.Literal["debit", "credit"] = debit_credit
+        self.debit_credit: Literal["debit", "credit"] = debit_credit
         """Either debit or credit."""
         self.general: DescriptionType = DescriptionType("general")
         """The general tags."""
@@ -194,14 +194,14 @@ class DescriptionDebitCredit:
         """The travel tags."""
         self.bus: DescriptionType = DescriptionType("bus")
         """The bus tags."""
-        self.__type_dict: dict[t.Literal["general", "travel", "bus"],
+        self.__type_dict: dict[Literal["general", "travel", "bus"],
                                DescriptionType] \
             = {x.id: x for x in {self.general, self.travel, self.bus}}
         """A dictionary from the type ID to the corresponding tags."""
         self.recurring: list[DescriptionRecurring] = []
         """The recurring transactions."""
 
-    def add_tag(self, tag_type: t.Literal["general", "travel", "bus"],
+    def add_tag(self, tag_type: Literal["general", "travel", "bus"],
                 name: str, account: Account, freq: int) -> None:
         """Adds a tag.
 
@@ -278,7 +278,7 @@ class DescriptionEditor:
         accounts: dict[int, Account] \
             = {x.id: x for x in Account.query
                .filter(Account.id.in_({x.account_id for x in result})).all()}
-        debit_credit_dict: dict[t.Literal["debit", "credit"],
+        debit_credit_dict: dict[Literal["debit", "credit"],
                                 DescriptionDebitCredit] \
             = {x.debit_credit: x for x in {self.debit, self.credit}}
         for row in result:

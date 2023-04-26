@@ -17,12 +17,13 @@
 """The current assets and liabilities account.
 
 """
-import typing as t
+from typing import Self
+
+import sqlalchemy as sa
 
 from accounting import db
 from accounting.locale import gettext
 from accounting.models import Account
-import sqlalchemy as sa
 
 
 class CurrentAccount:
@@ -54,7 +55,7 @@ class CurrentAccount:
         return self.str
 
     @classmethod
-    def current_assets_and_liabilities(cls) -> t.Self:
+    def current_assets_and_liabilities(cls) -> Self:
         """Returns the pseudo account for all current assets and liabilities.
 
         :return: The pseudo account for all current assets and liabilities.
@@ -67,7 +68,7 @@ class CurrentAccount:
         return account
 
     @classmethod
-    def accounts(cls) -> list[t.Self]:
+    def accounts(cls) -> list[Self]:
         """Returns the current assets and liabilities accounts.
 
         :return: The current assets and liabilities accounts.

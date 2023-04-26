@@ -21,7 +21,7 @@ This file is largely taken from the NanoParma ERP project, first written in
 
 """
 import datetime as dt
-import typing as t
+from collections.abc import Callable
 
 from accounting.models import JournalEntry
 from .period import Period
@@ -32,13 +32,13 @@ from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
 class PeriodChooser:
     """The period chooser."""
 
-    def __init__(self, get_url: t.Callable[[Period], str]):
+    def __init__(self, get_url: Callable[[Period], str]):
         """Constructs a period chooser.
 
         :param get_url: The callback to return the URL of the current report in
             a period.
         """
-        self.__get_url: t.Callable[[Period], str] = get_url
+        self.__get_url: Callable[[Period], str] = get_url
         """The callback to return the URL of the current report in a period."""
 
         # Shortcut periods

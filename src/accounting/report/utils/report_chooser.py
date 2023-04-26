@@ -21,7 +21,7 @@ This file is largely taken from the NanoParma ERP project, first written in
 
 """
 import re
-import typing as t
+from collections.abc import Iterator
 
 from flask_babel import LazyString
 
@@ -190,7 +190,7 @@ class ReportChooser:
                           self.__active_report == ReportType.UNMATCHED,
                           fa_icon="fa-solid fa-file-circle-question")
 
-    def __iter__(self) -> t.Iterator[OptionLink]:
+    def __iter__(self) -> Iterator[OptionLink]:
         """Returns the iteration of the reports.
 
         :return: The iteration of the reports.

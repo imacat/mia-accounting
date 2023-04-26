@@ -17,7 +17,7 @@
 """The SQLAlchemy alias for the offset items.
 
 """
-import typing as t
+from typing import Any
 
 import sqlalchemy as sa
 
@@ -30,10 +30,10 @@ def offset_alias() -> sa.Alias:
     :return: The SQLAlchemy alias for the offset items.
     """
 
-    def as_from(model_cls: t.Any) -> sa.FromClause:
+    def as_from(model_cls: Any) -> sa.FromClause:
         return model_cls
 
-    def as_alias(alias: t.Any) -> sa.Alias:
+    def as_alias(alias: Any) -> sa.Alias:
         return alias
 
     return as_alias(sa.alias(as_from(JournalEntryLineItem), name="offset"))

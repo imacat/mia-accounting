@@ -19,17 +19,17 @@
 This module should not import any other module from the application.
 
 """
-import typing as t
 from abc import ABC, abstractmethod
+from typing import TypeVar, Generic, Type
 
 import sqlalchemy as sa
 from flask import g, Response
 from flask_sqlalchemy.model import Model
 
-T = t.TypeVar("T", bound=Model)
+T = TypeVar("T", bound=Model)
 
 
-class UserUtilityInterface(t.Generic[T], ABC):
+class UserUtilityInterface(Generic[T], ABC):
     """The interface for the user utilities."""
 
     @abstractmethod
@@ -72,7 +72,7 @@ class UserUtilityInterface(t.Generic[T], ABC):
 
     @property
     @abstractmethod
-    def cls(self) -> t.Type[T]:
+    def cls(self) -> Type[T]:
         """Returns the class of the user data model.
 
         :return: The class of the user data model.
@@ -112,7 +112,7 @@ class UserUtilityInterface(t.Generic[T], ABC):
 
 __user_utils: UserUtilityInterface
 """The user utilities."""
-user_cls: t.Type[Model] = Model
+user_cls: Type[Model] = Model
 """The user class."""
 user_pk_column: sa.Column = sa.Column(sa.Integer)
 """The primary key column of the user class."""

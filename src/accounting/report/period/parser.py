@@ -20,7 +20,8 @@
 import calendar
 import datetime as dt
 import re
-import typing as t
+from collections.abc import Callable
+from typing import Type
 
 from .period import Period
 from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
@@ -39,7 +40,7 @@ def get_period(spec: str | None = None) -> Period:
     """
     if spec is None:
         return ThisMonth()
-    named_periods: dict[str, t.Type[t.Callable[[], Period]]] = {
+    named_periods: dict[str, Type[Callable[[], Period]]] = {
         "this-month": lambda: ThisMonth(),
         "last-month": lambda: LastMonth(),
         "since-last-month": lambda: SinceLastMonth(),

@@ -18,7 +18,7 @@
 
 """
 import csv
-import typing as t
+from typing import Any
 
 import sqlalchemy as sa
 
@@ -39,11 +39,11 @@ def init_currencies_command(username: str) -> None:
         return
 
     creator_pk: int = get_user_pk(username)
-    currency_data: list[dict[str, t.Any]] = [{"code": x["code"],
-                                              "name_l10n": x["name"],
-                                              "created_by_id": creator_pk,
-                                              "updated_by_id": creator_pk}
-                                             for x in to_add]
+    currency_data: list[dict[str, Any]] = [{"code": x["code"],
+                                            "name_l10n": x["name"],
+                                            "created_by_id": creator_pk,
+                                            "updated_by_id": creator_pk}
+                                           for x in to_add]
     locales: list[str] = [x[5:] for x in to_add[0] if x.startswith("l10n-")]
     l10n_data: list[dict[str, str]] = [{"currency_code": x["code"],
                                         "locale": y,

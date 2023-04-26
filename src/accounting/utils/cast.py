@@ -20,10 +20,10 @@ warnings from the IDE.
 This module should not import any other module from the application.
 
 """
-import typing as t
+from typing import Any
 
 
-def s(message: t.Any) -> str:
+def s(message: Any) -> str:
     """Casts the LazyString message to the string type.
 
     :param message: The message.
