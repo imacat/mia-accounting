@@ -450,11 +450,11 @@ class ReportTestData(BaseTestData):
         year: int = today.year - 5
         month: int = today.month
         while True:
-            j_date: dt.date = dt.date(year, month, 5)
-            if j_date > today:
+            date: dt.date = dt.date(year, month, 5)
+            if date > today:
                 break
             self._add_simple_journal_entry(
-                (j_date - today).days, "USD",
+                (date - today).days, "USD",
                 "Salary薪水", "1200", Accounts.BANK, Accounts.SERVICE)
             month = month + 1
             if month > 12:
