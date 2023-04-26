@@ -769,13 +769,13 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__net_balance")
 
     @net_balance.setter
-    def net_balance(self, net_balance: Decimal) -> None:
+    def net_balance(self, value: Decimal) -> None:
         """Sets the net balance.
 
-        :param net_balance: The net balance.
+        :param value: The net balance.
         :return: None.
         """
-        setattr(self, "__net_balance", net_balance)
+        setattr(self, "__net_balance", value)
 
     @property
     def balance(self) -> Decimal:
