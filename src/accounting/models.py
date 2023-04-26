@@ -779,9 +779,9 @@ class JournalEntryLineItem(db.Model):
 
     @property
     def balance(self) -> Decimal:
-        """Returns the net balance.
+        """Returns the balance.
 
-        :return: The net balance.
+        :return: The balance.
         """
         if not hasattr(self, "__balance"):
             setattr(self, "__balance", Decimal("0"))
@@ -789,9 +789,9 @@ class JournalEntryLineItem(db.Model):
 
     @balance.setter
     def balance(self, value: Decimal) -> None:
-        """Sets the net balance.
+        """Sets the balance.
 
-        :param value: The net balance.
+        :param value: The balance.
         :return: None.
         """
         setattr(self, "__balance", value)
