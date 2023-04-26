@@ -22,8 +22,6 @@ This module should not import any other module from the application.
 """
 import typing as t
 
-import sqlalchemy as sa
-
 
 def s(message: t.Any) -> str:
     """Casts the LazyString message to the string type.
