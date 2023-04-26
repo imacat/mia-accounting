@@ -25,7 +25,7 @@ from typing import Type
 from accounting import db
 
 
-def new_id(cls: Type):
+def new_id(cls: Type[db.Model]):
     """Returns a new random ID for the data model.
 
     :param cls: The data model.
