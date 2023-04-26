@@ -822,14 +822,13 @@ class JournalEntryLineItem(db.Model):
         return getattr(self, "__is_offset")
 
     @is_offset.setter
-    def is_offset(self, is_offset: bool) -> None:
+    def is_offset(self, value: bool) -> None:
         """Sets whether the line item is an offset.
 
-        :param is_offset: True if the line item is an offset, or False
-            otherwise.
+        :param value: True if the line item is an offset, or False otherwise.
         :return: None.
         """
-        setattr(self, "__is_offset", is_offset)
+        setattr(self, "__is_offset", value)
 
     @property
     def match(self) -> t.Self | None:
