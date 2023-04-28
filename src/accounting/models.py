@@ -42,9 +42,6 @@ user_pk: Type[int] \
     = Annotated[int, mapped_column(db.ForeignKey(user_pk_column,
                                                  onupdate="CASCADE"))]
 """The user primary key."""
-random_pk: Type[int] \
-    = Annotated[int, mapped_column(primary_key=True, autoincrement=False)]
-"""The random primary key."""
 
 
 class BaseAccount(db.Model):
