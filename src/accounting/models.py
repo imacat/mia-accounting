@@ -127,17 +127,17 @@ class Account(db.Model):
     is_need_offset: Mapped[bool] = mapped_column(default=False)
     """Whether the journal entry line items of this account need offset."""
     created_at: Mapped[timestamp]
-    """The time of creation."""
+    """The date and time when this record was created."""
     created_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the creator."""
+    """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
-    """The creator."""
+    """The user who created the record."""
     updated_at: Mapped[timestamp]
-    """The time of last update."""
+    """The date and time when this record was last updated."""
     updated_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the updator."""
+    """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
-    """The updator."""
+    """The last user who updated the record."""
     l10n: Mapped[list[AccountL10n]] \
         = db.relationship(back_populates="account", lazy=False)
     """The localized titles."""
@@ -377,18 +377,18 @@ class Currency(db.Model):
     name_l10n: Mapped[str] = mapped_column("name")
     """The name."""
     created_at: Mapped[timestamp]
-    """The time of creation."""
+    """The date and time when this record was created."""
     created_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the creator."""
+    """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
-    """The creator."""
+    """The user who created the record."""
     updated_at: Mapped[timestamp]
-    """The time of last update."""
+    """The date and time when this record was last updated."""
     updated_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the updator."""
+    """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] \
         = db.relationship(foreign_keys=updated_by_id)
-    """The updator."""
+    """The last user who updated the record."""
     l10n: Mapped[list[CurrencyL10n]] \
         = db.relationship(back_populates="currency", lazy=False)
     """The localized names."""
@@ -544,17 +544,17 @@ class JournalEntry(db.Model):
     note: Mapped[str | None]
     """The note."""
     created_at: Mapped[timestamp]
-    """The time of creation."""
+    """The date and time when this record was created."""
     created_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the creator."""
+    """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
-    """The creator."""
+    """The user who created the record."""
     updated_at: Mapped[timestamp]
-    """The time of last update."""
+    """The date and time when this record was last updated."""
     updated_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the updator."""
+    """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
-    """The updator."""
+    """The last user who updated the record."""
     line_items: Mapped[list[JournalEntryLineItem]] \
         = db.relationship(back_populates="journal_entry")
     """The line items."""
@@ -877,14 +877,14 @@ class Option(db.Model):
     value: Mapped[str] = mapped_column(db.Text)
     """The option value."""
     created_at: Mapped[timestamp]
-    """The time of creation."""
+    """The date and time when this record was created."""
     created_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the creator."""
+    """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
-    """The creator."""
+    """The user who created the record."""
     updated_at: Mapped[timestamp]
-    """The time of last update."""
+    """The date and time when this record was last updated."""
     updated_by_id: Mapped[user_pk] = mapped_column()
-    """The ID of the updator."""
+    """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
-    """The updator."""
+    """The last user who updated the record."""
