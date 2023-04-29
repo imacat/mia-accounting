@@ -22,7 +22,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from decimal import Decimal
-from typing import Type, Annotated, Self
+from typing import Type, Self
 
 import sqlalchemy as sa
 from babel import Locale
@@ -33,15 +33,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from accounting import db
 from accounting.locale import gettext
 from accounting.utils.user import user_cls, user_pk_column
-
-timestamp: Type[dt.datetime] \
-    = Annotated[dt.datetime, mapped_column(db.DateTime(timezone=True),
-                                           server_default=db.func.now())]
-"""The timestamp."""
-user_pk: Type[int] \
-    = Annotated[int, mapped_column(db.ForeignKey(user_pk_column,
-                                                 onupdate="CASCADE"))]
-"""The user primary key."""
 
 
 class BaseAccount(db.Model):
@@ -123,15 +114,21 @@ class Account(db.Model):
     """The title."""
     is_need_offset: Mapped[bool] = mapped_column(default=False)
     """Whether the journal entry line items of this account need offset."""
-    created_at: Mapped[timestamp]
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was created."""
-    created_by_id: Mapped[user_pk] = mapped_column()
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The user who created the record."""
-    updated_at: Mapped[timestamp]
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was last updated."""
-    updated_by_id: Mapped[user_pk] = mapped_column()
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
@@ -373,15 +370,21 @@ class Currency(db.Model):
     """The code."""
     name_l10n: Mapped[str] = mapped_column("name")
     """The name."""
-    created_at: Mapped[timestamp]
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was created."""
-    created_by_id: Mapped[user_pk] = mapped_column()
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The user who created the record."""
-    updated_at: Mapped[timestamp]
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was last updated."""
-    updated_by_id: Mapped[user_pk] = mapped_column()
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] \
         = db.relationship(foreign_keys=updated_by_id)
@@ -540,15 +543,21 @@ class JournalEntry(db.Model):
     """The account number under the date."""
     note: Mapped[str | None]
     """The note."""
-    created_at: Mapped[timestamp]
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was created."""
-    created_by_id: Mapped[user_pk] = mapped_column()
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The user who created the record."""
-    updated_at: Mapped[timestamp]
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was last updated."""
-    updated_by_id: Mapped[user_pk] = mapped_column()
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
@@ -873,15 +882,21 @@ class Option(db.Model):
     """The name."""
     value: Mapped[str] = mapped_column(db.Text)
     """The option value."""
-    created_at: Mapped[timestamp]
+    created_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was created."""
-    created_by_id: Mapped[user_pk] = mapped_column()
+    created_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
     created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
     """The user who created the record."""
-    updated_at: Mapped[timestamp]
+    updated_at: Mapped[dt.datetime] \
+        = mapped_column(db.DateTime(timezone=True),
+                        server_default=db.func.now())
     """The date and time when this record was last updated."""
-    updated_by_id: Mapped[user_pk] = mapped_column()
+    updated_by_id: Mapped[int] \
+        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
