@@ -124,14 +124,12 @@ class OffsetMatcher:
                      selectinload(JournalEntryLineItem.journal_entry)).all()
         for line_item in self.line_items:
             line_item.is_offset = line_item.id not in net_balances
-        self.unapplied = [x for x in self.line_items
-                          if not x.is_offset]
+        self.unapplied = [x for x in self.line_items if not x.is_offset]
         for line_item in self.unapplied:
             line_item.net_balance = line_item.amount \
                 if net_balances[line_item.id] is None \
                 else net_balances[line_item.id]
-        self.unmatched = [x for x in self.line_items
-                          if x.is_offset]
+        self.unmatched = [x for x in self.line_items if x.is_offset]
         self.__populate_accumulated_balances()
 
     def __populate_accumulated_balances(self) -> None:
