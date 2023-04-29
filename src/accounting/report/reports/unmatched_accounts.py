@@ -144,7 +144,7 @@ class AccountsWithUnmatchedOffsets(BaseReport):
 
         :return: The response of the report for download.
         """
-        filename: str = f"unapplied-accounts.csv"
+        filename: str = "unmatched-accounts.csv"
         return csv_download(filename, get_csv_rows(self.__accounts))
 
     def html(self) -> str:
