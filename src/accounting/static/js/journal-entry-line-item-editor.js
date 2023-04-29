@@ -276,7 +276,6 @@ class JournalEntryLineItemEditor {
         this.originalLineItemDate = originalLineItem.date;
         this.originalLineItemText = originalLineItem.text;
         this.#originalLineItemText.innerText = originalLineItem.text;
-        this.#setEnableDescriptionAccount(false);
         if (this.description === null) {
             if (originalLineItem.description === "") {
                 this.#descriptionControl.classList.remove("accounting-not-empty");
