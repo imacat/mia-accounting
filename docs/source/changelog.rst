@@ -2,6 +2,16 @@ Change Log
 ==========
 
 
+Version 1.5.1
+-------------
+
+Released 2023/4/30
+
+* Fixed the error calling the old ``setEnableDescriptionAccount``
+  method in the ``saveOriginalLineItem`` method of the JavaScript
+  ``JournalEntryLineItemEditor`` class.
+
+
 Version 1.5.0
 -------------
 
