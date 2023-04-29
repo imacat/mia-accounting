@@ -2,6 +2,14 @@ Change Log
 ==========
 
 
+Version 1.5.2
+-------------
+
+Released 2023/4/30
+
+* Fixed the error of the net balance in the unmatched offset list.
+
+
 Version 1.5.1
 -------------
 
