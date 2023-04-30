@@ -2,6 +2,17 @@ Change Log
 ==========
 
 
+Version 1.5.3
+-------------
+
+Released 2023/4/30
+
+* Fixed the error of the net balance in the unmatched offset list.
+* Revised the original line item editor not to override the existing
+  amount when the existing amount is less or equal to the net
+  balance.
+
+
 Version 1.5.2
 -------------
 
