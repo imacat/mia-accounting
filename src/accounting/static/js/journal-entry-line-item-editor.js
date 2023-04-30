@@ -290,7 +290,9 @@ class JournalEntryLineItemEditor {
         this.account = originalLineItem.account.copy();
         this.isAccountConfirmed = false;
         this.#accountText.innerText = this.account.text;
-        this.#amountInput.value = String(originalLineItem.netBalance);
+        if (this.#amountInput.value === "" || new Decimal(this.#amountInput.value).greaterThan(originalLineItem.netBalance)) {
+            this.#amountInput.value = String(originalLineItem.netBalance);
+        }
         this.#amountInput.max = String(originalLineItem.netBalance);
         this.#amountInput.min = "0";
         this.#validate();
