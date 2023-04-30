@@ -182,6 +182,8 @@ class Account(db.Model):
         :param value: The new title.
         :return: None.
         """
+        if self.title == value:
+            return
         if self.title_l10n is None:
             self.title_l10n = value
             return
@@ -424,6 +426,8 @@ class Currency(db.Model):
         :param value: The new name.
         :return: None.
         """
+        if self.name == value:
+            return
         if self.name_l10n is None:
             self.name_l10n = value
             return
