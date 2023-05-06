@@ -50,9 +50,9 @@ The following front-end JavaScript libraries must be loaded.  You may
 download it locally or use CDN_.
 
 * Bootstrap_ 5.2.3 or above
-* FontAwesome_ 6.2.1 or above
-* `Decimal.js`_ 6.4.3 or above
-* `Tempus-Dominus`_ 6.4.3 or above
+* FontAwesome_ 6.4.0 or above
+* `decimal.js`_ 10.4.3 or above, or `decimal.js-light`_ 2.5.1 or above.
+* `Tempus-Dominus`_ 6.7.7 or above
 
 
 Configuration
@@ -114,6 +114,7 @@ Check your Flask application and see how it works.
 .. _CDN: https://en.wikipedia.org/wiki/Content_delivery_network
 .. _Bootstrap: https://getbootstrap.com
 .. _FontAwesome: https://fontawesome.com
-.. _Decimal.js: https://mikemcl.github.io/decimal.js
+.. _decimal.js: https://mikemcl.github.io/decimal.js
+.. _decimal.js-light: https://mikemcl.github.io/decimal.js-light
 .. _Tempus-Dominus: https://getdatepicker.com
 .. _Bootstrap navigation bar: https://getbootstrap.com/docs/5.3/components/navbar/
