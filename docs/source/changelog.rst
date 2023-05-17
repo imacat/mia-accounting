@@ -2,6 +2,20 @@ Change Log
 ==========
 
 
+Version 1.5.4
+-------------
+
+Released 2023/5/18
+
+Security fixes.
+
+* Added safeguard to the next URI utilities, to prevent Cross-Site
+  Scripting (XSS) attacks.
+* Applied the safe next URI utilities to the test site.
+* Added the ``SameSite`` and ``Secure`` flags to the session cookie
+  of the test site.
+
+
 Version 1.5.3
 -------------
 
