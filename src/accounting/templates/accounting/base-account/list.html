@@ -26,7 +26,7 @@ First written: 2023/1/26
 {% block content %}
 
 <div class="mb-2 accounting-toolbar">
-  <form class="btn btn-primary d-flex input-group" action="{{ url_for("accounting.base-account.list") }}" method="get" role="search" aria-labelledby="accounting-toolbar-search-label">
+  <form class="btn btn-primary d-flex input-group" name="accounting-search-form" action="{{ url_for("accounting.base-account.list") }}" method="get" role="search" aria-labelledby="accounting-toolbar-search-label">
     <input id="accounting-toolbar-search" class="form-control form-control-sm" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label id="accounting-toolbar-search-label" for="accounting-toolbar-search" class="input-group-text">
       <button type="submit">

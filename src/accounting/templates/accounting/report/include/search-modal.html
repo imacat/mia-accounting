@@ -19,7 +19,7 @@ search-modal.html: The search modal
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/8
 #}
-<form action="{{ url_for("accounting-report.search") }}" method="get" role="search" aria-labelledby="accounting-search-modal-label">
+<form action="{{ url_for("accounting-report.search") }}" name="accounting-search-form" method="get" role="search" aria-labelledby="accounting-search-modal-label">
   <div class="modal fade" id="accounting-search-modal" tabindex="-1" aria-labelledby="accounting-search-modal-label" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
