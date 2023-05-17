@@ -19,9 +19,11 @@
 """
 from babel import Locale
 from flask import request, session, current_app, Blueprint, Response, \
-    redirect, url_for, Flask
+    redirect, Flask
 from flask_babel import Babel
 from werkzeug.datastructures import LanguageAccept
+
+from accounting.utils.next_uri import or_next
 
 bp: Blueprint = Blueprint("locale", __name__, url_prefix="/")
 
@@ -68,9 +70,7 @@ def set_locale() -> Response:
     all_linguas: dict[str, str] = get_all_linguas()
     if "locale" in request.form and request.form["locale"] in all_linguas:
         session["locale"] = request.form["locale"]
-    if "next" in request.form:
-        return redirect(request.form["next"])
-    return redirect(url_for("home.home"))
+    return redirect(or_next("/"))
 
 
 def get_all_linguas() -> dict[str, str]:
