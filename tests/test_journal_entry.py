@@ -2181,14 +2181,14 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         response = self.client.post(
             f"{PREFIX}/dates/{date.isoformat()}",
             data={"csrf_token": self.csrf_token,
-                  "next": "/next",
+                  "next": NEXT_URI,
                   f"{id_1}-no": "4",
                   f"{id_2}-no": "1",
                   f"{id_3}-no": "5",
                   f"{id_4}-no": "2",
                   f"{id_5}-no": "3"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/next")
+        self.assertEqual(response.headers["Location"], NEXT_URI)
 
         with self.app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 4)
@@ -2209,12 +2209,12 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         response = self.client.post(
             f"{PREFIX}/dates/{date.isoformat()}",
             data={"csrf_token": self.csrf_token,
-                  "next": "/next",
+                  "next": NEXT_URI,
                   f"{id_2}-no": "3a",
                   f"{id_3}-no": "5",
                   f"{id_4}-no": "2"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/next")
+        self.assertEqual(response.headers["Location"], NEXT_URI)
 
         with self.app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 3)
