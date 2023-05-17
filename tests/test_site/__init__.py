@@ -52,6 +52,8 @@ def create_app(is_testing: bool = False) -> Flask:
     db_uri: str = "sqlite:///" if is_testing else "sqlite:///local.sqlite"
     app.config.from_mapping({
         "SECRET_KEY": os.environ.get("SECRET_KEY", token_urlsafe(32)),
+        "SESSION_COOKIE_SAMESITE": "Lax",
+        "SESSION_COOKIE_SECURE": True,
         "SQLALCHEMY_DATABASE_URI": db_uri,
         "BABEL_DEFAULT_LOCALE": "en",
         "ALL_LINGUAS": "zh_Hant|正體中文,en|English,zh_Hans|简体中文",
