@@ -14,8 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""The utility to cast a SQLAlchemy column into the column type, to avoid
-warnings from the IDE.
+"""The utilities to cast values into desired types, to avoid IDE warnings.
 
 This module should not import any other module from the application.
 
