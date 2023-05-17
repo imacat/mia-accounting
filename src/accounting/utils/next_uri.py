@@ -41,11 +41,8 @@ def inherit_next(uri: str) -> str:
     :param uri: The URI.
     :return: The URI with the current next URI added at the query argument.
     """
-    next_uri: str | None = request.form.get("next") \
-        if request.method == "POST" else request.args.get("next")
-    if next_uri is None:
-        return uri
-    return __set_next(uri, next_uri)
+    next_uri: str | None = __get_next_uri()
+    return uri if next_uri is None else __set_next(uri, next_uri)
 
 
 def or_next(uri: str) -> str:
@@ -54,9 +51,22 @@ def or_next(uri: str) -> str:
     :param uri: The URI.
     :return: The next URI or the supplied URI.
     """
+    next_uri: str | None = __get_next_uri()
+    return uri if next_uri is None else next_uri
+
+
+def __get_next_uri() -> str | None:
+    """Returns the valid next URI.
+
+    :return: The valid next URI.
+    """
     next_uri: str | None = request.form.get("next") \
         if request.method == "POST" else request.args.get("next")
-    return uri if next_uri is None else next_uri
+    if next_uri is None or not next_uri.startswith("/"):
+        return None
+    if len(next_uri) > 512:
+        return next_uri[:512]
+    return next_uri
 
 
 def __set_next(uri: str, next_uri: str) -> str:
