@@ -2153,7 +2153,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 1)
             self.assertEqual(db.session.get(JournalEntry, id_2).no, 3)
             self.assertEqual(db.session.get(JournalEntry, id_3).no, 2)
-            self.assertEqual(db.session.get(JournalEntry, id_4).no, 1)
+            self.assertEqual(   db.session.get(JournalEntry, id_4).no, 1)
             self.assertEqual(db.session.get(JournalEntry, id_5).no, 2)
 
     def test_reorder(self) -> None:
@@ -2188,7 +2188,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
                   f"{id_4}-no": "2",
                   f"{id_5}-no": "3"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], f"/next")
+        self.assertEqual(response.headers["Location"], "/next")
 
         with self.app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 4)
@@ -2214,7 +2214,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
                   f"{id_3}-no": "5",
                   f"{id_4}-no": "2"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], f"/next")
+        self.assertEqual(response.headers["Location"], "/next")
 
         with self.app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 3)
