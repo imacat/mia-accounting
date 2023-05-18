@@ -140,21 +140,6 @@ class NextUriTestCase(unittest.TestCase):
                                      "next": next_uri})
         self.assertEqual(response.status_code, 200)
 
-        # An extremely-long URI to trigger the error
-        next_uri = "/" + "x" * 1024
-        expected2 = next_uri[:512]
-        expected1 = f"{self.TARGET}?next={quote_plus(expected2)}"
-        response = client.get(f"/test-invalid-next?next={quote_plus(next_uri)}"
-                              f"&inherit-expected={quote_plus(expected1)}"
-                              f"&or-expected={quote_plus(expected2)}")
-        self.assertEqual(response.status_code, 200)
-        response = client.post("/test-invalid-next"
-                               f"?inherit-expected={quote_plus(expected1)}"
-                               f"&or-expected={quote_plus(expected2)}",
-                               data={"csrf_token": csrf_token,
-                                     "next": next_uri})
-        self.assertEqual(response.status_code, 200)
-
 
 class QueryKeywordParserTestCase(unittest.TestCase):
     """The test case for the query keyword parser."""

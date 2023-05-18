@@ -64,8 +64,6 @@ def __get_next_uri() -> str | None:
         if request.method == "POST" else request.args.get("next")
     if next_uri is None or not next_uri.startswith("/"):
         return None
-    if len(next_uri) > 512:
-        return next_uri[:512]
     return next_uri
 
 
