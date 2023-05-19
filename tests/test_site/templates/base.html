@@ -121,10 +121,10 @@ First written: 2023/1/27
   {% if messages %}
     {% for category, message in messages %}
       {% if category == "success" %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
       {% elif category == "error" %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           <strong>{{ _("Error:") }}</strong> {{ message }}
