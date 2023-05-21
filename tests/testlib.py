@@ -71,9 +71,9 @@ def create_test_app() -> Flask:
         """The test view to return the CSRF token."""
         return render_template_string("{{csrf_token()}}")
 
-    @app.get("/.errors")
-    def get_errors_view() -> str:
-        """The test view to return the CSRF token."""
+    @app.get("/.messages")
+    def get_messages_view() -> str:
+        """The test view to return the flashed messages."""
         return render_template_string("{{get_flashed_messages()|tojson}}")
 
     return app
