@@ -19,7 +19,8 @@ description-editor-modal.html: The modal of the description editor
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/28
 #}
-<form id="accounting-description-editor-{{ description_editor.debit_credit }}" class="accounting-description-editor" name="accounting-dummy-form" data-debit-credit="{{ description_editor.debit_credit }}">
+<form id="accounting-description-editor-{{ description_editor.debit_credit }}" class="accounting-description-editor" data-debit-credit="{{ description_editor.debit_credit }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div id="accounting-description-editor-{{ description_editor.debit_credit }}-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-modal-label" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
