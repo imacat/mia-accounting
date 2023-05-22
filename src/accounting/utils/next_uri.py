@@ -41,7 +41,7 @@ def inherit_next(uri: str) -> str:
     :param uri: The URI.
     :return: The URI with the current next URI added at the query argument.
     """
-    next_uri: str | None = __get_next_uri()
+    next_uri: str | None = __get_next()
     return uri if next_uri is None else __set_next(uri, next_uri)
 
 
@@ -51,11 +51,11 @@ def or_next(uri: str) -> str:
     :param uri: The URI.
     :return: The next URI or the supplied URI.
     """
-    next_uri: str | None = __get_next_uri()
+    next_uri: str | None = __get_next()
     return uri if next_uri is None else next_uri
 
 
-def __get_next_uri() -> str | None:
+def __get_next() -> str | None:
     """Returns the valid next URI.
 
     :return: The valid next URI.
