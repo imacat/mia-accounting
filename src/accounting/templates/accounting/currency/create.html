@@ -23,6 +23,6 @@ First written: 2023/2/6
 
 {% block header %}{% block title %}{{ A_("Add a New Currency") }}{% endblock %}{% endblock %}
 
-{% block back_url %}{{ request.args.get("next") or url_for("accounting.currency.list") }}{% endblock %}
+{% block back_url %}{{ url_for("accounting.currency.list")|accounting_or_next }}{% endblock %}
 
 {% block action_url %}{{ url_for("accounting.currency.store") }}{% endblock %}

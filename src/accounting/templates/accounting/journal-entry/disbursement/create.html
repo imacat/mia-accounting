@@ -23,6 +23,6 @@ First written: 2023/2/25
 
 {% block header %}{% block title %}{{ A_("Add a New Cash Disbursement Journal Entry") }}{% endblock %}{% endblock %}
 
-{% block back_url %}{{ request.args.get("next") or url_for("accounting-report.default") }}{% endblock %}
+{% block back_url %}{{ url_for("accounting-report.default")|accounting_or_next }}{% endblock %}
 
 {% block action_url %}{{ url_for("accounting.journal-entry.store", journal_entry_type=journal_entry_type) }}{% endblock %}
