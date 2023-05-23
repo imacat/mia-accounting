@@ -23,6 +23,7 @@ import unittest
 import httpx
 from flask import Flask
 
+from accounting.utils.next_uri import encode_next
 from test_site import db
 from testlib import NEXT_URI, create_test_app, get_client, set_locale, \
     add_journal_entry
@@ -468,7 +469,7 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual(currency.name_l10n, USD.name)
             self.assertEqual(currency.l10n, [])
 
-        set_locale(self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.app, self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -483,7 +484,7 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.name) for x in currency.l10n},
                              {("zh_Hant", f"{USD.name}-zh_Hant")})
 
-        set_locale(self.client, self.csrf_token, "en")
+        set_locale(self.app, self.client, self.csrf_token, "en")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -498,7 +499,7 @@ class CurrencyTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.name) for x in currency.l10n},
                              {("zh_Hant", f"{USD.name}-zh_Hant")})
 
-        set_locale(self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.app, self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -521,6 +522,8 @@ class CurrencyTestCase(unittest.TestCase):
         from accounting.models import Currency
         detail_uri: str = f"{PREFIX}/{JPY.code}"
         delete_uri: str = f"{PREFIX}/{JPY.code}/delete"
+        with self.app.app_context():
+            encoded_next_uri: str = encode_next(NEXT_URI)
         list_uri: str = PREFIX
         response: httpx.Response
 
@@ -533,7 +536,7 @@ class CurrencyTestCase(unittest.TestCase):
 
         add_journal_entry(self.client,
                           form={"csrf_token": self.csrf_token,
-                                "next": NEXT_URI,
+                                "next": encoded_next_uri,
                                 "date": dt.date.today().isoformat(),
                                 "currency-1-code": EUR.code,
                                 "currency-1-credit-1-account_code": "1111-001",

@@ -24,6 +24,7 @@ from decimal import Decimal
 import httpx
 from flask import Flask
 
+from accounting.utils.next_uri import encode_next
 from test_site import db
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
     add_journal_entry, match_journal_entry_detail
@@ -53,6 +54,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -153,7 +155,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
                                     data=update_form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_id}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_id}?"
+                         f"next={self.encoded_next_uri}")
 
         response = self.client.post(f"{PREFIX}/{journal_entry_id}/delete",
                                     data={"csrf_token": self.csrf_token})
@@ -166,7 +169,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
-        create_uri: str = f"{PREFIX}/create/receipt?next=%2F_next"
+        create_uri: str = (f"{PREFIX}/create/receipt?"
+                           f"next={self.encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/receipt"
         response: httpx.Response
         form: dict[str, str]
@@ -322,8 +326,10 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
-        edit_uri: str = f"{PREFIX}/{journal_entry_id}/edit?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
+        edit_uri: str = (f"{PREFIX}/{journal_entry_id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
 
@@ -485,7 +491,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
@@ -524,7 +531,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             = add_journal_entry(self.client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
         client, csrf_token = get_client(self.app, admin_username)
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
@@ -557,7 +565,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry, JournalEntryLineItem
         journal_entry_id_1: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id_1}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id_1}?"
+                           f"next={self.encoded_next_uri}")
         delete_uri: str = f"{PREFIX}/{journal_entry_id_1}/delete"
         response: httpx.Response
 
@@ -575,7 +584,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         add_journal_entry(
             self.client,
             form={"csrf_token": self.csrf_token,
-                  "next": NEXT_URI,
+                  "next": self.encoded_next_uri,
                   "date": dt.date.today().isoformat(),
                   "currency-1-code": line_item.currency_code,
                   "currency-1-debit-1-original_line_item_id": line_item.id,
@@ -585,17 +594,18 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         # Cannot delete the journal entry that is in use
         response = self.client.post(f"{PREFIX}/{journal_entry_id_2}/delete",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_id_2}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_id_2}?"
+                         f"next={self.encoded_next_uri}")
 
         # Success
         response = self.client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -603,7 +613,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 404)
 
     def __get_add_form(self) -> dict[str, str]:
@@ -611,7 +621,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token)
+        form: dict[str, str] = get_add_form(self.csrf_token,
+                                            self.encoded_next_uri)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -625,7 +636,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             not changed.
         """
         form: dict[str, str] = get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token)
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -638,7 +649,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             changed.
         """
         form: dict[str, str] = get_update_form(
-            journal_entry_id, self.app, self.csrf_token, False)
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri,
+            False)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -658,6 +670,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -758,7 +771,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
                                     data=update_form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_id}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_id}?"
+                         f"next={self.encoded_next_uri}")
 
         response = self.client.post(f"{PREFIX}/{journal_entry_id}/delete",
                                     data={"csrf_token": self.csrf_token})
@@ -771,7 +785,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
-        create_uri: str = f"{PREFIX}/create/disbursement?next=%2F_next"
+        create_uri: str = (f"{PREFIX}/create/disbursement?"
+                           f"next={self.encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/disbursement"
         response: httpx.Response
         form: dict[str, str]
@@ -930,8 +945,10 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
-        edit_uri: str = f"{PREFIX}/{journal_entry_id}/edit?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
+        edit_uri: str = (f"{PREFIX}/{journal_entry_id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
 
@@ -1097,7 +1114,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
@@ -1136,7 +1154,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             = add_journal_entry(self.client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
         client, csrf_token = get_client(self.app, admin_username)
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
@@ -1168,7 +1187,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         delete_uri: str = f"{PREFIX}/{journal_entry_id}/delete"
         response: httpx.Response
 
@@ -1176,7 +1196,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -1184,7 +1204,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 404)
 
     def __get_add_form(self) -> dict[str, str]:
@@ -1192,7 +1212,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token)
+        form: dict[str, str] = get_add_form(self.csrf_token,
+                                            self.encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -1206,7 +1227,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             not changed.
         """
         form: dict[str, str] = get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token)
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -1219,7 +1240,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             changed.
         """
         form: dict[str, str] = get_update_form(
-            journal_entry_id, self.app, self.csrf_token, True)
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri,
+            True)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -1240,6 +1262,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
                 JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -1340,7 +1363,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
                                     data=update_form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_id}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_id}?"
+                         f"next={self.encoded_next_uri}")
 
         response = self.client.post(f"{PREFIX}/{journal_entry_id}/delete",
                                     data={"csrf_token": self.csrf_token})
@@ -1353,7 +1377,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
-        create_uri: str = f"{PREFIX}/create/transfer?next=%2F_next"
+        create_uri: str = (f"{PREFIX}/create/transfer?"
+                           f"next={self.encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/transfer"
         response: httpx.Response
         form: dict[str, str]
@@ -1548,8 +1573,10 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
-        edit_uri: str = f"{PREFIX}/{journal_entry_id}/edit?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
+        edit_uri: str = (f"{PREFIX}/{journal_entry_id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
 
@@ -1758,7 +1785,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
@@ -1797,7 +1825,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             = add_journal_entry(self.client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
         client, csrf_token = get_client(self.app, admin_username)
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
@@ -1831,7 +1860,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update?as=receipt"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
         form_0 = {x: form_0[x] for x in form_0 if "-debit-" not in x}
@@ -1932,7 +1962,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update?as=disbursement"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
         form_0 = {x: form_0[x] for x in form_0 if "-credit-" not in x}
@@ -2035,7 +2066,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
-        detail_uri: str = f"{PREFIX}/{journal_entry_id}?next=%2F_next"
+        detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
+                           f"next={self.encoded_next_uri}")
         delete_uri: str = f"{PREFIX}/{journal_entry_id}/delete"
         response: httpx.Response
 
@@ -2043,7 +2075,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -2051,7 +2083,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.post(delete_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 404)
 
     def __get_add_form(self) -> dict[str, str]:
@@ -2059,7 +2091,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        return get_add_form(self.csrf_token)
+        return get_add_form(self.csrf_token, self.encoded_next_uri)
 
     def __get_unchanged_update_form(self, journal_entry_id: int) \
             -> dict[str, str]:
@@ -2071,7 +2103,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             not changed.
         """
         return get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token)
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
 
     def __get_update_form(self, journal_entry_id: int) -> dict[str, str]:
         """Returns the form data to update a journal entry, where the data are
@@ -2081,8 +2113,9 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         :return: The form data to update the journal entry, where the data are
             changed.
         """
-        return get_update_form(journal_entry_id,
-                               self.app, self.csrf_token, None)
+        return get_update_form(
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri,
+            None)
 
 
 class JournalEntryReorderTestCase(unittest.TestCase):
@@ -2100,6 +2133,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -2147,7 +2181,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         response = self.client.post(f"{PREFIX}/{id_2}/update", data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{id_2}?next=%2F_next")
+                         f"{PREFIX}/{id_2}?next={self.encoded_next_uri}")
 
         with self.app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 1)
@@ -2181,7 +2215,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         response = self.client.post(
             f"{PREFIX}/dates/{date.isoformat()}",
             data={"csrf_token": self.csrf_token,
-                  "next": NEXT_URI,
+                  "next": self.encoded_next_uri,
                   f"{id_1}-no": "4",
                   f"{id_2}-no": "1",
                   f"{id_3}-no": "5",
@@ -2209,7 +2243,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         response = self.client.post(
             f"{PREFIX}/dates/{date.isoformat()}",
             data={"csrf_token": self.csrf_token,
-                  "next": NEXT_URI,
+                  "next": self.encoded_next_uri,
                   f"{id_2}-no": "3a",
                   f"{id_3}-no": "5",
                   f"{id_4}-no": "2"})
@@ -2228,7 +2262,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: The form data to add a new cash receipt journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token)
+        form: dict[str, str] = get_add_form(self.csrf_token,
+                                            self.encoded_next_uri)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -2237,7 +2272,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: The form data to add a new cash disbursement journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token)
+        form: dict[str, str] = get_add_form(self.csrf_token,
+                                            self.encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -2251,7 +2287,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             where the data are not changed.
         """
         form: dict[str, str] = get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token)
+            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -2260,4 +2296,4 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        return get_add_form(self.csrf_token)
+        return get_add_form(self.csrf_token, self.encoded_next_uri)

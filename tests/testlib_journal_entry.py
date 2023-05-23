@@ -33,14 +33,15 @@ EMPTY_NOTE: str = " \n\n  "
 """The empty note content."""
 
 
-def get_add_form(csrf_token: str) -> dict[str, str]:
+def get_add_form(csrf_token: str, encoded_next_uri: str) -> dict[str, str]:
     """Returns the form data to add a new journal entry.
 
     :param csrf_token: The CSRF token.
+    :param encoded_next_uri: The encoded next URI.
     :return: The form data to add a new journal entry.
     """
     return {"csrf_token": csrf_token,
-            "next": NEXT_URI,
+            "next": encoded_next_uri,
             "date": dt.date.today().isoformat(),
             "currency-0-code": "USD",
             "currency-0-debit-0-no": "16",
@@ -102,13 +103,15 @@ def get_add_form(csrf_token: str) -> dict[str, str]:
 
 
 def get_unchanged_update_form(journal_entry_id: int, app: Flask,
-                              csrf_token: str) -> dict[str, str]:
+                              csrf_token: str, encoded_next_uri: str) \
+        -> dict[str, str]:
     """Returns the form data to update a journal entry, where the data are not
     changed.
 
     :param journal_entry_id: The journal entry ID.
     :param app: The Flask application.
     :param csrf_token: The CSRF token.
+    :param encoded_next_uri: The encoded next URI.
     :return: The form data to update the journal entry, where the data are not
         changed.
     """
@@ -121,7 +124,7 @@ def get_unchanged_update_form(journal_entry_id: int, app: Flask,
 
     form: dict[str, str] \
         = {"csrf_token": csrf_token,
-           "next": NEXT_URI,
+           "next": encoded_next_uri,
            "date": journal_entry.date,
            "note": "  \n \n\n  " if journal_entry.note is None
            else f"\n    \n\n \n  \n{journal_entry.note}  \n\n   "}
@@ -182,20 +185,22 @@ def __get_new_index(indices_used: set[int]) -> int:
 
 
 def get_update_form(journal_entry_id: int, app: Flask,
-                    csrf_token: str, is_debit: bool | None) -> dict[str, str]:
+                    csrf_token: str, encoded_next_uri: str,
+                    is_debit: bool | None) -> dict[str, str]:
     """Returns the form data to update a journal entry, where the data are
     changed.
 
     :param journal_entry_id: The journal entry ID.
     :param app: The Flask application.
     :param csrf_token: The CSRF token.
+    :param encoded_next_uri: The encoded next URI.
     :param is_debit: True for a cash disbursement journal entry, False for a
         cash receipt journal entry, or None for a transfer journal entry.
     :return: The form data to update the journal entry, where the data are
         changed.
     """
     form: dict[str, str] = get_unchanged_update_form(
-        journal_entry_id, app, csrf_token)
+        journal_entry_id, app, csrf_token, encoded_next_uri)
 
     # Mess up the line items in a currency
     currency_prefix: str = __get_currency_prefix(form, "USD")

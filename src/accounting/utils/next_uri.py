@@ -22,7 +22,8 @@ This module should not import any other module from the application.
 from urllib.parse import urlparse, parse_qsl, ParseResult, urlencode, \
     urlunparse
 
-from flask import request, Blueprint
+from flask import request, Blueprint, current_app
+from itsdangerous import URLSafeSerializer, BadData
 
 
 def append_next(uri: str) -> str:
@@ -62,9 +63,13 @@ def __get_next() -> str | None:
     """
     next_uri: str | None = request.form.get("next") \
         if request.method == "POST" else request.args.get("next")
-    if next_uri is None or not next_uri.startswith("/"):
+    if next_uri is None:
         return None
-    return next_uri
+    try:
+        return URLSafeSerializer(current_app.config["SECRET_KEY"])\
+            .loads(next_uri, "next")
+    except BadData:
+        return None
 
 
 def __set_next(uri: str, next_uri: str) -> str:
@@ -77,10 +82,20 @@ def __set_next(uri: str, next_uri: str) -> str:
     uri_p: ParseResult = urlparse(uri)
     params: list[tuple[str, str]] = parse_qsl(uri_p.query)
     params = [x for x in params if x[0] != "next"]
-    params.append(("next", next_uri))
+    params.append(("next", encode_next(next_uri)))
     parts: list[str] = list(uri_p)
     parts[4] = urlencode(params)
     return urlunparse(parts)
+
+
+def encode_next(uri: str) -> str:
+    """Encodes the next URI.
+
+    :param uri: The next URI.
+    :return: The encoded next URI.
+    """
+    return URLSafeSerializer(current_app.config["SECRET_KEY"])\
+        .dumps(uri, "next")
 
 
 def init_app(bp: Blueprint) -> None:

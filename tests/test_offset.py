@@ -25,6 +25,7 @@ from decimal import Decimal
 import httpx
 from flask import Flask
 
+from accounting.utils.next_uri import encode_next
 from test_site import db
 from test_site.lib import JournalEntryLineItemData, JournalEntryCurrencyData, \
     JournalEntryData, BaseTestData
@@ -50,6 +51,7 @@ class OffsetTestCase(unittest.TestCase):
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
         self.data: OffsetTestData = OffsetTestData(self.app, "editor")
@@ -61,7 +63,8 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account, JournalEntry
-        create_uri: str = f"{PREFIX}/create/receipt?next=%2F_next"
+        create_uri: str = (f"{PREFIX}/create/receipt?"
+                           f"next={self.encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/receipt"
         form: dict[str, str]
         old_amount: Decimal
@@ -85,14 +88,16 @@ class OffsetTestCase(unittest.TestCase):
                      original_line_item=self.data.l_r_or3d)])])
 
         # Non-existing original line item ID
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-credit-1-original_line_item_id"] = "9999"
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # The same debit or credit
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-credit-1-original_line_item_id"] \
             = str(self.data.l_p_or1c.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_or1c.account
@@ -108,7 +113,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
         response = self.client.post(
             store_uri,
-            data=journal_entry_data.new_form(self.csrf_token, NEXT_URI))
+            data=journal_entry_data.new_form(self.csrf_token,
+                                             self.encoded_next_uri))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
         with self.app.app_context():
@@ -117,7 +123,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
 
         # The original line item is also an offset
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-credit-1-original_line_item_id"] \
             = str(self.data.l_p_of1d.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_of1d.account
@@ -126,21 +133,24 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not the same currency
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-code"] = "EUR"
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not the same account
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-credit-1-account_code"] = Accounts.NOTES_RECEIVABLE
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not exceeding net balance - partially offset
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-credit-1-amount"] \
             = str(journal_entry_data.currencies[0].credit[0].amount
                   + Decimal("0.01"))
@@ -149,7 +159,8 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not exceeding net balance - unmatched
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-credit-3-amount"] \
             = str(journal_entry_data.currencies[0].credit[2].amount
                   + Decimal("0.01"))
@@ -160,14 +171,16 @@ class OffsetTestCase(unittest.TestCase):
         # Not before the original line items
         old_days = journal_entry_data.days
         journal_entry_data.days = old_days + 1
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
         journal_entry_data.days = old_days
 
         # Success
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
@@ -184,7 +197,8 @@ class OffsetTestCase(unittest.TestCase):
         """
         from accounting.models import Account
         journal_entry_data: JournalEntryData = self.data.j_r_of2
-        edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
+        edit_uri: str = (f"{PREFIX}/{journal_entry_data.id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
@@ -196,14 +210,16 @@ class OffsetTestCase(unittest.TestCase):
         journal_entry_data.currencies[0].credit[2].amount = Decimal("600")
 
         # Non-existing original line item ID
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-credit-1-original_line_item_id"] = "9999"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # The same debit or credit
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-credit-1-original_line_item_id"] \
             = str(self.data.l_p_or1c.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_or1c.account
@@ -220,7 +236,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
         response = self.client.post(
             update_uri,
-            data=journal_entry_data.update_form(self.csrf_token, NEXT_URI))
+            data=journal_entry_data.update_form(self.csrf_token,
+                                                self.encoded_next_uri))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
         with self.app.app_context():
@@ -229,7 +246,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
 
         # The original line item is also an offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-credit-1-original_line_item_id"] \
             = str(self.data.l_p_of1d.id)
         form["currency-1-credit-1-account_code"] = self.data.l_p_of1d.account
@@ -238,21 +256,24 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not the same currency
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-code"] = "EUR"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not the same account
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-credit-1-account_code"] = Accounts.NOTES_RECEIVABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not exceeding net balance - partially offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-amount"] \
             = str(journal_entry_data.currencies[0].debit[0].amount
                   + Decimal("0.01"))
@@ -264,7 +285,8 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not exceeding net balance - unmatched
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-3-amount"] \
             = str(journal_entry_data.currencies[0].debit[2].amount
                   + Decimal("0.01"))
@@ -278,18 +300,21 @@ class OffsetTestCase(unittest.TestCase):
         # Not before the original line items
         old_days: int = journal_entry_data.days
         journal_entry_data.days = old_days + 1
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
         journal_entry_data.days = old_days
 
         # Success
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_data.id}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_data.id}?"
+                         f"next={self.encoded_next_uri}")
 
     def test_edit_receivable_original_line_item(self) -> None:
         """Tests to edit the receivable original line item.
@@ -298,7 +323,8 @@ class OffsetTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_data: JournalEntryData = self.data.j_r_or1
-        edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
+        edit_uri: str = (f"{PREFIX}/{journal_entry_data.id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
@@ -310,21 +336,24 @@ class OffsetTestCase(unittest.TestCase):
         journal_entry_data.currencies[0].credit[1].amount = Decimal("3.4")
 
         # Not the same currency
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-code"] = "EUR"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not the same account
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-account_code"] = Accounts.NOTES_RECEIVABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not less than offset total - partially offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-amount"] \
             = str(journal_entry_data.currencies[0].debit[0].amount
                   - Decimal("0.01"))
@@ -336,7 +365,8 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not less than offset total - fully offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-2-amount"] \
             = str(journal_entry_data.currencies[0].debit[1].amount
                   - Decimal("0.01"))
@@ -350,25 +380,29 @@ class OffsetTestCase(unittest.TestCase):
         # Not after the offset items
         old_days: int = journal_entry_data.days
         journal_entry_data.days = old_days - 1
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
         journal_entry_data.days = old_days
 
         # Not deleting matched original line items
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         del form["currency-1-debit-1-id"]
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Success
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_data.id}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_data.id}?"
+                         f"next={self.encoded_next_uri}")
 
         # The original line item is always before the offset item, even when
         # they happen in the same day.
@@ -388,7 +422,8 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account, JournalEntry
-        create_uri: str = f"{PREFIX}/create/disbursement?next=%2F_next"
+        create_uri: str = (f"{PREFIX}/create/disbursement?"
+                           f"next={self.encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/disbursement"
         form: dict[str, str]
         response: httpx.Response
@@ -411,14 +446,16 @@ class OffsetTestCase(unittest.TestCase):
                 [])])
 
         # Non-existing original line item ID
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-debit-1-original_line_item_id"] = "9999"
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # The same debit or credit
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-debit-1-original_line_item_id"] \
             = str(self.data.l_r_or1d.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_or1d.account
@@ -434,7 +471,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
         response = self.client.post(
             store_uri,
-            data=journal_entry_data.new_form(self.csrf_token, NEXT_URI))
+            data=journal_entry_data.new_form(self.csrf_token,
+                                             self.encoded_next_uri))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
         with self.app.app_context():
@@ -443,7 +481,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
 
         # The original line item is also an offset
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-debit-1-original_line_item_id"] \
             = str(self.data.l_r_of1c.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_of1c.account
@@ -452,21 +491,24 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not the same currency
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-code"] = "EUR"
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not the same account
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-debit-1-account_code"] = Accounts.NOTES_PAYABLE
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not exceeding net balance - partially offset
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-debit-1-amount"] \
             = str(journal_entry_data.currencies[0].debit[0].amount
                   + Decimal("0.01"))
@@ -475,7 +517,8 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Not exceeding net balance - unmatched
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         form["currency-1-debit-3-amount"] \
             = str(journal_entry_data.currencies[0].debit[2].amount
                   + Decimal("0.01"))
@@ -486,14 +529,16 @@ class OffsetTestCase(unittest.TestCase):
         # Not before the original line items
         old_days: int = journal_entry_data.days
         journal_entry_data.days = old_days + 1
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
         journal_entry_data.days = old_days
 
         # Success
-        form = journal_entry_data.new_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.new_form(self.csrf_token,
+                                           self.encoded_next_uri)
         response = self.client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
@@ -510,7 +555,8 @@ class OffsetTestCase(unittest.TestCase):
         """
         from accounting.models import Account, JournalEntry
         journal_entry_data: JournalEntryData = self.data.j_p_of2
-        edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
+        edit_uri: str = (f"{PREFIX}/{journal_entry_data.id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
@@ -522,14 +568,16 @@ class OffsetTestCase(unittest.TestCase):
         journal_entry_data.currencies[0].credit[2].amount = Decimal("900")
 
         # Non-existing original line item ID
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-original_line_item_id"] = "9999"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # The same debit or credit
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-original_line_item_id"] \
             = str(self.data.l_r_or1d.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_or1d.account
@@ -546,7 +594,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
         response = self.client.post(
             update_uri,
-            data=journal_entry_data.update_form(self.csrf_token, NEXT_URI))
+            data=journal_entry_data.update_form(self.csrf_token,
+                                                self.encoded_next_uri))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
         with self.app.app_context():
@@ -555,7 +604,8 @@ class OffsetTestCase(unittest.TestCase):
             db.session.commit()
 
         # The original line item is also an offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-original_line_item_id"] \
             = str(self.data.l_r_of1c.id)
         form["currency-1-debit-1-account_code"] = self.data.l_r_of1c.account
@@ -564,21 +614,24 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not the same currency
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-code"] = "EUR"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not the same account
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-account_code"] = Accounts.NOTES_PAYABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not exceeding net balance - partially offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-amount"] \
             = str(journal_entry_data.currencies[0].debit[0].amount
                   + Decimal("0.01"))
@@ -590,7 +643,8 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not exceeding net balance - unmatched
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-3-amount"] \
             = str(journal_entry_data.currencies[0].debit[2].amount
                   + Decimal("0.01"))
@@ -604,14 +658,16 @@ class OffsetTestCase(unittest.TestCase):
         # Not before the original line items
         old_days: int = journal_entry_data.days
         journal_entry_data.days = old_days + 1
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
         journal_entry_data.days = old_days
 
         # Success
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
@@ -628,7 +684,8 @@ class OffsetTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_data: JournalEntryData = self.data.j_p_or1
-        edit_uri: str = f"{PREFIX}/{journal_entry_data.id}/edit?next=%2F_next"
+        edit_uri: str = (f"{PREFIX}/{journal_entry_data.id}/edit?"
+                         f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_data.id}/update"
         form: dict[str, str]
         response: httpx.Response
@@ -640,21 +697,24 @@ class OffsetTestCase(unittest.TestCase):
         journal_entry_data.currencies[0].credit[1].amount = Decimal("0.9")
 
         # Not the same currency
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-code"] = "EUR"
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not the same account
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-credit-1-account_code"] = Accounts.NOTES_PAYABLE
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not less than offset total - partially offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-1-amount"] \
             = str(journal_entry_data.currencies[0].debit[0].amount
                   - Decimal("0.01"))
@@ -666,7 +726,8 @@ class OffsetTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not less than offset total - fully offset
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         form["currency-1-debit-2-amount"] \
             = str(journal_entry_data.currencies[0].debit[1].amount
                   - Decimal("0.01"))
@@ -680,25 +741,29 @@ class OffsetTestCase(unittest.TestCase):
         # Not after the offset items
         old_days: int = journal_entry_data.days
         journal_entry_data.days = old_days - 1
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
         journal_entry_data.days = old_days
 
         # Not deleting matched original line items
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         del form["currency-1-credit-1-id"]
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Success
-        form = journal_entry_data.update_form(self.csrf_token, NEXT_URI)
+        form = journal_entry_data.update_form(self.csrf_token,
+                                              self.encoded_next_uri)
         response = self.client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{journal_entry_data.id}?next=%2F_next")
+                         f"{PREFIX}/{journal_entry_data.id}?"
+                         f"next={self.encoded_next_uri}")
 
         # The original line item is always before the offset item, even when
         # they happen in the same day

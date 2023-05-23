@@ -23,6 +23,7 @@ import unittest
 import httpx
 from flask import Flask
 
+from accounting.utils.next_uri import encode_next
 from test_site import db
 from testlib import NEXT_URI, create_test_app, get_client, set_locale, \
     add_journal_entry
@@ -78,6 +79,7 @@ class AccountTestCase(unittest.TestCase):
             AccountL10n.query.delete()
             Account.query.delete()
             db.session.commit()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
         response: httpx.Response
@@ -143,7 +145,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = client.post(f"{PREFIX}/bases/{CASH.base_code}",
                                data={"csrf_token": csrf_token,
-                                     "next": NEXT_URI,
+                                     "next": self.encoded_next_uri,
                                      f"{cash_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
@@ -192,7 +194,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = client.post(f"{PREFIX}/bases/{CASH.base_code}",
                                data={"csrf_token": csrf_token,
-                                     "next": NEXT_URI,
+                                     "next": self.encoded_next_uri,
                                      f"{cash_id}-no": "5"})
         self.assertEqual(response.status_code, 403)
 
@@ -244,7 +246,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/bases/{CASH.base_code}",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI,
+                                          "next": self.encoded_next_uri,
                                           f"{cash_id}-no": "5"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
@@ -526,7 +528,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual(account.title_l10n, CASH.title)
             self.assertEqual(account.l10n, [])
 
-        set_locale(self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.app, self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -541,7 +543,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.title) for x in account.l10n},
                              {("zh_Hant", f"{CASH.title}-zh_Hant")})
 
-        set_locale(self.client, self.csrf_token, "en")
+        set_locale(self.app, self.client, self.csrf_token, "en")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -556,7 +558,7 @@ class AccountTestCase(unittest.TestCase):
             self.assertEqual({(x.locale, x.title) for x in account.l10n},
                              {("zh_Hant", f"{CASH.title}-zh_Hant")})
 
-        set_locale(self.client, self.csrf_token, "zh_Hant")
+        set_locale(self.app, self.client, self.csrf_token, "zh_Hant")
 
         response = self.client.post(update_uri,
                                     data={"csrf_token": self.csrf_token,
@@ -591,7 +593,7 @@ class AccountTestCase(unittest.TestCase):
 
         add_journal_entry(self.client,
                           form={"csrf_token": self.csrf_token,
-                                "next": NEXT_URI,
+                                "next": self.encoded_next_uri,
                                 "date": dt.date.today().isoformat(),
                                 "currency-1-code": "USD",
                                 "currency-1-credit-1-account_code": BANK.code,
@@ -709,7 +711,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/bases/1111",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI,
+                                          "next": self.encoded_next_uri,
                                           f"{id_1}-no": "4",
                                           f"{id_2}-no": "1",
                                           f"{id_3}-no": "5",
@@ -736,7 +738,7 @@ class AccountTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/bases/1111",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI,
+                                          "next": self.encoded_next_uri,
                                           f"{id_2}-no": "3a",
                                           f"{id_3}-no": "5",
                                           f"{id_4}-no": "2"})

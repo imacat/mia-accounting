@@ -25,6 +25,7 @@ from typing import Literal
 import httpx
 from flask import Flask, render_template_string
 
+from accounting.utils.next_uri import encode_next
 from test_site import create_app
 
 TEST_SERVER: str = "https://testserver"
@@ -98,30 +99,35 @@ def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
     client: httpx.Client = httpx.Client(app=app, base_url=TEST_SERVER)
     client.headers["Referer"] = TEST_SERVER
     csrf_token: str = get_csrf_token(client)
+    with app.app_context():
+        encoded_next_uri: str = encode_next(NEXT_URI)
     response: httpx.Response = client.post("/login",
                                            data={"csrf_token": csrf_token,
-                                                 "next": "/",
+                                                 "next": encoded_next_uri,
                                                  "username": username})
     assert response.status_code == 302
-    assert response.headers["Location"] == "/"
+    assert response.headers["Location"] == NEXT_URI
     return client, csrf_token
 
 
-def set_locale(client: httpx.Client, csrf_token: str,
+def set_locale(app: Flask, client: httpx.Client, csrf_token: str,
                locale: Literal["en", "zh_Hant", "zh_Hans"]) -> None:
     """Sets the current locale.
 
+    :param app: The Flask application.
     :param client: The test client.
     :param csrf_token: The CSRF token.
     :param locale: The locale.
     :return: None.
     """
+    with app.app_context():
+        encoded_next_uri: str = encode_next(NEXT_URI)
     response: httpx.Response = client.post("/locale",
                                            data={"csrf_token": csrf_token,
                                                  "locale": locale,
-                                                 "next": "/next"})
+                                                 "next": encoded_next_uri})
     assert response.status_code == 302
-    assert response.headers["Location"] == "/next"
+    assert response.headers["Location"] == NEXT_URI
 
 
 def add_journal_entry(client: httpx.Client, form: dict[str, str]) -> int:
@@ -152,6 +158,6 @@ def match_journal_entry_detail(location: str) -> int:
     :raise AssertionError: When the location is not the journal entry detail.
     """
     m: re.Match = re.match(
-        r"^/accounting/journal-entries/(\d+)\?next=%2F_next", location)
+        r"^/accounting/journal-entries/(\d+)\?next=", location)
     assert m is not None
     return int(m.group(1))

@@ -96,7 +96,7 @@ First written: 2023/1/27
           </span>
           <form action="{{ url_for("locale.set-locale") }}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+            <input type="hidden" name="next" value="{{ accounting_as_next() }}">
             <ul class="dropdown-menu dropdown-menu-end">
               {% for locale_code, locale_name in get_all_linguas().items() %}
                 <li>

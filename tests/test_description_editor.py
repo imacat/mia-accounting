@@ -22,6 +22,7 @@ import unittest
 
 from flask import Flask
 
+from accounting.utils.next_uri import encode_next
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
     add_journal_entry
 
@@ -41,6 +42,7 @@ class DescriptionEditorTestCase(unittest.TestCase):
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -51,7 +53,7 @@ class DescriptionEditorTestCase(unittest.TestCase):
         """
         from accounting.journal_entry.utils.description_editor import \
             DescriptionEditor
-        for form in get_form_data(self.csrf_token):
+        for form in get_form_data(self.csrf_token, self.encoded_next_uri):
             add_journal_entry(self.client, form)
         with self.app.app_context():
             editor: DescriptionEditor = DescriptionEditor()
@@ -143,22 +145,24 @@ class DescriptionEditorTestCase(unittest.TestCase):
                          Accounts.PREPAID)
 
 
-def get_form_data(csrf_token: str) -> list[dict[str, str]]:
+def get_form_data(csrf_token: str, encoded_next_uri: str) \
+        -> list[dict[str, str]]:
     """Returns the form data for multiple journal entry forms.
 
     :param csrf_token: The CSRF token.
+    :param encoded_next_uri: The encoded next URI.
     :return: A list of the form data.
     """
     journal_entry_date: str = dt.date.today().isoformat()
     return [{"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-credit-0-account_code": Accounts.SERVICE,
              "currency-0-credit-0-description": " Salary ",
              "currency-0-credit-0-amount": "2500"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.MEAL,
@@ -180,7 +184,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-2-description": " Dinner—Hamburger ",
              "currency-0-credit-2-amount": "4.25"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.MEAL,
@@ -196,7 +200,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-1-description": " Dinner—Steak ",
              "currency-0-credit-1-amount": "8.28"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.MEAL,
@@ -212,14 +216,14 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-1-description": " Lunch—Noodles ",
              "currency-0-credit-1-amount": "7.47"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.TRAVEL,
              "currency-0-debit-0-description": " Airplane—Lake City↔Hill Town",
              "currency-0-debit-0-amount": "800"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.TRAVEL,
@@ -247,7 +251,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-3-description": " Train—Red—Mall→Museum ",
              "currency-0-credit-3-amount": "4.4"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.TRAVEL,
@@ -293,7 +297,7 @@ def get_form_data(csrf_token: str) -> list[dict[str, str]]:
              "currency-0-credit-6-description": " Bike—Theatre→Home ",
              "currency-0-credit-6-amount": "5.5"},
             {"csrf_token": csrf_token,
-             "next": NEXT_URI,
+             "next": encoded_next_uri,
              "date": journal_entry_date,
              "currency-0-code": "USD",
              "currency-0-debit-0-account_code": Accounts.PETTY_CASH,

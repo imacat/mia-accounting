@@ -140,36 +140,38 @@ class JournalEntryData:
             for line_item in currency.credit:
                 line_item.journal_entry = self
 
-    def new_form(self, csrf_token: str, next_uri: str) -> dict[str, str]:
+    def new_form(self, csrf_token: str, encoded_next_uri: str) \
+            -> dict[str, str]:
         """Returns the journal entry as a creation form.
 
         :param csrf_token: The CSRF token.
-        :param next_uri: The next URI.
+        :param encoded_next_uri: The encoded next URI.
         :return: The journal entry as a creation form.
         """
-        return self.__form(csrf_token, next_uri, is_update=False)
+        return self.__form(csrf_token, encoded_next_uri, is_update=False)
 
-    def update_form(self, csrf_token: str, next_uri: str) -> dict[str, str]:
+    def update_form(self, csrf_token: str, encoded_next_uri: str) \
+            -> dict[str, str]:
         """Returns the journal entry as an update form.
 
         :param csrf_token: The CSRF token.
-        :param next_uri: The next URI.
+        :param encoded_next_uri: The encoded next URI.
         :return: The journal entry as an update form.
         """
-        return self.__form(csrf_token, next_uri, is_update=True)
+        return self.__form(csrf_token, encoded_next_uri, is_update=True)
 
-    def __form(self, csrf_token: str, next_uri: str, is_update: bool = False) \
-            -> dict[str, str]:
+    def __form(self, csrf_token: str, encoded_next_uri: str,
+               is_update: bool = False) -> dict[str, str]:
         """Returns the journal entry as a form.
 
         :param csrf_token: The CSRF token.
-        :param next_uri: The next URI.
+        :param encoded_next_uri: The encoded next URI.
         :param is_update: True for an update operation, or False otherwise
         :return: The journal entry as a form.
         """
         date: dt.date = dt.date.today() - dt.timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
-                                "next": next_uri,
+                                "next": encoded_next_uri,
                                 "date": date.isoformat()}
         for i in range(len(self.currencies)):
             form.update(self.currencies[i].form(i + 1, is_update))

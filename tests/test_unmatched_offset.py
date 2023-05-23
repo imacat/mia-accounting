@@ -22,6 +22,7 @@ import unittest
 import httpx
 from flask import Flask
 
+from accounting.utils.next_uri import encode_next
 from test_site import db
 from test_site.lib import JournalEntryCurrencyData, JournalEntryData, \
     BaseTestData
@@ -46,6 +47,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
+            self.encoded_next_uri: str = encode_next(NEXT_URI)
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -60,7 +62,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         response = client.post(f"{PREFIX}/{Accounts.PAYABLE}",
                                data={"csrf_token": csrf_token,
-                                     "next": NEXT_URI})
+                                     "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -74,7 +76,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         response = client.post(f"{PREFIX}/{Accounts.PAYABLE}",
                                data={"csrf_token": csrf_token,
-                                     "next": NEXT_URI})
+                                     "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 403)
 
     def test_editor(self) -> None:
@@ -87,7 +89,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/{Accounts.PAYABLE}",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -100,7 +102,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         response = self.client.post(f"{PREFIX}/{Accounts.PAYABLE}",
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -150,7 +152,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         match_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
         response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -200,7 +202,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         match_uri = f"{PREFIX}/{Accounts.PAYABLE}"
         response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -278,7 +280,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         match_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
         response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -344,7 +346,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         match_uri = f"{PREFIX}/{Accounts.PAYABLE}"
         response = self.client.post(match_uri,
                                     data={"csrf_token": self.csrf_token,
-                                          "next": NEXT_URI})
+                                          "next": self.encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 

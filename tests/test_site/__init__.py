@@ -23,12 +23,14 @@ from typing import Type
 
 from click.testing import Result
 from flask import Flask, Blueprint, render_template, redirect, Response, \
-    url_for
+    url_for, request
 from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from sqlalchemy import Column
+
+from accounting.utils.next_uri import encode_next
 
 bp: Blueprint = Blueprint("home", __name__)
 """The global blueprint."""
@@ -66,6 +68,7 @@ def create_app(is_testing: bool = False) -> Flask:
     db.init_app(app)
 
     app.register_blueprint(bp, url_prefix="/")
+    app.add_template_global(__as_next, "accounting_as_next")
 
     from . import locale
     locale.init_app(app)
@@ -146,3 +149,12 @@ def get_home() -> str:
     :return: The home page.
     """
     return render_template("home.html")
+
+
+def __as_next() -> str:
+    """Encodes the current request URI as value for the next URI.
+
+    :return: The current request URI as value for the next URI.
+    """
+    return encode_next(
+        request.full_path if request.query_string else request.path)
