@@ -2,6 +2,17 @@ Change Log
 ==========
 
 
+Version 1.5.6
+-------------
+
+Released 2023/5/23
+
+Bug fixes.
+
+* Fixed the return URI of the creation forms to decode the next URI.
+* Fixed the unmatched offset list to use the encoded next URI.
+
+
 Version 1.5.5
 -------------
 
