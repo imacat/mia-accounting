@@ -2,6 +2,19 @@ Change Log
 ==========
 
 
+Version 1.5.5
+-------------
+
+Released 2023/5/23
+
+Security fixes.
+
+* Revised the next URI utilities to encode and decode the next URI
+  preventing tampering with the next URI.
+* Added the integrity value of the CDN stylesheet links.
+* Various fixes.
+
+
 Version 1.5.4
 -------------
 
