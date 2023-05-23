@@ -49,7 +49,7 @@ First written: 2023/4/17
 
   <form action="{{ url_for("accounting-report.match-offsets", currency=report.currency, account=report.account) }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+    <input type="hidden" name="next" value="{{ accounting_as_next() }}">
     <div class="modal fade" id="accounting-match-modal" tabindex="-1" aria-labelledby="accounting-match-modal-label" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">

@@ -68,7 +68,6 @@ def create_app(is_testing: bool = False) -> Flask:
     db.init_app(app)
 
     app.register_blueprint(bp, url_prefix="/")
-    app.add_template_global(__as_next, "accounting_as_next")
 
     from . import locale
     locale.init_app(app)
@@ -149,12 +148,3 @@ def get_home() -> str:
     :return: The home page.
     """
     return render_template("home.html")
-
-
-def __as_next() -> str:
-    """Encodes the current request URI as value for the next URI.
-
-    :return: The current request URI as value for the next URI.
-    """
-    return encode_next(
-        request.full_path if request.query_string else request.path)

@@ -26,6 +26,15 @@ from flask import request, Blueprint, current_app
 from itsdangerous import URLSafeSerializer, BadData
 
 
+def __as_next() -> str:
+    """Encodes the current request URI as value for the next URI.
+
+    :return: The current request URI as value for the next URI.
+    """
+    return encode_next(
+        request.full_path if request.query_string else request.path)
+
+
 def append_next(uri: str) -> str:
     """Appends the current URI as the next URI to the query argument.
 
@@ -104,6 +113,7 @@ def init_app(bp: Blueprint) -> None:
     :param bp: The blueprint of the accounting application.
     :return: None.
     """
+    bp.add_app_template_global(__as_next, "accounting_as_next")
     bp.add_app_template_filter(append_next, "accounting_append_next")
     bp.add_app_template_filter(inherit_next, "accounting_inherit_next")
     bp.add_app_template_filter(or_next, "accounting_or_next")
