@@ -40,7 +40,7 @@ class BaseAccount(db.Model):
     __tablename__ = "accounting_base_accounts"
     """The table name."""
     code: Mapped[str] = mapped_column(primary_key=True)
-    """The code."""
+    """The account code."""
     title_l10n: Mapped[str] = mapped_column("title")
     """The title."""
     l10n: Mapped[list[BaseAccountL10n]] \
@@ -87,7 +87,7 @@ class BaseAccountL10n(db.Model):
         = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
                                       ondelete="CASCADE"),
                         primary_key=True)
-    """The code of the account."""
+    """The account code."""
     account: Mapped[BaseAccount] = db.relationship(back_populates="l10n")
     """The account."""
     locale: Mapped[str] = mapped_column(primary_key=True)
@@ -369,9 +369,9 @@ class Currency(db.Model):
     __tablename__ = "accounting_currencies"
     """The table name."""
     code: Mapped[str] = mapped_column(primary_key=True)
-    """The code."""
+    """The currency code."""
     name_l10n: Mapped[str] = mapped_column("name")
-    """The name."""
+    """The currency name."""
     created_at: Mapped[dt.datetime] \
         = mapped_column(db.DateTime(timezone=True),
                         server_default=db.func.now())
@@ -544,7 +544,7 @@ class JournalEntry(db.Model):
     date: Mapped[dt.date]
     """The date."""
     no: Mapped[int] = mapped_column(default=text("1"))
-    """The account number under the date."""
+    """The journal entry number under the date."""
     note: Mapped[str | None]
     """The note."""
     created_at: Mapped[dt.datetime] \
