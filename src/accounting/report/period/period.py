@@ -42,7 +42,7 @@ class Period:
         self.end: dt.date | None = end
         """The end of the period."""
         self.is_default: bool = False
-        """Whether the is the default period."""
+        """Whether this is the default period."""
         self.is_this_month: bool = False
         """Whether the period is this month."""
         self.is_last_month: bool = False
