@@ -63,6 +63,7 @@ DEFAULT_PAGE_SIZE: int = 10
 """The default page size."""
 
 T = TypeVar("T")
+"""The pagination item type."""
 
 
 class Pagination(Generic[T]):

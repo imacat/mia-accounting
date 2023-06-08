@@ -106,6 +106,7 @@ class Section:
         """The subsections in the section."""
         self.accumulated: AccumulatedTotal \
             = AccumulatedTotal(accumulated_title)
+        """The accumulated total."""
 
     @property
     def total(self) -> Decimal:

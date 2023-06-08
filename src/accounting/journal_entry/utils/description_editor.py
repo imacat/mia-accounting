@@ -166,8 +166,11 @@ class DescriptionRecurring:
         :param account: The account.
         """
         self.name: str = name
+        """The name."""
         self.account: DescriptionAccount = DescriptionAccount(account, 0)
+        """The account."""
         self.description_template: str = description_template
+        """The description template."""
 
     @property
     def account_codes(self) -> list[str]:

@@ -54,7 +54,9 @@ class JournalEntryReorderForm:
         :param date: The date.
         """
         self.date: dt.date = date
+        """The date."""
         self.is_modified: bool = False
+        """Whether the order is modified."""
 
     def save_order(self) -> None:
         """Saves the order of the account.

@@ -40,6 +40,7 @@ class BaseAccountTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.

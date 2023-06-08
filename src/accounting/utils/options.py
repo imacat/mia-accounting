@@ -39,8 +39,11 @@ class RecurringItem:
         :param description_template: The description template.
         """
         self.name: str = name
+        """The name."""
         self.account_code: str = account_code
+        """The account code."""
         self.description_template: str = description_template
+        """The description template."""
 
     @property
     def account_text(self) -> str:
@@ -61,8 +64,10 @@ class Recurring:
         """
         self.expenses: list[RecurringItem] \
             = [RecurringItem(x[0], x[1], x[2]) for x in data["expense"]]
+        """The recurring expenses."""
         self.incomes: list[RecurringItem] \
             = [RecurringItem(x[0], x[1], x[2]) for x in data["income"]]
+        """The recurring incomes."""
 
     @property
     def codes(self) -> set[str]:

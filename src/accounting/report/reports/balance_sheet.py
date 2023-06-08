@@ -145,6 +145,7 @@ class AccountCollector:
             .filter(sa.or_(Account.id.in_({x.id for x in account_balances}),
                            Account.base_code == "3351",
                            Account.base_code == "3353")).all()
+        """The accounts."""
         account_by_id: dict[int, Account] \
             = {x.id: x for x in self.__all_accounts}
         self.accounts: list[ReportAccount] \
@@ -154,6 +155,7 @@ class AccountCollector:
                                             account_by_id[x.id],
                                             self.__period))
                for x in account_balances]
+        """The accounts on the balance sheet."""
         self.__add_accumulated()
         self.__add_current_period()
         self.accounts.sort(key=lambda x: (x.account.base_code, x.account.no))

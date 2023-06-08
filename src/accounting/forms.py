@@ -65,6 +65,7 @@ class IsDebitAccount:
         :param message: The error message.
         """
         self.__message: str | LazyString = message
+        """The error message."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None:
@@ -85,6 +86,7 @@ class IsCreditAccount:
         :param message: The error message.
         """
         self.__message: str | LazyString = message
+        """The error message."""
 
     def __call__(self, form: FlaskForm, field: StringField) -> None:
         if field.data is None:

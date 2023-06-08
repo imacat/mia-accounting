@@ -26,6 +26,7 @@ from werkzeug.datastructures import LanguageAccept
 from accounting.utils.next_uri import or_next
 
 bp: Blueprint = Blueprint("locale", __name__, url_prefix="/")
+"""The blueprint for the localization."""
 
 
 def get_locale():

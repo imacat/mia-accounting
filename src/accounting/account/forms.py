@@ -168,7 +168,9 @@ class AccountReorderForm:
         :param base: The base account.
         """
         self.base: BaseAccount = base
+        """The base account."""
         self.is_modified: bool = False
+        """Whether the order is modified."""
 
     def save_order(self) -> None:
         """Saves the order of the account.

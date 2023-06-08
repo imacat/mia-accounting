@@ -27,6 +27,7 @@ from flask import g, Response
 from flask_sqlalchemy.model import Model
 
 T = TypeVar("T", bound=Model)
+"""The user data model data type."""
 
 
 class UserUtilityInterface(Generic[T], ABC):

@@ -41,11 +41,13 @@ class OptionTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import Option
             Option.query.delete()
             self.encoded_next_uri: str = encode_next(NEXT_URI)
+            """The encoded next URI."""
 
         self.client, self.csrf_token = get_client(self.app, "admin")
 

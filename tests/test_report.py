@@ -42,6 +42,7 @@ class ReportTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem

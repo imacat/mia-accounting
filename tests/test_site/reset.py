@@ -29,6 +29,7 @@ from .lib import Accounts, JournalEntryLineItemData, JournalEntryData, \
     JournalEntryCurrencyData, BaseTestData
 
 bp: Blueprint = Blueprint("reset", __name__, url_prefix="/")
+"""The blueprint for the data reset."""
 
 
 @bp.get("reset", endpoint="reset-page")

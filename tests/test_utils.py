@@ -41,6 +41,7 @@ class NextUriTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
     def test_next_uri(self) -> None:
         """Tests the next URI utilities with the next URI.
@@ -177,7 +178,7 @@ class PaginationTestCase(unittest.TestCase):
     """The test case for pagination."""
 
     class Params:
-        """The testing parameters."""
+        """The testing pagination parameters."""
 
         def __init__(self, items: list[int], is_reversed: bool | None,
                      result: list[int], is_paged: bool):
@@ -189,9 +190,13 @@ class PaginationTestCase(unittest.TestCase):
             :param is_paged: Whether we need pagination.
             """
             self.items: list[int] = items
+            """All the items in the list."""
             self.is_reversed: bool | None = is_reversed
+            """Whether the default page is the last page."""
             self.result: list[int] = result
+            """The expected items on the page."""
             self.is_paged: bool = is_paged
+            """Whether we need pagination."""
 
     def setUp(self) -> None:
         """Sets up the test.
@@ -200,7 +205,9 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
-        self.params = self.Params([], None, [], True)
+        """The Flask application."""
+        self.params: PaginationTestCase.Params = self.Params([], None, [], True)
+        """The testing pagination parameters."""
 
         @self.app.get("/test-pagination")
         def test_pagination_view() -> str:
@@ -215,7 +222,9 @@ class PaginationTestCase(unittest.TestCase):
             self.assertEqual(pagination.list, self.params.result)
             return ""
 
-        self.client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        self.client: httpx.Client = httpx.Client(app=self.app,
+                                                 base_url=TEST_SERVER)
+        """The user client."""
         self.client.headers["Referer"] = TEST_SERVER
 
     def __test_success(self, query: str, items: range,

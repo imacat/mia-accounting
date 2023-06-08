@@ -49,12 +49,14 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
             self.encoded_next_uri: str = encode_next(NEXT_URI)
+            """The encoded next URI."""
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -665,12 +667,14 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
             self.encoded_next_uri: str = encode_next(NEXT_URI)
+            """The encoded next URI."""
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -1256,6 +1260,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import JournalEntry, \
@@ -1263,6 +1268,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
             self.encoded_next_uri: str = encode_next(NEXT_URI)
+            """The encoded next URI."""
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 
@@ -2128,12 +2134,14 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
             self.encoded_next_uri: str = encode_next(NEXT_URI)
+            """The encoded next URI."""
 
         self.client, self.csrf_token = get_client(self.app, "editor")
 

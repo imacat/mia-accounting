@@ -46,15 +46,18 @@ class OffsetTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
             self.encoded_next_uri: str = encode_next(NEXT_URI)
+            """The encoded next URI."""
 
         self.client, self.csrf_token = get_client(self.app, "editor")
         self.data: OffsetTestData = OffsetTestData(self.app, "editor")
+        """The offset test data."""
         self.data.populate()
 
     def test_add_receivable_offset(self) -> None:
@@ -807,18 +810,22 @@ class OffsetTestData(BaseTestData):
             50, [JournalEntryCurrencyData(
                 "USD", [self.l_r_or1d, self.l_r_or4d],
                 [self.l_r_or1c, self.l_r_or4c])])
+        """The receivable original journal entry #1."""
         self.j_r_or2: JournalEntryData = JournalEntryData(
             30, [JournalEntryCurrencyData(
                 "USD", [self.l_r_or2d, self.l_r_or3d],
                 [self.l_r_or2c, self.l_r_or3c])])
+        """The receivable original journal entry #2."""
         self.j_p_or1: JournalEntryData = JournalEntryData(
             40, [JournalEntryCurrencyData(
                 "USD", [self.l_p_or1d, self.l_p_or4d],
                 [self.l_p_or1c, self.l_p_or4c])])
+        """The payable original journal entry #1."""
         self.j_p_or2: JournalEntryData = JournalEntryData(
             20, [JournalEntryCurrencyData(
                 "USD", [self.l_p_or2d, self.l_p_or3d],
                 [self.l_p_or2c, self.l_p_or3c])])
+        """The payable original journal entry #2."""
 
         self._add_journal_entry(self.j_r_or1)
         self._add_journal_entry(self.j_r_or2)
@@ -863,23 +870,29 @@ class OffsetTestData(BaseTestData):
         self.j_r_of1: JournalEntryData = JournalEntryData(
             25, [JournalEntryCurrencyData(
                 "USD", [self.l_r_of1d], [self.l_r_of1c])])
+        """The offset journal entry to the receivable #1."""
         self.j_r_of2: JournalEntryData = JournalEntryData(
             20, [JournalEntryCurrencyData(
                 "USD", [self.l_r_of2d, self.l_r_of3d, self.l_r_of4d],
                 [self.l_r_of2c, self.l_r_of3c, self.l_r_of4c])])
+        """The offset journal entry to the receivable #2."""
         self.j_r_of3: JournalEntryData = JournalEntryData(
             15, [JournalEntryCurrencyData(
                 "USD", [self.l_r_of5d], [self.l_r_of5c])])
+        """The offset journal entry to the receivable #3."""
         self.j_p_of1: JournalEntryData = JournalEntryData(
             15, [JournalEntryCurrencyData(
                 "USD", [self.l_p_of1d], [self.l_p_of1c])])
+        """The offset journal entry to the payable #1."""
         self.j_p_of2: JournalEntryData = JournalEntryData(
             10, [JournalEntryCurrencyData(
                 "USD", [self.l_p_of2d, self.l_p_of3d, self.l_p_of4d],
                 [self.l_p_of2c, self.l_p_of3c, self.l_p_of4c])])
+        """The offset journal entry to the payable #2."""
         self.j_p_of3: JournalEntryData = JournalEntryData(
             5, [JournalEntryCurrencyData(
                 "USD", [self.l_p_of5d], [self.l_p_of5c])])
+        """The offset journal entry to the payable #3."""
 
         self._add_journal_entry(self.j_r_of1)
         self._add_journal_entry(self.j_r_of2)

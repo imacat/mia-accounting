@@ -25,8 +25,10 @@ from flask_babel import LazyString, Domain
 from flask_babel_js import JAVASCRIPT, c2js
 
 translation_dir: Path = Path(__file__).parent / "translations"
+"""The directory of the translation files."""
 domain: Domain = Domain(translation_directories=[translation_dir],
                         domain="accounting")
+"""The message domain."""
 
 
 def gettext(string, **variables) -> str:
@@ -120,6 +122,5 @@ def init_app(app: Flask, bp: Blueprint) -> None:
     :param bp: The blueprint of the accounting application.
     :return: None.
     """
-    bp.add_url_rule("/_jstrans.js", "babel_catalog",
-                    __babel_js_catalog_view)
+    bp.add_url_rule("/_jstrans.js", "babel_catalog", __babel_js_catalog_view)
     app.jinja_env.globals["A_"] = domain.gettext

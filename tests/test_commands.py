@@ -41,6 +41,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
+        """The Flask application."""
 
         with self.app.app_context():
             # Drop every accounting table, to see if accounting-init recreates

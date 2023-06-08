@@ -57,13 +57,20 @@ class JournalEntryLineItemData:
         :param original_line_item: The original journal entry line item.
         """
         self.journal_entry: JournalEntryData | None = None
+        """The journal entry data."""
         self.id: int = -1
+        """The journal entry line item ID."""
         self.no: int = -1
+        """The line item number under the journal entry and debit or credit."""
         self.original_line_item: JournalEntryLineItemData | None \
             = original_line_item
+        """The original journal entry line item."""
         self.account: str = account
+        """The account code."""
         self.description: str | None = description
+        """The description."""
         self.amount: Decimal = Decimal(amount)
+        """The amount."""
 
     def form(self, prefix: str, debit_credit: str, index: int,
              is_update: bool) -> dict[str, str]:
@@ -101,8 +108,11 @@ class JournalEntryCurrencyData:
         :param credit: The credit line items.
         """
         self.code: str = currency
+        """The currency code."""
         self.debit: list[JournalEntryLineItemData] = debit
+        """The debit line items."""
         self.credit: list[JournalEntryLineItemData] = credit
+        """The credit line items."""
 
     def form(self, index: int, is_update: bool) -> dict[str, str]:
         """Returns the currency as form data.
@@ -131,9 +141,13 @@ class JournalEntryData:
         :param currencies: The journal entry currency data.
         """
         self.id: int = -1
+        """The journal entry ID."""
         self.days: int = days
+        """The number of days before today."""
         self.currencies: list[JournalEntryCurrencyData] = currencies
+        """The journal entry currency data."""
         self.note: str | None = None
+        """The note."""
         for currency in self.currencies:
             for line_item in currency.debit:
                 line_item.journal_entry = self
@@ -190,13 +204,17 @@ class BaseTestData(ABC):
         :param username: The username.
         """
         self._app: Flask = app
+        """The Flask application."""
         with self._app.app_context():
             current_user: User | None = User.query\
                 .filter(User.username == username).first()
             assert current_user is not None
             self.__current_user_id: int = current_user.id
+            """The current user ID."""
             self.__journal_entries: list[dict[str, Any]] = []
+            """The data of the journal entries."""
             self.__line_items: list[dict[str, Any]] = []
+            """The data of the journal entry line items."""
             self._init_data()
 
     @abstractmethod

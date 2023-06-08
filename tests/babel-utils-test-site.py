@@ -28,8 +28,11 @@ from babel.messages.frontend import CommandLineInterface
 from opencc import OpenCC
 
 root_dir: Path = Path(__file__).parent.parent
+"""The project root directory."""
 translation_dir: Path = root_dir / "tests" / "test_site" / "translations"
+"""The directory of the translation files."""
 domain: str = "messages"
+"""The message domain."""
 
 
 @click.group()
