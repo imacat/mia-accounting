@@ -75,8 +75,7 @@ def __get_next() -> str | None:
     if next_uri is None:
         return None
     try:
-        return URLSafeSerializer(current_app.config["SECRET_KEY"])\
-            .loads(next_uri, "next")
+        return decode_next(next_uri)
     except BadData:
         return None
 
@@ -105,6 +104,16 @@ def encode_next(uri: str) -> str:
     """
     return URLSafeSerializer(current_app.config["SECRET_KEY"])\
         .dumps(uri, "next")
+
+
+def decode_next(uri: str) -> str:
+    """Decodes the encoded next URI.
+
+    :param uri: The encoded next URI.
+    :return: The next URI.
+    """
+    return URLSafeSerializer(current_app.config["SECRET_KEY"])\
+        .loads(uri, "next")
 
 
 def init_app(bp: Blueprint) -> None:

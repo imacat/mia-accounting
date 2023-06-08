@@ -22,9 +22,9 @@ from urllib.parse import quote_plus
 
 import httpx
 from flask import Flask, request
-from itsdangerous import URLSafeSerializer
 
-from accounting.utils.next_uri import append_next, inherit_next, or_next
+from accounting.utils.next_uri import append_next, inherit_next, or_next, \
+    encode_next, decode_next
 from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
 from testlib import TEST_SERVER, create_test_app, get_csrf_token, NEXT_URI
@@ -41,8 +41,6 @@ class NextUriTestCase(unittest.TestCase):
         :return: None.
         """
         self.app: Flask = create_test_app()
-        self.serializer: URLSafeSerializer \
-            = URLSafeSerializer(self.app.config["SECRET_KEY"])
 
     def test_next_uri(self) -> None:
         """Tests the next URI utilities with the next URI.
@@ -53,13 +51,17 @@ class NextUriTestCase(unittest.TestCase):
             """The test view with the next URI."""
             current_uri: str = request.full_path if request.query_string \
                 else request.path
+            with self.app.app_context():
+                encoded_current: str = encode_next(current_uri)
             self.assertEqual(append_next(self.TARGET),
-                             f"{self.TARGET}?next={self.__encode(current_uri)}")
-            next_uri: str = request.form["next"] if request.method == "POST" \
-                else request.args["next"]
+                             f"{self.TARGET}?next={encoded_current}")
+            encoded_next_uri: str = request.form["next"] \
+                if request.method == "POST" else request.args["next"]
             self.assertEqual(inherit_next(self.TARGET),
-                             f"{self.TARGET}?next={next_uri}")
-            self.assertEqual(or_next(self.TARGET), self.__decode(next_uri))
+                             f"{self.TARGET}?next={encoded_next_uri}")
+            with self.app.app_context():
+                next_uri: str = decode_next(encoded_next_uri)
+            self.assertEqual(or_next(self.TARGET), next_uri)
             return ""
 
         self.app.add_url_rule("/test-next", view_func=test_next_uri_view,
@@ -69,7 +71,8 @@ class NextUriTestCase(unittest.TestCase):
         csrf_token: str = get_csrf_token(client)
         response: httpx.Response
 
-        encoded_uri: str = self.__encode(NEXT_URI)
+        with self.app.app_context():
+            encoded_uri: str = encode_next(NEXT_URI)
         response = client.get(f"/test-next?next={encoded_uri}&q=abc&page-no=4")
         self.assertEqual(response.status_code, 200)
         response = client.post("/test-next", data={"csrf_token": csrf_token,
@@ -131,22 +134,6 @@ class NextUriTestCase(unittest.TestCase):
                                data={"csrf_token": csrf_token,
                                      "next": next_uri})
         self.assertEqual(response.status_code, 200)
-
-    def __encode(self, uri: str) -> str:
-        """Encodes the next URI.
-
-        :param uri: The next URI.
-        :return: The encoded next URI.
-        """
-        return self.serializer.dumps(uri, "next")
-
-    def __decode(self, uri: str) -> str:
-        """Decodes the next URI.
-
-        :param uri: The encoded next URI.
-        :return: The next URI.
-        """
-        return self.serializer.loads(uri, "next")
 
 
 class QueryKeywordParserTestCase(unittest.TestCase):
