@@ -151,7 +151,6 @@ class JournalEntryForm(FlaskForm):
         is_new: bool = obj.id is None
         if is_new:
             obj.id = new_id(JournalEntry)
-        self.date: DateField
         self.__set_date(obj, self.date.data)
         obj.note = self.note.data
 
