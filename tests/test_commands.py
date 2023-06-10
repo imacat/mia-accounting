@@ -81,12 +81,13 @@ class ConsoleCommandTestCase(unittest.TestCase):
         from accounting.models import BaseAccount
 
         with open(data_dir / "base_accounts.csv") as fp:
-            data: dict[dict[str, Any]] \
-                = {x["code"]: {"code": x["code"],
-                               "title": x["title"],
-                               "l10n": {y[5:]: x[y]
-                                        for y in x if y.startswith("l10n-")}}
-                   for x in csv.DictReader(fp)}
+            rows: list[dict[str, str]] = list(csv.DictReader(fp))
+        data: dict[dict[str, Any]] \
+            = {x["code"]: {"code": x["code"],
+                           "title": x["title"],
+                           "l10n": {y[5:]: x[y]
+                                    for y in x if y.startswith("l10n-")}}
+               for x in rows}
 
         with self.__app.app_context():
             accounts: list[BaseAccount] = BaseAccount.query.all()
