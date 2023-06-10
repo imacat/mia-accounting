@@ -47,7 +47,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
         response: httpx.Response
 
         response = client.get(LIST_URI)
@@ -61,7 +61,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
         response: httpx.Response
 
         response = client.get(LIST_URI)
@@ -75,7 +75,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "editor")
+        client: httpx.Client = get_client(self.app, "editor")
         response: httpx.Response
 
         response = client.get(LIST_URI)

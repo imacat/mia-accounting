@@ -30,7 +30,7 @@ from test_site import db
 from test_site.lib import JournalEntryLineItemData, JournalEntryCurrencyData, \
     JournalEntryData, BaseTestData
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
-    match_journal_entry_detail
+    get_csrf_token, match_journal_entry_detail
 
 PREFIX: str = "/accounting/journal-entries"
 """The URL prefix for the journal entry management."""
@@ -55,7 +55,10 @@ class OffsetTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
         self.data: OffsetTestData = OffsetTestData(self.app, "editor")
         """The offset test data."""
         self.data.populate()

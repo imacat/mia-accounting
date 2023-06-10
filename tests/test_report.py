@@ -24,7 +24,7 @@ import httpx
 from flask import Flask
 
 from test_site.lib import BaseTestData
-from testlib import create_test_app, get_client, Accounts
+from testlib import create_test_app, get_client, get_csrf_token, Accounts
 
 PREFIX: str = "/accounting"
 """The URL prefix for the reports."""
@@ -49,14 +49,17 @@ class ReportTestCase(unittest.TestCase):
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
         ReportTestData(self.app, "editor").populate()
         response: httpx.Response
 
@@ -147,7 +150,7 @@ class ReportTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
         ReportTestData(self.app, "editor").populate()
         response: httpx.Response
 

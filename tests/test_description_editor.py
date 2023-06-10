@@ -20,11 +20,12 @@
 import datetime as dt
 import unittest
 
+import httpx
 from flask import Flask
 
 from accounting.utils.next_uri import encode_next
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
-    add_journal_entry
+    get_csrf_token, add_journal_entry
 
 
 class DescriptionEditorTestCase(unittest.TestCase):
@@ -46,7 +47,10 @@ class DescriptionEditorTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_description_editor(self) -> None:
         """Test the description editor.

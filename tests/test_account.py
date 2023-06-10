@@ -25,8 +25,8 @@ from flask import Flask
 
 from accounting.utils.next_uri import encode_next
 from test_site import db
-from testlib import NEXT_URI, create_test_app, get_client, set_locale, \
-    add_journal_entry
+from testlib import NEXT_URI, create_test_app, get_client, get_csrf_token, \
+    set_locale, add_journal_entry
 
 
 class AccountData:
@@ -83,7 +83,10 @@ class AccountTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
         response: httpx.Response
 
         response = self.client.post(f"{PREFIX}/store",
@@ -108,7 +111,8 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
+        csrf_token: str = get_csrf_token(client)
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -157,7 +161,8 @@ class AccountTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Account
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
+        csrf_token: str = get_csrf_token(client)
         response: httpx.Response
 
         response = client.get(PREFIX)
@@ -489,7 +494,8 @@ class AccountTestCase(unittest.TestCase):
         """
         from accounting.models import Account
         editor_username, admin_username = "editor", "admin"
-        client, csrf_token = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.app, admin_username)
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = f"{PREFIX}/{CASH.code}"
         update_uri: str = f"{PREFIX}/{CASH.code}/update"
         account: Account

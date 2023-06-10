@@ -25,7 +25,8 @@ from flask import Flask
 
 from accounting.utils.next_uri import encode_next
 from test_site import db
-from testlib import NEXT_URI, Accounts, create_test_app, get_client
+from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
+    get_csrf_token
 
 PREFIX: str = "/accounting/options"
 """The URL prefix for the option management."""
@@ -49,14 +50,18 @@ class OptionTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "admin")
+        self.client: httpx.Client = get_client(self.app, "admin")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
         edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
@@ -76,7 +81,8 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
         edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
@@ -96,7 +102,8 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "editor")
+        client: httpx.Client = get_client(self.app, "editor")
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
         edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"

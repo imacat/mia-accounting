@@ -27,7 +27,7 @@ from flask import Flask
 from accounting.utils.next_uri import encode_next
 from test_site import db
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
-    add_journal_entry, match_journal_entry_detail
+    get_csrf_token, add_journal_entry, match_journal_entry_detail
 from testlib_journal_entry import NON_EMPTY_NOTE, EMPTY_NOTE, \
     get_add_form, get_unchanged_update_form, get_update_form, \
     set_negative_amount, remove_debit_in_a_currency, \
@@ -58,14 +58,18 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
+        csrf_token: str = get_csrf_token(client)
         journal_entry_id: int = add_journal_entry(self.client,
                                                   self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
@@ -99,7 +103,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
+        csrf_token: str = get_csrf_token(client)
         journal_entry_id: int = add_journal_entry(self.client,
                                                   self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
@@ -532,7 +537,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
-        client, csrf_token = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.app, admin_username)
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
                            f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
@@ -676,14 +682,18 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
+        csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
@@ -717,7 +727,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
+        csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
@@ -1157,7 +1168,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
-        client, csrf_token = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.app, admin_username)
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
                            f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
@@ -1270,14 +1282,18 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
+        csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
@@ -1311,7 +1327,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
+        csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
@@ -1830,7 +1847,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         journal_entry_id: int \
             = add_journal_entry(self.client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
-        client, csrf_token = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.app, admin_username)
+        csrf_token: str = get_csrf_token(client)
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
                            f"next={self.encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
@@ -2143,7 +2161,10 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_change_date(self) -> None:
         """Tests to change the date of a journal entry.

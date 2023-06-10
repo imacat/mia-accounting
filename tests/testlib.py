@@ -89,12 +89,12 @@ def get_csrf_token(client: httpx.Client) -> str:
     return client.get("/.csrf-token").text
 
 
-def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
+def get_client(app: Flask, username: str) -> httpx.Client:
     """Returns a user client.
 
     :param app: The Flask application.
     :param username: The username.
-    :return: A tuple of the client and the CSRF token.
+    :return: The user client.
     """
     client: httpx.Client = httpx.Client(app=app, base_url=TEST_SERVER)
     client.headers["Referer"] = TEST_SERVER
@@ -107,7 +107,7 @@ def get_client(app: Flask, username: str) -> tuple[httpx.Client, str]:
                                                  "username": username})
     assert response.status_code == 302
     assert response.headers["Location"] == NEXT_URI
-    return client, csrf_token
+    return client
 
 
 def set_locale(app: Flask, client: httpx.Client, csrf_token: str,

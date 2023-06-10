@@ -26,7 +26,8 @@ from accounting.utils.next_uri import encode_next
 from test_site import db
 from test_site.lib import JournalEntryCurrencyData, JournalEntryData, \
     BaseTestData
-from testlib import NEXT_URI, create_test_app, get_client, Accounts
+from testlib import NEXT_URI, create_test_app, get_client, get_csrf_token, \
+    Accounts
 
 PREFIX: str = "/accounting/match-offsets/USD"
 """The URL prefix for the unmatched offset management."""
@@ -51,14 +52,18 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
             self.encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client, self.csrf_token = get_client(self.app, "editor")
+        self.client: httpx.Client = get_client(self.app, "editor")
+        """The user client."""
+        self.csrf_token: str = get_csrf_token(self.client)
+        """The CSRF token."""
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.app, "nobody")
+        csrf_token: str = get_csrf_token(client)
         DifferentTestData(self.app, "nobody").populate()
         response: httpx.Response
 
@@ -72,7 +77,8 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client, csrf_token = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.app, "viewer")
+        csrf_token: str = get_csrf_token(client)
         DifferentTestData(self.app, "viewer").populate()
         response: httpx.Response
 
