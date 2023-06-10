@@ -23,14 +23,12 @@ from typing import Type
 
 from click.testing import Result
 from flask import Flask, Blueprint, render_template, redirect, Response, \
-    url_for, request
+    url_for
 from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from sqlalchemy import Column
-
-from accounting.utils.next_uri import encode_next
 
 bp: Blueprint = Blueprint("home", __name__)
 """The global blueprint."""
