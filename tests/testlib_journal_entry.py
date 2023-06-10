@@ -25,7 +25,7 @@ from secrets import randbelow
 from flask import Flask
 
 from test_site import db
-from testlib import NEXT_URI, Accounts
+from testlib import Accounts
 
 NON_EMPTY_NOTE: str = "  This is \n\na test."
 """The stripped content of an non-empty note."""
