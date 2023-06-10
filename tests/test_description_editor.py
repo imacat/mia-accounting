@@ -37,19 +37,19 @@ class DescriptionEditorTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "editor")
+        self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_description_editor(self) -> None:
@@ -59,9 +59,9 @@ class DescriptionEditorTestCase(unittest.TestCase):
         """
         from accounting.journal_entry.utils.description_editor import \
             DescriptionEditor
-        for form in get_form_data(self.csrf_token, self.encoded_next_uri):
-            add_journal_entry(self.client, form)
-        with self.app.app_context():
+        for form in get_form_data(self.__csrf_token, self.__encoded_next_uri):
+            add_journal_entry(self.__client, form)
+        with self.__app.app_context():
             editor: DescriptionEditor = DescriptionEditor()
 
         # Debit-General

@@ -48,19 +48,19 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "editor")
+        self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_nobody(self) -> None:
@@ -68,9 +68,9 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.__app, "nobody")
         csrf_token: str = get_csrf_token(client)
-        journal_entry_id: int = add_journal_entry(self.client,
+        journal_entry_id: int = add_journal_entry(self.__client,
                                                   self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
@@ -103,9 +103,9 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.__app, "viewer")
         csrf_token: str = get_csrf_token(client)
-        journal_entry_id: int = add_journal_entry(self.client,
+        journal_entry_id: int = add_journal_entry(self.__client,
                                                   self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
@@ -138,35 +138,35 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        journal_entry_id: int = add_journal_entry(self.client,
+        journal_entry_id: int = add_journal_entry(self.__client,
                                                   self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
         response: httpx.Response
 
-        response = self.client.get(f"{PREFIX}/{journal_entry_id}")
+        response = self.__client.get(f"{PREFIX}/{journal_entry_id}")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/create/receipt")
+        response = self.__client.get(f"{PREFIX}/create/receipt")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(f"{PREFIX}/store/receipt",
-                                    data=add_form)
+        response = self.__client.post(f"{PREFIX}/store/receipt",
+                                      data=add_form)
         self.assertEqual(response.status_code, 302)
         match_journal_entry_detail(response.headers["Location"])
 
-        response = self.client.get(f"{PREFIX}/{journal_entry_id}/edit")
+        response = self.__client.get(f"{PREFIX}/{journal_entry_id}/edit")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(f"{PREFIX}/{journal_entry_id}/update",
-                                    data=update_form)
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id}/update",
+                                      data=update_form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          f"{PREFIX}/{journal_entry_id}?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
 
-        response = self.client.post(f"{PREFIX}/{journal_entry_id}/delete",
-                                    data={"csrf_token": self.csrf_token})
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id}/delete",
+                                      data={"csrf_token": self.__csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], RETURN_TO_URI)
 
@@ -177,7 +177,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         create_uri: str = (f"{PREFIX}/create/receipt?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/receipt"
         response: httpx.Response
         form: dict[str, str]
@@ -186,7 +186,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         # No currency content
         form = self.__get_add_form()
         form = {x: form[x] for x in form if not x.startswith("currency-")}
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -194,7 +194,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = ""
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -202,14 +202,14 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = "ZZZ"
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # No credit content in a currency
         form = self.__get_add_form()
         remove_credit_in_a_currency(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -217,7 +217,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-account_code")][0]
         form[key] = "9999-999"
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -226,7 +226,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.OFFICE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -235,25 +235,25 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.RECEIVABLE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Negative amount
         form = self.__get_add_form()
         set_negative_amount(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Success
-        response = self.client.post(store_uri,
-                                    data=self.__get_add_form())
+        response = self.__client.post(store_uri,
+                                      data=self.__get_add_form())
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
             = match_journal_entry_detail(response.headers["Location"])
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies: list[JournalEntryCurrency] = journal_entry.currencies
@@ -315,12 +315,12 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         # Success, with empty note
         form = self.__get_add_form()
         form["note"] = EMPTY_NOTE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
             = match_journal_entry_detail(response.headers["Location"])
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             self.assertIsNone(journal_entry.note)
@@ -332,15 +332,15 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         edit_uri: str = (f"{PREFIX}/{journal_entry_id}/edit?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies0: list[JournalEntryCurrency] = journal_entry.currencies
@@ -351,7 +351,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         # No currency content
         form = form_0.copy()
         form = {x: form[x] for x in form if not x.startswith("currency-")}
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -359,7 +359,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         form = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = ""
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -367,14 +367,14 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         form = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = "ZZZ"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # No credit content in a currency
         form = form_0.copy()
         remove_credit_in_a_currency(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -382,7 +382,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         form: dict[str, str] = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-account_code")][0]
         form[key] = "9999-999"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -391,7 +391,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.OFFICE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -400,23 +400,23 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.RECEIVABLE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Negative amount
         form: dict[str, str] = form_0.copy()
         set_negative_amount(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Success
-        response = self.client.post(update_uri, data=form_0)
+        response = self.__client.post(update_uri, data=form_0)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies1: list[JournalEntryCurrency] = journal_entry.currencies
@@ -497,20 +497,20 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
 
-        response = self.client.post(
+        response = self.__client.post(
             update_uri,
             data=self.__get_unchanged_update_form(journal_entry_id))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             journal_entry.created_at \
@@ -518,12 +518,12 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             journal_entry.updated_at = journal_entry.created_at
             db.session.commit()
 
-        response = self.client.post(
+        response = self.__client.post(
             update_uri, data=self.__get_update_form(journal_entry_id))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             self.assertLess(journal_entry.created_at, journal_entry.updated_at)
@@ -535,17 +535,17 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
-        client: httpx.Client = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.__app, admin_username)
         csrf_token: str = get_csrf_token(client)
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
@@ -558,7 +558,7 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
@@ -572,17 +572,17 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryLineItem
         journal_entry_id_1: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id_1}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         delete_uri: str = f"{PREFIX}/{journal_entry_id_1}/delete"
         response: httpx.Response
 
         form: dict[str, str] = self.__get_add_form()
         key: str = [x for x in form if x.endswith("-account_code")][0]
         form[key] = Accounts.PAYABLE
-        journal_entry_id_2: int = add_journal_entry(self.client, form)
-        with self.app.app_context():
+        journal_entry_id_2: int = add_journal_entry(self.__client, form)
+        with self.__app.app_context():
             journal_entry: JournalEntry | None \
                 = db.session.get(JournalEntry, journal_entry_id_2)
             self.assertIsNotNone(journal_entry)
@@ -590,9 +590,9 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
                 = [x for x in journal_entry.line_items
                    if x.account_code == Accounts.PAYABLE][0]
         add_journal_entry(
-            self.client,
-            form={"csrf_token": self.csrf_token,
-                  "next": self.encoded_next_uri,
+            self.__client,
+            form={"csrf_token": self.__csrf_token,
+                  "next": self.__encoded_next_uri,
                   "date": dt.date.today().isoformat(),
                   "currency-1-code": line_item.currency_code,
                   "currency-1-debit-1-original_line_item_id": line_item.id,
@@ -600,28 +600,28 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
                   "currency-1-debit-1-amount": "1"})
 
         # Cannot delete the journal entry that is in use
-        response = self.client.post(f"{PREFIX}/{journal_entry_id_2}/delete",
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id_2}/delete",
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          f"{PREFIX}/{journal_entry_id_2}?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
 
         # Success
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(delete_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(delete_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 404)
-        response = self.client.post(delete_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(delete_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 404)
 
     def __get_add_form(self) -> dict[str, str]:
@@ -629,8 +629,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token,
-                                            self.encoded_next_uri)
+        form: dict[str, str] = get_add_form(self.__csrf_token,
+                                            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -644,7 +644,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             not changed.
         """
         form: dict[str, str] = get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -657,8 +658,8 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
             changed.
         """
         form: dict[str, str] = get_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri,
-            False)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri, False)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -672,19 +673,19 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "editor")
+        self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_nobody(self) -> None:
@@ -692,10 +693,10 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.__app, "nobody")
         csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
@@ -727,10 +728,10 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.__app, "viewer")
         csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
@@ -763,34 +764,34 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
         response: httpx.Response
 
-        response = self.client.get(f"{PREFIX}/{journal_entry_id}")
+        response = self.__client.get(f"{PREFIX}/{journal_entry_id}")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/create/disbursement")
+        response = self.__client.get(f"{PREFIX}/create/disbursement")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(f"{PREFIX}/store/disbursement",
-                                    data=add_form)
+        response = self.__client.post(f"{PREFIX}/store/disbursement",
+                                      data=add_form)
         self.assertEqual(response.status_code, 302)
         match_journal_entry_detail(response.headers["Location"])
 
-        response = self.client.get(f"{PREFIX}/{journal_entry_id}/edit")
+        response = self.__client.get(f"{PREFIX}/{journal_entry_id}/edit")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(f"{PREFIX}/{journal_entry_id}/update",
-                                    data=update_form)
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id}/update",
+                                      data=update_form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          f"{PREFIX}/{journal_entry_id}?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
 
-        response = self.client.post(f"{PREFIX}/{journal_entry_id}/delete",
-                                    data={"csrf_token": self.csrf_token})
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id}/delete",
+                                      data={"csrf_token": self.__csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], RETURN_TO_URI)
 
@@ -801,7 +802,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         create_uri: str = (f"{PREFIX}/create/disbursement?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/disbursement"
         response: httpx.Response
         form: dict[str, str]
@@ -810,7 +811,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         # No currency content
         form = self.__get_add_form()
         form = {x: form[x] for x in form if not x.startswith("currency-")}
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -818,7 +819,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = ""
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -826,14 +827,14 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = "ZZZ"
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # No debit content in a currency
         form = self.__get_add_form()
         remove_debit_in_a_currency(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -841,7 +842,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-account_code")][0]
         form[key] = "9999-999"
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -850,7 +851,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.SERVICE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -859,25 +860,25 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.PAYABLE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Negative amount
         form = self.__get_add_form()
         set_negative_amount(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Success
-        response = self.client.post(store_uri,
-                                    data=self.__get_add_form())
+        response = self.__client.post(store_uri,
+                                      data=self.__get_add_form())
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
             = match_journal_entry_detail(response.headers["Location"])
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies: list[JournalEntryCurrency] = journal_entry.currencies
@@ -942,12 +943,12 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         # Success, with empty note
         form = self.__get_add_form()
         form["note"] = EMPTY_NOTE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
             = match_journal_entry_detail(response.headers["Location"])
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             self.assertIsNone(journal_entry.note)
@@ -959,15 +960,15 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         edit_uri: str = (f"{PREFIX}/{journal_entry_id}/edit?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies0: list[JournalEntryCurrency] = journal_entry.currencies
@@ -978,7 +979,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         # No currency content
         form = form_0.copy()
         form = {x: form[x] for x in form if not x.startswith("currency-")}
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -986,7 +987,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         form = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = ""
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -994,14 +995,14 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         form = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = "ZZZ"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # No debit content in a currency
         form = form_0.copy()
         remove_debit_in_a_currency(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1009,7 +1010,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         form: dict[str, str] = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-account_code")][0]
         form[key] = "9999-999"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1018,7 +1019,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.SERVICE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1027,23 +1028,23 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.PAYABLE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Negative amount
         form: dict[str, str] = form_0.copy()
         set_negative_amount(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Success
-        response = self.client.post(update_uri, data=form_0)
+        response = self.__client.post(update_uri, data=form_0)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies1: list[JournalEntryCurrency] = journal_entry.currencies
@@ -1128,20 +1129,20 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
 
-        response = self.client.post(
+        response = self.__client.post(
             update_uri,
             data=self.__get_unchanged_update_form(journal_entry_id))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             journal_entry.created_at \
@@ -1149,12 +1150,12 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             journal_entry.updated_at = journal_entry.created_at
             db.session.commit()
 
-        response = self.client.post(
+        response = self.__client.post(
             update_uri, data=self.__get_update_form(journal_entry_id))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             self.assertLess(journal_entry.created_at, journal_entry.updated_at)
@@ -1166,17 +1167,17 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
-        client: httpx.Client = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.__app, admin_username)
         csrf_token: str = get_csrf_token(client)
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
@@ -1189,7 +1190,7 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
@@ -1202,25 +1203,25 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         delete_uri: str = f"{PREFIX}/{journal_entry_id}/delete"
         response: httpx.Response
 
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(delete_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(delete_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 404)
-        response = self.client.post(delete_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(delete_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 404)
 
     def __get_add_form(self) -> dict[str, str]:
@@ -1228,8 +1229,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token,
-                                            self.encoded_next_uri)
+        form: dict[str, str] = get_add_form(self.__csrf_token,
+                                            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -1243,7 +1244,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             not changed.
         """
         form: dict[str, str] = get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -1256,8 +1258,8 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
             changed.
         """
         form: dict[str, str] = get_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri,
-            True)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri, True)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -1271,20 +1273,20 @@ class TransferJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import JournalEntry, \
                 JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "editor")
+        self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_nobody(self) -> None:
@@ -1292,10 +1294,10 @@ class TransferJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.__app, "nobody")
         csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
@@ -1327,10 +1329,10 @@ class TransferJournalEntryTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.__app, "viewer")
         csrf_token: str = get_csrf_token(client)
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         add_form["csrf_token"] = csrf_token
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
@@ -1363,34 +1365,34 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         add_form: dict[str, str] = self.__get_add_form()
         update_form: dict[str, str] = self.__get_update_form(journal_entry_id)
         response: httpx.Response
 
-        response = self.client.get(f"{PREFIX}/{journal_entry_id}")
+        response = self.__client.get(f"{PREFIX}/{journal_entry_id}")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(f"{PREFIX}/create/transfer")
+        response = self.__client.get(f"{PREFIX}/create/transfer")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(f"{PREFIX}/store/transfer",
-                                    data=add_form)
+        response = self.__client.post(f"{PREFIX}/store/transfer",
+                                      data=add_form)
         self.assertEqual(response.status_code, 302)
         match_journal_entry_detail(response.headers["Location"])
 
-        response = self.client.get(f"{PREFIX}/{journal_entry_id}/edit")
+        response = self.__client.get(f"{PREFIX}/{journal_entry_id}/edit")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(f"{PREFIX}/{journal_entry_id}/update",
-                                    data=update_form)
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id}/update",
+                                      data=update_form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          f"{PREFIX}/{journal_entry_id}?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
 
-        response = self.client.post(f"{PREFIX}/{journal_entry_id}/delete",
-                                    data={"csrf_token": self.csrf_token})
+        response = self.__client.post(f"{PREFIX}/{journal_entry_id}/delete",
+                                      data={"csrf_token": self.__csrf_token})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], RETURN_TO_URI)
 
@@ -1401,7 +1403,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         create_uri: str = (f"{PREFIX}/create/transfer?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         store_uri: str = f"{PREFIX}/store/transfer"
         response: httpx.Response
         form: dict[str, str]
@@ -1410,7 +1412,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         # No currency content
         form = self.__get_add_form()
         form = {x: form[x] for x in form if not x.startswith("currency-")}
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1418,7 +1420,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = ""
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1426,21 +1428,21 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = "ZZZ"
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # No debit content in a currency
         form = self.__get_add_form()
         remove_debit_in_a_currency(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # No credit content in a currency
         form = self.__get_add_form()
         remove_credit_in_a_currency(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1448,7 +1450,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-account_code")][0]
         form[key] = "9999-999"
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1457,7 +1459,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.SERVICE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1466,7 +1468,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.OFFICE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1475,7 +1477,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.RECEIVABLE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1484,14 +1486,14 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.PAYABLE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Negative amount
         form = self.__get_add_form()
         set_negative_amount(form)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
@@ -1499,18 +1501,18 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form = self.__get_add_form()
         key: str = [x for x in form.keys() if x.endswith("-amount")][0]
         form[key] = str(Decimal(form[key]) + 1000)
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Success
-        response = self.client.post(store_uri,
-                                    data=self.__get_add_form())
+        response = self.__client.post(store_uri,
+                                      data=self.__get_add_form())
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
             = match_journal_entry_detail(response.headers["Location"])
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies: list[JournalEntryCurrency] = journal_entry.currencies
@@ -1578,12 +1580,12 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         # Success, with empty note
         form = self.__get_add_form()
         form["note"] = EMPTY_NOTE
-        response = self.client.post(store_uri, data=form)
+        response = self.__client.post(store_uri, data=form)
         self.assertEqual(response.status_code, 302)
         journal_entry_id: int \
             = match_journal_entry_detail(response.headers["Location"])
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             self.assertIsNone(journal_entry.note)
@@ -1595,15 +1597,15 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         edit_uri: str = (f"{PREFIX}/{journal_entry_id}/edit?"
-                         f"next={self.encoded_next_uri}")
+                         f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies0: list[JournalEntryCurrency] = journal_entry.currencies
@@ -1614,7 +1616,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         # No currency content
         form = form_0.copy()
         form = {x: form[x] for x in form if not x.startswith("currency-")}
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1622,7 +1624,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = ""
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1630,21 +1632,21 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-code")][0]
         form[key] = "ZZZ"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # No debit content in a currency
         form = form_0.copy()
         remove_debit_in_a_currency(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # No credit content in a currency
         form = form_0.copy()
         remove_credit_in_a_currency(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1652,7 +1654,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form: dict[str, str] = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-account_code")][0]
         form[key] = "9999-999"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1661,7 +1663,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.SERVICE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1670,7 +1672,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.OFFICE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1679,7 +1681,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-credit-" in x][0]
         form[key] = Accounts.RECEIVABLE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1688,14 +1690,14 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         key: str = [x for x in form.keys()
                     if x.endswith("-account_code") and "-debit-" in x][0]
         form[key] = Accounts.PAYABLE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Negative amount
         form: dict[str, str] = form_0.copy()
         set_negative_amount(form)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -1703,16 +1705,16 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         form: dict[str, str] = form_0.copy()
         key: str = [x for x in form.keys() if x.endswith("-amount")][0]
         form[key] = str(Decimal(form[key]) + 1000)
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Success
-        response = self.client.post(update_uri, data=form_0)
+        response = self.__client.post(update_uri, data=form_0)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies1: list[JournalEntryCurrency] = journal_entry.currencies
@@ -1807,20 +1809,20 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
 
-        response = self.client.post(
+        response = self.__client.post(
             update_uri,
             data=self.__get_unchanged_update_form(journal_entry_id))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             journal_entry.created_at \
@@ -1828,12 +1830,12 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             journal_entry.updated_at = journal_entry.created_at
             db.session.commit()
 
-        response = self.client.post(
+        response = self.__client.post(
             update_uri, data=self.__get_update_form(journal_entry_id))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             self.assertLess(journal_entry.created_at, journal_entry.updated_at)
@@ -1845,17 +1847,17 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         editor_username, admin_username = "editor", "admin"
-        client: httpx.Client = get_client(self.app, admin_username)
+        client: httpx.Client = get_client(self.__app, admin_username)
         csrf_token: str = get_csrf_token(client)
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update"
         journal_entry: JournalEntry
         response: httpx.Response
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
@@ -1868,7 +1870,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertEqual(journal_entry.created_by.username,
                              editor_username)
@@ -1883,14 +1885,14 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update?as=receipt"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
         form_0 = {x: form_0[x] for x in form_0 if "-debit-" not in x}
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies0: list[JournalEntryCurrency] = journal_entry.currencies
@@ -1899,11 +1901,11 @@ class TransferJournalEntryTestCase(unittest.TestCase):
                 old_id.update({x.id for x in currency.debit})
 
         # Success
-        response = self.client.post(update_uri, data=form_0)
+        response = self.__client.post(update_uri, data=form_0)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies1: list[JournalEntryCurrency] = journal_entry.currencies
@@ -1985,14 +1987,14 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """
         from accounting.models import JournalEntry, JournalEntryCurrency
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         update_uri: str = f"{PREFIX}/{journal_entry_id}/update?as=disbursement"
         form_0: dict[str, str] = self.__get_update_form(journal_entry_id)
         form_0 = {x: form_0[x] for x in form_0 if "-credit-" not in x}
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies0: list[JournalEntryCurrency] = journal_entry.currencies
@@ -2001,11 +2003,11 @@ class TransferJournalEntryTestCase(unittest.TestCase):
                 old_id.update({x.id for x in currency.debit})
 
         # Success
-        response = self.client.post(update_uri, data=form_0)
+        response = self.__client.post(update_uri, data=form_0)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry = db.session.get(JournalEntry, journal_entry_id)
             self.assertIsNotNone(journal_entry)
             currencies1: list[JournalEntryCurrency] = journal_entry.currencies
@@ -2089,25 +2091,25 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         :return: None.
         """
         journal_entry_id: int \
-            = add_journal_entry(self.client, self.__get_add_form())
+            = add_journal_entry(self.__client, self.__get_add_form())
         detail_uri: str = (f"{PREFIX}/{journal_entry_id}?"
-                           f"next={self.encoded_next_uri}")
+                           f"next={self.__encoded_next_uri}")
         delete_uri: str = f"{PREFIX}/{journal_entry_id}/delete"
         response: httpx.Response
 
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(delete_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(delete_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 404)
-        response = self.client.post(delete_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(delete_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 404)
 
     def __get_add_form(self) -> dict[str, str]:
@@ -2115,7 +2117,7 @@ class TransferJournalEntryTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        return get_add_form(self.csrf_token, self.encoded_next_uri)
+        return get_add_form(self.__csrf_token, self.__encoded_next_uri)
 
     def __get_unchanged_update_form(self, journal_entry_id: int) \
             -> dict[str, str]:
@@ -2127,7 +2129,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             not changed.
         """
         return get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri)
 
     def __get_update_form(self, journal_entry_id: int) -> dict[str, str]:
         """Returns the form data to update a journal entry, where the data are
@@ -2138,8 +2141,8 @@ class TransferJournalEntryTestCase(unittest.TestCase):
             changed.
         """
         return get_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri,
-            None)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri, None)
 
 
 class JournalEntryReorderTestCase(unittest.TestCase):
@@ -2151,19 +2154,19 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "editor")
+        self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_change_date(self) -> None:
@@ -2174,18 +2177,18 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         response: httpx.Response
 
-        id_1: int = add_journal_entry(self.client,
+        id_1: int = add_journal_entry(self.__client,
                                       self.__get_add_receipt_form())
-        id_2: int = add_journal_entry(self.client,
+        id_2: int = add_journal_entry(self.__client,
                                       self.__get_add_disbursement_form())
-        id_3: int = add_journal_entry(self.client,
+        id_3: int = add_journal_entry(self.__client,
                                       self.__get_add_transfer_form())
-        id_4: int = add_journal_entry(self.client,
+        id_4: int = add_journal_entry(self.__client,
                                       self.__get_add_receipt_form())
-        id_5: int = add_journal_entry(self.client,
+        id_5: int = add_journal_entry(self.__client,
                                       self.__get_add_disbursement_form())
 
-        with self.app.app_context():
+        with self.__app.app_context():
             journal_entry_1: JournalEntry = db.session.get(JournalEntry, id_1)
             journal_entry_date_2: dt.date = journal_entry_1.date
             journal_entry_date_1: dt.date \
@@ -2207,12 +2210,12 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         form: dict[str, str] \
             = self.__get_disbursement_unchanged_update_form(id_2)
         form["date"] = journal_entry_date_2.isoformat()
-        response = self.client.post(f"{PREFIX}/{id_2}/update", data=form)
+        response = self.__client.post(f"{PREFIX}/{id_2}/update", data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
-                         f"{PREFIX}/{id_2}?next={self.encoded_next_uri}")
+                         f"{PREFIX}/{id_2}?next={self.__encoded_next_uri}")
 
-        with self.app.app_context():
+        with self.__app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 1)
             self.assertEqual(db.session.get(JournalEntry, id_2).no, 3)
             self.assertEqual(db.session.get(JournalEntry, id_3).no, 2)
@@ -2227,24 +2230,24 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         from accounting.models import JournalEntry
         response: httpx.Response
 
-        id_1: int = add_journal_entry(self.client,
+        id_1: int = add_journal_entry(self.__client,
                                       self.__get_add_receipt_form())
-        id_2: int = add_journal_entry(self.client,
+        id_2: int = add_journal_entry(self.__client,
                                       self.__get_add_disbursement_form())
-        id_3: int = add_journal_entry(self.client,
+        id_3: int = add_journal_entry(self.__client,
                                       self.__get_add_transfer_form())
-        id_4: int = add_journal_entry(self.client,
+        id_4: int = add_journal_entry(self.__client,
                                       self.__get_add_receipt_form())
-        id_5: int = add_journal_entry(self.client,
+        id_5: int = add_journal_entry(self.__client,
                                       self.__get_add_disbursement_form())
 
-        with self.app.app_context():
+        with self.__app.app_context():
             date: dt.date = db.session.get(JournalEntry, id_1).date
 
-        response = self.client.post(
+        response = self.__client.post(
             f"{PREFIX}/dates/{date.isoformat()}",
-            data={"csrf_token": self.csrf_token,
-                  "next": self.encoded_next_uri,
+            data={"csrf_token": self.__csrf_token,
+                  "next": self.__encoded_next_uri,
                   f"{id_1}-no": "4",
                   f"{id_2}-no": "1",
                   f"{id_3}-no": "5",
@@ -2253,7 +2256,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 4)
             self.assertEqual(db.session.get(JournalEntry, id_2).no, 1)
             self.assertEqual(db.session.get(JournalEntry, id_3).no, 5)
@@ -2261,7 +2264,7 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             self.assertEqual(db.session.get(JournalEntry, id_5).no, 3)
 
         # Malformed orders
-        with self.app.app_context():
+        with self.__app.app_context():
             db.session.get(JournalEntry, id_1).no = 3
             db.session.get(JournalEntry, id_2).no = 4
             db.session.get(JournalEntry, id_3).no = 6
@@ -2269,17 +2272,17 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             db.session.get(JournalEntry, id_5).no = 9
             db.session.commit()
 
-        response = self.client.post(
+        response = self.__client.post(
             f"{PREFIX}/dates/{date.isoformat()}",
-            data={"csrf_token": self.csrf_token,
-                  "next": self.encoded_next_uri,
+            data={"csrf_token": self.__csrf_token,
+                  "next": self.__encoded_next_uri,
                   f"{id_2}-no": "3a",
                   f"{id_3}-no": "5",
                   f"{id_4}-no": "2"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             self.assertEqual(db.session.get(JournalEntry, id_1).no, 3)
             self.assertEqual(db.session.get(JournalEntry, id_2).no, 4)
             self.assertEqual(db.session.get(JournalEntry, id_3).no, 2)
@@ -2291,8 +2294,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: The form data to add a new cash receipt journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token,
-                                            self.encoded_next_uri)
+        form: dict[str, str] = get_add_form(self.__csrf_token,
+                                            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-debit-" not in x}
         return form
 
@@ -2301,8 +2304,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: The form data to add a new cash disbursement journal entry.
         """
-        form: dict[str, str] = get_add_form(self.csrf_token,
-                                            self.encoded_next_uri)
+        form: dict[str, str] = get_add_form(self.__csrf_token,
+                                            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -2316,7 +2319,8 @@ class JournalEntryReorderTestCase(unittest.TestCase):
             where the data are not changed.
         """
         form: dict[str, str] = get_unchanged_update_form(
-            journal_entry_id, self.app, self.csrf_token, self.encoded_next_uri)
+            journal_entry_id, self.__app, self.__csrf_token,
+            self.__encoded_next_uri)
         form = {x: form[x] for x in form if "-credit-" not in x}
         return form
 
@@ -2325,4 +2329,4 @@ class JournalEntryReorderTestCase(unittest.TestCase):
 
         :return: The form data to add a new journal entry.
         """
-        return get_add_form(self.csrf_token, self.encoded_next_uri)
+        return get_add_form(self.__csrf_token, self.__encoded_next_uri)

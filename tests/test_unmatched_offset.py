@@ -42,19 +42,19 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import JournalEntry, JournalEntryLineItem
             JournalEntry.query.delete()
             JournalEntryLineItem.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "editor")
+        self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_nobody(self) -> None:
@@ -62,14 +62,14 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.__app, "nobody")
         csrf_token: str = get_csrf_token(client)
-        DifferentTestData(self.app, "nobody").populate()
+        DifferentTestData(self.__app, "nobody").populate()
         response: httpx.Response
 
         response = client.post(f"{PREFIX}/{Accounts.PAYABLE}",
                                data={"csrf_token": csrf_token,
-                                     "next": self.encoded_next_uri})
+                                     "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 403)
 
     def test_viewer(self) -> None:
@@ -77,14 +77,14 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.__app, "viewer")
         csrf_token: str = get_csrf_token(client)
-        DifferentTestData(self.app, "viewer").populate()
+        DifferentTestData(self.__app, "viewer").populate()
         response: httpx.Response
 
         response = client.post(f"{PREFIX}/{Accounts.PAYABLE}",
                                data={"csrf_token": csrf_token,
-                                     "next": self.encoded_next_uri})
+                                     "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 403)
 
     def test_editor(self) -> None:
@@ -92,12 +92,12 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
 
         :return: None.
         """
-        DifferentTestData(self.app, "editor").populate()
+        DifferentTestData(self.__app, "editor").populate()
         response: httpx.Response
 
-        response = self.client.post(f"{PREFIX}/{Accounts.PAYABLE}",
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(f"{PREFIX}/{Accounts.PAYABLE}",
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -108,9 +108,9 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         """
         response: httpx.Response
 
-        response = self.client.post(f"{PREFIX}/{Accounts.PAYABLE}",
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(f"{PREFIX}/{Accounts.PAYABLE}",
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
@@ -122,7 +122,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         from accounting.models import Currency, Account, JournalEntryLineItem
         from accounting.report.utils.offset_matcher import OffsetMatcher
         from accounting.template_globals import default_currency_code
-        data: DifferentTestData = DifferentTestData(self.app, "editor")
+        data: DifferentTestData = DifferentTestData(self.__app, "editor")
         data.populate()
         account: Account | None
         line_item: JournalEntryLineItem | None
@@ -130,13 +130,13 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         match_uri: str
         response: httpx.Response
 
-        with self.app.app_context():
+        with self.__app.app_context():
             currency: Currency | None \
                 = db.session.get(Currency, default_currency_code())
             assert currency is not None
 
         # The receivables
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -158,13 +158,13 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
                 self.assertIsNone(line_item.original_line_item_id)
 
         match_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
-        response = self.client.post(match_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(match_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -186,7 +186,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
             self.assertEqual(line_item.original_line_item_id, data.l_r_or4d.id)
 
         # The payables
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -208,13 +208,13 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
                 self.assertIsNone(line_item.original_line_item_id)
 
         match_uri = f"{PREFIX}/{Accounts.PAYABLE}"
-        response = self.client.post(match_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(match_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -243,7 +243,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         from accounting.models import Currency, Account, JournalEntryLineItem
         from accounting.report.utils.offset_matcher import OffsetMatcher
         from accounting.template_globals import default_currency_code
-        data: SameTestData = SameTestData(self.app, "editor")
+        data: SameTestData = SameTestData(self.__app, "editor")
         data.populate()
         account: Account | None
         line_item: JournalEntryLineItem | None
@@ -251,13 +251,13 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
         match_uri: str
         response: httpx.Response
 
-        with self.app.app_context():
+        with self.__app.app_context():
             currency: Currency | None \
                 = db.session.get(Currency, default_currency_code())
             assert currency is not None
 
         # The receivables
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -286,13 +286,13 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
             self.assertEqual(line_item.original_line_item_id, data.l_r_or2d.id)
 
         match_uri = f"{PREFIX}/{Accounts.RECEIVABLE}"
-        response = self.client.post(match_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(match_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.RECEIVABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -323,7 +323,7 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
             self.assertEqual(line_item.original_line_item_id, data.l_r_or4d.id)
 
         # The payables
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)
@@ -352,13 +352,13 @@ class UnmatchedOffsetTestCase(unittest.TestCase):
             self.assertEqual(line_item.original_line_item_id, data.l_p_or2c.id)
 
         match_uri = f"{PREFIX}/{Accounts.PAYABLE}"
-        response = self.client.post(match_uri,
-                                    data={"csrf_token": self.csrf_token,
-                                          "next": self.encoded_next_uri})
+        response = self.__client.post(match_uri,
+                                      data={"csrf_token": self.__csrf_token,
+                                            "next": self.__encoded_next_uri})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], NEXT_URI)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             account = Account.find_by_code(Accounts.PAYABLE)
             assert account is not None
             matcher = OffsetMatcher(currency, account)

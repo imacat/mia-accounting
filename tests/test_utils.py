@@ -40,7 +40,7 @@ class NextUriTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
     def test_next_uri(self) -> None:
@@ -52,7 +52,7 @@ class NextUriTestCase(unittest.TestCase):
             """The test view with the next URI."""
             current_uri: str = request.full_path if request.query_string \
                 else request.path
-            with self.app.app_context():
+            with self.__app.app_context():
                 encoded_current: str = encode_next(current_uri)
             self.assertEqual(append_next(self.TARGET),
                              f"{self.TARGET}?next={encoded_current}")
@@ -60,19 +60,20 @@ class NextUriTestCase(unittest.TestCase):
                 if request.method == "POST" else request.args["next"]
             self.assertEqual(inherit_next(self.TARGET),
                              f"{self.TARGET}?next={encoded_next_uri}")
-            with self.app.app_context():
+            with self.__app.app_context():
                 next_uri: str = decode_next(encoded_next_uri)
             self.assertEqual(or_next(self.TARGET), next_uri)
             return ""
 
-        self.app.add_url_rule("/test-next", view_func=test_next_uri_view,
-                              methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        self.__app.add_url_rule("/test-next", view_func=test_next_uri_view,
+                                methods=["GET", "POST"])
+        client: httpx.Client = httpx.Client(app=self.__app,
+                                            base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
         csrf_token: str = get_csrf_token(client)
         response: httpx.Response
 
-        with self.app.app_context():
+        with self.__app.app_context():
             encoded_uri: str = encode_next(NEXT_URI)
         response = client.get(f"/test-next?next={encoded_uri}&q=abc&page-no=4")
         self.assertEqual(response.status_code, 200)
@@ -92,9 +93,11 @@ class NextUriTestCase(unittest.TestCase):
             self.assertEqual(or_next(self.TARGET), self.TARGET)
             return ""
 
-        self.app.add_url_rule("/test-no-next", view_func=test_no_next_uri_view,
-                              methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        self.__app.add_url_rule("/test-no-next",
+                                view_func=test_no_next_uri_view,
+                                methods=["GET", "POST"])
+        client: httpx.Client = httpx.Client(app=self.__app,
+                                            base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
         csrf_token: str = get_csrf_token(client)
         response: httpx.Response
@@ -116,10 +119,11 @@ class NextUriTestCase(unittest.TestCase):
             self.assertEqual(or_next(self.TARGET), self.TARGET)
             return ""
 
-        self.app.add_url_rule("/test-invalid-next",
-                              view_func=test_invalid_next_uri_view,
-                              methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.app, base_url=TEST_SERVER)
+        self.__app.add_url_rule("/test-invalid-next",
+                                view_func=test_invalid_next_uri_view,
+                                methods=["GET", "POST"])
+        client: httpx.Client = httpx.Client(app=self.__app,
+                                            base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
         csrf_token: str = get_csrf_token(client)
         next_uri: str
@@ -204,28 +208,29 @@ class PaginationTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
-        self.params: PaginationTestCase.Params = self.Params([], None, [], True)
+        self.__params: PaginationTestCase.Params \
+            = self.Params([], None, [], True)
         """The testing pagination parameters."""
 
-        @self.app.get("/test-pagination")
+        @self.__app.get("/test-pagination")
         def test_pagination_view() -> str:
             """The test view with the pagination."""
             pagination: Pagination
-            if self.params.is_reversed is not None:
+            if self.__params.is_reversed is not None:
                 pagination = Pagination[int](
-                    self.params.items, is_reversed=self.params.is_reversed)
+                    self.__params.items, is_reversed=self.__params.is_reversed)
             else:
-                pagination = Pagination[int](self.params.items)
-            self.assertEqual(pagination.is_paged, self.params.is_paged)
-            self.assertEqual(pagination.list, self.params.result)
+                pagination = Pagination[int](self.__params.items)
+            self.assertEqual(pagination.is_paged, self.__params.is_paged)
+            self.assertEqual(pagination.list, self.__params.result)
             return ""
 
-        self.client: httpx.Client = httpx.Client(app=self.app,
-                                                 base_url=TEST_SERVER)
+        self.__client: httpx.Client = httpx.Client(app=self.__app,
+                                                   base_url=TEST_SERVER)
         """The user client."""
-        self.client.headers["Referer"] = TEST_SERVER
+        self.__client.headers["Referer"] = TEST_SERVER
 
     def __test_success(self, query: str, items: range,
                        result: range, is_paged: bool = True,
@@ -242,9 +247,9 @@ class PaginationTestCase(unittest.TestCase):
         target: str = "/test-pagination"
         if query != "":
             target = f"{target}?{query}"
-        self.params = self.Params(list(items), is_reversed,
-                                  list(result), is_paged)
-        response: httpx.Response = self.client.get(target)
+        self.__params = self.Params(list(items), is_reversed,
+                                    list(result), is_paged)
+        response: httpx.Response = self.__client.get(target)
         self.assertEqual(response.status_code, 200)
 
     def __test_malformed(self, query: str, items: range, redirect_to: str,
@@ -258,8 +263,8 @@ class PaginationTestCase(unittest.TestCase):
         :return: None.
         """
         target: str = "/test-pagination"
-        self.params = self.Params(list(items), is_reversed, [], True)
-        response: httpx.Response = self.client.get(f"{target}?{query}")
+        self.__params = self.Params(list(items), is_reversed, [], True)
+        response: httpx.Response = self.__client.get(f"{target}?{query}")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"],
                          f"{target}?{redirect_to}")

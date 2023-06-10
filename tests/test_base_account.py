@@ -39,7 +39,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
     def test_nobody(self) -> None:
@@ -47,7 +47,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.__app, "nobody")
         response: httpx.Response
 
         response = client.get(LIST_URI)
@@ -61,7 +61,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.__app, "viewer")
         response: httpx.Response
 
         response = client.get(LIST_URI)
@@ -75,7 +75,7 @@ class BaseAccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "editor")
+        client: httpx.Client = get_client(self.__app, "editor")
         response: httpx.Response
 
         response = client.get(LIST_URI)

@@ -41,18 +41,18 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             from accounting.models import Option
             Option.query.delete()
-            self.encoded_next_uri: str = encode_next(NEXT_URI)
+            self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
-        self.client: httpx.Client = get_client(self.app, "admin")
+        self.__client: httpx.Client = get_client(self.__app, "admin")
         """The user client."""
-        self.csrf_token: str = get_csrf_token(self.client)
+        self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
 
     def test_nobody(self) -> None:
@@ -60,10 +60,10 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "nobody")
+        client: httpx.Client = get_client(self.__app, "nobody")
         csrf_token: str = get_csrf_token(client)
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
-        edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
+        edit_uri: str = f"{PREFIX}/edit?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         response: httpx.Response
 
@@ -81,10 +81,10 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "viewer")
+        client: httpx.Client = get_client(self.__app, "viewer")
         csrf_token: str = get_csrf_token(client)
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
-        edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
+        edit_uri: str = f"{PREFIX}/edit?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         response: httpx.Response
 
@@ -102,10 +102,10 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        client: httpx.Client = get_client(self.app, "editor")
+        client: httpx.Client = get_client(self.__app, "editor")
         csrf_token: str = get_csrf_token(client)
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
-        edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
+        edit_uri: str = f"{PREFIX}/edit?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         response: httpx.Response
 
@@ -123,18 +123,18 @@ class OptionTestCase(unittest.TestCase):
 
         :return: None.
         """
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
-        edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
+        edit_uri: str = f"{PREFIX}/edit?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         response: httpx.Response
 
-        response = self.client.get(detail_uri)
+        response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(edit_uri)
+        response = self.__client.get(edit_uri)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(update_uri, data=self.__get_form())
+        response = self.__client.post(update_uri, data=self.__get_form())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
@@ -144,8 +144,8 @@ class OptionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.utils.options import options
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
-        edit_uri: str = f"{PREFIX}/edit?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
+        edit_uri: str = f"{PREFIX}/edit?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         form: dict[str, str]
         response: httpx.Response
@@ -153,35 +153,35 @@ class OptionTestCase(unittest.TestCase):
         # Empty currency code
         form = self.__get_form()
         form["default_currency_code"] = " "
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Non-existing currency code
         form = self.__get_form()
         form["default_currency_code"] = "ZZZ"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Empty current account
         form = self.__get_form()
         form["default_ie_account_code"] = " "
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Non-existing current account
         form = self.__get_form()
         form["default_ie_account_code"] = "9999-999"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Not a current account
         form = self.__get_form()
         form["default_ie_account_code"] = Accounts.MEAL
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -189,7 +189,7 @@ class OptionTestCase(unittest.TestCase):
         form = self.__get_form()
         key = [x for x in form if x.endswith("-name")][0]
         form[key] = " "
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -197,7 +197,7 @@ class OptionTestCase(unittest.TestCase):
         form = self.__get_form()
         key = [x for x in form if x.endswith("-account_code")][0]
         form[key] = " "
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -207,7 +207,7 @@ class OptionTestCase(unittest.TestCase):
                if x.startswith("recurring-expense-")
                and x.endswith("-account_code")][0]
         form[key] = Accounts.SERVICE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -217,7 +217,7 @@ class OptionTestCase(unittest.TestCase):
                if x.startswith("recurring-income-")
                and x.endswith("-account_code")][0]
         form[key] = Accounts.UTILITIES
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -227,7 +227,7 @@ class OptionTestCase(unittest.TestCase):
                if x.startswith("recurring-expense-")
                and x.endswith("-account_code")][0]
         form[key] = Accounts.PAYABLE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -237,7 +237,7 @@ class OptionTestCase(unittest.TestCase):
                if x.startswith("recurring-income-")
                and x.endswith("-account_code")][0]
         form[key] = Accounts.RECEIVABLE
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
@@ -245,22 +245,22 @@ class OptionTestCase(unittest.TestCase):
         form = self.__get_form()
         key = [x for x in form if x.endswith("-description_template")][0]
         form[key] = " "
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], edit_uri)
 
         # Success, with malformed order
-        with self.app.app_context():
+        with self.__app.app_context():
             self.assertEqual(options.default_currency_code, "USD")
             self.assertEqual(options.default_ie_account_code, "1111-001")
             self.assertEqual(len(options.recurring.expenses), 0)
             self.assertEqual(len(options.recurring.incomes), 0)
 
-        response = self.client.post(update_uri, data=self.__get_form())
+        response = self.__client.post(update_uri, data=self.__get_form())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             self.assertEqual(options.default_currency_code, "EUR")
             self.assertEqual(options.default_ie_account_code, "0000-000")
             self.assertEqual(len(options.recurring.expenses), 4)
@@ -281,11 +281,11 @@ class OptionTestCase(unittest.TestCase):
         # Success, with no recurring data
         form = self.__get_form()
         form = {x: form[x] for x in form if not x.startswith("recurring-")}
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             self.assertEqual(len(options.recurring.expenses), 0)
             self.assertEqual(len(options.recurring.incomes), 0)
 
@@ -295,17 +295,17 @@ class OptionTestCase(unittest.TestCase):
         :return: None.
         """
         from accounting.models import Option
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         form: dict[str, str]
         option: Option | None
         resource: httpx.Response
 
-        response = self.client.post(update_uri, data=self.__get_form())
+        response = self.__client.post(update_uri, data=self.__get_form())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
             timestamp: dt.datetime \
@@ -317,11 +317,11 @@ class OptionTestCase(unittest.TestCase):
         # The recurring setting was not modified
         form = self.__get_form()
         form["default_currency_code"] = "JPY"
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
             self.assertEqual(option.created_at, timestamp)
@@ -333,11 +333,11 @@ class OptionTestCase(unittest.TestCase):
                     if x.startswith("recurring-expense-")
                     and x.endswith("-account_code")][0]
         form[key] = Accounts.MEAL
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
             self.assertLess(option.created_at, option.updated_at)
@@ -350,16 +350,16 @@ class OptionTestCase(unittest.TestCase):
         from accounting.models import Option
         from accounting.utils.user import get_user_pk
         admin_username, editor_username = "admin", "editor"
-        detail_uri: str = f"{PREFIX}?next={self.encoded_next_uri}"
+        detail_uri: str = f"{PREFIX}?next={self.__encoded_next_uri}"
         update_uri: str = f"{PREFIX}/update"
         option: Option | None
         response: httpx.Response
 
-        response = self.client.post(update_uri, data=self.__get_form())
+        response = self.__client.post(update_uri, data=self.__get_form())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             editor_pk: int = get_user_pk(editor_username)
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
@@ -372,11 +372,11 @@ class OptionTestCase(unittest.TestCase):
                     if x.startswith("recurring-expense-")
                     and x.endswith("-account_code")][0]
         form[key] = Accounts.MEAL
-        response = self.client.post(update_uri, data=form)
+        response = self.__client.post(update_uri, data=form)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
-        with self.app.app_context():
+        with self.__app.app_context():
             option = db.session.get(Option, "recurring")
             self.assertIsNotNone(option)
             self.assertEqual(option.created_by.username, editor_username)
@@ -389,9 +389,9 @@ class OptionTestCase(unittest.TestCase):
         :return: The option form.
         """
         if csrf_token is None:
-            csrf_token = self.csrf_token
+            csrf_token = self.__csrf_token
         return {"csrf_token": csrf_token,
-                "next": self.encoded_next_uri,
+                "next": self.__encoded_next_uri,
                 "default_currency_code": "EUR",
                 "default_ie_account_code": "0000-000",
                 "recurring-expense-1-name": "Water bill",

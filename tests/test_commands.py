@@ -40,10 +40,10 @@ class ConsoleCommandTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.app: Flask = create_test_app()
+        self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.app.app_context():
+        with self.__app.app_context():
             # Drop every accounting table, to see if accounting-init recreates
             # them correctly.
             tables: list[sa.Table] \
@@ -62,8 +62,8 @@ class ConsoleCommandTestCase(unittest.TestCase):
 
         :return: None.
         """
-        runner: FlaskCliRunner = self.app.test_cli_runner()
-        with self.app.app_context():
+        runner: FlaskCliRunner = self.__app.test_cli_runner()
+        with self.__app.app_context():
             result: Result = runner.invoke(
                 args=["accounting-init-db", "-u", "editor"])
         self.assertEqual(result.exit_code, 0,
@@ -88,7 +88,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
                                         for y in x if y.startswith("l10n-")}}
                    for x in csv.DictReader(fp)}
 
-        with self.app.app_context():
+        with self.__app.app_context():
             accounts: list[BaseAccount] = BaseAccount.query.all()
 
         self.assertEqual(len(accounts), len(data))
@@ -109,7 +109,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         """
         from accounting.models import BaseAccount, Account, AccountL10n
 
-        with self.app.app_context():
+        with self.__app.app_context():
             bases: list[BaseAccount] = BaseAccount.query\
                 .filter(sa.func.char_length(BaseAccount.code) == 4).all()
             accounts: list[Account] = Account.query.all()
@@ -143,7 +143,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
                                         for y in x if y.startswith("l10n-")}}
                    for x in csv.DictReader(fp)}
 
-        with self.app.app_context():
+        with self.__app.app_context():
             currencies: list[Currency] = Currency.query.all()
 
         self.assertEqual(len(currencies), len(data))
