@@ -25,7 +25,7 @@ First written: 2023/1/27
 
 {% block content %}
 
-<p>{{ _("This is the live demonstration of the Mia! Accounting project.  Please <a href=\"/login?next=%%2Faccounting\">log in</a> to continue.") }}</p>
+<p>{{ _("This is the live demonstration of the Mia! Accounting project.  Please <a href=\"%(url)s\">log in</a> to continue.", url=url_for("auth.login")) }}</p>
 
 <p>{{ _("You may also want to check the <a href=\"https://mia-accounting.readthedocs.io\">full documentation</a> and the <a href=\"https://github.com/imacat/mia-accounting\">Github repository</a>.") }}</p>
 
