@@ -18,6 +18,7 @@
 
 """
 import csv
+import re
 import unittest
 from typing import Any
 
@@ -95,13 +96,32 @@ class ConsoleCommandTestCase(unittest.TestCase):
         self.assertEqual(len(accounts), len(data))
         for account in accounts:
             self.assertIn(account.code, data)
-            self.assertEqual(account.title_l10n, data[account.code]["title"])
+            self.assertEqual(account.title_l10n.lower(),
+                             data[account.code]["title"].lower())
+            self.__test_title_case(account.title_l10n)
             l10n: dict[str, str] = {x.locale: x.title for x in account.l10n}
             self.assertEqual(len(l10n), len(data[account.code]["l10n"]))
             for locale in l10n:
                 self.assertIn(locale, data[account.code]["l10n"])
                 self.assertEqual(l10n[locale],
                                  data[account.code]["l10n"][locale])
+
+    def __test_title_case(self, s: str) -> None:
+        """Tests the case of a base account title.
+
+        :param s: The base account title.
+        :return: None.
+        """
+        from accounting.utils.title_case import MINOR_WORDS
+
+        self.assertTrue(s[0].isupper(), s)
+        for word in re.findall(r"\w+", s):
+            if len(word) >= 4:
+                self.assertTrue(word.istitle(), s)
+            elif word in MINOR_WORDS:
+                self.assertTrue(word.islower(), s)
+            else:
+                self.assertTrue(word.istitle(), s)
 
     def __test_account_data(self) -> None:
         """Tests the account data.

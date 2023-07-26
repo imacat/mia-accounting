@@ -26,7 +26,7 @@ First written: 2023/3/5
         {{ line_item.date|accounting_format_date }}
       {% endif %}
       {% if line_item.account %}
-        {{ line_item.account.title|title }}
+        {{ line_item.account.title }}
       {% endif %}
     </div>
   {% endif %}

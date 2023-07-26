@@ -224,7 +224,7 @@ class TrialBalance(BaseReport):
         """
         rows: list[CSVRow] = [CSVRow(gettext("Account"), gettext("Debit"),
                                      gettext("Credit"))]
-        rows.extend([CSVRow(str(x.account).title(), x.debit, x.credit)
+        rows.extend([CSVRow(str(x.account), x.debit, x.credit)
                      for x in self.__accounts])
         rows.append(CSVRow(gettext("Total"), self.__total.debit,
                            self.__total.credit))

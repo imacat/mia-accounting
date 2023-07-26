@@ -226,12 +226,12 @@ class IncomeStatement(BaseReport):
                                           for x in balances})).all()
 
         total_titles: dict[str, str] \
-            = {"4": gettext("total operating revenue"),
-               "5": gettext("gross income"),
-               "6": gettext("operating income"),
-               "7": gettext("before tax income"),
-               "8": gettext("after tax income"),
-               "9": gettext("net income or loss for current period")}
+            = {"4": gettext("Total Operating Revenue"),
+               "5": gettext("Gross Income"),
+               "6": gettext("Operating Income"),
+               "7": gettext("Before Tax Income"),
+               "8": gettext("After Tax Income"),
+               "9": gettext("Net Income or Loss for Current Period")}
 
         sections: dict[str, Section] \
             = {x.code: Section(x, total_titles[x.code]) for x in titles}
@@ -301,14 +301,14 @@ class IncomeStatement(BaseReport):
         total_str: str = gettext("Total")
         rows: list[CSVRow] = [CSVRow(None, gettext("Amount"))]
         for section in self.__sections:
-            rows.append(CSVRow(str(section.title).title(), None))
+            rows.append(CSVRow(str(section.title), None))
             for subsection in section.subsections:
-                rows.append(CSVRow(f" {str(subsection.title).title()}", None))
+                rows.append(CSVRow(f" {str(subsection.title)}", None))
                 for account in subsection.accounts:
-                    rows.append(CSVRow(f"  {str(account.account).title()}",
+                    rows.append(CSVRow(f"  {str(account.account)}",
                                        account.amount))
                 rows.append(CSVRow(f" {total_str}", subsection.total))
-            rows.append(CSVRow(section.accumulated.title.title(),
+            rows.append(CSVRow(section.accumulated.title,
                                section.accumulated.amount))
             rows.append(CSVRow(None, None))
         rows = rows[:-1]

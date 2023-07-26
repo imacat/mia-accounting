@@ -26,7 +26,7 @@ First written: 2023/4/8
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts with Unapplied Items") }}{% else %}{{ A_("Accounts with Unapplied Items in %(currency)s", currency=report.currency.name|title) }}{% endif %}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts With Unapplied Items") }}{% else %}{{ A_("Accounts With Unapplied Items in %(currency)s", currency=report.currency.name|title) }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -46,9 +46,9 @@ First written: 2023/4/8
     <div class="d-none d-sm-flex justify-content-center mb-3">
       <h2 class="text-center">
         {% if report.currency.code == accounting_default_currency_code() %}
-          {{ A_("Accounts with Unapplied Items") }}
+          {{ A_("Accounts With Unapplied Items") }}
         {% else %}
-          {{ A_("Accounts with Unapplied Items in %(currency)s", currency=report.currency.name|title) }}
+          {{ A_("Accounts With Unapplied Items in %(currency)s", currency=report.currency.name|title) }}
         {% endif %}
       </h2>
     </div>
@@ -64,7 +64,7 @@ First written: 2023/4/8
           <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unapplied", currency=report.currency, account=account, period=report.period) }}">
             <div>
               <span class="d-none d-md-inline">{{ account.code }}</span>
-              {{ account.title|title }}
+              {{ account.title }}
             </div>
             <div class="accounting-amount">{{ account.count }}</div>
           </a>

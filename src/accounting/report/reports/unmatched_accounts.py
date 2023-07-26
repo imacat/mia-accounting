@@ -120,8 +120,7 @@ def get_csv_rows(accounts: list[Account]) -> list[CSVRow]:
     :return: The CSV rows.
     """
     rows: list[CSVRow] = [CSVRow(gettext("Account"), gettext("Count"))]
-    rows.extend([CSVRow(str(x).title(), x.count)
-                 for x in accounts])
+    rows.extend([CSVRow(str(x), x.count) for x in accounts])
     return rows
 
 

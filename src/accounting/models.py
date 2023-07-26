@@ -54,7 +54,7 @@ class BaseAccount(db.Model):
 
         :return: The string representation of the base account.
         """
-        return f"{self.code} {self.title.title()}"
+        return f"{self.code} {self.title}"
 
     @property
     def title(self) -> str:
@@ -151,7 +151,7 @@ class Account(db.Model):
 
         :return: The string representation of this account.
         """
-        return f"{self.base_code}-{self.no:03d} {self.title.title()}"
+        return f"{self.base_code}-{self.no:03d} {self.title}"
 
     @property
     def code(self) -> str:

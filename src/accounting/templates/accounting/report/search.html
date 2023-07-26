@@ -62,7 +62,7 @@ First written: 2023/3/8
           <div>{{ line_item.currency.name }}</div>
           <div>
             <span class="d-none d-md-inline">{{ line_item.account.code }}</span>
-            {{ line_item.account.title|title }}
+            {{ line_item.account.title }}
           </div>
           <div>{{ line_item.description|accounting_default }}</div>
           <div class="accounting-amount">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
@@ -79,7 +79,7 @@ First written: 2023/3/8
         <div {% if not line_item.is_debit %} class="accounting-mobile-journal-credit" {% endif %}>
           <div class="text-muted small">
             {{ line_item.journal_entry.date|accounting_format_date }}
-            {{ line_item.account.title|title }}
+            {{ line_item.account.title }}
             {% if line_item.currency.code != accounting_default_currency_code() %}
               <span class="badge rounded-pill bg-info">{{ line_item.currency.code }}</span>
             {% endif %}

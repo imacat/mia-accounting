@@ -454,11 +454,11 @@ class BalanceSheet(BaseReport):
         :return: The CSV rows for the section.
         """
         rows: list[CSVHalfRow] \
-            = [CSVHalfRow(section.title.title.title(), None)]
+            = [CSVHalfRow(section.title.title, None)]
         for subsection in section.subsections:
-            rows.append(CSVHalfRow(f" {subsection.title.title.title()}", None))
+            rows.append(CSVHalfRow(f" {subsection.title.title}", None))
             for account in subsection.accounts:
-                rows.append(CSVHalfRow(f"  {str(account.account).title()}",
+                rows.append(CSVHalfRow(f"  {str(account.account)}",
                                        account.amount))
         return rows
 

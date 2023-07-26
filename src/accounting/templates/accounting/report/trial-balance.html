@@ -68,7 +68,7 @@ First written: 2023/3/5
           <a class="accounting-report-table-row" href="{{ account.url }}">
             <div>
               <span class="d-none d-md-inline">{{ account.account.code }}</span>
-              {{ account.account.title|title }}
+              {{ account.account.title }}
             </div>
             <div class="accounting-amount">{{ account.debit|accounting_format_amount|accounting_default }}</div>
             <div class="accounting-amount">{{ account.credit|accounting_format_amount|accounting_default }}</div>

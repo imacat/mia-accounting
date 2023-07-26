@@ -407,13 +407,13 @@ class IncomeExpenses(BaseReport):
                                      gettext("Note"))]
         if self.__brought_forward is not None:
             rows.append(CSVRow(self.__brought_forward.date,
-                               str(self.__brought_forward.account).title(),
+                               str(self.__brought_forward.account),
                                self.__brought_forward.description,
                                self.__brought_forward.income,
                                self.__brought_forward.expense,
                                self.__brought_forward.balance,
                                None))
-        rows.extend([CSVRow(x.date, str(x.account).title(), x.description,
+        rows.extend([CSVRow(x.date, str(x.account), x.description,
                             x.income, x.expense, x.balance, x.note)
                      for x in self.__line_items])
         if self.__total is not None:

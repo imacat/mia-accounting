@@ -42,7 +42,7 @@ First written: 2023/2/25
                 <div class="small">
                   {{ line_item.journal_entry.date|accounting_format_date }}
                   <span class="d-none d-md-inline">{{ line_item.account.code }}</span>
-                  {{ line_item.account.title|title }}
+                  {{ line_item.account.title }}
                 </div>
                 {{ line_item.description|accounting_default }}
               </div>

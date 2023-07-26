@@ -26,7 +26,7 @@ First written: 2023/4/17
   <script src="{{ url_for("accounting.static", filename="js/period-chooser.js") }}"></script>
 {% endblock %}
 
-{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts with Unmatched Offsets") }}{% else %}{{ A_("Accounts with Unmatched Offsets in %(currency)s", currency=report.currency.name|title) }}{% endif %}{% endblock %}{% endblock %}
+{% block header %}{% block title %}{% if report.currency.code == accounting_default_currency_code() %}{{ A_("Accounts With Unmatched Offsets") }}{% else %}{{ A_("Accounts With Unmatched Offsets in %(currency)s", currency=report.currency.name|title) }}{% endif %}{% endblock %}{% endblock %}
 
 {% block content %}
 
@@ -46,9 +46,9 @@ First written: 2023/4/17
     <div class="d-none d-sm-flex justify-content-center mb-3">
       <h2 class="text-center">
         {% if report.currency.code == accounting_default_currency_code() %}
-          {{ A_("Accounts with Unmatched Offsets") }}
+          {{ A_("Accounts With Unmatched Offsets") }}
         {% else %}
-          {{ A_("Accounts with Unmatched Offsets in %(currency)s", currency=report.currency.name|title) }}
+          {{ A_("Accounts With Unmatched Offsets in %(currency)s", currency=report.currency.name|title) }}
         {% endif %}
       </h2>
     </div>
@@ -64,7 +64,7 @@ First written: 2023/4/17
           <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unmatched", currency=report.currency, account=account, period=report.period) }}">
             <div>
               <span class="d-none d-md-inline">{{ account.code }}</span>
-              {{ account.title|title }}
+              {{ account.title }}
             </div>
             <div class="accounting-amount">{{ account.count }}</div>
           </a>

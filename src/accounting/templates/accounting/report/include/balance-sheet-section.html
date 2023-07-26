@@ -20,21 +20,21 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/8
 #}
 <div class="accounting-report-table-row accounting-balance-sheet-section">
-  <div>{{ section.title.title|title }}</div>
+  <div>{{ section.title.title }}</div>
 </div>
 <div class="accounting-report-table-body">
   {% for subsection in section.subsections %}
     <div class="accounting-report-table-row accounting-balance-sheet-subsection">
       <div>
         <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
-        {{ subsection.title.title|title }}
+        {{ subsection.title.title }}
       </div>
     </div>
     {% for account in subsection.accounts %}
       <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
         <div>
           <span class="d-none d-md-inline">{{ account.account.code }}</span>
-          {{ account.account.title|title }}
+          {{ account.account.title }}
         </div>
         <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
       </a>

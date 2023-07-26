@@ -66,21 +66,21 @@ First written: 2023/3/7
           <div class="accounting-report-table-row accounting-income-statement-section">
             <div>
               <span class="d-none d-md-inline">{{ section.title.code }}</span>
-              {{ section.title.title|title }}
+              {{ section.title.title }}
             </div>
           </div>
           {% for subsection in section.subsections %}
             <div class="accounting-report-table-row accounting-income-statement-subsection">
               <div>
                 <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
-                {{ subsection.title.title|title }}
+                {{ subsection.title.title }}
               </div>
             </div>
             {% for account in subsection.accounts %}
               <a class="accounting-report-table-row accounting-income-statement-account" href="{{ account.url }}">
                 <div>
                   <span class="d-none d-md-inline">{{ account.account.code }}</span>
-                  {{ account.account.title|title }}
+                  {{ account.account.title }}
                 </div>
                 <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
               </a>
@@ -91,7 +91,7 @@ First written: 2023/3/7
             </div>
           {% endfor %}
           <div class="accounting-report-table-row accounting-income-statement-total">
-            <div>{{ section.accumulated.title|title }}</div>
+            <div>{{ section.accumulated.title }}</div>
             <div class="accounting-amount {% if section.accumulated.amount < 0 %} text-danger {% endif %}">{{ section.accumulated.amount|accounting_report_format_amount }}</div>
           </div>
         {% endfor %}

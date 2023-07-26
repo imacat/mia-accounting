@@ -160,7 +160,7 @@ def get_csv_rows(line_items: list[JournalEntryLineItem]) -> list[CSVRow]:
                                  gettext("Debit"), gettext("Credit"),
                                  gettext("Note"))]
     rows.extend([CSVRow(x.journal_entry.date, x.currency.code,
-                        str(x.account).title(), x.description,
+                        str(x.account), x.description,
                         x.debit, x.credit, x.journal_entry.note)
                  for x in line_items])
     return rows

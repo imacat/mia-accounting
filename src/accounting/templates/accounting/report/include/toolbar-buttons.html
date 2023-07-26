@@ -93,7 +93,7 @@ First written: 2023/3/8
       {% for account in report.account_options %}
         <li>
           <a class="dropdown-item {% if account.is_active %} active {% endif %}" href="{{ account.url }}">
-            {{ account.title|title }}
+            {{ account.title }}
           </a>
         </li>
       {% endfor %}

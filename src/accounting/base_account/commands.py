@@ -24,6 +24,7 @@ import sqlalchemy as sa
 from accounting import data_dir
 from accounting import db
 from accounting.models import BaseAccount, BaseAccountL10n
+from accounting.utils.title_case import title_case
 
 
 def init_base_accounts_command() -> None:
@@ -34,7 +35,7 @@ def init_base_accounts_command() -> None:
     with open(data_dir / "base_accounts.csv") as fp:
         data: list[dict[str, str]] = [x for x in csv.DictReader(fp)]
     account_data: list[dict[str, str]] = [{"code": x["code"],
-                                           "title_l10n": x["title"]}
+                                           "title_l10n": title_case(x["title"])}
                                           for x in data]
     locales: list[str] = [x[5:] for x in data[0] if x.startswith("l10n-")]
     l10n_data: list[dict[str, str]] = [{"account_code": x["code"],
