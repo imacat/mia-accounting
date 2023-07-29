@@ -44,7 +44,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         self.__app: Flask = create_test_app()
         """The Flask application."""
 
-    def test_init(self) -> None:
+    def test_init_db(self) -> None:
         """Tests the "accounting-init-db" console command.
 
         :return: None.
