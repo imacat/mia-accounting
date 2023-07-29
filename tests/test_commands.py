@@ -18,6 +18,7 @@
 
 """
 import csv
+import datetime as dt
 import re
 import unittest
 from typing import Any
@@ -177,3 +178,69 @@ class ConsoleCommandTestCase(unittest.TestCase):
                 self.assertIn(locale, data[currency.code]["l10n"])
                 self.assertEqual(l10n[locale],
                                  data[currency.code]["l10n"][locale])
+
+    def test_titleize(self) -> None:
+        """Tests the "accounting-titleize" console command.
+
+        :return: None.
+        """
+        from accounting.models import BaseAccount, Account
+        from accounting.utils.random_id import new_id
+        from accounting.utils.user import get_user_pk
+        runner: FlaskCliRunner = self.__app.test_cli_runner()
+
+        with self.__app.app_context():
+            # Resets the accounts.
+            tables: list[sa.Table] \
+                = [db.metadata.tables[x] for x in db.metadata.tables
+                   if x.startswith("accounting_")]
+            for table in tables:
+                db.session.execute(DropTable(table))
+            db.session.commit()
+            inspector: sa.Inspector = sa.inspect(db.session.connection())
+            self.assertEqual(len({x for x in inspector.get_table_names()
+                                  if x.startswith("accounting_")}),
+                             0)
+            result: Result = runner.invoke(
+                args=["accounting-init-db", "-u", "editor"])
+            self.assertEqual(result.exit_code, 0,
+                             result.output + str(result.exception))
+
+            # Turns the titles into lowercase.
+            for base in BaseAccount.query:
+                base.title_l10n = base.title_l10n.lower()
+            for account in Account.query:
+                account.title_l10n = account.title_l10n.lower()
+                account.created_at \
+                    = account.created_at - dt.timedelta(seconds=5)
+                account.updated_at = account.created_at
+
+            # Adds a custom account.
+            custom_title = "MBK Bank"
+            creator_pk: int = get_user_pk("editor")
+            new_account: Account = Account(
+                id=new_id(Account),
+                base_code="1112",
+                no="2",
+                title_l10n=custom_title,
+                is_need_offset=False,
+                created_by_id=creator_pk,
+                updated_by_id=creator_pk)
+            db.session.add(new_account)
+            db.session.commit()
+
+            result: Result = runner.invoke(
+                args=["accounting-titleize", "-u", "editor"])
+            self.assertEqual(result.exit_code, 0,
+                             result.output + str(result.exception))
+            for base in BaseAccount.query:
+                self.__test_title_case(base.title_l10n)
+            for account in Account.query:
+                if account.id != new_account.id:
+                    self.__test_title_case(account.title_l10n)
+                    self.assertNotEqual(account.created_at, account.updated_at)
+                else:
+                    self.assertEqual(account.title_l10n, custom_title)
+
+            db.session.delete(new_account)
+            db.session.commit()

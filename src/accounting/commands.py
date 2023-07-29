@@ -26,7 +26,10 @@ from accounting import db
 from accounting.account import init_accounts_command
 from accounting.base_account import init_base_accounts_command
 from accounting.currency import init_currencies_command
-from accounting.utils.user import has_user
+from accounting.models import BaseAccount, Account
+from accounting.utils.title_case import title_case
+from accounting.utils.user import has_user, get_user_pk
+import sqlalchemy as sa
 
 
 def __validate_username(ctx: click.core.Context, param: click.core.Option,
@@ -60,3 +63,32 @@ def init_db_command(username: str) -> None:
     init_currencies_command(username)
     db.session.commit()
     click.echo("Accounting database initialized.")
+
+
+@click.command("accounting-titleize")
+@click.option("-u", "--username", metavar="USERNAME", prompt=True,
+              help="The username.", callback=__validate_username,
+              default=lambda: os.getlogin())
+@with_appcontext
+def titleize_command(username: str) -> None:
+    """Capitalize the account titles."""
+    updater_pk: int = get_user_pk(username)
+    updated: int = 0
+    for base in BaseAccount.query:
+        new_title: str = title_case(base.title_l10n)
+        if base.title_l10n != new_title:
+            base.title_l10n = new_title
+            updated = updated + 1
+    for account in Account.query:
+        if account.title_l10n.lower() == account.base.title_l10n.lower():
+            new_title: str = title_case(account.title_l10n)
+            if account.title_l10n != new_title:
+                account.title_l10n = new_title
+                account.updated_at = sa.func.now()
+                account.updated_by_id = updater_pk
+                updated = updated + 1
+    if updated == 0:
+        click.echo("All account titles were already capitalized.")
+        return
+    db.session.commit()
+    click.echo(f"{updated} account titles capitalized.")
