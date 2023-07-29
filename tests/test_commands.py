@@ -44,6 +44,11 @@ class ConsoleCommandTestCase(unittest.TestCase):
         self.__app: Flask = create_test_app()
         """The Flask application."""
 
+    def test_init(self) -> None:
+        """Tests the "accounting-init" console command.
+
+        :return: None.
+        """
         with self.__app.app_context():
             # Drop every accounting table, to see if accounting-init recreates
             # them correctly.
@@ -58,11 +63,6 @@ class ConsoleCommandTestCase(unittest.TestCase):
                                   if x.startswith("accounting_")}),
                              0)
 
-    def test_init(self) -> None:
-        """Tests the "accounting-init" console command.
-
-        :return: None.
-        """
         runner: FlaskCliRunner = self.__app.test_cli_runner()
         with self.__app.app_context():
             result: Result = runner.invoke(
