@@ -45,13 +45,13 @@ class ConsoleCommandTestCase(unittest.TestCase):
         """The Flask application."""
 
     def test_init(self) -> None:
-        """Tests the "accounting-init" console command.
+        """Tests the "accounting-init-db" console command.
 
         :return: None.
         """
         with self.__app.app_context():
-            # Drop every accounting table, to see if accounting-init recreates
-            # them correctly.
+            # Drop every accounting table, to see if accounting-init-db
+            # recreates them correctly.
             tables: list[sa.Table] \
                 = [db.metadata.tables[x] for x in db.metadata.tables
                    if x.startswith("accounting_")]
