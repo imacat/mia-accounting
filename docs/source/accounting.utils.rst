@@ -100,6 +100,14 @@ accounting.utils.strip\_text module
    :undoc-members:
    :show-inheritance:
 
+accounting.utils.title\_case module
+-----------------------------------
+
+.. automodule:: accounting.utils.title_case
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 accounting.utils.user module
 ----------------------------
 
