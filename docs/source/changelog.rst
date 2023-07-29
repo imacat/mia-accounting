@@ -2,6 +2,27 @@ Change Log
 ==========
 
 
+Version 1.5.7
+-------------
+
+Released 2023/7/29
+
+Revised account title capitalization to capitalize account titles
+upon initialization of base accounts, rather than when displaying
+the accounts.  This prevents the system from incorrectly
+capitalizing titles of user-added accounts.
+
+For existing installation, run the ``accounting-titleize`` console
+command to capitalize the existing account titles that were already
+initialized.
+
+Other fixes:
+
+* Added missing documentation to the global variables, class
+  properties, and object properties.
+* Various minor fixes.
+
+
 Version 1.5.6
 -------------
 
