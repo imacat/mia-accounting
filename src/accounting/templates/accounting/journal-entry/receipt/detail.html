@@ -23,7 +23,7 @@ First written: 2023/2/26
 
 {% block as_trasfer %}
   <a class="btn btn-primary" role="button" href="{{ url_for("accounting.journal-entry.edit", journal_entry=obj)|accounting_journal_entry_to_transfer|accounting_inherit_next }}">
-    <i class="fa-solid fa-bars-staggered"></i>
+    <i class="fa-solid fa-table-columns"></i>
     <span class="d-none d-md-inline">{{ A_("As Transfer") }}</span>
   </a>
 {% endblock %}
