@@ -2,6 +2,18 @@ Change Log
 ==========
 
 
+Version 1.5.8
+-------------
+
+Released 2023/10/24
+
+Bug fix.
+
+* Fixed an icon in the detail of the cash receipt journal entry.
+
+Released at Jaipur, India on vacation.
+
+
 Version 1.5.7
 -------------
 
