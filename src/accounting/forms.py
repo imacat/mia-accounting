@@ -71,7 +71,7 @@ class IsDebitAccount:
         if field.data is None:
             return
         if re.match(r"^(?:[1235689]|7[5678])", field.data) \
-                and not field.data.startswith("3351-") \
+                and field.data != "3351-001" \
                 and not field.data.startswith("3353-"):
             return
         raise ValidationError(self.__message)
@@ -92,7 +92,7 @@ class IsCreditAccount:
         if field.data is None:
             return
         if re.match(r"^(?:[123489]|7[1234])", field.data) \
-                and not field.data.startswith("3351-") \
+                and field.data != "3351-001" \
                 and not field.data.startswith("3353-"):
             return
         raise ValidationError(self.__message)
