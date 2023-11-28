@@ -2,6 +2,17 @@ Change Log
 ==========
 
 
+Version 1.5.9
+-------------
+
+Released 2023/10/24
+
+Bug fix.
+
+* Refined to enable the selection of Accumulated Profit or Loss accounts other
+  than 3351-001, facilitating the consolidation of existing balances.
+
+
 Version 1.5.8
 -------------
 
