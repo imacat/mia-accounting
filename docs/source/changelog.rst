@@ -2,6 +2,17 @@ Change Log
 ==========
 
 
+Version 1.5.10
+--------------
+
+Released 2023/11/28
+
+Bug fix.
+
+* Fixed the form validator to enable the selection of Accumulated Profit or
+  Loss accounts other than 3351-001.
+
+
 Version 1.5.9
 -------------
 
