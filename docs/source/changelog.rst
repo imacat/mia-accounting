@@ -2,6 +2,17 @@ Change Log
 ==========
 
 
+Version 1.5.11
+--------------
+
+Released 2023/12/26
+
+Bug fix.
+
+* Refined to enable the selection of the 3351-001 Accumulated Profit or Loss
+  account.
+
+
 Version 1.5.10
 --------------
 

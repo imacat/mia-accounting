@@ -24,7 +24,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from accounting.utils.user import UserUtilityInterface
 
-VERSION: str = "1.5.10"
+VERSION: str = "1.5.11"
 """The package version."""
 db: SQLAlchemy = SQLAlchemy()
 """The database instance."""
