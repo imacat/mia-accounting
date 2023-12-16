@@ -304,8 +304,6 @@ class Account(db.Model):
                                        cls.base_code.startswith("78"),
                                        cls.base_code.startswith("8"),
                                        cls.base_code.startswith("9")),
-                                sa.not_(sa.and_(cls.base_code == "3351",
-                                                cls.no == 1)),
                                 cls.base_code != "3353")\
             .order_by(cls.base_code, cls.no).all()
 
@@ -327,8 +325,6 @@ class Account(db.Model):
                                        cls.base_code.startswith("74"),
                                        cls.base_code.startswith("8"),
                                        cls.base_code.startswith("9")),
-                                sa.not_(sa.and_(cls.base_code == "3351",
-                                                cls.no == 1)),
                                 cls.base_code != "3353")\
             .order_by(cls.base_code, cls.no).all()
 
