@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2022/8/21
 
-#  Copyright (c) 2022-2023 imacat.
+#  Copyright (c) 2022-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ name = "mia-accounting"
 dynamic = ["version"]
 description = "A Flask accounting module."
 readme = "README.rst"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     {name = "imacat", email = "imacat@mail.imacat.idv.tw"},
 ]
