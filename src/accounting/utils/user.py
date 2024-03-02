@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/1
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ class UserUtilityInterface(Generic[T], ABC):
 
 __user_utils: UserUtilityInterface
 """The user utilities."""
-user_cls: Type[Model] = Model
+type user_cls = Model
 """The user class."""
 user_pk_column: sa.Column = sa.Column(sa.Integer)
 """The primary key column of the user class."""
