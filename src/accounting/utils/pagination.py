@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 This module should not import any other module from the application.
 
 """
-from typing import TypeVar, Generic
 from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
     ParseResult
 
@@ -62,11 +61,8 @@ class Redirection(RequestRedirect):
 DEFAULT_PAGE_SIZE: int = 10
 """The default page size."""
 
-T = TypeVar("T")
-"""The pagination item type."""
 
-
-class Pagination(Generic[T]):
+class Pagination[T]:
     """The pagination utility."""
 
     def __init__(self, items: list[T], is_reversed: bool = False):
@@ -92,7 +88,7 @@ class Pagination(Generic[T]):
         """The options to the number of items in a page."""
 
 
-class AbstractPagination(Generic[T]):
+class AbstractPagination[T]:
     """An abstract pagination."""
 
     def __init__(self):
@@ -109,12 +105,12 @@ class AbstractPagination(Generic[T]):
         """The options to the number of items in a page."""
 
 
-class EmptyPagination(AbstractPagination[T]):
+class EmptyPagination[T](AbstractPagination[T]):
     """The pagination from empty data."""
     pass
 
 
-class NonEmptyPagination(AbstractPagination[T]):
+class NonEmptyPagination[T](AbstractPagination[T]):
     """The pagination with real data."""
     PAGE_SIZE_OPTION_VALUES: list[int] = [10, 100, 200]
     """The page size options."""

@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/18
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 """
 import datetime as dt
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Type
+from typing import Type
 
 import sqlalchemy as sa
 from flask_babel import LazyString
@@ -308,11 +308,7 @@ class JournalEntryForm(FlaskForm):
         return db.session.scalar(select)
 
 
-T = TypeVar("T", bound=JournalEntryForm)
-"""A journal entry form variant."""
-
-
-class LineItemCollector(Generic[T], ABC):
+class LineItemCollector[T: JournalEntryForm](ABC):
     """The line item collector."""
 
     def __init__(self, form: T, obj: JournalEntry):

@@ -20,17 +20,14 @@ This module should not import any other module from the application.
 
 """
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Type
+from typing import Type
 
 import sqlalchemy as sa
 from flask import g, Response
 from flask_sqlalchemy.model import Model
 
-T = TypeVar("T", bound=Model)
-"""The user data model data type."""
 
-
-class UserUtilityInterface(Generic[T], ABC):
+class UserUtilityInterface[T: Model](ABC):
     """The interface for the user utilities."""
 
     @abstractmethod
