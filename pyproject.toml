@@ -42,8 +42,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = [
-    "unittest",
+devel = [
     "httpx",
     "OpenCC",
 ]
