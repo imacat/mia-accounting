@@ -33,7 +33,7 @@ classifiers = [
     "Topic :: Office/Business :: Financial :: Accounting",
 ]
 dependencies = [
-    "flask",
+    "Flask",
     "SQLAlchemy >= 2",
     "Flask-SQLAlchemy",
     "Flask-WTF",
