@@ -2,6 +2,18 @@ Change Log
 ==========
 
 
+Version 1.6.0
+--------------
+
+Released 2024/6/4
+
+* Updated Python version to 3.12.
+* Revised the calculation of "today" to use the client's timezone instead of
+  the server's timezone.
+* Updated the Bootstrap, FontAwesome, and Tempus-Dominus versions in the test
+  site.
+
+
 Version 1.5.11
 --------------
 
