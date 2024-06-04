@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/25
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from typing import Any
 from flask_babel import get_locale
 
 from accounting.locale import gettext
+from accounting.utils.timezone import get_tz_today
 
 
 def format_amount(value: Decimal | None) -> str | None:
@@ -47,7 +48,7 @@ def format_date(value: dt.date) -> str:
     :param value: The date.
     :return: The human-friendly date text.
     """
-    today: dt.date = dt.date.today()
+    today: dt.date = get_tz_today()
     if value == today:
         return gettext("Today")
     if value == today - dt.timedelta(days=1):

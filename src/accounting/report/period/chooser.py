@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/4
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import datetime as dt
 from collections.abc import Callable
 
 from accounting.models import JournalEntry
+from accounting.utils.timezone import get_tz_today
 from .period import Period
 from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
     LastYear, Today, Yesterday, AllTime, TemplatePeriod, YearPeriod
@@ -80,7 +81,7 @@ class PeriodChooser:
         """The available years."""
 
         if self.has_data:
-            today: dt.date = dt.date.today()
+            today: dt.date = get_tz_today()
             self.has_last_month = start < dt.date(today.year, today.month, 1)
             self.has_last_year = start.year < today.year
             self.has_yesterday = start < today

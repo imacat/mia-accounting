@@ -1,7 +1,7 @@
 # The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/13
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ from typing import Any
 import sqlalchemy as sa
 from flask import Flask
 
+from accounting.utils.timezone import get_tz_today
 from . import db
 from .auth import User
 
@@ -42,6 +43,17 @@ class Accounts:
     SERVICE: str = "4611-001"
     RENT_EXPENSE: str = "6252-001"
     MEAL: str = "6272-001"
+
+
+def get_today() -> dt.date:
+    """Returns today, based on the context.
+
+    :return: Today.
+    """
+    try:
+        return get_tz_today()
+    except RuntimeError:
+        return dt.date.today()
 
 
 class JournalEntryLineItemData:
@@ -183,7 +195,7 @@ class JournalEntryData:
         :param is_update: True for an update operation, or False otherwise
         :return: The journal entry as a form.
         """
-        date: dt.date = dt.date.today() - dt.timedelta(days=self.days)
+        date: dt.date = get_today() - dt.timedelta(days=self.days)
         form: dict[str, str] = {"csrf_token": csrf_token,
                                 "next": encoded_next_uri,
                                 "date": date.isoformat()}
@@ -260,8 +272,7 @@ class BaseTestData(ABC):
         existing_j_id: set[int] = {x["id"] for x in self.__journal_entries}
         existing_l_id: set[int] = {x["id"] for x in self.__line_items}
         journal_entry_data.id = self.__new_id(existing_j_id)
-        date: dt.date \
-            = dt.date.today() - dt.timedelta(days=journal_entry_data.days)
+        date: dt.date = get_today() - dt.timedelta(days=journal_entry_data.days)
         self.__journal_entries.append(
             {"id": journal_entry_data.id,
              "date": date,

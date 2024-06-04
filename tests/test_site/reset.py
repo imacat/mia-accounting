@@ -1,7 +1,7 @@
 # The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/12
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from flask import Flask, Blueprint, url_for, flash, redirect, session, \
     render_template, current_app
 from flask_babel import lazy_gettext
 
+from accounting.utils.timezone import get_tz_today
 from . import db
 from .auth import admin_required
 from .lib import Accounts, JournalEntryLineItemData, JournalEntryData, \
@@ -117,7 +118,7 @@ class SampleData(BaseTestData):
 
         :return: None.
         """
-        today: dt.date = dt.date.today()
+        today: dt.date = get_tz_today()
         days: int
         year: int
         month: int
@@ -160,7 +161,7 @@ class SampleData(BaseTestData):
 
         :return: None.
         """
-        today: dt.date = dt.date.today()
+        today: dt.date = get_tz_today()
 
         year: int = today.year - 5
         month: int = today.month

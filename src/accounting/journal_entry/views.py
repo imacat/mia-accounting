@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/18
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ from accounting.utils.flash_errors import flash_form_errors
 from accounting.utils.journal_entry_types import JournalEntryType
 from accounting.utils.next_uri import inherit_next, or_next
 from accounting.utils.permission import has_permission, can_view, can_edit
+from accounting.utils.timezone import get_tz_today
 from accounting.utils.user import get_current_user_pk
 from .forms import sort_journal_entries_in, JournalEntryReorderForm
 from .template_filters import with_type, to_transfer, format_amount_input, \
@@ -67,7 +68,7 @@ def show_add_journal_entry_form(journal_entry_type: JournalEntryType) -> str:
         form.validate()
     else:
         form = journal_entry_op.form()
-        form.date.data = dt.date.today()
+        form.date.data = get_tz_today()
     return journal_entry_op.render_create_template(form)
 
 

@@ -2,7 +2,7 @@
 The Mia! Accounting Project
 base.html: The application-wide base template.
 
- Copyright (c) 2023 imacat.
+ Copyright (c) 2023-2024 imacat.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -27,5 +27,6 @@ First written: 2023/1/27
 
 {% block scripts %}
   <script src="{{ url_for("accounting.babel_catalog") }}"></script>
+  <script src="{{ url_for("accounting.static", filename="js/timezone.js") }}"></script>
   {% block accounting_scripts %}{% endblock %}
 {% endblock %}

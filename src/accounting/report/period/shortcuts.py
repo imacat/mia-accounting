@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/4
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2024 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 import datetime as dt
 
 from accounting.locale import gettext
+from accounting.utils.timezone import get_tz_today
 from .month_end import month_end
 from .period import Period
 
@@ -27,7 +28,7 @@ from .period import Period
 class ThisMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: dt.date = dt.date.today()
+        today: dt.date = get_tz_today()
         this_month_start: dt.date = dt.date(today.year, today.month, 1)
         super().__init__(this_month_start, month_end(today))
         self.is_default = True
@@ -43,7 +44,7 @@ class ThisMonth(Period):
 class LastMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: dt.date = dt.date.today()
+        today: dt.date = get_tz_today()
         year: int = today.year
         month: int = today.month - 1
         if month < 1:
@@ -63,7 +64,7 @@ class LastMonth(Period):
 class SinceLastMonth(Period):
     """The period of this month."""
     def __init__(self):
-        today: dt.date = dt.date.today()
+        today: dt.date = get_tz_today()
         year: int = today.year
         month: int = today.month - 1
         if month < 1:
@@ -82,7 +83,7 @@ class SinceLastMonth(Period):
 class ThisYear(Period):
     """The period of this year."""
     def __init__(self):
-        year: int = dt.date.today().year
+        year: int = get_tz_today().year
         start: dt.date = dt.date(year, 1, 1)
         end: dt.date = dt.date(year, 12, 31)
         super().__init__(start, end)
@@ -97,7 +98,7 @@ class ThisYear(Period):
 class LastYear(Period):
     """The period of last year."""
     def __init__(self):
-        year: int = dt.date.today().year
+        year: int = get_tz_today().year
         start: dt.date = dt.date(year - 1, 1, 1)
         end: dt.date = dt.date(year - 1, 12, 31)
         super().__init__(start, end)
@@ -112,7 +113,7 @@ class LastYear(Period):
 class Today(Period):
     """The period of today."""
     def __init__(self):
-        today: dt.date = dt.date.today()
+        today: dt.date = get_tz_today()
         super().__init__(today, today)
         self.is_today = True
 
@@ -125,7 +126,7 @@ class Today(Period):
 class Yesterday(Period):
     """The period of yesterday."""
     def __init__(self):
-        yesterday: dt.date = dt.date.today() - dt.timedelta(days=1)
+        yesterday: dt.date = get_tz_today() - dt.timedelta(days=1)
         super().__init__(yesterday, yesterday)
         self.is_yesterday = True
 
