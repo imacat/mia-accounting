@@ -49,7 +49,7 @@ def create_app(is_testing: bool = False) -> Flask:
     import accounting
 
     app: Flask = Flask(__name__)
-    db_uri: str = "sqlite:///" if is_testing else "sqlite:///local.sqlite"
+    db_uri: str = "sqlite://" if is_testing else "sqlite:///local.sqlite"
     app.config.from_mapping({
         "SECRET_KEY": os.environ.get("SECRET_KEY", token_urlsafe(32)),
         "SESSION_COOKIE_SAMESITE": "Lax",
