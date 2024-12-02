@@ -96,7 +96,9 @@ def get_client(app: Flask, username: str) -> httpx.Client:
     :param username: The username.
     :return: The user client.
     """
-    client: httpx.Client = httpx.Client(app=app, base_url=TEST_SERVER)
+    client: httpx.Client = httpx.Client(
+        transport=httpx.WSGITransport(app=app),
+        base_url=TEST_SERVER)
     client.headers["Referer"] = TEST_SERVER
     csrf_token: str = get_csrf_token(client)
     with app.app_context():

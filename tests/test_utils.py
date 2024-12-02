@@ -67,8 +67,9 @@ class NextUriTestCase(unittest.TestCase):
 
         self.__app.add_url_rule("/test-next", view_func=test_next_uri_view,
                                 methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.__app,
-                                            base_url=TEST_SERVER)
+        client: httpx.Client = httpx.Client(
+            transport=httpx.WSGITransport(app=self.__app),
+            base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
         csrf_token: str = get_csrf_token(client)
         response: httpx.Response
@@ -96,8 +97,9 @@ class NextUriTestCase(unittest.TestCase):
         self.__app.add_url_rule("/test-no-next",
                                 view_func=test_no_next_uri_view,
                                 methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.__app,
-                                            base_url=TEST_SERVER)
+        client: httpx.Client = httpx.Client(
+            transport=httpx.WSGITransport(app=self.__app),
+            base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
         csrf_token: str = get_csrf_token(client)
         response: httpx.Response
@@ -122,8 +124,9 @@ class NextUriTestCase(unittest.TestCase):
         self.__app.add_url_rule("/test-invalid-next",
                                 view_func=test_invalid_next_uri_view,
                                 methods=["GET", "POST"])
-        client: httpx.Client = httpx.Client(app=self.__app,
-                                            base_url=TEST_SERVER)
+        client: httpx.Client = httpx.Client(
+            transport=httpx.WSGITransport(app=self.__app),
+            base_url=TEST_SERVER)
         client.headers["Referer"] = TEST_SERVER
         csrf_token: str = get_csrf_token(client)
         next_uri: str
@@ -227,8 +230,9 @@ class PaginationTestCase(unittest.TestCase):
             self.assertEqual(pagination.list, self.__params.result)
             return ""
 
-        self.__client: httpx.Client = httpx.Client(app=self.__app,
-                                                   base_url=TEST_SERVER)
+        self.__client: httpx.Client = httpx.Client(
+            transport=httpx.WSGITransport(app=self.__app),
+            base_url=TEST_SERVER)
         """The user client."""
         self.__client.headers["Referer"] = TEST_SERVER
 
