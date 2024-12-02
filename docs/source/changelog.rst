@@ -2,6 +2,14 @@ Change Log
 ==========
 
 
+Version 1.6.1
+--------------
+
+Released 2024/12/3
+
+Fix test cases for compatibility with httpx 0.28.0.
+
+
 Version 1.6.0
 --------------
 
