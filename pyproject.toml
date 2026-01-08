@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2022/8/21
 
-#  Copyright (c) 2022-2024 imacat.
+#  Copyright (c) 2022-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ dependencies = [
 
 [project.optional-dependencies]
 devel = [
-    "httpx >= 0.20.0",
+    "httpx >= 0.28.0",
     "OpenCC",
 ]
 
