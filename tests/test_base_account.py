@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/26
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import unittest
 import httpx
 from flask import Flask
 
+from test_site import db
 from testlib import create_test_app, get_client
 
 LIST_URI: str = "/accounting/base-accounts"
@@ -41,6 +42,15 @@ class BaseAccountTestCase(unittest.TestCase):
         """
         self.__app: Flask = create_test_app()
         """The Flask application."""
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.

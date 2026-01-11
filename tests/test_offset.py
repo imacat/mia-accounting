@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/11
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -62,6 +62,15 @@ class OffsetTestCase(unittest.TestCase):
         self.__data: OffsetTestData = OffsetTestData(self.__app, "editor")
         """The offset test data."""
         self.__data.populate()
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def test_add_receivable_offset(self) -> None:
         """Tests to add the receivable offset.

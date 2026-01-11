@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/3
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from accounting.utils.next_uri import append_next, inherit_next, or_next, \
     encode_next, decode_next
 from accounting.utils.pagination import Pagination, DEFAULT_PAGE_SIZE
 from accounting.utils.query import parse_query_keywords
+from test_site import db
 from testlib import TEST_SERVER, create_test_app, get_csrf_token, NEXT_URI
 
 
@@ -42,6 +43,15 @@ class NextUriTestCase(unittest.TestCase):
         """
         self.__app: Flask = create_test_app()
         """The Flask application."""
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def test_next_uri(self) -> None:
         """Tests the next URI utilities with the next URI.
@@ -235,6 +245,15 @@ class PaginationTestCase(unittest.TestCase):
             base_url=TEST_SERVER)
         """The user client."""
         self.__client.headers["Referer"] = TEST_SERVER
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def __test_success(self, query: str, items: range,
                        result: range, is_paged: bool = True,

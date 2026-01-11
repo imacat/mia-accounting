@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/1
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -93,6 +93,15 @@ class CurrencyTestCase(unittest.TestCase):
                                             "name": EUR.name})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], f"{PREFIX}/{EUR.code}")
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def test_nobody(self) -> None:
         """Test the permission as nobody.

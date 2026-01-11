@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/10
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -44,6 +44,15 @@ class ConsoleCommandTestCase(unittest.TestCase):
         """
         self.__app: Flask = create_test_app()
         """The Flask application."""
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def test_init_db(self) -> None:
         """Tests the "accounting-init-db" console command.

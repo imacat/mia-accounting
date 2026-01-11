@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/28
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import httpx
 from flask import Flask
 
 from accounting.utils.next_uri import encode_next
+from test_site import db
 from testlib import NEXT_URI, Accounts, create_test_app, get_client, \
     get_csrf_token, add_journal_entry
 
@@ -51,6 +52,15 @@ class DescriptionEditorTestCase(unittest.TestCase):
         """The user client."""
         self.__csrf_token: str = get_csrf_token(self.__client)
         """The CSRF token."""
+
+    def tearDown(self) -> None:
+        """Tears down the test.
+        This is run once per test.
+
+        :return: None.
+        """
+        with self.__app.app_context():
+            db.engine.dispose()
 
     def test_description_editor(self) -> None:
         """Test the description editor.
