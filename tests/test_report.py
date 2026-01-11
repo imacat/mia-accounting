@@ -45,11 +45,6 @@ class ReportTestCase(unittest.TestCase):
         self.__app: Flask = create_test_app()
         """The Flask application."""
 
-        with self.__app.app_context():
-            from accounting.models import JournalEntry, JournalEntryLineItem
-            JournalEntry.query.delete()
-            JournalEntryLineItem.query.delete()
-
         self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""
         self.__csrf_token: str = get_csrf_token(self.__client)

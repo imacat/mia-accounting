@@ -54,13 +54,20 @@ def __validate_username(ctx: click.core.Context, param: click.core.Option,
 @click.option("-u", "--username", metavar="USERNAME", prompt=True,
               help="The username.", callback=__validate_username,
               default=lambda: os.getlogin())
+@click.option("--skip-accounts", is_flag=True, default=False,
+              help="Skip initializing accounts.")
+@click.option("--skip-currencies", is_flag=True, default=False,
+              help="Skip initializing currencies.")
 @with_appcontext
-def init_db_command(username: str) -> None:
+def init_db_command(username: str, skip_accounts: bool,
+                    skip_currencies: bool) -> None:
     """Initializes the accounting database."""
     db.create_all()
     init_base_accounts_command()
-    init_accounts_command(username)
-    init_currencies_command(username)
+    if not skip_accounts:
+        init_accounts_command(username)
+    if not skip_currencies:
+        init_currencies_command(username)
     db.session.commit()
     click.echo("Accounting database initialized.")
 

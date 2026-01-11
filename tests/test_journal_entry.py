@@ -52,9 +52,6 @@ class CashReceiptJournalEntryTestCase(unittest.TestCase):
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import JournalEntry, JournalEntryLineItem
-            JournalEntry.query.delete()
-            JournalEntryLineItem.query.delete()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
@@ -686,9 +683,6 @@ class CashDisbursementJournalEntryTestCase(unittest.TestCase):
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import JournalEntry, JournalEntryLineItem
-            JournalEntry.query.delete()
-            JournalEntryLineItem.query.delete()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
@@ -1295,10 +1289,6 @@ class TransferJournalEntryTestCase(unittest.TestCase):
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import JournalEntry, \
-                JournalEntryLineItem
-            JournalEntry.query.delete()
-            JournalEntryLineItem.query.delete()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 
@@ -2185,9 +2175,6 @@ class JournalEntryReorderTestCase(unittest.TestCase):
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import JournalEntry, JournalEntryLineItem
-            JournalEntry.query.delete()
-            JournalEntryLineItem.query.delete()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 

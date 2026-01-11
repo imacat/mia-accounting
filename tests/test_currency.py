@@ -65,14 +65,8 @@ class CurrencyTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.__app: Flask = create_test_app()
+        self.__app: Flask = create_test_app(is_skip_currencies=True)
         """The Flask application."""
-
-        with self.__app.app_context():
-            from accounting.models import Currency, CurrencyL10n
-            CurrencyL10n.query.delete()
-            Currency.query.delete()
-            db.session.commit()
 
         self.__client: httpx.Client = get_client(self.__app, "editor")
         """The user client."""

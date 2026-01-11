@@ -60,12 +60,18 @@ class Accounts:
     RENT_INCOME: str = "7482-001"
 
 
-def create_test_app() -> Flask:
+def create_test_app(is_skip_accounts: bool = False,
+                    is_skip_currencies: bool = False) -> Flask:
     """Creates and returns the testing Flask application.
 
+    :param is_skip_accounts: True to skip account initialization, or False
+        otherwise.
+    :param is_skip_currencies: True to skip currency initialization, or False
+        otherwise.
     :return: The testing Flask application.
     """
-    app: Flask = create_app(is_testing=True)
+    app: Flask = create_app(is_testing=True, is_skip_accounts=is_skip_accounts,
+                            is_skip_currencies=is_skip_currencies)
 
     @app.get("/.csrf-token")
     def get_csrf_token_view() -> str:

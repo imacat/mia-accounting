@@ -49,9 +49,6 @@ class OffsetTestCase(unittest.TestCase):
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import JournalEntry, JournalEntryLineItem
-            JournalEntry.query.delete()
-            JournalEntryLineItem.query.delete()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 

@@ -45,8 +45,6 @@ class OptionTestCase(unittest.TestCase):
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import Option
-            Option.query.delete()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 

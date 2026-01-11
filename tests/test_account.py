@@ -72,14 +72,10 @@ class AccountTestCase(unittest.TestCase):
 
         :return: None.
         """
-        self.__app: Flask = create_test_app()
+        self.__app: Flask = create_test_app(is_skip_accounts=True)
         """The Flask application."""
 
         with self.__app.app_context():
-            from accounting.models import Account, AccountL10n
-            AccountL10n.query.delete()
-            Account.query.delete()
-            db.session.commit()
             self.__encoded_next_uri: str = encode_next(NEXT_URI)
             """The encoded next URI."""
 

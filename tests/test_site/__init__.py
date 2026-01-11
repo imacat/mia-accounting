@@ -40,10 +40,15 @@ db: SQLAlchemy = SQLAlchemy()
 """The database instance."""
 
 
-def create_app(is_testing: bool = False) -> Flask:
+def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
+               is_skip_currencies: bool = False) -> Flask:
     """Create and configure the application.
 
     :param is_testing: True if we are running for testing, or False otherwise.
+    :param is_skip_accounts: True to skip account initialization, or False
+        otherwise.
+    :param is_skip_currencies: True to skip currency initialization, or False
+        otherwise.
     :return: The application.
     """
     import accounting
@@ -117,15 +122,20 @@ def create_app(is_testing: bool = False) -> Flask:
     accounting.init_app(app, user_utils=UserUtilities())
 
     with app.app_context():
-        init_db(app)
+        init_db(app, is_skip_accounts, is_skip_currencies)
 
     return app
 
 
-def init_db(app: Flask) -> None:
+def init_db(app: Flask, is_skip_accounts: bool,
+            is_skip_currencies: bool) -> None:
     """Initializes the database.
 
     :param app: The Flask application.
+    :param is_skip_accounts: True to skip account initialization, or False
+        otherwise.
+    :param is_skip_currencies: True to skip currency initialization, or False
+        otherwise.
     :return: None.
     """
     db.create_all()
@@ -135,7 +145,12 @@ def init_db(app: Flask) -> None:
             db.session.add(User(username=username))
     db.session.commit()
     runner: FlaskCliRunner = app.test_cli_runner()
-    result: Result = runner.invoke(args=["accounting-init-db", "-u", "editor"])
+    args: list[str] = ["accounting-init-db", "-u", "editor"]
+    if is_skip_accounts:
+        args += ["--skip-accounts"]
+    if is_skip_currencies:
+        args += ["--skip-currencies"]
+    result: Result = runner.invoke(args=args)
     assert result.exit_code == 0, result.output + str(result.exception)
 
 
