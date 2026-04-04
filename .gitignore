@@ -25,6 +25,8 @@ venv
 
 .DS_Store
 .idea
+.claude
+.codex
 
 instance
 flask_session
