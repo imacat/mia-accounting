@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ def init_base_accounts_command() -> None:
 
     with open(data_dir / "base_accounts.csv") as fp:
         data: list[dict[str, str]] = [x for x in csv.DictReader(fp)]
-    account_data: list[dict[str, str]] = [{"code": x["code"],
-                                           "title_l10n": title_case(x["title"])}
-                                          for x in data]
+    account_data: list[dict[str, str]] = \
+        [{"code": x["code"], "title_l10n": title_case(x["title"])}
+         for x in data]
     locales: list[str] = [x[5:] for x in data[0] if x.startswith("l10n-")]
     l10n_data: list[dict[str, str]] = [{"account_code": x["code"],
                                         "locale": y,

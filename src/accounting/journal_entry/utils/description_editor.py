@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/27
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -317,7 +317,7 @@ class DescriptionEditor:
 
         def get_condition(code0: str) -> sa.BinaryExpression:
             m: re.Match = re.match(r"^(\d{4})-(\d{3})$", code0)
-            assert m is not None,\
+            assert m is not None, \
                 f"Malformed account code \"{code0}\" for regular transactions."
             return sa.and_(Account.base_code == m.group(1),
                            Account.no == int(m.group(2)))
@@ -328,7 +328,7 @@ class DescriptionEditor:
             = {x.code: x for x in
                Account.query.filter(sa.or_(*conditions)).all()}
         for code in codes:
-            assert code in accounts,\
+            assert code in accounts, \
                 f"Unknown account \"{code}\" for regular transactions."
         return accounts
 

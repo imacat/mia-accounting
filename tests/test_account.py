@@ -334,10 +334,10 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         # Success, with spaces to be stripped
-        response = self.__client.post(store_uri,
-                                      data={"csrf_token": self.__csrf_token,
-                                            "base_code": f" {STOCK.base_code} ",
-                                            "title": f" {STOCK.title} "})
+        response = self.__client.post(
+            store_uri, data={"csrf_token": self.__csrf_token,
+                             "base_code": f" {STOCK.base_code} ",
+                             "title": f" {STOCK.title} "})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
@@ -574,10 +574,10 @@ class AccountTestCase(unittest.TestCase):
 
         set_locale(self.__app, self.__client, self.__csrf_token, "zh_Hant")
 
-        response = self.__client.post(update_uri,
-                                      data={"csrf_token": self.__csrf_token,
-                                            "base_code": CASH.base_code,
-                                            "title": f"{CASH.title}-zh_Hant-2"})
+        response = self.__client.post(
+            update_uri, data={"csrf_token": self.__csrf_token,
+                              "base_code": CASH.base_code,
+                              "title": f"{CASH.title}-zh_Hant-2"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], detail_uri)
 
@@ -656,10 +656,10 @@ class AccountTestCase(unittest.TestCase):
         response: httpx.Response
 
         for i in range(2, 6):
-            response = self.__client.post(f"{PREFIX}/store",
-                                          data={"csrf_token": self.__csrf_token,
-                                                "base_code": "1111",
-                                                "title": "Title"})
+            response = self.__client.post(
+                f"{PREFIX}/store", data={"csrf_token": self.__csrf_token,
+                                         "base_code": "1111",
+                                         "title": "Title"})
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.headers["Location"],
                              f"{PREFIX}/1111-00{i}")
@@ -707,10 +707,10 @@ class AccountTestCase(unittest.TestCase):
         response: httpx.Response
 
         for i in range(2, 6):
-            response = self.__client.post(f"{PREFIX}/store",
-                                          data={"csrf_token": self.__csrf_token,
-                                                "base_code": "1111",
-                                                "title": "Title"})
+            response = self.__client.post(
+                f"{PREFIX}/store", data={"csrf_token": self.__csrf_token,
+                                         "base_code": "1111",
+                                         "title": "Title"})
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.headers["Location"],
                              f"{PREFIX}/1111-00{i}")

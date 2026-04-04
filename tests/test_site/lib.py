@@ -1,7 +1,7 @@
 # The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/13
 
-#  Copyright (c) 2023-2024 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -259,7 +259,7 @@ class BaseTestData(ABC):
         :param credit: The credit account code.
         :return: The debit line item and credit line item.
         """
-        return JournalEntryLineItemData(debit, description, amount),\
+        return JournalEntryLineItemData(debit, description, amount), \
             JournalEntryLineItemData(credit, description, amount)
 
     def _add_journal_entry(self, journal_entry_data: JournalEntryData) -> None:
@@ -272,7 +272,8 @@ class BaseTestData(ABC):
         existing_j_id: set[int] = {x["id"] for x in self.__journal_entries}
         existing_l_id: set[int] = {x["id"] for x in self.__line_items}
         journal_entry_data.id = self.__new_id(existing_j_id)
-        date: dt.date = get_today() - dt.timedelta(days=journal_entry_data.days)
+        date: dt.date = get_today() - \
+            dt.timedelta(days=journal_entry_data.days)
         self.__journal_entries.append(
             {"id": journal_entry_data.id,
              "date": date,

@@ -146,7 +146,8 @@ class NextUriTestCase(unittest.TestCase):
 
         # A foreign URI
         next_uri = "https://example.com"
-        response = client.get(f"/test-invalid-next?next={quote_plus(next_uri)}")
+        response = client.get(
+            f"/test-invalid-next?next={quote_plus(next_uri)}")
         self.assertEqual(response.status_code, 200)
         response = client.post("/test-invalid-next",
                                data={"csrf_token": csrf_token,
