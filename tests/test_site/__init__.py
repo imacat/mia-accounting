@@ -1,7 +1,7 @@
 # The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/27
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 """
 import os
 from secrets import token_urlsafe
-from typing import Type
 
 from click.testing import Result
 from flask import Flask, Blueprint, render_template, redirect, Response, \
@@ -101,7 +100,7 @@ def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
             return redirect(append_next(url_for("auth.login-form")))
 
         @property
-        def cls(self) -> Type[auth.User]:
+        def cls(self) -> type[auth.User]:
             return auth.User
 
         @property

@@ -22,7 +22,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from decimal import Decimal
-from typing import Type, Self
+from typing import Self
 
 import sqlalchemy as sa
 from babel import Locale
@@ -269,7 +269,7 @@ class Account(db.Model):
         :return: None.
         """
         AccountL10n.query.filter(AccountL10n.account == self).delete()
-        cls: Type[Self] = self.__class__
+        cls: type[Self] = self.__class__
         cls.query.filter(cls.id == self.id).delete()
 
     @classmethod
@@ -473,7 +473,7 @@ class Currency(db.Model):
         :return: None.
         """
         CurrencyL10n.query.filter(CurrencyL10n.currency == self).delete()
-        cls: Type[Self] = self.__class__
+        cls: type[Self] = self.__class__
         cls.query.filter(cls.code == self.code).delete()
 
 
@@ -815,7 +815,7 @@ class JournalEntryLineItem(db.Model):
         :return: The offset items.
         """
         if not hasattr(self, "__offsets"):
-            cls: Type[Self] = self.__class__
+            cls: type[Self] = self.__class__
             offsets: list[Self] = cls.query.join(JournalEntry)\
                 .filter(JournalEntryLineItem.original_line_item_id == self.id)\
                 .order_by(JournalEntry.date, JournalEntry.no,

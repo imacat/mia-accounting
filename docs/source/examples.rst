@@ -37,7 +37,7 @@ The following is an example configuration for *Mia! Accounting*.
                 return redirect("/login")
 
             @property
-            def cls(self) -> t.Type[User]:
+            def cls(self) -> type[User]:
                 return User
 
             @property

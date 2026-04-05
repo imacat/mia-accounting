@@ -19,7 +19,6 @@
 """
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Type
 from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
     urlunparse
 
@@ -53,7 +52,7 @@ class BasePageParams(ABC):
         """
 
     @property
-    def journal_entry_types(self) -> Type[JournalEntryType]:
+    def journal_entry_types(self) -> type[JournalEntryType]:
         """Returns the journal entry types.
 
         :return: The journal entry types.

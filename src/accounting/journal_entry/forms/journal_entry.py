@@ -19,7 +19,6 @@
 """
 import datetime as dt
 from abc import ABC, abstractmethod
-from typing import Type
 
 import sqlalchemy as sa
 from flask_babel import LazyString
@@ -122,7 +121,7 @@ class JournalEntryForm(FlaskForm):
         super().__init__(*args, **kwargs)
         self.is_modified: bool = False
         """Whether the journal entry is modified during populate_obj()."""
-        self.collector: Type[LineItemCollector] = LineItemCollector
+        self.collector: type[LineItemCollector] = LineItemCollector
         """The line item collector.  The default is the base abstract
         collector only to provide the correct type.  The subclass forms should
         provide their own collectors."""
@@ -153,7 +152,7 @@ class JournalEntryForm(FlaskForm):
         self.__set_date(obj, self.date.data)
         obj.note = self.note.data
 
-        collector_cls: Type[LineItemCollector] = self.collector
+        collector_cls: type[LineItemCollector] = self.collector
         collector: collector_cls = collector_cls(self, obj)
         collector.collect()
 

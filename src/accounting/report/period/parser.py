@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/4
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import calendar
 import datetime as dt
 import re
 from collections.abc import Callable
-from typing import Type
 
 from .period import Period
 from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
@@ -40,7 +39,7 @@ def get_period(spec: str | None = None) -> Period:
     """
     if spec is None:
         return ThisMonth()
-    named_periods: dict[str, Type[Callable[[], Period]]] = {
+    named_periods: dict[str, type[Callable[[], Period]]] = {
         "this-month": lambda: ThisMonth(),
         "last-month": lambda: LastMonth(),
         "since-last-month": lambda: SinceLastMonth(),

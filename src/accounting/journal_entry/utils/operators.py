@@ -18,7 +18,6 @@
 
 """
 from abc import ABC, abstractmethod
-from typing import Type
 
 from flask import render_template, request, abort
 from flask_wtf import FlaskForm
@@ -38,7 +37,7 @@ class JournalEntryOperator(ABC):
 
     @property
     @abstractmethod
-    def form(self) -> Type[JournalEntryForm]:
+    def form(self) -> type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
@@ -99,7 +98,7 @@ class CashReceiptJournalEntry(JournalEntryOperator):
     """The order when checking the journal entry operator."""
 
     @property
-    def form(self) -> Type[JournalEntryForm]:
+    def form(self) -> type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
@@ -169,7 +168,7 @@ class CashDisbursementJournalEntry(JournalEntryOperator):
     """The order when checking the journal entry operator."""
 
     @property
-    def form(self) -> Type[JournalEntryForm]:
+    def form(self) -> type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
@@ -242,7 +241,7 @@ class TransferJournalEntry(JournalEntryOperator):
     """The order when checking the journal entry operator."""
 
     @property
-    def form(self) -> Type[JournalEntryForm]:
+    def form(self) -> type[JournalEntryForm]:
         """Returns the form class.
 
         :return: The form class.
