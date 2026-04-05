@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/25
 
-#  Copyright (c) 2023-2024 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ from typing import Any
 
 from flask_babel import get_locale
 
-from accounting.locale import gettext
-from accounting.utils.timezone import get_tz_today
+from .locale import gettext
+from .utils.timezone import get_tz_today
 
 
 def format_amount(value: Decimal | None) -> str | None:

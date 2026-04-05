@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/19
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,13 +23,12 @@ from typing import Type
 from flask import render_template, request, abort
 from flask_wtf import FlaskForm
 
-from accounting.journal_entry.forms import JournalEntryForm, \
-    CashReceiptJournalEntryForm, CashDisbursementJournalEntryForm, \
-    TransferJournalEntryForm
-from accounting.journal_entry.forms.line_item import LineItemForm
-from accounting.models import JournalEntry
-from accounting.template_globals import default_currency_code
-from accounting.utils.journal_entry_types import JournalEntryType
+from ..forms import JournalEntryForm, CashReceiptJournalEntryForm, \
+    CashDisbursementJournalEntryForm, TransferJournalEntryForm
+from ..forms.line_item import LineItemForm
+from ...models import JournalEntry
+from ...template_globals import default_currency_code
+from ...utils.journal_entry_types import JournalEntryType
 
 
 class JournalEntryOperator(ABC):

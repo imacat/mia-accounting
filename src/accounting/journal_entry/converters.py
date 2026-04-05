@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/19
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import datetime as dt
 from flask import abort
 from werkzeug.routing import BaseConverter
 
-from accounting import db
-from accounting.models import JournalEntry
-from accounting.utils.journal_entry_types import JournalEntryType
+from .. import db
+from ..models import JournalEntry
+from ..utils.journal_entry_types import JournalEntryType
 
 
 class JournalEntryConverter(BaseConverter):

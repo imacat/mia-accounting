@@ -23,13 +23,13 @@ from flask import Blueprint, render_template, redirect, session, request, \
     flash, url_for, Response
 from werkzeug.datastructures import ImmutableMultiDict
 
-from accounting.locale import lazy_gettext
-from accounting.utils.cast import s
-from accounting.utils.flash_errors import flash_form_errors
-from accounting.utils.next_uri import inherit_next
-from accounting.utils.options import options
-from accounting.utils.permission import has_permission, can_admin
 from .forms import OptionForm
+from ..locale import lazy_gettext
+from ..utils.cast import s
+from ..utils.flash_errors import flash_form_errors
+from ..utils.next_uri import inherit_next
+from ..utils.options import options
+from ..utils.permission import has_permission, can_admin
 
 bp: Blueprint = Blueprint("option", __name__)
 """The view blueprint for the currency management."""

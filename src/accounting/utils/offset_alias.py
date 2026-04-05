@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/15
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from typing import Any
 
 import sqlalchemy as sa
 
-from accounting.models import JournalEntryLineItem
+from ..models import JournalEntryLineItem
 
 
 def offset_alias() -> sa.Alias:

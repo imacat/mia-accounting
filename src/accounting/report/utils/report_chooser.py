@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/4
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,18 +25,18 @@ from collections.abc import Iterator
 
 from flask_babel import LazyString
 
-from accounting import db
-from accounting.locale import gettext
-from accounting.models import Currency, Account
-from accounting.report.period import Period, get_period
-from accounting.template_globals import default_currency_code
-from accounting.utils.current_account import CurrentAccount
-from accounting.utils.permission import can_edit
 from .option_link import OptionLink
 from .report_type import ReportType
 from .urls import journal_url, ledger_url, income_expenses_url, \
     trial_balance_url, income_statement_url, balance_sheet_url, \
     unapplied_url, unmatched_url
+from ..period import Period, get_period
+from ... import db
+from ...locale import gettext
+from ...models import Currency, Account
+from ...template_globals import default_currency_code
+from ...utils.current_account import CurrentAccount
+from ...utils.permission import can_edit
 
 
 class ReportChooser:

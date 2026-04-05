@@ -25,21 +25,21 @@ from flask import Blueprint, render_template, session, redirect, request, \
     flash, url_for, Response
 from werkzeug.datastructures import ImmutableMultiDict
 
-from accounting import db
-from accounting.locale import lazy_gettext
-from accounting.models import JournalEntry
-from accounting.utils.cast import s
-from accounting.utils.flash_errors import flash_form_errors
-from accounting.utils.journal_entry_types import JournalEntryType
-from accounting.utils.next_uri import inherit_next, or_next
-from accounting.utils.permission import has_permission, can_view, can_edit
-from accounting.utils.timezone import get_tz_today
-from accounting.utils.user import get_current_user_pk
 from .forms import sort_journal_entries_in, JournalEntryReorderForm
 from .template_filters import with_type, to_transfer, format_amount_input, \
     text2html
 from .utils.operators import JournalEntryOperator, JOURNAL_ENTRY_TYPE_TO_OP, \
     get_journal_entry_op
+from .. import db
+from ..locale import lazy_gettext
+from ..models import JournalEntry
+from ..utils.cast import s
+from ..utils.flash_errors import flash_form_errors
+from ..utils.journal_entry_types import JournalEntryType
+from ..utils.next_uri import inherit_next, or_next
+from ..utils.permission import has_permission, can_view, can_edit
+from ..utils.timezone import get_tz_today
+from ..utils.user import get_current_user_pk
 
 bp: Blueprint = Blueprint("journal-entry", __name__)
 """The view blueprint for the journal entry management."""

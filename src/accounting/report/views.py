@@ -19,15 +19,6 @@
 """
 from flask import Blueprint, request, Response, redirect, flash
 
-from accounting import db
-from accounting.locale import lazy_gettext
-from accounting.models import Currency, Account
-from accounting.template_globals import default_currency_code
-from accounting.utils.cast import s
-from accounting.utils.current_account import CurrentAccount
-from accounting.utils.next_uri import or_next
-from accounting.utils.options import options
-from accounting.utils.permission import has_permission, can_view, can_edit
 from .period import Period, get_period
 from .reports import Journal, Ledger, IncomeExpenses, TrialBalance, \
     IncomeStatement, BalanceSheet, Search
@@ -38,6 +29,15 @@ from .reports.unmatched_accounts import AccountsWithUnmatchedOffsets
 from .template_filters import format_amount
 from .utils.offset_matcher import OffsetMatcher
 from .utils.urls import unmatched_url
+from .. import db
+from ..locale import lazy_gettext
+from ..models import Currency, Account
+from ..template_globals import default_currency_code
+from ..utils.cast import s
+from ..utils.current_account import CurrentAccount
+from ..utils.next_uri import or_next
+from ..utils.options import options
+from ..utils.permission import has_permission, can_view, can_edit
 
 bp: Blueprint = Blueprint("accounting-report", __name__)
 """The view blueprint for the reports."""

@@ -21,10 +21,9 @@ import csv
 
 import sqlalchemy as sa
 
-from accounting import data_dir
-from accounting import db
-from accounting.models import BaseAccount, BaseAccountL10n
-from accounting.utils.title_case import title_case
+from .. import db, data_dir
+from ..models import BaseAccount, BaseAccountL10n
+from ..utils.title_case import title_case
 
 
 def init_base_accounts_command() -> None:

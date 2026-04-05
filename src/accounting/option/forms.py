@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/22
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, FieldList, FormField, IntegerField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting.forms import ACCOUNT_REQUIRED, CurrencyExists, AccountExists, \
+from ..forms import ACCOUNT_REQUIRED, CurrencyExists, AccountExists, \
     IsDebitAccount, IsCreditAccount
-from accounting.locale import lazy_gettext
-from accounting.models import Account
-from accounting.utils.current_account import CurrentAccount
-from accounting.utils.options import Options
-from accounting.utils.strip_text import strip_text
+from ..locale import lazy_gettext
+from ..models import Account
+from ..utils.current_account import CurrentAccount
+from ..utils.options import Options
+from ..utils.strip_text import strip_text
 
 
 class CurrentAccountExists:

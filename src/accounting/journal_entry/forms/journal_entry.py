@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/18
 
-#  Copyright (c) 2023-2024 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -28,21 +28,20 @@ from wtforms import DateField, FieldList, FormField, TextAreaField, \
     BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting import db
-from accounting.journal_entry.utils.account_option import AccountOption
-from accounting.journal_entry.utils.description_editor import DescriptionEditor
-from accounting.journal_entry.utils.original_line_items import \
-    get_selectable_original_line_items
-from accounting.locale import lazy_gettext
-from accounting.models import JournalEntry, Account, JournalEntryLineItem, \
-    JournalEntryCurrency
-from accounting.utils.random_id import new_id
-from accounting.utils.strip_text import strip_multiline_text
-from accounting.utils.user import get_current_user_pk
 from .currency import CurrencyForm, CashReceiptCurrencyForm, \
     CashDisbursementCurrencyForm, TransferCurrencyForm
 from .line_item import LineItemForm, DebitLineItemForm, CreditLineItemForm
 from .reorder import sort_journal_entries_in
+from ..utils.account_option import AccountOption
+from ..utils.description_editor import DescriptionEditor
+from ..utils.original_line_items import get_selectable_original_line_items
+from ... import db
+from ...locale import lazy_gettext
+from ...models import JournalEntry, Account, JournalEntryLineItem, \
+    JournalEntryCurrency
+from ...utils.random_id import new_id
+from ...utils.strip_text import strip_multiline_text
+from ...utils.user import get_current_user_pk
 
 DATE_REQUIRED: DataRequired = DataRequired(
     lazy_gettext("Please fill in the date."))

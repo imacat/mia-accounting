@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/7
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,19 +22,18 @@ from decimal import Decimal
 import sqlalchemy as sa
 from flask import render_template, Response
 
-from accounting import db
-from accounting.locale import gettext
-from accounting.models import Currency, BaseAccount, Account, JournalEntry, \
+from ..period import Period, PeriodChooser
+from ..utils.base_page_params import BasePageParams
+from ..utils.base_report import BaseReport
+from ..utils.csv_export import BaseCSVRow, csv_download, period_spec
+from ..utils.option_link import OptionLink
+from ..utils.report_chooser import ReportChooser
+from ..utils.report_type import ReportType
+from ..utils.urls import ledger_url, income_statement_url
+from ... import db
+from ...locale import gettext
+from ...models import Currency, BaseAccount, Account, JournalEntry, \
     JournalEntryLineItem
-from accounting.report.period import Period, PeriodChooser
-from accounting.report.utils.base_page_params import BasePageParams
-from accounting.report.utils.base_report import BaseReport
-from accounting.report.utils.csv_export import BaseCSVRow, csv_download, \
-    period_spec
-from accounting.report.utils.option_link import OptionLink
-from accounting.report.utils.report_chooser import ReportChooser
-from accounting.report.utils.report_type import ReportType
-from accounting.report.utils.urls import ledger_url, income_statement_url
 
 
 class ReportAccount:

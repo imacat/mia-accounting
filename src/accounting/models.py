@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ from flask_babel import get_locale, get_babel
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from accounting import db
-from accounting.locale import gettext
-from accounting.utils.user import user_cls, user_pk_column
+from . import db
+from .locale import gettext
+from .utils.user import user_cls, user_pk_column
 
 
 class BaseAccount(db.Model):
@@ -462,7 +462,7 @@ class Currency(db.Model):
 
         :return: True if the currency can be deleted, or False otherwise.
         """
-        from accounting.template_globals import default_currency_code
+        from .template_globals import default_currency_code
         if self.code == default_currency_code():
             return False
         return len(self.line_items) == 0
@@ -699,7 +699,7 @@ class JournalEntryLineItem(db.Model):
         :return: The string representation of the line item.
         """
         if not hasattr(self, "__str"):
-            from accounting.template_filters import format_date, format_amount
+            from .template_filters import format_date, format_amount
             setattr(self, "__str",
                     gettext("%(date)s %(description)s %(amount)s",
                             date=format_date(self.journal_entry.date),

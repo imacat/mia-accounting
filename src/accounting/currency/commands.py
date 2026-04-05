@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/6
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ from typing import Any
 
 import sqlalchemy as sa
 
-from accounting import db, data_dir
-from accounting.models import Currency, CurrencyL10n
-from accounting.utils.user import get_user_pk
+from .. import db, data_dir
+from ..models import Currency, CurrencyL10n
+from ..utils.user import get_user_pk
 
 
 def init_currencies_command(username: str) -> None:

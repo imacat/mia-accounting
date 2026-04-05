@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/8
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@
 """
 import sqlalchemy as sa
 
-from accounting import db
-from accounting.models import Currency, Account, JournalEntry, \
-    JournalEntryLineItem
+from ... import db
+from ...models import Currency, Account, JournalEntry, JournalEntryLineItem
 
 
 def get_accounts_with_unmatched(currency: Currency) -> list[Account]:

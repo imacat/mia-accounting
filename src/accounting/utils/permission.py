@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ from collections.abc import Callable
 
 from flask import abort, Blueprint, Response
 
-from accounting.utils.user import get_current_user, UserUtilityInterface
+from .user import get_current_user, UserUtilityInterface
 
 
 def has_permission(rule: Callable[[], bool]) -> Callable:

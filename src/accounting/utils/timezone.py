@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2024/6/4
 
-#  Copyright (c) 2024 imacat.
+#  Copyright (c) 2024-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 This module should not import any other module from the application.
 
 """
-
 import datetime as dt
 
 import pytz

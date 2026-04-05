@@ -24,17 +24,17 @@ from flask import Blueprint, render_template, session, redirect, flash, \
     url_for, request, Response
 from werkzeug.datastructures import ImmutableMultiDict
 
-from accounting import db
-from accounting.locale import lazy_gettext
-from accounting.models import Account, BaseAccount
-from accounting.utils.cast import s
-from accounting.utils.flash_errors import flash_form_errors
-from accounting.utils.next_uri import inherit_next, or_next
-from accounting.utils.pagination import Pagination
-from accounting.utils.permission import can_view, has_permission, can_edit
-from accounting.utils.user import get_current_user_pk
 from .forms import AccountForm, sort_accounts_in, AccountReorderForm
 from .queries import get_account_query
+from .. import db
+from ..locale import lazy_gettext
+from ..models import Account, BaseAccount
+from ..utils.cast import s
+from ..utils.flash_errors import flash_form_errors
+from ..utils.next_uri import inherit_next, or_next
+from ..utils.pagination import Pagination
+from ..utils.permission import can_view, has_permission, can_edit
+from ..utils.user import get_current_user_pk
 
 bp: Blueprint = Blueprint("account", __name__)
 """The view blueprint for the account management."""

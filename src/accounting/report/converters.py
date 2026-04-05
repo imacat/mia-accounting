@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/3
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import re
 from flask import abort
 from werkzeug.routing import BaseConverter
 
-from accounting.models import Account
-from accounting.utils.current_account import CurrentAccount
 from .period import Period, get_period
+from ..models import Account
+from ..utils.current_account import CurrentAccount
 
 
 class PeriodConverter(BaseConverter):

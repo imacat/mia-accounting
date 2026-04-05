@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/22
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import json
 
 import sqlalchemy as sa
 
-from accounting import db
-from accounting.models import Option, Account, Currency
-from accounting.utils.current_account import CurrentAccount
-from accounting.utils.user import get_current_user_pk
+from .current_account import CurrentAccount
+from .user import get_current_user_pk
+from .. import db
+from ..models import Option, Account, Currency
 
 
 class RecurringItem:

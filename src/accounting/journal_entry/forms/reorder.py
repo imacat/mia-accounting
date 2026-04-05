@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/10
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import datetime as dt
 import sqlalchemy as sa
 from flask import request
 
-from accounting import db
-from accounting.models import JournalEntry
+from ... import db
+from ...models import JournalEntry
 
 
 def sort_journal_entries_in(date: dt.date, exclude: int | None = None) -> None:

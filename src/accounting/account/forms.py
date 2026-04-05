@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/1
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
-from accounting import db
-from accounting.locale import lazy_gettext
-from accounting.models import BaseAccount, Account
-from accounting.utils.random_id import new_id
-from accounting.utils.strip_text import strip_text
-from accounting.utils.user import get_current_user_pk
+from .. import db
+from ..locale import lazy_gettext
+from ..models import BaseAccount, Account
+from ..utils.random_id import new_id
+from ..utils.strip_text import strip_text
+from ..utils.user import get_current_user_pk
 
 
 class BaseAccountExists:

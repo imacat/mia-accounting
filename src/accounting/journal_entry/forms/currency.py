@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/10
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ from wtforms import StringField, ValidationError, FieldList, IntegerField, \
     BooleanField, FormField
 from wtforms.validators import DataRequired
 
-from accounting import db
-from accounting.forms import CurrencyExists
-from accounting.locale import lazy_gettext
-from accounting.models import JournalEntryLineItem
-from accounting.utils.offset_alias import offset_alias
-from accounting.utils.strip_text import strip_text
 from .line_item import LineItemForm, CreditLineItemForm, DebitLineItemForm
+from ... import db
+from ...forms import CurrencyExists
+from ...locale import lazy_gettext
+from ...models import JournalEntryLineItem
+from ...utils.offset_alias import offset_alias
+from ...utils.strip_text import strip_text
 
 CURRENCY_REQUIRED: DataRequired = DataRequired(
     lazy_gettext("Please select the currency."))

@@ -19,10 +19,10 @@
 """
 from flask import Blueprint, render_template
 
-from accounting.models import BaseAccount
-from accounting.utils.pagination import Pagination
-from accounting.utils.permission import has_permission, can_view
 from .queries import get_base_account_query
+from ..models import BaseAccount
+from ..utils.pagination import Pagination
+from ..utils.permission import has_permission, can_view
 
 bp: Blueprint = Blueprint("base-account", __name__)
 """The view blueprint for the base account management."""

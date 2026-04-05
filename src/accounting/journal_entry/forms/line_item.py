@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/10
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -27,15 +27,15 @@ from sqlalchemy.orm import selectinload
 from wtforms import StringField, ValidationError, DecimalField, IntegerField
 from wtforms.validators import Optional
 
-from accounting import db
-from accounting.forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
+from ... import db
+from ...forms import ACCOUNT_REQUIRED, AccountExists, IsDebitAccount, \
     IsCreditAccount
-from accounting.locale import lazy_gettext
-from accounting.models import Account, JournalEntry, JournalEntryLineItem
-from accounting.template_filters import format_amount
-from accounting.utils.random_id import new_id
-from accounting.utils.strip_text import strip_text
-from accounting.utils.user import get_current_user_pk
+from ...locale import lazy_gettext
+from ...models import Account, JournalEntry, JournalEntryLineItem
+from ...template_filters import format_amount
+from ...utils.random_id import new_id
+from ...utils.strip_text import strip_text
+from ...utils.user import get_current_user_pk
 
 
 class OriginalLineItemExists:

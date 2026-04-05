@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/9
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 """
 from flask import url_for
 
-from accounting.models import Currency, Account
-from accounting.report.period import Period
-from accounting.template_globals import default_currency_code
-from accounting.utils.current_account import CurrentAccount
-from accounting.utils.options import options
+from ...models import Currency, Account
+from ...report.period import Period
+from ...template_globals import default_currency_code
+from ...utils.current_account import CurrentAccount
+from ...utils.options import options
 
 
 def journal_url(period: Period) \

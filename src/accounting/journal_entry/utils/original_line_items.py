@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/10
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ from decimal import Decimal
 import sqlalchemy as sa
 from sqlalchemy.orm import selectinload
 
-from accounting import db
-from accounting.models import Account, JournalEntry, JournalEntryLineItem
-from accounting.utils.offset_alias import offset_alias
+from ... import db
+from ...models import Account, JournalEntry, JournalEntryLineItem
+from ...utils.offset_alias import offset_alias
 
 
 def get_selectable_original_line_items(

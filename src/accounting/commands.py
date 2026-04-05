@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/10
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@
 import os
 
 import click
+import sqlalchemy as sa
 from flask.cli import with_appcontext
 
-from accounting import db
-from accounting.account import init_accounts_command
-from accounting.base_account import init_base_accounts_command
-from accounting.currency import init_currencies_command
-from accounting.models import BaseAccount, Account
-from accounting.utils.title_case import title_case
-from accounting.utils.user import has_user, get_user_pk
-import sqlalchemy as sa
+from . import db
+from .account import init_accounts_command
+from .base_account import init_base_accounts_command
+from .currency import init_currencies_command
+from .models import BaseAccount, Account
+from .utils.title_case import title_case
+from .utils.user import has_user, get_user_pk
 
 
 def __validate_username(ctx: click.core.Context, param: click.core.Option,

@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/6
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ from urllib.parse import urlparse, ParseResult, parse_qsl, urlencode, \
 import sqlalchemy as sa
 from flask import request
 
-from accounting import db
-from accounting.models import Currency, JournalEntryLineItem
-from accounting.utils.journal_entry_types import JournalEntryType
 from .option_link import OptionLink
 from .report_chooser import ReportChooser
+from ... import db
+from ...models import Currency, JournalEntryLineItem
+from ...utils.journal_entry_types import JournalEntryType
 
 
 class BasePageParams(ABC):

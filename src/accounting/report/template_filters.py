@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/3/7
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 """
 from decimal import Decimal
 
-from accounting.template_filters import format_amount as core_format_amount
+from ..template_filters import format_amount as core_format_amount
 
 
 def format_amount(value: Decimal | None) -> str | None:

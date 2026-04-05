@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/8
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import sqlalchemy as sa
 from flask_babel import LazyString
 from sqlalchemy.orm import selectinload
 
-from accounting.locale import lazy_gettext
-from accounting.models import Currency, Account, JournalEntry, \
-    JournalEntryLineItem
-from accounting.report.utils.unapplied import get_net_balances
+from ..utils.unapplied import get_net_balances
+from ...locale import lazy_gettext
+from ...models import Currency, Account, JournalEntry, JournalEntryLineItem
 
 
 class OffsetPair:

@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/25
 
-#  Copyright (c) 2023-2024 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, \
 from flask import request
 from werkzeug.routing import RequestRedirect
 
-from accounting.locale import pgettext
+from ..locale import pgettext
 
 
 class Link:

@@ -22,9 +22,9 @@ from typing import Literal
 
 import sqlalchemy as sa
 
-from accounting import db
-from accounting.models import Account, JournalEntryLineItem
-from accounting.utils.options import options, Recurring
+from ... import db
+from ...models import Account, JournalEntryLineItem
+from ...utils.options import options, Recurring
 
 
 class DescriptionAccount:
