@@ -37,7 +37,7 @@ def init_accounts_command(username: str) -> None:
     creator_pk: int = get_user_pk(username)
 
     bases: list[BaseAccount] = db.session.scalars(
-        sa.select(BaseAccount).where(db.func.length(BaseAccount.code) == 4)
+        sa.select(BaseAccount).where(sa.func.length(BaseAccount.code) == 4)
         .order_by(BaseAccount.code)).unique().all()
     if len(bases) == 0:
         raise click.Abort

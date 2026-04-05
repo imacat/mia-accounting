@@ -28,7 +28,6 @@ from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
-from sqlalchemy import Column
 
 bp: Blueprint = Blueprint("home", __name__)
 """The global blueprint."""
@@ -105,7 +104,7 @@ def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
             return auth.User
 
         @property
-        def pk_column(self) -> Column:
+        def pk_column(self) -> sa.Column:
             return auth.User.id
 
         @property

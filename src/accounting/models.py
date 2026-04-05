@@ -27,8 +27,7 @@ from typing import Self
 import sqlalchemy as sa
 from babel import Locale
 from flask_babel import get_locale, get_babel
-from sqlalchemy import text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from . import db
 from .locale import gettext
@@ -44,9 +43,9 @@ class BaseAccount(db.Model):
     title_l10n: Mapped[str] = mapped_column("title")
     """The title."""
     l10n: Mapped[list[BaseAccountL10n]] \
-        = db.relationship(back_populates="account", lazy=False)
+        = relationship(back_populates="account", lazy=False)
     """The localized titles."""
-    accounts: Mapped[list[Account]] = db.relationship(back_populates="base")
+    accounts: Mapped[list[Account]] = relationship(back_populates="base")
     """The descendant accounts under the base account."""
 
     def __str__(self) -> str:
@@ -84,11 +83,11 @@ class BaseAccountL10n(db.Model):
     __tablename__ = "accounting_base_accounts_l10n"
     """The table name."""
     account_code: Mapped[str] \
-        = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
+        = mapped_column(sa.ForeignKey(BaseAccount.code, onupdate="CASCADE",
                                       ondelete="CASCADE"),
                         primary_key=True)
     """The account code."""
-    account: Mapped[BaseAccount] = db.relationship(back_populates="l10n")
+    account: Mapped[BaseAccount] = relationship(back_populates="l10n")
     """The account."""
     locale: Mapped[str] = mapped_column(primary_key=True)
     """The locale."""
@@ -103,40 +102,40 @@ class Account(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     """The account ID."""
     base_code: Mapped[str] \
-        = mapped_column(db.ForeignKey(BaseAccount.code, onupdate="CASCADE",
+        = mapped_column(sa.ForeignKey(BaseAccount.code, onupdate="CASCADE",
                                       ondelete="CASCADE"))
     """The code of the base account."""
-    base: Mapped[BaseAccount] = db.relationship(back_populates="accounts")
+    base: Mapped[BaseAccount] = relationship(back_populates="accounts")
     """The base account."""
-    no: Mapped[int] = mapped_column(default=text("1"))
+    no: Mapped[int] = mapped_column(default=sa.text("1"))
     """The account number under the base account."""
     title_l10n: Mapped[str] = mapped_column("title")
     """The title."""
     is_need_offset: Mapped[bool] = mapped_column(default=False)
     """Whether the journal entry line items of this account need offset."""
     created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was created."""
     created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
-    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = relationship(foreign_keys=created_by_id)
     """The user who created the record."""
     updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was last updated."""
     updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
-    updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] = relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
     l10n: Mapped[list[AccountL10n]] \
-        = db.relationship(back_populates="account", lazy=False)
+        = relationship(back_populates="account", lazy=False)
     """The localized titles."""
     line_items: Mapped[list[JournalEntryLineItem]] \
-        = db.relationship(back_populates="account")
+        = relationship(back_populates="account")
     """The journal entry line items."""
 
     CASH_CODE: str = "1111-001"
@@ -360,11 +359,11 @@ class AccountL10n(db.Model):
     __tablename__ = "accounting_accounts_l10n"
     """The table name."""
     account_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(Account.id, onupdate="CASCADE",
+        = mapped_column(sa.ForeignKey(Account.id, onupdate="CASCADE",
                                       ondelete="CASCADE"),
                         primary_key=True)
     """The account ID."""
-    account: Mapped[Account] = db.relationship(back_populates="l10n")
+    account: Mapped[Account] = relationship(back_populates="l10n")
     """The account."""
     locale: Mapped[str] = mapped_column(primary_key=True)
     """The locale."""
@@ -381,29 +380,29 @@ class Currency(db.Model):
     name_l10n: Mapped[str] = mapped_column("name")
     """The currency name."""
     created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was created."""
     created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
-    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = relationship(foreign_keys=created_by_id)
     """The user who created the record."""
     updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was last updated."""
     updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
     updated_by: Mapped[user_cls] \
-        = db.relationship(foreign_keys=updated_by_id)
+        = relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
     l10n: Mapped[list[CurrencyL10n]] \
-        = db.relationship(back_populates="currency", lazy=False)
+        = relationship(back_populates="currency", lazy=False)
     """The localized names."""
     line_items: Mapped[list[JournalEntryLineItem]] \
-        = db.relationship(back_populates="currency")
+        = relationship(back_populates="currency")
     """The journal entry line items."""
 
     def __str__(self) -> str:
@@ -489,11 +488,11 @@ class CurrencyL10n(db.Model):
     __tablename__ = "accounting_currencies_l10n"
     """The table name."""
     currency_code: Mapped[str] \
-        = mapped_column(db.ForeignKey(Currency.code, onupdate="CASCADE",
+        = mapped_column(sa.ForeignKey(Currency.code, onupdate="CASCADE",
                                       ondelete="CASCADE"),
                         primary_key=True)
     """The currency code."""
-    currency: Mapped[Currency] = db.relationship(back_populates="l10n")
+    currency: Mapped[Currency] = relationship(back_populates="l10n")
     """The currency."""
     locale: Mapped[str] = mapped_column(primary_key=True)
     """The locale."""
@@ -552,30 +551,30 @@ class JournalEntry(db.Model):
     """The journal entry ID."""
     date: Mapped[dt.date]
     """The date."""
-    no: Mapped[int] = mapped_column(default=text("1"))
+    no: Mapped[int] = mapped_column(default=sa.text("1"))
     """The journal entry number under the date."""
     note: Mapped[str | None]
     """The note."""
     created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was created."""
     created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
-    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = relationship(foreign_keys=created_by_id)
     """The user who created the record."""
     updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was last updated."""
     updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
-    updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] = relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
     line_items: Mapped[list[JournalEntryLineItem]] \
-        = db.relationship(back_populates="journal_entry")
+        = relationship(back_populates="journal_entry")
     """The line items."""
 
     def __str__(self) -> str:
@@ -669,36 +668,36 @@ class JournalEntryLineItem(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     """The line item ID."""
     journal_entry_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(JournalEntry.id, onupdate="CASCADE",
+        = mapped_column(sa.ForeignKey(JournalEntry.id, onupdate="CASCADE",
                                       ondelete="CASCADE"))
     """The journal entry ID."""
     journal_entry: Mapped[JournalEntry] \
-        = db.relationship(back_populates="line_items")
+        = relationship(back_populates="line_items")
     """The journal entry."""
     is_debit: Mapped[bool]
     """True for a debit line item, or False for a credit line item."""
     no: Mapped[int]
     """The line item number under the journal entry and debit or credit."""
     original_line_item_id: Mapped[int | None] \
-        = mapped_column(db.ForeignKey(id, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(id, onupdate="CASCADE"))
     """The ID of the original line item."""
     original_line_item: Mapped[JournalEntryLineItem | None] \
-        = db.relationship(remote_side=id, passive_deletes=True)
+        = relationship(remote_side=id, passive_deletes=True)
     """The original line item."""
     currency_code: Mapped[str] \
-        = mapped_column(db.ForeignKey(Currency.code, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(Currency.code, onupdate="CASCADE"))
     """The currency code."""
-    currency: Mapped[Currency] = db.relationship(back_populates="line_items")
+    currency: Mapped[Currency] = relationship(back_populates="line_items")
     """The currency."""
     account_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(Account.id, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(Account.id, onupdate="CASCADE"))
     """The account ID."""
     account: Mapped[Account] \
-        = db.relationship(back_populates="line_items", lazy=False)
+        = relationship(back_populates="line_items", lazy=False)
     """The account."""
     description: Mapped[str | None]
     """The description."""
-    amount: Mapped[Decimal] = mapped_column(db.Numeric(14, 2))
+    amount: Mapped[Decimal] = mapped_column(sa.Numeric(14, 2))
     """The amount."""
 
     def __str__(self) -> str:
@@ -895,23 +894,23 @@ class Option(db.Model):
     """The table name."""
     name: Mapped[str] = mapped_column(primary_key=True)
     """The name."""
-    value: Mapped[str] = mapped_column(db.Text)
+    value: Mapped[str] = mapped_column(sa.Text)
     """The option value."""
     created_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was created."""
     created_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the user who created the record."""
-    created_by: Mapped[user_cls] = db.relationship(foreign_keys=created_by_id)
+    created_by: Mapped[user_cls] = relationship(foreign_keys=created_by_id)
     """The user who created the record."""
     updated_at: Mapped[dt.datetime] \
-        = mapped_column(db.DateTime(timezone=True),
-                        server_default=db.func.now())
+        = mapped_column(sa.DateTime(timezone=True),
+                        server_default=sa.func.now())
     """The date and time when this record was last updated."""
     updated_by_id: Mapped[int] \
-        = mapped_column(db.ForeignKey(user_pk_column, onupdate="CASCADE"))
+        = mapped_column(sa.ForeignKey(user_pk_column, onupdate="CASCADE"))
     """The ID of the last user who updated the record."""
-    updated_by: Mapped[user_cls] = db.relationship(foreign_keys=updated_by_id)
+    updated_by: Mapped[user_cls] = relationship(foreign_keys=updated_by_id)
     """The last user who updated the record."""
