@@ -27,12 +27,18 @@ def get_spec(start: dt.date | None, end: dt.date | None) -> str:
     :param end: The end of the period.
     :return: The period specification.
     """
-    if start is None and end is None:
-        return "-"
-    if end is None:
-        return __get_since_spec(start)
     if start is None:
-        return __get_until_spec(end)
+        return "-" if end is None else __get_until_spec(end)
+    return __get_since_spec(start) if end is None else __get_spec(start, end)
+
+
+def __get_spec(start: dt.date, end: dt.date) -> str:
+    """Returns the period specification with both start and end.
+
+    :param start: The start of the period.
+    :param end: The end of the period.
+    :return: The period specification.
+    """
     try:
         return __get_year_spec(start, end)
     except ValueError:

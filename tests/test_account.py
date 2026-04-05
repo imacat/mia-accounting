@@ -352,7 +352,9 @@ class AccountTestCase(unittest.TestCase):
 
         # Success under the same base, with order in a mess.
         with self.__app.app_context():
-            stock_2: Account = Account.find_by_code(f"{STOCK.base_code}-002")
+            stock_2: Account | None = \
+                Account.find_by_code(f"{STOCK.base_code}-002")
+            self.assertIsNotNone(stock_2)
             stock_2.no = 66
             db.session.commit()
 
@@ -370,7 +372,8 @@ class AccountTestCase(unittest.TestCase):
                               f"{STOCK.base_code}-002",
                               f"{STOCK.base_code}-003"})
 
-            account: Account = Account.find_by_code(STOCK.code)
+            account: Account | None = Account.find_by_code(STOCK.code)
+            self.assertIsNotNone(account)
             self.assertEqual(account.base_code, STOCK.base_code)
             self.assertEqual(account.title_l10n, STOCK.title)
 
@@ -395,7 +398,8 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], detail_uri)
 
         with self.__app.app_context():
-            account: Account = Account.find_by_code(CASH.code)
+            account: Account | None = Account.find_by_code(CASH.code)
+            self.assertIsNotNone(account)
             self.assertEqual(account.base_code, CASH.base_code)
             self.assertEqual(account.title_l10n, f"{CASH.title}-1")
 
@@ -462,7 +466,7 @@ class AccountTestCase(unittest.TestCase):
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{CASH.code}"
         update_uri: str = f"{PREFIX}/{CASH.code}/update"
-        account: Account
+        account: Account | None
         response: httpx.Response
 
         response = self.__client.post(update_uri,
@@ -504,11 +508,12 @@ class AccountTestCase(unittest.TestCase):
         csrf_token: str = get_csrf_token(client)
         detail_uri: str = f"{PREFIX}/{CASH.code}"
         update_uri: str = f"{PREFIX}/{CASH.code}/update"
-        account: Account
+        account: Account | None
         response: httpx.Response
 
         with self.__app.app_context():
             account = Account.find_by_code(CASH.code)
+            self.assertIsNotNone(account)
             self.assertEqual(account.created_by.username, editor_username)
             self.assertEqual(account.updated_by.username, editor_username)
 
@@ -534,11 +539,12 @@ class AccountTestCase(unittest.TestCase):
         from accounting.models import Account
         detail_uri: str = f"{PREFIX}/{CASH.code}"
         update_uri: str = f"{PREFIX}/{CASH.code}/update"
-        account: Account
+        account: Account | None
         response: httpx.Response
 
         with self.__app.app_context():
             account = Account.find_by_code(CASH.code)
+            self.assertIsNotNone(account)
             self.assertEqual(account.title_l10n, CASH.title)
             self.assertEqual(account.l10n, [])
 
@@ -553,6 +559,7 @@ class AccountTestCase(unittest.TestCase):
 
         with self.__app.app_context():
             account = Account.find_by_code(CASH.code)
+            self.assertIsNotNone(account)
             self.assertEqual(account.title_l10n, CASH.title)
             self.assertEqual({(x.locale, x.title) for x in account.l10n},
                              {("zh_Hant", f"{CASH.title}-zh_Hant")})
@@ -665,15 +672,20 @@ class AccountTestCase(unittest.TestCase):
                              f"{PREFIX}/1111-00{i}")
 
         with self.__app.app_context():
-            account_1: Account = Account.find_by_code("1111-001")
+            account_1: Account | None = Account.find_by_code("1111-001")
+            self.assertIsNotNone(account_1)
             id_1: int = account_1.id
-            account_2: Account = Account.find_by_code("1111-002")
+            account_2: Account | None = Account.find_by_code("1111-002")
+            self.assertIsNotNone(account_2)
             id_2: int = account_2.id
-            account_3: Account = Account.find_by_code("1111-003")
+            account_3: Account | None = Account.find_by_code("1111-003")
+            self.assertIsNotNone(account_3)
             id_3: int = account_3.id
-            account_4: Account = Account.find_by_code("1111-004")
+            account_4: Account | None = Account.find_by_code("1111-004")
+            self.assertIsNotNone(account_4)
             id_4: int = account_4.id
-            account_5: Account = Account.find_by_code("1111-005")
+            account_5: Account | None = Account.find_by_code("1111-005")
+            self.assertIsNotNone(account_5)
             id_5: int = account_5.id
             account_1.no = 3
             account_2.no = 5

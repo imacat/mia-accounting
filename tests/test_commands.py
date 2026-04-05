@@ -230,7 +230,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
             new_account: Account = Account(
                 id=new_id(Account),
                 base_code="1112",
-                no="2",
+                no=2,
                 title_l10n=custom_title,
                 is_need_offset=False,
                 created_by_id=creator_pk,

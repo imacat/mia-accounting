@@ -119,12 +119,12 @@ class LineItemCollector:
         balance_func: sa.Function = sa.func.sum(sa.case(
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
-        select: sa.Select = sa.Select(balance_func)\
+        select: sa.Select[tuple[Decimal]] = sa.Select(balance_func)\
             .join(JournalEntry).join(Account)\
             .filter(JournalEntryLineItem.currency_code == self.__currency.code,
                     self.__account_condition,
                     JournalEntry.date < self.__period.start)
-        balance: int | None = db.session.scalar(select)
+        balance: Decimal | None = db.session.scalar(select)
         if balance is None:
             return None
         line_item: ReportLineItem = ReportLineItem()
@@ -144,7 +144,7 @@ class LineItemCollector:
 
         :return: The line items.
         """
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                self.__account_condition]
         if self.__period.start is not None:
@@ -170,7 +170,7 @@ class LineItemCollector:
                          selectinload(JournalEntryLineItem.journal_entry))]
 
     @property
-    def __account_condition(self) -> sa.BinaryExpression:
+    def __account_condition(self) -> sa.ColumnElement[bool]:
         if self.__account.code == CurrentAccount.CURRENT_AL_CODE:
             return CurrentAccount.sql_condition()
         return Account.id == self.__account.id

@@ -66,15 +66,19 @@ def period_spec(period: Period) -> str:
     """
     start: str | None = __get_start_str(period.start)
     end: str | None = __get_end_str(period.end)
-    if period.start is None and period.end is None:
-        return "all-time"
-    if start == end:
-        return start
-    if period.start is None:
-        return f"until-{end}"
-    if period.end is None:
-        return f"since-{start}"
-    return f"{start}-{end}"
+    if start is None:
+        return "all-time" if end is None else f"until-{end}"
+    return f"since-{start}" if end is None else __get_spec(start, end)
+
+
+def __get_spec(start: str, end: str) -> str:
+    """Constructs the period specification with both start and end
+
+    :param start: The start date.
+    :param end: The end date.
+    :return: The period specification.
+    """
+    return start if start == end else f"{start}-{end}"
 
 
 def __get_start_str(start: dt.date | None) -> str | None:

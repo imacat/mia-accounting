@@ -48,7 +48,7 @@ def title_case(s: str) -> str:
     return re.sub(r"\w+", __cap_word, s)
 
 
-def __cap_word(m: re.Match) -> str:
+def __cap_word(m: re.Match[str]) -> str:
     """Capitalize a matched title word.
 
     :param m: The matched title word.

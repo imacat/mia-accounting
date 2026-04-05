@@ -1,7 +1,7 @@
 # The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/27
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ def show_login_form() -> str | Response:
 
 
 @bp.post("login", endpoint="login")
-def login() -> redirect:
+def login() -> Response:
     """Logs in the user.
 
     :return: The redirection to the home page.
@@ -72,7 +72,7 @@ def login() -> redirect:
 
 
 @bp.post("logout", endpoint="logout")
-def logout() -> redirect:
+def logout() -> Response:
     """Logs out the user.
 
     :return: The redirection to the home page.

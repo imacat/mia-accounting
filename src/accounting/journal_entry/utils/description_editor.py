@@ -315,14 +315,14 @@ class DescriptionEditor:
         if len(codes) == 0:
             return {}
 
-        def get_condition(code0: str) -> sa.BinaryExpression:
-            m: re.Match = re.match(r"^(\d{4})-(\d{3})$", code0)
+        def get_condition(code0: str) -> sa.ColumnElement[bool]:
+            m: re.Match[str] | None = re.match(r"^(\d{4})-(\d{3})$", code0)
             assert m is not None, \
                 f"Malformed account code \"{code0}\" for regular transactions."
             return sa.and_(Account.base_code == m.group(1),
                            Account.no == int(m.group(2)))
 
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [get_condition(x) for x in codes]
         accounts: dict[str, Account] \
             = {x.code: x for x in

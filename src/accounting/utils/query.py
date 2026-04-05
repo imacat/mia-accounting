@@ -21,6 +21,8 @@ This module should not import any other module from the application.
 """
 import re
 
+from typing_extensions import assert_type
+
 
 def parse_query_keywords(q: str | None) -> list[str]:
     """Returns the query keywords by the query parameter.
@@ -35,7 +37,8 @@ def parse_query_keywords(q: str | None) -> list[str]:
         return []
     keywords: list[str] = []
     while True:
-        m: re.Match
+        m: re.Match[str] | None
+        assert q is not None
         m = re.match(r"\"([^\"]+)\"\s+(.+)$", q)
         if m is not None:
             keywords.append(m.group(1))

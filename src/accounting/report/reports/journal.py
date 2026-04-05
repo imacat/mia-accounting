@@ -185,7 +185,7 @@ class Journal(BaseReport):
 
         :return: The line items.
         """
-        conditions: list[sa.BinaryExpression] = []
+        conditions: list[sa.ColumnElement[bool]] = []
         if self.__period.start is not None:
             conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:

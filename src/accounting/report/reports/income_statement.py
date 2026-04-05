@@ -254,9 +254,9 @@ class IncomeStatement(BaseReport):
 
         :return: The balances.
         """
-        sub_conditions: list[sa.BinaryExpression] \
+        sub_conditions: list[sa.ColumnElement[bool]] \
             = [Account.base_code.startswith(str(x)) for x in range(4, 10)]
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                sa.or_(*sub_conditions)]
         if self.__period.start is not None:

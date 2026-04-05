@@ -46,8 +46,8 @@ def get_selectable_original_line_items(
         (offset.c.id.in_(line_item_id_on_form), 0),
         (offset.c.is_debit == JournalEntryLineItem.is_debit, offset.c.amount),
         else_=-offset.c.amount))).label("net_balance")
-    conditions: list[sa.BinaryExpression] = [Account.is_need_offset]
-    sub_conditions: list[sa.BinaryExpression] = []
+    conditions: list[sa.ColumnElement[bool]] = [Account.is_need_offset]
+    sub_conditions: list[sa.ColumnElement[bool]] = []
     if is_payable:
         sub_conditions.append(sa.and_(Account.base_code.startswith("2"),
                                       sa.not_(JournalEntryLineItem.is_debit)))

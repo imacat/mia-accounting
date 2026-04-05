@@ -53,9 +53,9 @@ class LineItemCollector:
         keywords: list[str] = parse_query_keywords(request.args.get("q"))
         if len(keywords) == 0:
             return []
-        conditions: list[sa.BinaryExpression] = []
+        conditions: list[sa.ColumnElement[bool]] = []
         for k in keywords:
-            sub_conditions: list[sa.BinaryExpression] \
+            sub_conditions: list[sa.ColumnElement[bool]] \
                 = [JournalEntryLineItem.description.icontains(k),
                    JournalEntryLineItem.account_id.in_(
                        self.__get_account_condition(k)),
@@ -86,13 +86,13 @@ class LineItemCollector:
         :param k: The keyword.
         :return: The condition to filter the account.
         """
-        code: sa.BinaryExpression = Account.base_code + "-" \
+        code: sa.ColumnElement[str] = Account.base_code + "-" \
             + sa.func.substr("000" + sa.cast(Account.no, sa.String),
                              sa.func.char_length(sa.cast(Account.no,
                                                          sa.String)) + 1)
         select_l10n: sa.Select = sa.select(AccountL10n.account_id)\
             .filter(AccountL10n.title.icontains(k))
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [Account.base_code.contains(k),
                Account.title_l10n.icontains(k),
                code.contains(k),
@@ -122,7 +122,7 @@ class LineItemCollector:
         :param k: The keyword.
         :return: The condition to filter the journal entry.
         """
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntry.note.icontains(k)]
         date: dt.datetime
         try:

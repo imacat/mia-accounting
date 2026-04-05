@@ -224,13 +224,14 @@ def __mess_up_debit(form: dict[str, str], currency_prefix: str) \
     :return: The messed-up form.
     """
     key: str
-    m: re.Match
+    m: re.Match[str] | None
 
     # Remove the office disbursement
     key = [x for x in form
            if x.startswith(currency_prefix)
            and form[x] == Accounts.OFFICE][0]
     m = re.match(r"^((.+-)\d+-)account_code$", key)
+    assert m is not None
     debit_prefix: str = m.group(2)
     line_item_prefix: str = m.group(1)
     amount: Decimal = Decimal(form[f"{line_item_prefix}amount"])
@@ -265,13 +266,14 @@ def __mess_up_credit(form: dict[str, str], currency_prefix: str) \
     :return: The messed-up form.
     """
     key: str
-    m: re.Match
+    m: re.Match[str] | None
 
     # Remove the sales receipt
     key = [x for x in form
            if x.startswith(currency_prefix)
            and form[x] == Accounts.SALES][0]
     m = re.match(r"^((.+-)\d+-)account_code$", key)
+    assert m is not None
     credit_prefix: str = m.group(2)
     line_item_prefix: str = m.group(1)
     amount: Decimal = Decimal(form[f"{line_item_prefix}amount"])
@@ -304,7 +306,6 @@ def __mess_up_currencies(form: dict[str, str]) -> dict[str, str]:
     :return: The messed-up form.
     """
     key: str
-    m: re.Match
 
     # Remove JPY
     currency_prefix: str = __get_currency_prefix(form, "JPY")
@@ -312,7 +313,7 @@ def __mess_up_currencies(form: dict[str, str]) -> dict[str, str]:
     # Add AUD
     indices: set[int] = set()
     for key in form:
-        m = re.match(r"^currency-(\d+)-code$", key)
+        m: re.Match[str] | None = re.match(r"^currency-(\d+)-code$", key)
         if m is not None:
             indices.add(int(m.group(1)))
     new_index: int = max(indices) + 5 + randbelow(20)
@@ -363,7 +364,8 @@ def __get_line_item_no_key(form: dict[str, str], currency_prefix: str,
     key: str = [x for x in form
                 if x.startswith(currency_prefix)
                 and form[x] == code][0]
-    m: re.Match = re.match(r"^(.+-\d+-)account_code$", key)
+    m: re.Match[str] | None = re.match(r"^(.+-\d+-)account_code$", key)
+    assert m is not None
     return f"{m.group(1)}no"
 
 
@@ -375,7 +377,8 @@ def __get_currency_prefix(form: dict[str, str], code: str) -> str:
     :return: The prefix of the currency.
     """
     key: str = [x for x in form if form[x] == code][0]
-    m: re.Match = re.match(r"^(.+-)code$", key)
+    m: re.Match[str] | None = re.match(r"^(.+-)code$", key)
+    assert m is not None
     return m.group(1)
 
 
@@ -388,7 +391,7 @@ def set_negative_amount(form: dict[str, str]) -> None:
     amount_keys: list[str] = []
     prefix: str = ""
     for key in form.keys():
-        m: re.Match = re.match(r"^(.+)-\d+-amount$", key)
+        m: re.Match[str] | None = re.match(r"^(.+)-\d+-amount$", key)
         if m is None:
             continue
         if prefix != "" and prefix != m.group(1):
@@ -407,7 +410,8 @@ def remove_debit_in_a_currency(form: dict[str, str]) -> None:
     :return: None.
     """
     key: str = [x for x in form if "-debit-" in x][0]
-    m: re.Match = re.match(r"^(.+-debit-)", key)
+    m: re.Match[str] | None = re.match(r"^(.+-debit-)", key)
+    assert m is not None
     keys: set[str] = {x for x in form if x.startswith(m.group(1))}
     for key in keys:
         del form[key]
@@ -420,7 +424,8 @@ def remove_credit_in_a_currency(form: dict[str, str]) -> None:
     :return: None.
     """
     key: str = [x for x in form if "-credit-" in x][0]
-    m: re.Match = re.match(r"^(.+-credit-)", key)
+    m: re.Match[str] | None = re.match(r"^(.+-credit-)", key)
+    assert m is not None
     keys: set[str] = {x for x in form if x.startswith(m.group(1))}
     for key in keys:
         del form[key]

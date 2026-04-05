@@ -32,7 +32,7 @@ def get_base_account_query() -> list[BaseAccount]:
     keywords: list[str] = parse_query_keywords(request.args.get("q"))
     if len(keywords) == 0:
         return BaseAccount.query.order_by(BaseAccount.code).all()
-    conditions: list[sa.BinaryExpression] = []
+    conditions: list[sa.ColumnElement[bool]] = []
     for k in keywords:
         l10n: list[BaseAccountL10n] = BaseAccountL10n.query\
             .filter(BaseAccountL10n.title.icontains(k)).all()

@@ -139,7 +139,7 @@ class LineItemCollector:
 
         :return: The line items.
         """
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                JournalEntryLineItem.account_id == self.__account.id]
         if self.__period.start is not None:

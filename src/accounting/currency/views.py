@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/6
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from urllib.parse import urlencode, parse_qsl
 
 import sqlalchemy as sa
 from flask import Blueprint, render_template, redirect, session, request, \
-    flash, url_for
+    flash, url_for, Response
 from werkzeug.datastructures import ImmutableMultiDict
 
 from accounting import db
@@ -74,7 +74,7 @@ def show_add_currency_form() -> str:
 
 @bp.post("store", endpoint="store")
 @has_permission(can_edit)
-def add_currency() -> redirect:
+def add_currency() -> Response:
     """Adds a currency.
 
     :return: The redirection to the currency detail on success, or the currency
@@ -125,7 +125,7 @@ def show_currency_edit_form(currency: Currency) -> str:
 
 @bp.post("<currency:currency>/update", endpoint="update")
 @has_permission(can_edit)
-def update_currency(currency: Currency) -> redirect:
+def update_currency(currency: Currency) -> Response:
     """Updates a currency.
 
     :param currency: The currency.
@@ -153,7 +153,7 @@ def update_currency(currency: Currency) -> redirect:
 
 @bp.post("<currency:currency>/delete", endpoint="delete")
 @has_permission(can_edit)
-def delete_currency(currency: Currency) -> redirect:
+def delete_currency(currency: Currency) -> Response:
     """Deletes a currency.
 
     :param currency: The currency.

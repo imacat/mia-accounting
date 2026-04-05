@@ -32,7 +32,7 @@ def get_currency_query() -> list[Currency]:
     keywords: list[str] = parse_query_keywords(request.args.get("q"))
     if len(keywords) == 0:
         return Currency.query.order_by(Currency.code).all()
-    conditions: list[sa.BinaryExpression] = []
+    conditions: list[sa.ColumnElement[bool]] = []
     for k in keywords:
         l10n: list[CurrencyL10n] = CurrencyL10n.query\
             .filter(CurrencyL10n.name.icontains(k)).all()

@@ -334,3 +334,4 @@ def get_journal_entry_op(journal_entry: JournalEntry,
                                      key=lambda x: x.CHECK_ORDER):
         if journal_entry_type.is_my_type(journal_entry):
             return journal_entry_type
+    assert False

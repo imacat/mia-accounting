@@ -121,9 +121,9 @@ class AccountCollector:
 
         :return: The balances.
         """
-        sub_conditions: list[sa.BinaryExpression] \
+        sub_conditions: list[sa.ColumnElement[bool]] \
             = [Account.base_code.startswith(x) for x in {"1", "2", "3"}]
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                sa.or_(*sub_conditions)]
         if self.__period.end is not None:
@@ -180,7 +180,7 @@ class AccountCollector:
         """
         if self.__period.start is None:
             return None
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code,
                JournalEntry.date < self.__period.start]
         return self.__query_balance(conditions)
@@ -199,7 +199,7 @@ class AccountCollector:
 
         :return: The net income or loss for current period.
         """
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code]
         if self.__period.start is not None:
             conditions.append(JournalEntry.date >= self.__period.start)
@@ -208,7 +208,7 @@ class AccountCollector:
         return self.__query_balance(conditions)
 
     @staticmethod
-    def __query_balance(conditions: list[sa.BinaryExpression])\
+    def __query_balance(conditions: list[sa.ColumnElement[bool]])\
             -> Decimal:
         """Queries the balance.
 

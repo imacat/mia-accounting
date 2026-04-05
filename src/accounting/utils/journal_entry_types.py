@@ -22,9 +22,9 @@ from enum import Enum
 
 class JournalEntryType(Enum):
     """The journal entry types."""
-    CASH_RECEIPT: str = "receipt"
+    CASH_RECEIPT = "receipt"
     """The cash receipt journal entry."""
-    CASH_DISBURSEMENT: str = "disbursement"
+    CASH_DISBURSEMENT = "disbursement"
     """The cash disbursement journal entry."""
-    TRANSFER: str = "transfer"
+    TRANSFER = "transfer"
     """The transfer journal entry."""

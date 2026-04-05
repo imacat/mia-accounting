@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/2/18
 
-#  Copyright (c) 2023-2024 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from urllib.parse import parse_qsl, urlencode
 
 import sqlalchemy as sa
 from flask import Blueprint, render_template, session, redirect, request, \
-    flash, url_for
+    flash, url_for, Response
 from werkzeug.datastructures import ImmutableMultiDict
 
 from accounting import db
@@ -74,7 +74,7 @@ def show_add_journal_entry_form(journal_entry_type: JournalEntryType) -> str:
 
 @bp.post("store/<journalEntryType:journal_entry_type>", endpoint="store")
 @has_permission(can_edit)
-def add_journal_entry(journal_entry_type: JournalEntryType) -> redirect:
+def add_journal_entry(journal_entry_type: JournalEntryType) -> Response:
     """Adds a journal entry.
 
     :param journal_entry_type: The journal entry type.
@@ -136,7 +136,7 @@ def show_journal_entry_edit_form(journal_entry: JournalEntry) -> str:
 
 @bp.post("<journalEntry:journal_entry>/update", endpoint="update")
 @has_permission(can_edit)
-def update_journal_entry(journal_entry: JournalEntry) -> redirect:
+def update_journal_entry(journal_entry: JournalEntry) -> Response:
     """Updates a journal entry.
 
     :param journal_entry: The journal entry.
@@ -169,7 +169,7 @@ def update_journal_entry(journal_entry: JournalEntry) -> redirect:
 
 @bp.post("<journalEntry:journal_entry>/delete", endpoint="delete")
 @has_permission(can_edit)
-def delete_journal_entry(journal_entry: JournalEntry) -> redirect:
+def delete_journal_entry(journal_entry: JournalEntry) -> Response:
     """Deletes a journal entry.
 
     :param journal_entry: The journal entry.
@@ -204,7 +204,7 @@ def show_journal_entry_order(date: dt.date) -> str:
 
 @bp.post("dates/<date:date>", endpoint="sort")
 @has_permission(can_edit)
-def sort_journal_entries(date: dt.date) -> redirect:
+def sort_journal_entries(date: dt.date) -> Response:
     """Reorders the journal entries in a date.
 
     :param date: The date.

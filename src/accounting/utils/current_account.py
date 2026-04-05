@@ -59,7 +59,7 @@ class CurrentAccount:
 
         :return: The pseudo account for all current assets and liabilities.
         """
-        account: cls = cls()
+        account: Self = cls()
         account.id = 0
         account.code = cls.CURRENT_AL_CODE
         account.title = gettext("current assets and liabilities")
@@ -73,14 +73,14 @@ class CurrentAccount:
         :return: The current assets and liabilities accounts.
         """
         accounts: list[cls] = [cls.current_assets_and_liabilities()]
-        accounts.extend([CurrentAccount(x)
+        accounts.extend([cls(x)
                          for x in Account.query
                         .filter(cls.sql_condition())
                         .order_by(Account.base_code, Account.no)])
         return accounts
 
     @classmethod
-    def sql_condition(cls) -> sa.BinaryExpression:
+    def sql_condition(cls) -> sa.ColumnElement[bool]:
         """Returns the SQL condition for the current assets and liabilities
         accounts.
 

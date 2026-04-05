@@ -54,7 +54,7 @@ class OffsetMatcher:
         :param currency: The currency.
         :param account: The account.
         """
-        self.__currency: Account = currency
+        self.__currency: Currency = currency
         """The currency."""
         self.__account: Account = account
         """The account."""
@@ -105,7 +105,7 @@ class OffsetMatcher:
         """
         net_balances: dict[int, Decimal | None] \
             = get_net_balances(self.__currency, self.__account)
-        unmatched_offset_condition: sa.BinaryExpression \
+        unmatched_offset_condition: sa.ColumnElement[bool] \
             = sa.and_(Account.id == self.__account.id,
                       JournalEntryLineItem.currency_code
                       == self.__currency.code,

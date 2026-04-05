@@ -165,7 +165,7 @@ def match_journal_entry_detail(location: str) -> int:
     :return: The journal entry ID.
     :raise AssertionError: When the location is not the journal entry detail.
     """
-    m: re.Match = re.match(
+    m: re.Match[str] | None = re.match(
         r"^/accounting/journal-entries/(\d+)\?next=", location)
     assert m is not None
     return int(m.group(1))

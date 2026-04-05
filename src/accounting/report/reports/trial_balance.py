@@ -178,7 +178,7 @@ class TrialBalance(BaseReport):
 
         :return: None.
         """
-        conditions: list[sa.BinaryExpression] \
+        conditions: list[sa.ColumnElement[bool]] \
             = [JournalEntryLineItem.currency_code == self.__currency.code]
         if self.__period.start is not None:
             conditions.append(JournalEntry.date >= self.__period.start)

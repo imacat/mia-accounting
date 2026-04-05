@@ -1,7 +1,7 @@
 # The Mia! Accounting Project.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/1/30
 
-#  Copyright (c) 2023 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from urllib.parse import parse_qsl, urlencode
 
 import sqlalchemy as sa
 from flask import Blueprint, render_template, session, redirect, flash, \
-    url_for, request
+    url_for, request, Response
 from werkzeug.datastructures import ImmutableMultiDict
 
 from accounting import db
@@ -47,8 +47,8 @@ def list_accounts() -> str:
 
     :return: The account list.
     """
-    accounts: list[BaseAccount] = get_account_query()
-    pagination: Pagination = Pagination[BaseAccount](accounts)
+    accounts: list[Account] = get_account_query()
+    pagination: Pagination = Pagination[Account](accounts)
     return render_template("accounting/account/list.html",
                            list=pagination.list, pagination=pagination)
 
@@ -72,7 +72,7 @@ def show_add_account_form() -> str:
 
 @bp.post("store", endpoint="store")
 @has_permission(can_edit)
-def add_account() -> redirect:
+def add_account() -> Response:
     """Adds an account.
 
     :return: The redirection to the account detail on success, or the account
@@ -123,7 +123,7 @@ def show_account_edit_form(account: Account) -> str:
 
 @bp.post("<account:account>/update", endpoint="update")
 @has_permission(can_edit)
-def update_account(account: Account) -> redirect:
+def update_account(account: Account) -> Response:
     """Updates an account.
 
     :param account: The account.
@@ -150,7 +150,7 @@ def update_account(account: Account) -> redirect:
 
 @bp.post("<account:account>/delete", endpoint="delete")
 @has_permission(can_edit)
-def delete_account(account: Account) -> redirect:
+def delete_account(account: Account) -> Response:
     """Deletes an account.
 
     :param account: The account.
@@ -180,7 +180,7 @@ def show_account_order(base: BaseAccount) -> str:
 
 @bp.post("bases/<baseAccount:base>", endpoint="sort")
 @has_permission(can_edit)
-def sort_accounts(base: BaseAccount) -> redirect:
+def sort_accounts(base: BaseAccount) -> Response:
     """Reorders the accounts under a base account.
 
     :param base: The base account.

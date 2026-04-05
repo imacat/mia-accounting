@@ -33,16 +33,16 @@ def get_account_query() -> list[Account]:
     keywords: list[str] = parse_query_keywords(request.args.get("q"))
     if len(keywords) == 0:
         return Account.query.order_by(Account.base_code, Account.no).all()
-    code: sa.BinaryExpression = Account.base_code + "-" \
+    code: sa.ColumnElement[str] = Account.base_code + "-" \
         + sa.func.substr("000" + sa.cast(Account.no, sa.String),
                          sa.func.char_length(sa.cast(Account.no,
                                                      sa.String)) + 1)
-    conditions: list[sa.BinaryExpression] = []
+    conditions: list[sa.ColumnElement[bool]] = []
     for k in keywords:
         l10n: list[AccountL10n] = AccountL10n.query\
             .filter(AccountL10n.title.icontains(k)).all()
-        l10n_matches: set[str] = {x.account_id for x in l10n}
-        sub_conditions: list[sa.BinaryExpression] \
+        l10n_matches: set[int] = {x.account_id for x in l10n}
+        sub_conditions: list[sa.ColumnElement[bool]] \
             = [Account.base_code.contains(k),
                Account.title_l10n.icontains(k),
                code.contains(k),

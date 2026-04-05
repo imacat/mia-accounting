@@ -34,7 +34,7 @@ def sort_journal_entries_in(date: dt.date, exclude: int | None = None) -> None:
     :param exclude: The journal entry ID to exclude.
     :return: None.
     """
-    conditions: list[sa.BinaryExpression] = [JournalEntry.date == date]
+    conditions: list[sa.ColumnElement[bool]] = [JournalEntry.date == date]
     if exclude is not None:
         conditions.append(JournalEntry.id != exclude)
     journal_entries: list[JournalEntry] = JournalEntry.query\

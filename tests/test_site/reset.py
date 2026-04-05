@@ -1,7 +1,7 @@
 # The Mia! Accounting Demonstration Website.
 # Author: imacat@mail.imacat.idv.tw (imacat), 2023/4/12
 
-#  Copyright (c) 2023-2024 imacat.
+#  Copyright (c) 2023-2026 imacat.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 import datetime as dt
 
 from flask import Flask, Blueprint, url_for, flash, redirect, session, \
-    render_template, current_app
+    render_template, current_app, Response
 from flask_babel import lazy_gettext
 
 from accounting.utils.timezone import get_tz_today
@@ -45,7 +45,7 @@ def reset() -> str:
 
 @bp.post("sample", endpoint="sample")
 @admin_required
-def reset_sample() -> redirect:
+def reset_sample() -> Response:
     """Resets the sample data.
 
     :return: Redirection to the accounting application.
@@ -60,7 +60,7 @@ def reset_sample() -> redirect:
 
 @bp.post("reset", endpoint="clean-up")
 @admin_required
-def clean_up() -> redirect:
+def clean_up() -> Response:
     """Clean-up the database data.
 
     :return: Redirection to the accounting application.

@@ -68,6 +68,7 @@ def __parse_spec(text: str) -> tuple[dt.date | None, dt.date | None]:
     """
     if text == "-":
         return None, None
+    m: re.Match[str] | None
     m = re.match(f"^{DATE_SPEC_RE}$", text)
     if m is not None:
         return __get_start(m[1], m[2], m[3]), \

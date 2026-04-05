@@ -28,7 +28,7 @@ class AccountOption:
 
         :param account: The account.
         """
-        self.id: str = account.id
+        self.id: int = account.id
         """The account ID."""
         self.code: str = account.code
         """The account code."""

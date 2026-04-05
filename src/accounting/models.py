@@ -279,7 +279,7 @@ class Account(db.Model):
         :param code: The code.
         :return: The account, or None if this account does not exist.
         """
-        m = re.match(r"^([1-9]{4})-(\d{3})$", code)
+        m: re.Match[str] | None = re.match(r"^([1-9]{4})-(\d{3})$", code)
         if m is None:
             return None
         return cls.query.filter(cls.base_code == m.group(1),
@@ -334,7 +334,9 @@ class Account(db.Model):
 
         :return: The cash account
         """
-        return cls.find_by_code(cls.CASH_CODE)
+        account: Self | None = cls.find_by_code(cls.CASH_CODE)
+        assert account is not None
+        return account
 
     @classmethod
     def accumulated_change(cls) -> Self:
@@ -342,7 +344,9 @@ class Account(db.Model):
 
         :return: The accumulated-change account
         """
-        return cls.find_by_code(cls.ACCUMULATED_CHANGE_CODE)
+        account: Self | None = cls.find_by_code(cls.ACCUMULATED_CHANGE_CODE)
+        assert account is not None
+        return account
 
 
 class AccountL10n(db.Model):
