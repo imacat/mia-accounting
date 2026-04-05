@@ -61,20 +61,21 @@ def get_selectable_original_line_items(
         .join(offset,
               JournalEntryLineItem.id == offset.c.original_line_item_id,
               isouter=True)\
-        .filter(*conditions)\
+        .where(*conditions)\
         .group_by(JournalEntryLineItem.id)\
         .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
     net_balances: dict[int, Decimal] \
         = {x.id: x.net_balance
-           for x in db.session.execute(select_net_balances).all()}
-    line_items: list[JournalEntryLineItem] = JournalEntryLineItem.query\
-        .filter(JournalEntryLineItem.id.in_({x for x in net_balances}))\
-        .join(JournalEntry)\
+           for x in db.session.execute(select_net_balances)}
+    line_items: list[JournalEntryLineItem] = db.session.scalars(
+        sa.select(JournalEntryLineItem)
+        .where(JournalEntryLineItem.id.in_({x for x in net_balances}))
+        .join(JournalEntry)
         .order_by(JournalEntry.date, JournalEntry.no,
-                  JournalEntryLineItem.is_debit, JournalEntryLineItem.no)\
+                  JournalEntryLineItem.is_debit, JournalEntryLineItem.no)
         .options(selectinload(JournalEntryLineItem.currency),
                  selectinload(JournalEntryLineItem.account),
-                 selectinload(JournalEntryLineItem.journal_entry)).all()
+                 selectinload(JournalEntryLineItem.journal_entry))).all()
     line_items.reverse()
     for line_item in line_items:
         line_item.net_balance = line_item.amount \

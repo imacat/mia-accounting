@@ -97,8 +97,9 @@ class AccountForm(FlaskForm):
             if obj.base_code is not None:
                 sort_accounts_in(obj.base_code, obj.id)
             sort_accounts_in(self.base_code.data, obj.id)
-            count: int = Account.query\
-                .filter(Account.base_code == self.base_code.data).count()
+            count: int = db.session.scalar(
+                sa.select(sa.func.count(Account.id))
+                .where(Account.base_code == self.base_code.data))
             obj.base_code = self.base_code.data
             obj.no = count + 1
         obj.title = self.title.data
@@ -137,9 +138,10 @@ class AccountForm(FlaskForm):
 
         :return: The selectable base accounts.
         """
-        return BaseAccount.query\
-            .filter(sa.func.char_length(BaseAccount.code) == 4)\
-            .order_by(BaseAccount.code).all()
+        return db.session.scalars(
+            sa.select(BaseAccount)
+            .where(sa.func.char_length(BaseAccount.code) == 4)
+            .order_by(BaseAccount.code)).unique()
 
 
 def sort_accounts_in(base_code: str, exclude: int) -> None:
@@ -150,10 +152,10 @@ def sort_accounts_in(base_code: str, exclude: int) -> None:
     :param exclude: The account ID to exclude.
     :return: None.
     """
-    accounts: list[Account] = Account.query\
-        .filter(Account.base_code == base_code,
-                Account.id != exclude)\
-        .order_by(Account.no).all()
+    accounts: list[Account] = db.session.scalars(
+        sa.select(Account)
+        .where(Account.base_code == base_code, Account.id != exclude)
+        .order_by(Account.no)).unique().all()
     for i in range(len(accounts)):
         if accounts[i].no != i + 1:
             accounts[i].no = i + 1

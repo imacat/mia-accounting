@@ -37,9 +37,9 @@ def sort_journal_entries_in(date: dt.date, exclude: int | None = None) -> None:
     conditions: list[sa.ColumnElement[bool]] = [JournalEntry.date == date]
     if exclude is not None:
         conditions.append(JournalEntry.id != exclude)
-    journal_entries: list[JournalEntry] = JournalEntry.query\
-        .filter(*conditions)\
-        .order_by(JournalEntry.no).all()
+    journal_entries: list[JournalEntry] = db.session.scalars(
+        sa.select(JournalEntry).where(*conditions)
+        .order_by(JournalEntry.no)).all()
     for i in range(len(journal_entries)):
         if journal_entries[i].no != i + 1:
             journal_entries[i].no = i + 1
@@ -63,8 +63,9 @@ class JournalEntryReorderForm:
 
         :return:
         """
-        journal_entries: list[JournalEntry] = JournalEntry.query\
-            .filter(JournalEntry.date == self.date).all()
+        journal_entries: list[JournalEntry] = db.session.scalars(
+            sa.select(JournalEntry)
+            .where(JournalEntry.date == self.date)).all()
 
         # Collects the specified order.
         orders: dict[JournalEntry, int] = {}

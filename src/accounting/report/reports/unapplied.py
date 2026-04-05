@@ -20,6 +20,7 @@
 import datetime as dt
 from decimal import Decimal
 
+import sqlalchemy as sa
 from flask import render_template, Response
 from sqlalchemy.orm import selectinload
 
@@ -31,6 +32,7 @@ from ..utils.report_chooser import ReportChooser
 from ..utils.report_type import ReportType
 from ..utils.unapplied import get_accounts_with_unapplied, get_net_balances
 from ..utils.urls import unapplied_url
+from ... import db
 from ...locale import gettext
 from ...models import Currency, Account, JournalEntry, JournalEntryLineItem
 from ...utils.pagination import Pagination
@@ -176,13 +178,14 @@ class UnappliedOriginalLineItems(BaseReport):
         """
         net_balances: dict[int, Decimal | None] \
             = get_net_balances(self.__currency, self.__account)
-        line_items: list[JournalEntryLineItem] = JournalEntryLineItem.query \
-            .join(Account).join(JournalEntry) \
-            .filter(JournalEntryLineItem.id.in_(net_balances)) \
+        line_items: list[JournalEntryLineItem] = db.session.scalars(
+            sa.select(JournalEntryLineItem).join(Account).join(JournalEntry)
+            .where(JournalEntryLineItem.id.in_(net_balances))
             .order_by(JournalEntry.date, JournalEntry.no,
-                      JournalEntryLineItem.is_debit, JournalEntryLineItem.no) \
+                      JournalEntryLineItem.is_debit, JournalEntryLineItem.no)
             .options(selectinload(JournalEntryLineItem.currency),
-                     selectinload(JournalEntryLineItem.journal_entry)).all()
+                     selectinload(JournalEntryLineItem.journal_entry)))\
+            .unique().all()
         for line_item in line_items:
             line_item.net_balance = line_item.amount \
                 if net_balances[line_item.id] is None \

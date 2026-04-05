@@ -21,6 +21,7 @@ import datetime as dt
 import unittest
 
 import httpx
+import sqlalchemy as sa
 from flask import Flask
 
 from accounting.utils.next_uri import encode_next
@@ -275,8 +276,10 @@ class AccountTestCase(unittest.TestCase):
         response: httpx.Response
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Account.query.all()},
-                             {CASH.code, BANK.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Account)).unique()},
+                {CASH.code, BANK.code})
 
         # Missing CSRF token
         response = self.__client.post(store_uri,
@@ -367,10 +370,11 @@ class AccountTestCase(unittest.TestCase):
                          f"{PREFIX}/{STOCK.base_code}-003")
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Account.query.all()},
-                             {CASH.code, BANK.code, STOCK.code,
-                              f"{STOCK.base_code}-002",
-                              f"{STOCK.base_code}-003"})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Account)).unique()},
+                {CASH.code, BANK.code, STOCK.code,
+                 f"{STOCK.base_code}-002", f"{STOCK.base_code}-003"})
 
             account: Account | None = Account.find_by_code(STOCK.code)
             self.assertIsNotNone(account)
@@ -621,8 +625,10 @@ class AccountTestCase(unittest.TestCase):
                                 "currency-1-credit-1-amount": "20"})
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Account.query.all()},
-                             {CASH.code, PETTY.code, BANK.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Account)).unique()},
+                {CASH.code, PETTY.code, BANK.code})
 
         # Cannot delete the cash account
         response = self.__client.post(f"{PREFIX}/{CASH.code}/delete",
@@ -645,8 +651,10 @@ class AccountTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], list_uri)
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Account.query.all()},
-                             {CASH.code, BANK.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Account)).unique()},
+                {CASH.code, BANK.code})
 
         response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 404)

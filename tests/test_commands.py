@@ -101,7 +101,8 @@ class ConsoleCommandTestCase(unittest.TestCase):
                for x in rows}
 
         with self.__app.app_context():
-            accounts: list[BaseAccount] = BaseAccount.query.all()
+            accounts: list[BaseAccount] = db.session.scalars(
+                sa.select(BaseAccount)).unique().all()
 
         self.assertEqual(len(accounts), len(data))
         for account in accounts:
@@ -141,10 +142,14 @@ class ConsoleCommandTestCase(unittest.TestCase):
         from accounting.models import BaseAccount, Account, AccountL10n
 
         with self.__app.app_context():
-            bases: list[BaseAccount] = BaseAccount.query\
-                .filter(sa.func.char_length(BaseAccount.code) == 4).all()
-            accounts: list[Account] = Account.query.all()
-            l10n: list[AccountL10n] = AccountL10n.query.all()
+            bases: list[BaseAccount] = db.session.scalars(
+                sa.select(BaseAccount)
+                .where(sa.func.char_length(BaseAccount.code) == 4))\
+                .unique().all()
+            accounts: list[Account] = db.session.scalars(
+                sa.select(Account)).unique().all()
+            l10n: list[AccountL10n] = db.session.scalars(
+                sa.select(AccountL10n)).all()
 
         self.assertEqual({x.code for x in bases},
                          {x.base_code for x in accounts})
@@ -175,7 +180,8 @@ class ConsoleCommandTestCase(unittest.TestCase):
                    for x in csv.DictReader(fp)}
 
         with self.__app.app_context():
-            currencies: list[Currency] = Currency.query.all()
+            currencies: list[Currency] = db.session.scalars(
+                sa.select(Currency)).unique().all()
 
         self.assertEqual(len(currencies), len(data))
         for currency in currencies:
@@ -216,9 +222,9 @@ class ConsoleCommandTestCase(unittest.TestCase):
                              result.output + str(result.exception))
 
             # Turns the titles into lowercase.
-            for base in BaseAccount.query:
+            for base in db.session.scalars(sa.select(BaseAccount)).unique():
                 base.title_l10n = base.title_l10n.lower()
-            for account in Account.query:
+            for account in db.session.scalars(sa.select(Account)).unique():
                 account.title_l10n = account.title_l10n.lower()
                 account.created_at \
                     = account.created_at - dt.timedelta(seconds=5)
@@ -242,9 +248,9 @@ class ConsoleCommandTestCase(unittest.TestCase):
                 args=["accounting-titleize", "-u", "editor"])
             self.assertEqual(result.exit_code, 0,
                              result.output + str(result.exception))
-            for base in BaseAccount.query:
+            for base in db.session.scalars(sa.select(BaseAccount)).unique():
                 self.__test_title_case(base.title_l10n)
-            for account in Account.query:
+            for account in db.session.scalars(sa.select(Account)).unique():
                 if account.id != new_account.id:
                     self.__test_title_case(account.title_l10n)
                     self.assertNotEqual(account.created_at, account.updated_at)

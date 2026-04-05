@@ -19,6 +19,7 @@
 """
 import datetime as dt
 
+import sqlalchemy as sa
 from flask import Flask, Blueprint, url_for, flash, redirect, session, \
     render_template, current_app, Response
 from flask_babel import lazy_gettext
@@ -83,14 +84,14 @@ def __reset_database() -> None:
     from accounting.account import init_accounts_command
     from accounting.currency import init_currencies_command
 
-    JournalEntryLineItem.query.delete()
-    JournalEntry.query.delete()
-    CurrencyL10n.query.delete()
-    Currency.query.delete()
-    AccountL10n.query.delete()
-    Account.query.delete()
-    BaseAccountL10n.query.delete()
-    BaseAccount.query.delete()
+    db.session.execute(sa.delete(JournalEntryLineItem))
+    db.session.execute(sa.delete(JournalEntry))
+    db.session.execute(sa.delete(CurrencyL10n))
+    db.session.execute(sa.delete(Currency))
+    db.session.execute(sa.delete(AccountL10n))
+    db.session.execute(sa.delete(Account))
+    db.session.execute(sa.delete(BaseAccountL10n))
+    db.session.execute(sa.delete(BaseAccount))
     init_base_accounts_command()
     init_accounts_command(session["user"])
     init_currencies_command(session["user"])

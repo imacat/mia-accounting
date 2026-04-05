@@ -119,9 +119,9 @@ class LineItemCollector:
             else_=-JournalEntryLineItem.amount))
         select: sa.Select[tuple[Decimal]] = sa.Select(balance_func)\
             .join(JournalEntry).join(Account)\
-            .filter(JournalEntryLineItem.currency_code == self.__currency.code,
-                    self.__account_condition,
-                    JournalEntry.date < self.__period.start)
+            .where(JournalEntryLineItem.currency_code == self.__currency.code,
+                   self.__account_condition,
+                   JournalEntry.date < self.__period.start)
         balance: Decimal | None = db.session.scalar(select)
         if balance is None:
             return None
@@ -150,22 +150,22 @@ class LineItemCollector:
         if self.__period.end is not None:
             conditions.append(JournalEntry.date <= self.__period.end)
         journal_entry_with_account: sa.Select = sa.Select(JournalEntry.id).\
-            join(JournalEntryLineItem).join(Account).filter(*conditions)
+            join(JournalEntryLineItem).join(Account).where(*conditions)
 
-        return [ReportLineItem(x)
-                for x in JournalEntryLineItem.query
+        return [ReportLineItem(x) for x in db.session.scalars(
+                sa.select(JournalEntryLineItem)
                 .join(JournalEntry).join(Account)
-                .filter(JournalEntryLineItem.journal_entry_id
-                        .in_(journal_entry_with_account),
-                        JournalEntryLineItem.currency_code
-                        == self.__currency.code,
-                        sa.not_(self.__account_condition))
+                .where(JournalEntryLineItem.journal_entry_id
+                       .in_(journal_entry_with_account),
+                       JournalEntryLineItem.currency_code
+                       == self.__currency.code,
+                       sa.not_(self.__account_condition))
                 .order_by(JournalEntry.date,
                           JournalEntry.no,
                           JournalEntryLineItem.is_debit,
                           JournalEntryLineItem.no)
                 .options(selectinload(JournalEntryLineItem.account),
-                         selectinload(JournalEntryLineItem.journal_entry))]
+                         selectinload(JournalEntryLineItem.journal_entry)))]
 
     @property
     def __account_condition(self) -> sa.ColumnElement[bool]:
@@ -343,8 +343,8 @@ class PageParams(BasePageParams):
                           self.account.id == 0)]
         in_use: sa.Select = sa.Select(JournalEntryLineItem.account_id)\
             .join(Account)\
-            .filter(JournalEntryLineItem.currency_code == self.currency.code,
-                    CurrentAccount.sql_condition())\
+            .where(JournalEntryLineItem.currency_code == self.currency.code,
+                   CurrentAccount.sql_condition())\
             .group_by(JournalEntryLineItem.account_id)
         options.extend([OptionLink(str(x),
                                    income_expenses_url(
@@ -352,8 +352,10 @@ class PageParams(BasePageParams):
                                        CurrentAccount(x),
                                        self.period),
                                    x.id == self.account.id)
-                        for x in Account.query.filter(Account.id.in_(in_use))
-                       .order_by(Account.base_code, Account.no).all()])
+                        for x in db.session.scalars(
+                        sa.select(Account).where(Account.id.in_(in_use))
+                        .order_by(Account.base_code, Account.no))
+                        .unique()])
         return options
 
 

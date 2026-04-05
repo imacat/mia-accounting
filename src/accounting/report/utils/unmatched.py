@@ -35,19 +35,20 @@ def get_accounts_with_unmatched(currency: Currency) -> list[Account]:
     select: sa.Select = sa.select(Account.id, count_func)\
         .select_from(Account)\
         .join(JournalEntryLineItem, isouter=True).join(JournalEntry)\
-        .filter(Account.is_need_offset,
-                JournalEntryLineItem.currency_code == currency.code,
-                JournalEntryLineItem.original_line_item_id.is_(None),
-                sa.or_(sa.and_(Account.base_code.startswith("2"),
-                               JournalEntryLineItem.is_debit),
-                       sa.and_(Account.base_code.startswith("1"),
-                               sa.not_(JournalEntryLineItem.is_debit))))\
+        .where(Account.is_need_offset,
+               JournalEntryLineItem.currency_code == currency.code,
+               JournalEntryLineItem.original_line_item_id.is_(None),
+               sa.or_(sa.and_(Account.base_code.startswith("2"),
+                              JournalEntryLineItem.is_debit),
+                      sa.and_(Account.base_code.startswith("1"),
+                              sa.not_(JournalEntryLineItem.is_debit))))\
         .group_by(Account.id)\
         .having(count_func > 0)
     counts: dict[int, int] \
         = {x.id: x.count for x in db.session.execute(select)}
-    accounts: list[Account] = Account.query.filter(Account.id.in_(counts))\
-        .order_by(Account.base_code, Account.no).all()
+    accounts: list[Account] = db.session.scalars(
+        sa.select(Account).where(Account.id.in_(counts))
+        .order_by(Account.base_code, Account.no)).unique().all()
     for account in accounts:
         account.count = counts[account.id]
     return accounts

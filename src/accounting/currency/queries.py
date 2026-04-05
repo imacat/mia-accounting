@@ -20,6 +20,7 @@
 import sqlalchemy as sa
 from flask import request
 
+from .. import db
 from ..models import Currency, CurrencyL10n
 from ..utils.query import parse_query_keywords
 
@@ -31,14 +32,17 @@ def get_currency_query() -> list[Currency]:
     """
     keywords: list[str] = parse_query_keywords(request.args.get("q"))
     if len(keywords) == 0:
-        return Currency.query.order_by(Currency.code).all()
+        return db.session.scalars(
+            sa.select(Currency).order_by(Currency.code)).unique().all()
     conditions: list[sa.ColumnElement[bool]] = []
     for k in keywords:
-        l10n: list[CurrencyL10n] = CurrencyL10n.query\
-            .filter(CurrencyL10n.name.icontains(k)).all()
+        l10n: list[CurrencyL10n] = db.session.scalars(
+            sa.select(CurrencyL10n)
+            .where(CurrencyL10n.name.icontains(k))).all()
         l10n_matches: set[str] = {x.account_code for x in l10n}
         conditions.append(sa.or_(Currency.code.icontains(k),
                                  Currency.name_l10n.icontains(k),
                                  Currency.code.in_(l10n_matches)))
-    return Currency.query.filter(*conditions)\
-        .order_by(Currency.code).all()
+    return db.session.scalars(
+        sa.select(Currency).where(*conditions)
+        .order_by(Currency.code)).unique().all()

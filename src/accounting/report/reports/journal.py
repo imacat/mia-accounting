@@ -31,6 +31,7 @@ from ..utils.csv_export import BaseCSVRow, csv_download, period_spec
 from ..utils.report_chooser import ReportChooser
 from ..utils.report_type import ReportType
 from ..utils.urls import journal_url
+from ... import db
 from ...locale import gettext
 from ...models import Currency, Account, JournalEntry, JournalEntryLineItem
 from ...utils.pagination import Pagination
@@ -188,15 +189,16 @@ class Journal(BaseReport):
             conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(JournalEntry.date <= self.__period.end)
-        return JournalEntryLineItem.query.join(JournalEntry)\
-            .filter(*conditions)\
+        return db.session.scalars(
+            sa.select(JournalEntryLineItem).join(JournalEntry)
+            .where(*conditions)
             .order_by(JournalEntry.date,
                       JournalEntry.no,
                       JournalEntryLineItem.is_debit.desc(),
-                      JournalEntryLineItem.no)\
+                      JournalEntryLineItem.no)
             .options(selectinload(JournalEntryLineItem.account),
                      selectinload(JournalEntryLineItem.currency),
-                     selectinload(JournalEntryLineItem.journal_entry)).all()
+                     selectinload(JournalEntryLineItem.journal_entry))).all()
 
     def csv(self) -> Response:
         """Returns the report as CSV for download.

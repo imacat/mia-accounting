@@ -84,5 +84,6 @@ class BasePageParams(ABC):
             sa.select(JournalEntryLineItem.currency_code)
             .group_by(JournalEntryLineItem.currency_code)).all())
         return [OptionLink(str(x), get_url(x), x.code == active_currency.code)
-                for x in Currency.query.filter(Currency.code.in_(in_use))
-                .order_by(Currency.code).all()]
+                for x in db.session.scalars(
+                sa.select(Currency).where(Currency.code.in_(in_use))
+                .order_by(Currency.code)).unique()]

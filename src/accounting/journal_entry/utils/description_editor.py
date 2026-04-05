@@ -272,15 +272,17 @@ class DescriptionEditor:
         select: sa.Select = sa.Select(debit_credit, tag_type, tag,
                                       JournalEntryLineItem.account_id,
                                       sa.func.count().label("freq"))\
-            .filter(JournalEntryLineItem.description.is_not(None),
-                    JournalEntryLineItem.description.like("_%—_%"),
-                    JournalEntryLineItem.original_line_item_id.is_(None))\
+            .where(JournalEntryLineItem.description.is_not(None),
+                   JournalEntryLineItem.description.like("_%—_%"),
+                   JournalEntryLineItem.original_line_item_id.is_(None))\
             .group_by(debit_credit, tag_type, tag,
                       JournalEntryLineItem.account_id)
         result: list[sa.Row] = db.session.execute(select).all()
         accounts: dict[int, Account] \
-            = {x.id: x for x in Account.query
-               .filter(Account.id.in_({x.account_id for x in result})).all()}
+            = {x.id: x for x in db.session.scalars(
+               sa.select(Account)
+               .where(Account.id.in_({x.account_id for x in result})))
+               .unique()}
         debit_credit_dict: dict[Literal["debit", "credit"],
                                 DescriptionDebitCredit] \
             = {x.debit_credit: x for x in {self.debit, self.credit}}
@@ -326,7 +328,8 @@ class DescriptionEditor:
             = [get_condition(x) for x in codes]
         accounts: dict[str, Account] \
             = {x.code: x for x in
-               Account.query.filter(sa.or_(*conditions)).all()}
+               db.session.scalars(
+                   sa.select(Account).where(sa.or_(*conditions))).unique()}
         for code in codes:
             assert code in accounts, \
                 f"Unknown account \"{code}\" for regular transactions."

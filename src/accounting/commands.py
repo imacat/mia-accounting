@@ -66,8 +66,10 @@ def init_db_command(username: str, skip_accounts: bool,
     init_base_accounts_command()
     if not skip_accounts:
         init_accounts_command(username)
+    print("OK 1")
     if not skip_currencies:
         init_currencies_command(username)
+    print("OK 2")
     db.session.commit()
     click.echo("Accounting database initialized.")
 
@@ -81,12 +83,12 @@ def titleize_command(username: str) -> None:
     """Capitalize the account titles."""
     updater_pk: int = get_user_pk(username)
     updated: int = 0
-    for base in BaseAccount.query:
+    for base in db.session.scalars(sa.select(BaseAccount)).unique():
         new_title: str = title_case(base.title_l10n)
         if base.title_l10n != new_title:
             base.title_l10n = new_title
             updated = updated + 1
-    for account in Account.query:
+    for account in db.session.scalars(sa.select(Account)).unique():
         if account.title_l10n.lower() == account.base.title_l10n.lower():
             new_title: str = title_case(account.title_l10n)
             if account.title_l10n != new_title:

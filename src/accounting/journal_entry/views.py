@@ -195,9 +195,9 @@ def show_journal_entry_order(date: dt.date) -> str:
     :param date: The date.
     :return: The order of the journal entries in the date.
     """
-    journal_entries: list[JournalEntry] = JournalEntry.query \
-        .filter(JournalEntry.date == date) \
-        .order_by(JournalEntry.no).all()
+    journal_entries: list[JournalEntry] = db.session.scalars(
+        sa.select(JournalEntry).where(JournalEntry.date == date)
+        .order_by(JournalEntry.no)).all()
     return render_template("accounting/journal-entry/order.html",
                            date=date, list=journal_entries)
 

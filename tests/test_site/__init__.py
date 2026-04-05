@@ -20,6 +20,7 @@
 import os
 from secrets import token_urlsafe
 
+import sqlalchemy as sa
 from click.testing import Result
 from flask import Flask, Blueprint, render_template, redirect, Response, \
     url_for
@@ -112,8 +113,8 @@ def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
             return auth.current_user()
 
         def get_by_username(self, username: str) -> auth.User | None:
-            return auth.User.query\
-                .filter(auth.User.username == username).first()
+            return db.session.scalar(
+                sa.select(auth.User).where(auth.User.username == username))
 
         def get_pk(self, user: auth.User) -> int:
             return user.id
@@ -140,7 +141,9 @@ def init_db(app: Flask, is_skip_accounts: bool,
     db.create_all()
     from .auth import User
     for username in ["viewer", "editor", "admin", "nobody"]:
-        if User.query.filter(User.username == username).first() is None:
+        user: User | None = db.session.scalar(
+            sa.select(User).where(User.username == username))
+        if user is None:
             db.session.add(User(username=username))
     db.session.commit()
     runner: FlaskCliRunner = app.test_cli_runner()

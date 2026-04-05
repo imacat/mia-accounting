@@ -20,6 +20,7 @@
 import sqlalchemy as sa
 from flask import request
 
+from .. import db
 from ..models import BaseAccount, BaseAccountL10n
 from ..utils.query import parse_query_keywords
 
@@ -31,14 +32,17 @@ def get_base_account_query() -> list[BaseAccount]:
     """
     keywords: list[str] = parse_query_keywords(request.args.get("q"))
     if len(keywords) == 0:
-        return BaseAccount.query.order_by(BaseAccount.code).all()
+        return db.session.scalars(
+            sa.select(BaseAccount).order_by(BaseAccount.code)).unique().all()
     conditions: list[sa.ColumnElement[bool]] = []
     for k in keywords:
-        l10n: list[BaseAccountL10n] = BaseAccountL10n.query\
-            .filter(BaseAccountL10n.title.icontains(k)).all()
+        l10n: list[BaseAccountL10n] = db.session.scalars(
+            sa.select(BaseAccountL10n)
+            .where((BaseAccountL10n.title.icontains(k)))).all()
         l10n_matches: set[str] = {x.account_code for x in l10n}
         conditions.append(sa.or_(BaseAccount.code.contains(k),
                                  BaseAccount.title_l10n.icontains(k),
                                  BaseAccount.code.in_(l10n_matches)))
-    return BaseAccount.query.filter(*conditions)\
-        .order_by(BaseAccount.code).all()
+    return db.session.scalars(
+        sa.select(BaseAccount).where(*conditions)
+        .order_by(BaseAccount.code)).unique().all()

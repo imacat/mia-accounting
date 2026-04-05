@@ -28,7 +28,7 @@ from ..utils.title_case import title_case
 
 def init_base_accounts_command() -> None:
     """Initializes the base accounts."""
-    if BaseAccount.query.first() is not None:
+    if db.session.scalar(sa.select(BaseAccount)) is not None:
         return
 
     with open(data_dir / "base_accounts.csv") as fp:

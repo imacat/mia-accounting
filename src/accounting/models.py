@@ -268,9 +268,10 @@ class Account(db.Model):
 
         :return: None.
         """
-        AccountL10n.query.filter(AccountL10n.account == self).delete()
+        db.session.execute(sa.delete(AccountL10n)
+                           .where(AccountL10n.account == self))
         cls: type[Self] = self.__class__
-        cls.query.filter(cls.id == self.id).delete()
+        db.session.execute(sa.delete(cls).where(cls.id == self.id))
 
     @classmethod
     def find_by_code(cls, code: str) -> Self | None:
@@ -282,8 +283,9 @@ class Account(db.Model):
         m: re.Match[str] | None = re.match(r"^([1-9]{4})-(\d{3})$", code)
         if m is None:
             return None
-        return cls.query.filter(cls.base_code == m.group(1),
-                                cls.no == int(m.group(2))).first()
+        return db.session.scalar(
+            sa.select(cls).where(cls.base_code == m.group(1),
+                                 cls.no == int(m.group(2))))
 
     @classmethod
     def selectable_debit(cls) -> list[Self]:
@@ -292,20 +294,22 @@ class Account(db.Model):
 
         :return: The selectable debit accounts.
         """
-        return cls.query.filter(sa.or_(cls.base_code.startswith("1"),
-                                       sa.and_(cls.base_code.startswith("2"),
-                                               sa.not_(cls.is_need_offset)),
-                                       cls.base_code.startswith("3"),
-                                       cls.base_code.startswith("5"),
-                                       cls.base_code.startswith("6"),
-                                       cls.base_code.startswith("75"),
-                                       cls.base_code.startswith("76"),
-                                       cls.base_code.startswith("77"),
-                                       cls.base_code.startswith("78"),
-                                       cls.base_code.startswith("8"),
-                                       cls.base_code.startswith("9")),
-                                cls.base_code != "3353")\
-            .order_by(cls.base_code, cls.no).all()
+        return db.session.scalars(
+            sa.select(cls)
+            .where(sa.or_(cls.base_code.startswith("1"),
+                          sa.and_(cls.base_code.startswith("2"),
+                                  sa.not_(cls.is_need_offset)),
+                          cls.base_code.startswith("3"),
+                          cls.base_code.startswith("5"),
+                          cls.base_code.startswith("6"),
+                          cls.base_code.startswith("75"),
+                          cls.base_code.startswith("76"),
+                          cls.base_code.startswith("77"),
+                          cls.base_code.startswith("78"),
+                          cls.base_code.startswith("8"),
+                          cls.base_code.startswith("9")),
+                   cls.base_code != "3353")
+            .order_by(cls.base_code, cls.no)).unique().all()
 
     @classmethod
     def selectable_credit(cls) -> list[Self]:
@@ -314,19 +318,21 @@ class Account(db.Model):
 
         :return: The selectable debit accounts.
         """
-        return cls.query.filter(sa.or_(sa.and_(cls.base_code.startswith("1"),
-                                               sa.not_(cls.is_need_offset)),
-                                       cls.base_code.startswith("2"),
-                                       cls.base_code.startswith("3"),
-                                       cls.base_code.startswith("4"),
-                                       cls.base_code.startswith("71"),
-                                       cls.base_code.startswith("72"),
-                                       cls.base_code.startswith("73"),
-                                       cls.base_code.startswith("74"),
-                                       cls.base_code.startswith("8"),
-                                       cls.base_code.startswith("9")),
-                                cls.base_code != "3353")\
-            .order_by(cls.base_code, cls.no).all()
+        return db.session.scalars(
+            sa.select(cls)
+            .where(sa.or_(sa.and_(cls.base_code.startswith("1"),
+                                  sa.not_(cls.is_need_offset)),
+                          cls.base_code.startswith("2"),
+                          cls.base_code.startswith("3"),
+                          cls.base_code.startswith("4"),
+                          cls.base_code.startswith("71"),
+                          cls.base_code.startswith("72"),
+                          cls.base_code.startswith("73"),
+                          cls.base_code.startswith("74"),
+                          cls.base_code.startswith("8"),
+                          cls.base_code.startswith("9")),
+                   cls.base_code != "3353")
+            .order_by(cls.base_code, cls.no)).unique().all()
 
     @classmethod
     def cash(cls) -> Self:
@@ -472,9 +478,10 @@ class Currency(db.Model):
 
         :return: None.
         """
-        CurrencyL10n.query.filter(CurrencyL10n.currency == self).delete()
-        cls: type[Self] = self.__class__
-        cls.query.filter(cls.code == self.code).delete()
+        db.session.execute(
+            sa.delete(CurrencyL10n)
+            .where(CurrencyL10n.currency_code == self.code))
+        db.session.delete(self)
 
 
 class CurrencyL10n(db.Model):
@@ -649,8 +656,9 @@ class JournalEntry(db.Model):
 
         :return: None.
         """
-        JournalEntryLineItem.query\
-            .filter(JournalEntryLineItem.journal_entry_id == self.id).delete()
+        db.session.execute(
+            sa.delete(JournalEntryLineItem)
+            .where(JournalEntryLineItem.journal_entry_id == self.id))
         db.session.delete(self)
 
 
@@ -816,10 +824,11 @@ class JournalEntryLineItem(db.Model):
         """
         if not hasattr(self, "__offsets"):
             cls: type[Self] = self.__class__
-            offsets: list[Self] = cls.query.join(JournalEntry)\
-                .filter(JournalEntryLineItem.original_line_item_id == self.id)\
+            offsets: list[Self] = db.session.scalars(
+                sa.select(cls).join(JournalEntry)
+                .where(cls.original_line_item_id == self.id)
                 .order_by(JournalEntry.date, JournalEntry.no,
-                          cls.is_debit, cls.no).all()
+                          cls.is_debit, cls.no)).unique().all()
             setattr(self, "__offsets", offsets)
         return getattr(self, "__offsets")
 

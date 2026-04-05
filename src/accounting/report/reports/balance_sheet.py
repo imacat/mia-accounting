@@ -133,16 +133,17 @@ class AccountCollector:
             = sa.select(Account.id, Account.base_code, Account.no,
                         balance_func)\
             .join(JournalEntry).join(Account)\
-            .filter(*conditions)\
+            .where(*conditions)\
             .group_by(Account.id, Account.base_code, Account.no)\
             .having(balance_func != 0)\
             .order_by(Account.base_code, Account.no)
         account_balances: list[sa.Row] \
             = db.session.execute(select_balance).all()
-        self.__all_accounts: list[Account] = Account.query\
-            .filter(sa.or_(Account.id.in_({x.id for x in account_balances}),
-                           Account.base_code == "3351",
-                           Account.base_code == "3353")).all()
+        self.__all_accounts: list[Account] = db.session.scalars(
+            sa.select(Account)
+            .where(sa.or_(Account.id.in_({x.id for x in account_balances}),
+                          Account.base_code == "3351",
+                          Account.base_code == "3353"))).unique().all()
         """The accounts."""
         account_by_id: dict[int, Account] \
             = {x.id: x for x in self.__all_accounts}
@@ -219,7 +220,7 @@ class AccountCollector:
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
         select_balance: sa.Select = sa.select(balance_func)\
-            .join(JournalEntry).join(Account).filter(*conditions)
+            .join(JournalEntry).join(Account).where(*conditions)
         return db.session.scalar(select_balance)
 
     def __add_owner_s_equity(self, code: str, amount: Decimal | None,
@@ -383,11 +384,13 @@ class BalanceSheet(BaseReport):
         balances: list[ReportAccount] = AccountCollector(
             self.__currency, self.__period).accounts
 
-        titles: list[BaseAccount] = BaseAccount.query\
-            .filter(BaseAccount.code.in_({"1", "2", "3"})).all()
-        subtitles: list[BaseAccount] = BaseAccount.query\
-            .filter(BaseAccount.code.in_({x.account.base_code[:2]
-                                          for x in balances})).all()
+        titles: list[BaseAccount] = db.session.scalars(
+            sa.select(BaseAccount)
+            .where(BaseAccount.code.in_({"1", "2", "3"}))).unique().all()
+        subtitle_codes: set[str] = {x.account.base_code[:2] for x in balances}
+        subtitles: list[BaseAccount] = db.session.scalars(
+            sa.select(BaseAccount)
+            .where(BaseAccount.code.in_(subtitle_codes))).unique().all()
 
         sections: dict[str, Section] = {x.code: Section(x) for x in titles}
         subsections: dict[str, Subsection] = {x.code: Subsection(x)

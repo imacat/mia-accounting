@@ -55,7 +55,7 @@ class SameCurrencyAsOriginalLineItems:
             return
         original_line_item_currency_codes: set[str] = set(db.session.scalars(
             sa.select(JournalEntryLineItem.currency_code)
-            .filter(JournalEntryLineItem.id.in_(original_line_item_id))).all())
+            .where(JournalEntryLineItem.id.in_(original_line_item_id))).all())
         for currency_code in original_line_item_currency_codes:
             if field.data != currency_code:
                 raise ValidationError(lazy_gettext(
@@ -72,17 +72,17 @@ class KeepCurrencyWhenHavingOffset:
         if field.data is None:
             return
         offset: sa.Alias = offset_alias()
-        original_line_items: list[JournalEntryLineItem]\
-            = JournalEntryLineItem.query\
+        original_line_items: list[JournalEntryLineItem] = db.session.scalars(
+            sa.select(JournalEntryLineItem)
             .join(offset,
                   JournalEntryLineItem.id == offset.c.original_line_item_id,
-                  isouter=True)\
-            .filter(JournalEntryLineItem.id
-                    .in_({x.id.data for x in form.line_items
-                          if x.id.data is not None}))\
+                  isouter=True)
+            .where(JournalEntryLineItem.id
+                   .in_({x.id.data for x in form.line_items
+                         if x.id.data is not None}))
             .group_by(JournalEntryLineItem.id,
-                      JournalEntryLineItem.currency_code)\
-            .having(sa.func.count(offset.c.id) > 0).all()
+                      JournalEntryLineItem.currency_code)
+            .having(sa.func.count(offset.c.id) > 0)).unique().all()
         for original_line_item in original_line_items:
             if original_line_item.currency_code != field.data:
                 raise ValidationError(lazy_gettext(
@@ -152,8 +152,8 @@ class CurrencyForm(FlaskForm):
         line_item_id: set[int] = {x.id.data for x in line_item_forms
                                   if x.id.data is not None}
         select: sa.Select = sa.select(sa.func.count(JournalEntryLineItem.id))\
-            .filter(JournalEntryLineItem.original_line_item_id
-                    .in_(line_item_id))
+            .where(JournalEntryLineItem.original_line_item_id
+                   .in_(line_item_id))
         return db.session.scalar(select) > 0
 
 

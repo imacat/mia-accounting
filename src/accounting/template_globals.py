@@ -17,6 +17,9 @@
 """The template globals.
 
 """
+import sqlalchemy as sa
+
+from . import db
 from .models import Currency
 from .utils.options import options
 
@@ -26,7 +29,8 @@ def currency_options() -> list[Currency]:
 
     :return: The currency options.
     """
-    return Currency.query.order_by(Currency.code).all()
+    return db.session.scalars(
+        sa.select(Currency).order_by(Currency.code)).unique().all()
 
 
 def default_currency_code() -> str:

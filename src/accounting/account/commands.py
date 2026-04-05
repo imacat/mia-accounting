@@ -36,13 +36,14 @@ def init_accounts_command(username: str) -> None:
     """Initializes the accounts."""
     creator_pk: int = get_user_pk(username)
 
-    bases: list[BaseAccount] = BaseAccount.query\
-        .filter(db.func.length(BaseAccount.code) == 4)\
-        .order_by(BaseAccount.code).all()
+    bases: list[BaseAccount] = db.session.scalars(
+        sa.select(BaseAccount).where(db.func.length(BaseAccount.code) == 4)
+        .order_by(BaseAccount.code)).unique().all()
     if len(bases) == 0:
         raise click.Abort
 
-    existing: list[Account] = Account.query.all()
+    existing: list[Account] = \
+        db.session.scalars(sa.select(Account)).unique().all()
 
     existing_base_code: set[str] = {x.base_code for x in existing}
     bases_to_add: list[BaseAccount] = [x for x in bases

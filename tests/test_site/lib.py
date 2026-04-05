@@ -218,8 +218,8 @@ class BaseTestData(ABC):
         self._app: Flask = app
         """The Flask application."""
         with self._app.app_context():
-            current_user: User | None = User.query\
-                .filter(User.username == username).first()
+            current_user: User | None = db.session.scalar(
+                sa.select(User).where(User.username == username))
             assert current_user is not None
             self.__current_user_id: int = current_user.id
             """The current user ID."""

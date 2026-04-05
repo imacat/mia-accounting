@@ -24,6 +24,7 @@ from flask_babel import LazyString
 from sqlalchemy.orm import selectinload
 
 from ..utils.unapplied import get_net_balances
+from ... import db
 from ...locale import lazy_gettext
 from ...models import Currency, Account, JournalEntry, JournalEntryLineItem
 
@@ -113,14 +114,15 @@ class OffsetMatcher:
                                      JournalEntryLineItem.is_debit),
                              sa.and_(Account.base_code.startswith("1"),
                                      sa.not_(JournalEntryLineItem.is_debit))))
-        self.line_items = JournalEntryLineItem.query \
-            .join(Account).join(JournalEntry) \
-            .filter(sa.or_(JournalEntryLineItem.id.in_(net_balances),
-                           unmatched_offset_condition)) \
+        self.line_items = db.session.scalars(
+            sa.select(JournalEntryLineItem).join(Account).join(JournalEntry)
+            .where(sa.or_(JournalEntryLineItem.id.in_(net_balances),
+                          unmatched_offset_condition))
             .order_by(JournalEntry.date, JournalEntry.no,
-                      JournalEntryLineItem.is_debit, JournalEntryLineItem.no) \
+                      JournalEntryLineItem.is_debit, JournalEntryLineItem.no)
             .options(selectinload(JournalEntryLineItem.currency),
-                     selectinload(JournalEntryLineItem.journal_entry)).all()
+                     selectinload(JournalEntryLineItem.journal_entry)))\
+            .unique().all()
         for line_item in self.line_items:
             line_item.is_offset = line_item.id not in net_balances
         self.unapplied = [x for x in self.line_items if not x.is_offset]

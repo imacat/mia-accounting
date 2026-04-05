@@ -202,9 +202,9 @@ class NotExceedingOriginalLineItemNetBalance:
             else_=-JournalEntryLineItem.amount))
         offset_total_but_form: Decimal | None = db.session.scalar(
             sa.select(offset_total_func)
-            .filter(JournalEntryLineItem.original_line_item_id
-                    == original_line_item.id,
-                    JournalEntryLineItem.id.not_in(existing_line_item_id)))
+            .where(JournalEntryLineItem.original_line_item_id
+                   == original_line_item.id,
+                   JournalEntryLineItem.id.not_in(existing_line_item_id)))
         if offset_total_but_form is None:
             offset_total_but_form = Decimal("0")
         offset_total_on_form: Decimal = sum(
@@ -231,7 +231,7 @@ class NotLessThanOffsetTotal:
             (JournalEntryLineItem.is_debit != is_debit,
              JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount)))\
-            .filter(JournalEntryLineItem.original_line_item_id == form.id.data)
+            .where(JournalEntryLineItem.original_line_item_id == form.id.data)
         offset_total: Decimal | None = db.session.scalar(select_offset_total)
         if offset_total is not None and field.data < offset_total:
             raise ValidationError(lazy_gettext(
@@ -353,13 +353,14 @@ class LineItemForm(FlaskForm):
             def get_offsets() -> list[JournalEntryLineItem]:
                 if not self.is_need_offset or self.id.data is None:
                     return []
-                return JournalEntryLineItem.query.join(JournalEntry)\
-                    .filter(JournalEntryLineItem.original_line_item_id
-                            == self.id.data)\
+                return db.session.scalars(
+                    sa.select(JournalEntryLineItem).join(JournalEntry)
+                    .where(JournalEntryLineItem.original_line_item_id
+                           == self.id.data)
                     .order_by(JournalEntry.date, JournalEntry.no,
-                              JournalEntryLineItem.no)\
+                              JournalEntryLineItem.no)
                     .options(selectinload(JournalEntryLineItem.journal_entry),
-                             selectinload(JournalEntryLineItem.account)).all()
+                             selectinload(JournalEntryLineItem.account))).all()
             setattr(self, "__offsets", get_offsets())
         return getattr(self, "__offsets")
 

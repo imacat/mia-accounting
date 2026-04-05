@@ -45,12 +45,12 @@ def get_accounts_with_unapplied(currency: Currency) -> list[Account]:
         .join(offset,
               JournalEntryLineItem.id == offset.c.original_line_item_id,
               isouter=True)\
-        .filter(Account.is_need_offset,
-                JournalEntryLineItem.currency_code == currency.code,
-                sa.or_(sa.and_(Account.base_code.startswith("2"),
-                               sa.not_(JournalEntryLineItem.is_debit)),
-                       sa.and_(Account.base_code.startswith("1"),
-                               JournalEntryLineItem.is_debit)))\
+        .where(Account.is_need_offset,
+               JournalEntryLineItem.currency_code == currency.code,
+               sa.or_(sa.and_(Account.base_code.startswith("2"),
+                              sa.not_(JournalEntryLineItem.is_debit)),
+                      sa.and_(Account.base_code.startswith("1"),
+                              JournalEntryLineItem.is_debit)))\
         .group_by(JournalEntryLineItem.id)\
         .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
 
@@ -58,13 +58,14 @@ def get_accounts_with_unapplied(currency: Currency) -> list[Account]:
         = sa.func.count(JournalEntryLineItem.id).label("count")
     select: sa.Select = sa.select(Account.id, count_func)\
         .join(JournalEntryLineItem, isouter=True)\
-        .filter(JournalEntryLineItem.id.in_(select_unapplied))\
+        .where(JournalEntryLineItem.id.in_(select_unapplied))\
         .group_by(Account.id)\
         .having(count_func > 0)
     counts: dict[int, int] \
         = {x.id: x.count for x in db.session.execute(select)}
-    accounts: list[Account] = Account.query.filter(Account.id.in_(counts))\
-        .order_by(Account.base_code, Account.no).all()
+    accounts: list[Account] = db.session.scalars(
+        sa.select(Account).where(Account.id.in_(counts))
+        .order_by(Account.base_code, Account.no)).unique().all()
     for account in accounts:
         account.count = counts[account.id]
     return accounts
@@ -91,13 +92,13 @@ def get_net_balances(currency: Currency, account: Account) \
         .join(offset,
               JournalEntryLineItem.id == offset.c.original_line_item_id,
               isouter=True) \
-        .filter(Account.id == account.id,
-                JournalEntryLineItem.currency_code == currency.code,
-                sa.or_(sa.and_(Account.base_code.startswith("2"),
-                               sa.not_(JournalEntryLineItem.is_debit)),
-                       sa.and_(Account.base_code.startswith("1"),
-                               JournalEntryLineItem.is_debit))) \
+        .where(Account.id == account.id,
+               JournalEntryLineItem.currency_code == currency.code,
+               sa.or_(sa.and_(Account.base_code.startswith("2"),
+                              sa.not_(JournalEntryLineItem.is_debit)),
+                      sa.and_(Account.base_code.startswith("1"),
+                              JournalEntryLineItem.is_debit))) \
         .group_by(JournalEntryLineItem.id) \
         .having(sa.or_(sa.func.count(offset.c.id) == 0, net_balance != 0))
     return {x.id: x.net_balance
-            for x in db.session.execute(select_net_balances).all()}
+            for x in db.session.execute(select_net_balances)}

@@ -23,9 +23,12 @@ This file is largely taken from the NanoParma ERP project, first written in
 import datetime as dt
 from collections.abc import Callable
 
+import sqlalchemy as sa
+
 from .period import Period
 from .shortcuts import ThisMonth, LastMonth, SinceLastMonth, ThisYear, \
     LastYear, Today, Yesterday, AllTime, TemplatePeriod, YearPeriod
+from ... import db
 from ...models import JournalEntry
 from ...utils.timezone import get_tz_today
 
@@ -62,8 +65,8 @@ class PeriodChooser:
         self.url_template: str = get_url(TemplatePeriod())
         """The URL template."""
 
-        first: JournalEntry | None \
-            = JournalEntry.query.order_by(JournalEntry.date).first()
+        first: JournalEntry | None = db.session.scalar(
+            sa.select(JournalEntry).order_by(JournalEntry.date))
         start: dt.date | None = None if first is None else first.date
 
         # Attributes

@@ -19,6 +19,7 @@
 """
 from collections.abc import Callable
 
+import sqlalchemy as sa
 from flask import Blueprint, render_template, Flask, redirect, url_for, \
     session, request, g, Response, abort
 from sqlalchemy.orm import Mapped, mapped_column
@@ -91,8 +92,8 @@ def current_user() -> User | None:
         if "user" not in session:
             g.user = None
         else:
-            g.user = User.query.filter(
-                User.username == session["user"]).first()
+            g.user = db.session.scalar(
+                sa.select(User).where(User.username == session["user"]))
     return g.user
 
 

@@ -29,7 +29,8 @@ from ..utils.user import get_user_pk
 
 def init_currencies_command(username: str) -> None:
     """Initializes the currencies."""
-    existing_codes: set[str] = {x.code for x in Currency.query.all()}
+    existing_codes: set[str] = \
+        {x.code for x in db.session.scalars(sa.select(Currency)).unique()}
 
     with open(data_dir / "currencies.csv") as fp:
         data: list[dict[str, str]] = [x for x in csv.DictReader(fp)]

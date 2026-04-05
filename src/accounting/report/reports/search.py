@@ -30,6 +30,7 @@ from ..utils.base_report import BaseReport
 from ..utils.csv_export import csv_download
 from ..utils.report_chooser import ReportChooser
 from ..utils.report_type import ReportType
+from ... import db
 from ...locale import gettext
 from ...models import Currency, CurrencyL10n, Account, AccountL10n, \
     JournalEntry, JournalEntryLineItem
@@ -69,15 +70,16 @@ class LineItemCollector:
             except ArithmeticError:
                 pass
             conditions.append(sa.or_(*sub_conditions))
-        return JournalEntryLineItem.query.join(JournalEntry)\
-            .filter(*conditions)\
+        return db.session.scalars(
+            sa.select(JournalEntryLineItem).join(JournalEntry)
+            .where(*conditions)
             .order_by(JournalEntry.date,
                       JournalEntry.no,
                       JournalEntryLineItem.is_debit,
-                      JournalEntryLineItem.no)\
+                      JournalEntryLineItem.no)
             .options(selectinload(JournalEntryLineItem.account),
                      selectinload(JournalEntryLineItem.currency),
-                     selectinload(JournalEntryLineItem.journal_entry)).all()
+                     selectinload(JournalEntryLineItem.journal_entry))).all()
 
     @staticmethod
     def __get_account_condition(k: str) -> sa.Select:
@@ -91,7 +93,7 @@ class LineItemCollector:
                              sa.func.char_length(sa.cast(Account.no,
                                                          sa.String)) + 1)
         select_l10n: sa.Select = sa.select(AccountL10n.account_id)\
-            .filter(AccountL10n.title.icontains(k))
+            .where(AccountL10n.title.icontains(k))
         conditions: list[sa.ColumnElement[bool]] \
             = [Account.base_code.contains(k),
                Account.title_l10n.icontains(k),
@@ -99,7 +101,7 @@ class LineItemCollector:
                Account.id.in_(select_l10n)]
         if k in gettext("Needs Offset"):
             conditions.append(Account.is_need_offset)
-        return sa.select(Account.id).filter(sa.or_(*conditions))
+        return sa.select(Account.id).where(sa.or_(*conditions))
 
     @staticmethod
     def __get_currency_condition(k: str) -> sa.Select:
@@ -109,11 +111,11 @@ class LineItemCollector:
         :return: The condition to filter the currency.
         """
         select_l10n: sa.Select = sa.select(CurrencyL10n.currency_code)\
-            .filter(CurrencyL10n.name.icontains(k))
-        return sa.select(Currency.code).filter(
-            sa.or_(Currency.code.icontains(k),
-                   Currency.name_l10n.icontains(k),
-                   Currency.code.in_(select_l10n)))
+            .where(CurrencyL10n.name.icontains(k))
+        return sa.select(Currency.code)\
+            .where(sa.or_(Currency.code.icontains(k),
+                          Currency.name_l10n.icontains(k),
+                          Currency.code.in_(select_l10n)))
 
     @staticmethod
     def __get_journal_entry_condition(k: str) -> sa.Select:
@@ -153,7 +155,7 @@ class LineItemCollector:
                 sa.extract("day", JournalEntry.date) == date.day))
         except ValueError:
             pass
-        return sa.select(JournalEntry.id).filter(sa.or_(*conditions))
+        return sa.select(JournalEntry.id).where(sa.or_(*conditions))
 
 
 class PageParams(BasePageParams):

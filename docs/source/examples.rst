@@ -49,7 +49,8 @@ The following is an example configuration for *Mia! Accounting*.
                 return current_user()
 
             def get_by_username(self, username: str) -> User | None:
-                return User.query.filter(User.username == username).first()
+                return db.session.scalar(
+                    sa.select(User).where(User.username == username))
 
             def get_pk(self, user: User) -> int:
                 return user.id

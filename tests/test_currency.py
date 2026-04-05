@@ -21,6 +21,7 @@ import datetime as dt
 import unittest
 
 import httpx
+import sqlalchemy as sa
 from flask import Flask
 
 from accounting.utils.next_uri import encode_next
@@ -221,8 +222,10 @@ class CurrencyTestCase(unittest.TestCase):
         response: httpx.Response
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Currency.query.all()},
-                             {USD.code, EUR.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Currency)).unique()},
+                {USD.code, EUR.code})
 
         # Missing CSRF token
         response = self.__client.post(store_uri,
@@ -287,8 +290,10 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], create_uri)
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Currency.query.all()},
-                             {USD.code, EUR.code, TWD.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Currency)).unique()},
+                {USD.code, EUR.code, TWD.code})
 
             currency: Currency = db.session.get(Currency, TWD.code)
             self.assertEqual(currency.code, TWD.code)
@@ -554,8 +559,10 @@ class CurrencyTestCase(unittest.TestCase):
                                 "currency-1-credit-1-amount": "20"})
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Currency.query.all()},
-                             {USD.code, EUR.code, JPY.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Currency)).unique()},
+                {USD.code, EUR.code, JPY.code})
 
         # Cannot delete the default currency
         response = self.__client.post(f"{PREFIX}/{USD.code}/delete",
@@ -578,8 +585,10 @@ class CurrencyTestCase(unittest.TestCase):
         self.assertEqual(response.headers["Location"], list_uri)
 
         with self.__app.app_context():
-            self.assertEqual({x.code for x in Currency.query.all()},
-                             {USD.code, EUR.code})
+            self.assertEqual(
+                {x.code
+                 for x in db.session.scalars(sa.select(Currency)).unique()},
+                {USD.code, EUR.code})
 
         response = self.__client.get(detail_uri)
         self.assertEqual(response.status_code, 404)

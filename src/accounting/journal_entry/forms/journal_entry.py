@@ -159,8 +159,9 @@ class JournalEntryForm(FlaskForm):
         to_delete: set[int] = {x.id for x in obj.line_items
                                if x.id not in collector.to_keep}
         if len(to_delete) > 0:
-            JournalEntryLineItem.query\
-                .filter(JournalEntryLineItem.id.in_(to_delete)).delete()
+            db.session.execute(
+                sa.delete(JournalEntryLineItem)
+                .where(JournalEntryLineItem.id.in_(to_delete)))
             self.is_modified = True
 
         if is_new or db.session.is_modified(obj):
@@ -195,7 +196,7 @@ class JournalEntryForm(FlaskForm):
             if self.max_date is not None and new_date == self.max_date:
                 db_min_no: int | None = db.session.scalar(
                     sa.select(sa.func.min(JournalEntry.no))
-                    .filter(JournalEntry.date == new_date))
+                    .where(JournalEntry.date == new_date))
                 if db_min_no is None:
                     obj.date = new_date
                     obj.no = 1
@@ -205,8 +206,9 @@ class JournalEntryForm(FlaskForm):
                     sort_journal_entries_in(new_date)
             else:
                 sort_journal_entries_in(new_date, obj.id)
-                count: int = JournalEntry.query\
-                    .filter(JournalEntry.date == new_date).count()
+                count: int = db.session.scalar(
+                    sa.select(sa.func.count(JournalEntry.id))
+                    .where(JournalEntry.date == new_date))
                 obj.date = new_date
                 obj.no = count + 1
 
@@ -221,7 +223,7 @@ class JournalEntryForm(FlaskForm):
                if not (x.code[0] == "2" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntryLineItem.account_id)
-            .filter(JournalEntryLineItem.is_debit)
+            .where(JournalEntryLineItem.is_debit)
             .group_by(JournalEntryLineItem.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
@@ -238,7 +240,7 @@ class JournalEntryForm(FlaskForm):
                if not (x.code[0] == "1" and x.is_need_offset)]
         in_use: set[int] = set(db.session.scalars(
             sa.select(JournalEntryLineItem.account_id)
-            .filter(sa.not_(JournalEntryLineItem.is_debit))
+            .where(sa.not_(JournalEntryLineItem.is_debit))
             .group_by(JournalEntryLineItem.account_id)).all())
         for account in accounts:
             account.is_in_use = account.id in in_use
@@ -288,7 +290,7 @@ class JournalEntryForm(FlaskForm):
             return None
         select: sa.Select = sa.select(sa.func.max(JournalEntry.date))\
             .join(JournalEntryLineItem)\
-            .filter(JournalEntryLineItem.id.in_(original_line_item_id))
+            .where(JournalEntryLineItem.id.in_(original_line_item_id))
         return db.session.scalar(select)
 
     @property
@@ -301,8 +303,8 @@ class JournalEntryForm(FlaskForm):
                                   if x.id.data is not None}
         select: sa.Select = sa.select(sa.func.min(JournalEntry.date))\
             .join(JournalEntryLineItem)\
-            .filter(JournalEntryLineItem.original_line_item_id
-                    .in_(line_item_id))
+            .where(JournalEntryLineItem.original_line_item_id
+                   .in_(line_item_id))
         return db.session.scalar(select)
 
 

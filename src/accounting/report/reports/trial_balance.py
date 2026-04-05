@@ -187,14 +187,15 @@ class TrialBalance(BaseReport):
             else_=-JournalEntryLineItem.amount)).label("balance")
         select_balances: sa.Select = sa.select(Account.id, balance_func)\
             .join(JournalEntry).join(Account)\
-            .filter(*conditions)\
+            .where(*conditions)\
             .group_by(Account.id)\
             .having(balance_func != 0)\
             .order_by(Account.base_code, Account.no)
         balances: list[sa.Row] = db.session.execute(select_balances).all()
         accounts: dict[int, Account] \
-            = {x.id: x for x in Account.query
-               .filter(Account.id.in_([x.id for x in balances])).all()}
+            = {x.id: x for x in db.session.scalars(
+               sa.select(Account)
+               .where(Account.id.in_([x.id for x in balances]))).unique()}
         self.__accounts = [ReportAccount(account=accounts[x.id],
                                          amount=x.balance,
                                          url=ledger_url(self.__currency,

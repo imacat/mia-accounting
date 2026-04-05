@@ -21,6 +21,7 @@ from typing import Self
 
 import sqlalchemy as sa
 
+from .. import db
 from ..locale import gettext
 from ..models import Account
 
@@ -74,9 +75,10 @@ class CurrentAccount:
         """
         accounts: list[cls] = [cls.current_assets_and_liabilities()]
         accounts.extend([cls(x)
-                         for x in Account.query
-                        .filter(cls.sql_condition())
-                        .order_by(Account.base_code, Account.no)])
+                         for x in db.session.scalars(
+                         sa.select(Account).where(cls.sql_condition())
+                         .order_by(Account.base_code, Account.no))
+                         .unique()])
         return accounts
 
     @classmethod

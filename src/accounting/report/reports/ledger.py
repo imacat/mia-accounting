@@ -115,9 +115,9 @@ class LineItemCollector:
             (JournalEntryLineItem.is_debit, JournalEntryLineItem.amount),
             else_=-JournalEntryLineItem.amount))
         select: sa.Select = sa.Select(balance_func).join(JournalEntry)\
-            .filter(JournalEntryLineItem.currency_code == self.__currency.code,
-                    JournalEntryLineItem.account_id == self.__account.id,
-                    JournalEntry.date < self.__period.start)
+            .where(JournalEntryLineItem.currency_code == self.__currency.code,
+                   JournalEntryLineItem.account_id == self.__account.id,
+                   JournalEntry.date < self.__period.start)
         balance: int | None = db.session.scalar(select)
         if balance is None:
             return None
@@ -144,15 +144,15 @@ class LineItemCollector:
             conditions.append(JournalEntry.date >= self.__period.start)
         if self.__period.end is not None:
             conditions.append(JournalEntry.date <= self.__period.end)
-        return [ReportLineItem(x) for x in JournalEntryLineItem.query
-                .join(JournalEntry)
-                .filter(*conditions)
+        return [ReportLineItem(x) for x in db.session.scalars(
+                sa.select(JournalEntryLineItem).join(JournalEntry)
+                .where(*conditions)
                 .order_by(JournalEntry.date,
                           JournalEntry.no,
                           JournalEntryLineItem.is_debit.desc(),
                           JournalEntryLineItem.no)
-                .options(selectinload(JournalEntryLineItem.journal_entry))
-                .all()]
+                .options(selectinload(JournalEntryLineItem.journal_entry)))
+                .unique()]
 
     def __get_total(self) -> ReportLineItem | None:
         """Composes the total line item.
@@ -308,12 +308,13 @@ class PageParams(BasePageParams):
         :return: The account options.
         """
         in_use: sa.Select = sa.Select(JournalEntryLineItem.account_id)\
-            .filter(JournalEntryLineItem.currency_code == self.currency.code)\
+            .where(JournalEntryLineItem.currency_code == self.currency.code)\
             .group_by(JournalEntryLineItem.account_id)
         return [OptionLink(str(x), ledger_url(self.currency, x, self.period),
                            x.id == self.account.id)
-                for x in Account.query.filter(Account.id.in_(in_use))
-                .order_by(Account.base_code, Account.no).all()]
+                for x in db.session.scalars(
+                sa.select(Account).where(Account.id.in_(in_use))
+                .order_by(Account.base_code, Account.no)).unique()]
 
 
 class Ledger(BaseReport):

@@ -218,11 +218,14 @@ class IncomeStatement(BaseReport):
         """
         balances: list[ReportAccount] = self.__query_balances()
 
-        titles: list[BaseAccount] = BaseAccount.query\
-            .filter(BaseAccount.code.in_({"4", "5", "6", "7", "8", "9"})).all()
-        subtitles: list[BaseAccount] = BaseAccount.query\
-            .filter(BaseAccount.code.in_({x.account.base_code[:2]
-                                          for x in balances})).all()
+        title_codes: set[str] = {"4", "5", "6", "7", "8", "9"}
+        titles: list[BaseAccount] = db.session.scalars(
+            sa.select(BaseAccount)
+            .where(BaseAccount.code.in_(title_codes))).unique().all()
+        subtitle_codes: set[str] = {x.account.base_code[:2] for x in balances}
+        subtitles: list[BaseAccount] = db.session.scalars(
+            sa.select(BaseAccount)
+            .where(BaseAccount.code.in_(subtitle_codes))).unique().all()
 
         total_titles: dict[str, str] \
             = {"4": gettext("Total Operating Revenue"),
@@ -267,14 +270,15 @@ class IncomeStatement(BaseReport):
             else_=JournalEntryLineItem.amount)).label("balance")
         select_balances: sa.Select = sa.select(Account.id, balance_func)\
             .join(JournalEntry).join(Account)\
-            .filter(*conditions)\
+            .where(*conditions)\
             .group_by(Account.id)\
             .having(balance_func != 0)\
             .order_by(Account.base_code, Account.no)
         balances: list[sa.Row] = db.session.execute(select_balances).all()
         accounts: dict[int, Account] \
-            = {x.id: x for x in Account.query
-               .filter(Account.id.in_([x.id for x in balances])).all()}
+            = {x.id: x for x in db.session.scalars(
+               sa.select(Account)
+               .where(Account.id.in_([x.id for x in balances]))).unique()}
         return [ReportAccount(account=accounts[x.id],
                               amount=x.balance,
                               url=ledger_url(self.__currency,
