@@ -22,9 +22,10 @@ This module should not import any other module from the application.
 from secrets import randbelow
 
 from .. import db
+from ..utils.user import base_cls
 
 
-def new_id(cls: type[db.Model]):
+def new_id(cls: type[base_cls]):
     """Generates and returns a new, unused random ID for the data model.
 
     :param cls: The data model.

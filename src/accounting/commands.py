@@ -29,7 +29,7 @@ from .base_account import init_base_accounts_command
 from .currency import init_currencies_command
 from .models import BaseAccount, Account
 from .utils.title_case import title_case
-from .utils.user import has_user, get_user_pk
+from .utils.user import base_cls, has_user, get_user_pk
 
 
 def __validate_username(ctx: click.core.Context, param: click.core.Option,
@@ -62,7 +62,7 @@ def __validate_username(ctx: click.core.Context, param: click.core.Option,
 def init_db_command(username: str, skip_accounts: bool,
                     skip_currencies: bool) -> None:
     """Initializes the accounting database."""
-    db.create_all()
+    base_cls.metadata.create_all(db.engine)
     init_base_accounts_command()
     if not skip_accounts:
         init_accounts_command(username)

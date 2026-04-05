@@ -28,6 +28,7 @@ from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from sqlalchemy.orm import DeclarativeBase
 
 bp: Blueprint = Blueprint("home", __name__)
 """The global blueprint."""
@@ -37,6 +38,10 @@ csrf: CSRFProtect = CSRFProtect()
 """The CSRF protector."""
 db: SQLAlchemy = SQLAlchemy()
 """The database instance."""
+
+
+class Base(DeclarativeBase):
+    """The base class for all models."""
 
 
 def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
@@ -100,6 +105,10 @@ def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
             return redirect(append_next(url_for("auth.login-form")))
 
         @property
+        def base(self) -> type[DeclarativeBase]:
+            return Base
+
+        @property
         def cls(self) -> type[auth.User]:
             return auth.User
 
@@ -137,7 +146,7 @@ def init_db(app: Flask, is_skip_accounts: bool,
         otherwise.
     :return: None.
     """
-    db.create_all()
+    Base.metadata.create_all(db.engine)
     from .auth import User
     for username in ["viewer", "editor", "admin", "nobody"]:
         user: User | None = db.session.scalar(

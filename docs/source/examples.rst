@@ -13,7 +13,7 @@ The following is an example configuration for *Mia! Accounting*.
 
     from flask import Response, redirect
     from .auth import current_user()
-    from .modules import User
+    from .modules import Base, User
 
     def create_app(test_config=None) -> Flask:
         app: Flask = Flask(__name__)
@@ -35,6 +35,10 @@ The following is an example configuration for *Mia! Accounting*.
 
             def unauthorized(self) -> Response:
                 return redirect("/login")
+
+            @property
+            def base(self) -> type[DeclarativeBase]:
+                return Base
 
             @property
             def cls(self) -> type[User]:

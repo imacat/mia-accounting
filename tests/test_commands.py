@@ -29,7 +29,7 @@ from flask import Flask
 from flask.testing import FlaskCliRunner
 from sqlalchemy.sql.ddl import DropTable
 
-from test_site import db
+from test_site import db, Base
 from testlib import create_test_app
 
 
@@ -63,7 +63,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
             # Drop every accounting table, to see if accounting-init-db
             # recreates them correctly.
             tables: list[sa.Table] \
-                = [db.metadata.tables[x] for x in db.metadata.tables
+                = [Base.metadata.tables[x] for x in Base.metadata.tables
                    if x.startswith("accounting_")]
             for table in tables:
                 db.session.execute(DropTable(table))
@@ -207,7 +207,7 @@ class ConsoleCommandTestCase(unittest.TestCase):
         with self.__app.app_context():
             # Resets the accounts.
             tables: list[sa.Table] \
-                = [db.metadata.tables[x] for x in db.metadata.tables
+                = [Base.metadata.tables[x] for x in Base.metadata.tables
                    if x.startswith("accounting_")]
             for table in tables:
                 db.session.execute(DropTable(table))

@@ -23,10 +23,10 @@ from abc import ABC, abstractmethod
 
 import sqlalchemy as sa
 from flask import g, Response
-from flask_sqlalchemy.model import Model
+from sqlalchemy.orm import DeclarativeBase
 
 
-class UserUtilityInterface[T: Model](ABC):
+class UserUtilityInterface[T: DeclarativeBase](ABC):
     """The interface for the user utilities."""
 
     @abstractmethod
@@ -65,6 +65,14 @@ class UserUtilityInterface[T: Model](ABC):
         an HTTP 403 Forbidden response is return to the user.
 
         :return: The response to require the user to log in.
+        """
+
+    @property
+    @abstractmethod
+    def base(self) -> type[DeclarativeBase]:
+        """Returns the base data model.
+
+        :return: The base data model.
         """
 
     @property
@@ -109,7 +117,9 @@ class UserUtilityInterface[T: Model](ABC):
 
 __user_utils: UserUtilityInterface
 """The user utilities."""
-type user_cls = Model
+base_cls = DeclarativeBase
+"""The base data model."""
+type user_cls = DeclarativeBase
 """The user class."""
 user_pk_column: sa.Column = sa.Column(sa.Integer)
 """The primary key column of the user class."""
@@ -121,8 +131,9 @@ def init_user_utils(utils: UserUtilityInterface) -> None:
     :param utils: The user utilities.
     :return: None.
     """
-    global __user_utils, user_cls, user_pk_column
+    global __user_utils, base_cls, user_cls, user_pk_column
     __user_utils = utils
+    base_cls = utils.base
     user_cls = utils.cls
     user_pk_column = utils.pk_column
 

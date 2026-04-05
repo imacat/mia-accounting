@@ -24,13 +24,13 @@ from flask import Blueprint, render_template, Flask, redirect, url_for, \
     session, request, g, Response, abort
 from sqlalchemy.orm import Mapped, mapped_column
 
-from . import db
+from . import db, Base
 
 bp: Blueprint = Blueprint("auth", __name__, url_prefix="/")
 """The authentication blueprint."""
 
 
-class User(db.Model):
+class User(Base):
     """A user."""
     __tablename__ = "users"
     """The table name."""

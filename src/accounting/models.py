@@ -31,10 +31,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from . import db
 from .locale import gettext
-from .utils.user import user_cls, user_pk_column
+from .utils.user import base_cls, user_cls, user_pk_column
 
 
-class BaseAccount(db.Model):
+class BaseAccount(base_cls):
     """A base account."""
     __tablename__ = "accounting_base_accounts"
     """The table name."""
@@ -78,7 +78,7 @@ class BaseAccount(db.Model):
         return [self.code, self.title_l10n] + [x.title for x in self.l10n]
 
 
-class BaseAccountL10n(db.Model):
+class BaseAccountL10n(base_cls):
     """A localized base account title."""
     __tablename__ = "accounting_base_accounts_l10n"
     """The table name."""
@@ -95,7 +95,7 @@ class BaseAccountL10n(db.Model):
     """The localized title."""
 
 
-class Account(db.Model):
+class Account(base_cls):
     """An account."""
     __tablename__ = "accounting_accounts"
     """The table name."""
@@ -354,7 +354,7 @@ class Account(db.Model):
         return account
 
 
-class AccountL10n(db.Model):
+class AccountL10n(base_cls):
     """A localized account title."""
     __tablename__ = "accounting_accounts_l10n"
     """The table name."""
@@ -371,7 +371,7 @@ class AccountL10n(db.Model):
     """The localized title."""
 
 
-class Currency(db.Model):
+class Currency(base_cls):
     """A currency."""
     __tablename__ = "accounting_currencies"
     """The table name."""
@@ -483,7 +483,7 @@ class Currency(db.Model):
         db.session.delete(self)
 
 
-class CurrencyL10n(db.Model):
+class CurrencyL10n(base_cls):
     """A localized currency name."""
     __tablename__ = "accounting_currencies_l10n"
     """The table name."""
@@ -543,7 +543,7 @@ class JournalEntryCurrency:
         return sum([x.amount for x in self.credit])
 
 
-class JournalEntry(db.Model):
+class JournalEntry(base_cls):
     """A journal entry."""
     __tablename__ = "accounting_journal_entries"
     """The table name."""
@@ -661,7 +661,7 @@ class JournalEntry(db.Model):
         db.session.delete(self)
 
 
-class JournalEntryLineItem(db.Model):
+class JournalEntryLineItem(base_cls):
     """A line item in the journal entry."""
     __tablename__ = "accounting_journal_entry_line_items"
     """The table name."""
@@ -888,7 +888,7 @@ class JournalEntryLineItem(db.Model):
                 format_amount(self.amount)]
 
 
-class Option(db.Model):
+class Option(base_cls):
     """An option."""
     __tablename__ = "accounting_options"
     """The table name."""
