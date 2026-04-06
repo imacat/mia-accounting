@@ -35,7 +35,7 @@ classifiers = [
 dependencies = [
     "Flask",
     "SQLAlchemy >= 2",
-    "Flask-SQLAlchemy",
+    "Flask-SQLAlchemy-Lite",
     "Flask-WTF",
     "Flask-Babel >= 3",
     "Flask-Babel-JS",

@@ -26,7 +26,7 @@ from flask import Flask, Blueprint, render_template, redirect, Response, \
     url_for
 from flask.testing import FlaskCliRunner
 from flask_babel_js import BabelJS
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy_lite import SQLAlchemy
 from flask_wtf import CSRFProtect
 from sqlalchemy.orm import DeclarativeBase
 
@@ -58,12 +58,13 @@ def create_app(is_testing: bool = False, is_skip_accounts: bool = False,
     import accounting
 
     app: Flask = Flask(__name__)
-    db_uri: str = "sqlite://" if is_testing else "sqlite:///local.sqlite"
+    db_uri: str = "sqlite://" if is_testing \
+        else "sqlite:///" + os.path.join(app.instance_path, "local.sqlite")
     app.config.from_mapping({
         "SECRET_KEY": os.environ.get("SECRET_KEY", token_urlsafe(32)),
         "SESSION_COOKIE_SAMESITE": "Lax",
         "SESSION_COOKIE_SECURE": True,
-        "SQLALCHEMY_DATABASE_URI": db_uri,
+        "SQLALCHEMY_ENGINES": {"default": db_uri},
         "BABEL_DEFAULT_LOCALE": "en",
         "ALL_LINGUAS": "zh_Hant|正體中文,en|English,zh_Hans|简体中文",
     })

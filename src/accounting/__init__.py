@@ -20,7 +20,7 @@
 from pathlib import Path
 
 from flask import Flask, Blueprint
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy_lite import SQLAlchemy
 
 from .utils.user import UserUtilityInterface
 
