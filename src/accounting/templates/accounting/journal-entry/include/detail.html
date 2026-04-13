@@ -2,7 +2,7 @@
 The Mia! Accounting Project
 detail.html: The account detail
 
- Copyright (c) 2023 imacat.
+ Copyright (c) 2023-2026 imacat.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ First written: 2023/2/26
     <span class="d-none d-md-inline">{{ A_("Order") }}</span>
   </a>
   {% if accounting_can_edit() %}
-    {% block as_trasfer %}{% endblock %}
+    {% block as_transfer %}{% endblock %}
     {% if obj.can_delete %}
       <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#accounting-delete-modal">
         <i class="fa-solid fa-trash"></i>
