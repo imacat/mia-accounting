@@ -32,7 +32,7 @@ First written: 2023/3/22
 
 <div class="mb-3 accounting-toolbar">
   <a class="btn btn-primary" role="button" href="{{ url_for("accounting.option.detail")|accounting_inherit_next }}">
-    <i class="fa-solid fa-circle-chevron-left"></i>
+    <i class="fa-solid fa-circle-chevron-left" aria-hidden="true"></i>
     <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
 </div>
@@ -76,14 +76,14 @@ First written: 2023/3/22
 
   <div class="d-none d-md-block">
     <button class="btn btn-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
+      <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
       {{ A_("Save") }}
     </button>
   </div>
 
   <div class="d-md-none accounting-material-fab">
-    <button class="btn btn-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
+    <button class="btn btn-primary" type="submit" aria-label="{{ A_("Save") }}">
+      <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
     </button>
   </div>
 </form>

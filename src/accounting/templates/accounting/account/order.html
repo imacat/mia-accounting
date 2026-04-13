@@ -32,7 +32,7 @@ First written: 2023/2/2
 
 <div class="mb-3 accounting-toolbar">
   <a class="btn btn-primary" role="button" href="{{ url_for("accounting.account.list")|accounting_or_next }}">
-    <i class="fa-solid fa-circle-chevron-left"></i>
+    <i class="fa-solid fa-circle-chevron-left" aria-hidden="true"></i>
     <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
 </div>
@@ -51,21 +51,21 @@ First written: 2023/2/2
             <span id="accounting-order-{{ account.id }}-code">{{ account.code }}</span>
             {{ account.title }}
           </div>
-          <i class="fa-solid fa-bars"></i>
+          <i class="fa-solid fa-bars" aria-hidden="true"></i>
         </li>
       {% endfor %}
     </ul>
 
     <div class="d-none d-md-block">
       <button class="btn btn-primary" type="submit">
-        <i class="fa-solid fa-floppy-disk"></i>
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
         {{ A_("Save") }}
       </button>
     </div>
 
     <div class="d-md-none accounting-material-fab">
-      <button class="btn btn-primary" type="submit">
-        <i class="fa-solid fa-floppy-disk"></i>
+      <button class="btn btn-primary" type="submit" aria-label="{{ A_("Save") }}">
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
       </button>
     </div>
   </form>

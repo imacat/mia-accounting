@@ -23,38 +23,38 @@ First written: 2023/1/26
 {% if accounting_can_view() %}
   <li class="nav-item dropdown">
     <span class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
       {{ A_("Accounting") }}
     </span>
     <ul class="dropdown-menu">
       <li>
         <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting-report.") %} active {% endif %}" href="{{ url_for("accounting-report.default") }}">
-          <i class="fa-solid fa-book"></i>
+          <i class="fa-solid fa-book" aria-hidden="true"></i>
           {{ A_("Reports") }}
         </a>
       </li>
       <li>
         <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.account.") %} active {% endif %}" href="{{ url_for("accounting.account.list") }}">
-          <i class="fa-solid fa-clipboard"></i>
+          <i class="fa-solid fa-clipboard" aria-hidden="true"></i>
           {{ A_("Accounts") }}
         </a>
       </li>
       <li>
         <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.base-account.") %} active {% endif %}" href="{{ url_for("accounting.base-account.list") }}">
-          <i class="fa-solid fa-list"></i>
+          <i class="fa-solid fa-list" aria-hidden="true"></i>
           {{ A_("Base Accounts") }}
         </a>
       </li>
       <li>
         <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.currency.") %} active {% endif %}" href="{{ url_for("accounting.currency.list") }}">
-          <i class="fa-solid fa-money-bill-wave"></i>
+          <i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i>
           {{ A_("Currencies") }}
         </a>
       </li>
       {% if accounting_can_admin() %}
         <li>
           <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting.option.") %} active {% endif %}" href="{{ url_for("accounting.option.detail") }}">
-            <i class="fa-solid fa-gear"></i>
+            <i class="fa-solid fa-gear" aria-hidden="true"></i>
             {{ A_("Settings") }}
           </a>
         </li>

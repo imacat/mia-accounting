@@ -35,8 +35,8 @@ First written: 2023/3/21
       </div>
 
       <div>
-        <button id="accounting-currency-{{ currency_index }}-delete" class="btn btn-danger rounded-circle {% if only_one_currency_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}">
-          <i class="fas fa-minus"></i>
+        <button id="accounting-currency-{{ currency_index }}-delete" class="btn btn-danger rounded-circle {% if only_one_currency_form %} d-none {% endif %}" type="button" data-target="accounting-currency-{{ currency_index }}" aria-label="{{ A_("Remove") }}">
+          <i class="fas fa-minus" aria-hidden="true"></i>
         </button>
       </div>
     </div>

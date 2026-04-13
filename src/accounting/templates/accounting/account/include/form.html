@@ -29,7 +29,7 @@ First written: 2023/2/1
 
 <div class="mb-3 accounting-toolbar">
   <a class="btn btn-primary" role="button" href="{% block back_url %}{% endblock %}">
-    <i class="fa-solid fa-circle-chevron-left"></i>
+    <i class="fa-solid fa-circle-chevron-left" aria-hidden="true"></i>
     <span class="d-none d-md-inline">{{ A_("Back") }}</span>
   </a>
 </div>
@@ -71,14 +71,14 @@ First written: 2023/2/1
 
   <div class="d-none d-md-block">
     <button class="btn btn-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
+      <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
       {{ A_("Save") }}
     </button>
   </div>
 
   <div class="d-md-none accounting-material-fab">
-    <button class="btn btn-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
+    <button class="btn btn-primary" type="submit" aria-label="{{ A_("Save") }}">
+      <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
     </button>
   </div>
 </form>
@@ -94,7 +94,7 @@ First written: 2023/2/1
         <div class="input-group mb-2">
           <input id="accounting-base-selector-query" class="form-control form-control-sm" type="search" placeholder=" " required="required">
           <label class="input-group-text" for="accounting-base-selector-query">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             {{ A_("Search") }}
           </label>
         </div>

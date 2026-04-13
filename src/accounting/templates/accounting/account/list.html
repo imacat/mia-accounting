@@ -28,7 +28,7 @@ First written: 2023/1/30
 <div class="mb-2 accounting-toolbar">
   {% if accounting_can_edit() %}
     <a class="btn btn-primary text-nowrap d-none d-md-block" role="button" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
-      <i class="fa-solid fa-plus"></i>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
       {{ A_("New") }}
     </a>
   {% endif %}
@@ -36,7 +36,7 @@ First written: 2023/1/30
     <input id="accounting-toolbar-search" class="form-control form-control-sm" type="search" name="q" value="{{ request.args.q }}" placeholder=" " required="required">
     <label id="accounting-toolbar-search-label" for="accounting-toolbar-search" class="input-group-text">
       <button type="submit">
-        <i class="fa-solid fa-magnifying-glass"></i>
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         <span class="d-none d-md-inline">{{ A_("Search") }}</span>
       </button>
     </label>
@@ -45,8 +45,8 @@ First written: 2023/1/30
 
 {% if accounting_can_edit() %}
   <div class="d-md-none accounting-material-fab">
-    <a class="btn btn-primary" role="button" href="{{ url_for("accounting.account.create")|accounting_append_next }}">
-      <i class="fa-solid fa-plus"></i>
+    <a class="btn btn-primary" role="button" href="{{ url_for("accounting.account.create")|accounting_append_next }}" aria-label="{{ A_("New") }}">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
     </a>
   </div>
 {% endif %}

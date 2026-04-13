@@ -27,14 +27,14 @@ First written: 2023/3/22
 
 <div class="mb-3 accounting-toolbar">
   <a class="btn btn-primary d-none d-md-inline" role="button" href="{{ url_for("accounting.option.edit")|accounting_inherit_next }}">
-    <i class="fa-solid fa-pen-to-square"></i>
+    <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
     {{ A_("Edit") }}
   </a>
 </div>
 
 <div class="d-md-none accounting-material-fab">
-  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.option.edit")|accounting_inherit_next }}">
-    <i class="fa-solid fa-pen-to-square"></i>
+  <a class="btn btn-primary" role="button" href="{{ url_for("accounting.option.edit")|accounting_inherit_next }}" aria-label="{{ A_("Edit") }}">
+    <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
   </a>
 </div>
 
