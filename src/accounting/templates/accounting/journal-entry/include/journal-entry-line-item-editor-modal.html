@@ -31,10 +31,10 @@ First written: 2023/2/25
         <div class="modal-body">
           <div id="accounting-line-item-editor-original-line-item-container" class="d-flex justify-content-between mb-3">
             <div class="accounting-line-item-editor-original-line-item-content">
-              <div id="accounting-line-item-editor-original-line-item-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="#accounting-original-line-item-selector-modal">
-                <label class="form-label" for="accounting-line-item-editor-original-line-item">{{ A_("Original Line Item") }}</label>
-                <div id="accounting-line-item-editor-original-line-item"></div>
-              </div>
+              <button id="accounting-line-item-editor-original-line-item-control" class="form-control text-start accounting-material-text-field" type="button" data-bs-toggle="modal" data-bs-target="#accounting-original-line-item-selector-modal">
+                <span class="form-label">{{ A_("Original Line Item") }}</span>
+                <span id="accounting-line-item-editor-original-line-item"></span>
+              </button>
               <div id="accounting-line-item-editor-original-line-item-error" class="invalid-feedback"></div>
             </div>
 
@@ -46,18 +46,18 @@ First written: 2023/2/25
           </div>
 
           <div class="mb-3">
-            <div id="accounting-line-item-editor-description-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="">
-              <label class="form-label" for="accounting-line-item-editor-description">{{ A_("Description") }}</label>
-              <div id="accounting-line-item-editor-description"></div>
-            </div>
+            <button id="accounting-line-item-editor-description-control" class="form-control text-start accounting-material-text-field" type="button" data-bs-toggle="modal" data-bs-target="">
+              <span class="form-label">{{ A_("Description") }}</span>
+              <span id="accounting-line-item-editor-description"></span>
+            </button>
             <div id="accounting-line-item-editor-description-error" class="invalid-feedback"></div>
           </div>
 
           <div class="mb-3">
-            <div id="accounting-line-item-editor-account-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="">
-              <label class="form-label" for="accounting-line-item-editor-account">{{ A_("Account") }}</label>
-              <div id="accounting-line-item-editor-account"></div>
-            </div>
+            <button id="accounting-line-item-editor-account-control" class="form-control text-start accounting-material-text-field" type="button" data-bs-toggle="modal" data-bs-target="">
+              <span class="form-label">{{ A_("Account") }}</span>
+              <span id="accounting-line-item-editor-account"></span>
+            </button>
             <div id="accounting-line-item-editor-account-error" class="invalid-feedback"></div>
           </div>
 

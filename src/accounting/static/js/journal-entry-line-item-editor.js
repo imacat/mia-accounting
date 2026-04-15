@@ -66,13 +66,13 @@ class JournalEntryLineItemEditor {
 
     /**
      * The control of the original line item
-     * @type {HTMLDivElement}
+     * @type {HTMLButtonElement}
      */
     #originalLineItemControl;
 
     /**
      * The original line item
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #originalLineItemText;
 
@@ -90,13 +90,13 @@ class JournalEntryLineItemEditor {
 
     /**
      * The control of the description
-     * @type {HTMLDivElement}
+     * @type {HTMLButtonElement}
      */
     #descriptionControl;
 
     /**
      * The description
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #descriptionText;
 
@@ -108,13 +108,13 @@ class JournalEntryLineItemEditor {
 
     /**
      * The control of the account
-     * @type {HTMLDivElement}
+     * @type {HTMLButtonElement}
      */
     #accountControl;
 
     /**
      * The account
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #accountText;
 

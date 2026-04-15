@@ -36,10 +36,10 @@ First written: 2023/3/22
           </div>
 
           <div class="mb-3">
-            <div id="accounting-recurring-item-editor-{{ expense_income }}-account-control" class="form-control accounting-clickable accounting-material-text-field" data-bs-toggle="modal" data-bs-target="#accounting-recurring-accounting-selector-{{ expense_income }}-modal">
-              <label class="form-label" for="accounting-recurring-item-editor-{{ expense_income }}-account">{{ A_("Account") }}</label>
-              <div id="accounting-recurring-item-editor-{{ expense_income }}-account"></div>
-            </div>
+            <button id="accounting-recurring-item-editor-{{ expense_income }}-account-control" class="form-control text-start accounting-material-text-field" type="button" data-bs-toggle="modal" data-bs-target="#accounting-recurring-accounting-selector-{{ expense_income }}-modal">
+              <span class="form-label">{{ A_("Account") }}</span>
+              <span id="accounting-recurring-item-editor-{{ expense_income }}-account"></span>
+            </button>
             <div id="accounting-recurring-item-editor-{{ expense_income }}-account-error" class="invalid-feedback"></div>
           </div>
 

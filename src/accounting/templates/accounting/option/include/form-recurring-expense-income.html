@@ -19,8 +19,8 @@ form-recurring-expense-income.html: The recurring expense or income sub-form in 
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/22
 #}
-<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field {% if recurring_items %} accounting-not-empty {% else %} accounting-clickable {% endif %}">
-  <label class="form-label" for="accounting-recurring-{{ expense_income }}">{{ label }}</label>
+<div id="accounting-recurring-{{ expense_income }}" class="form-control mb-3 accounting-material-text-field {% if recurring_items %} accounting-not-empty {% else %} accounting-clickable {% endif %}" {% if recurring_items %} tabindex="-1" {% else %} role="button" tabindex="0" {% endif %}>
+  <span class="form-label">{{ label }}</span>
   <div id="accounting-recurring-{{ expense_income }}-content" class="{% if not recurring_items %} d-none {% endif %}">
     <ul id="accounting-recurring-{{ expense_income }}-list" class="list-group mb-2 mt-2">
       {% for recurring_item in recurring_items %}

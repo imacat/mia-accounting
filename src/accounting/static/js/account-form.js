@@ -48,7 +48,7 @@ class AccountForm {
 
     /**
      * The control of the base account
-     * @type {HTMLDivElement}
+     * @type {HTMLButtonElement}
      */
     #baseControl;
 
@@ -60,7 +60,7 @@ class AccountForm {
 
     /**
      * The base account
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #base;
 

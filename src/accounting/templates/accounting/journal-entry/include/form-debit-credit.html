@@ -20,8 +20,8 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/21
 #}
 <div class="mb-2">
-  <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}" class="form-control accounting-material-text-field {% if line_item_forms %} accounting-not-empty {% else %} accounting-clickable {% endif %} {% if debit_errors %} is-invalid {% endif %}">
-    <label class="form-label" for="accounting-currency-{{ currency_index }}-{{ debit_credit }}">{{ header }}</label>
+  <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}" class="form-control accounting-material-text-field {% if line_item_forms %} accounting-not-empty {% else %} accounting-clickable {% endif %} {% if debit_errors %} is-invalid {% endif %}" {% if line_item_forms %} tabindex="-1" {% else %} role="button" tabindex="0" {% endif %}>
+    <span class="form-label">{{ header }}</span>
     <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-content" class="mt-2 {% if not line_item_forms %} d-none {% endif %}">
       <ul id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-list" class="list-group accounting-line-item-list">
         {% for line_item_form in line_item_forms %}

@@ -701,12 +701,23 @@ class DebitCreditSubForm {
                 this.#element.classList.add("accounting-not-empty");
                 this.currency.form.lineItemEditor.onAddNew(this);
             };
+            this.#element.role = "button";
+            this.#element.tabIndex = 0;
+            this.#element.onkeydown = (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    this.#element.click();
+                }
+            };
         } else {
             this.#element.classList.add("accounting-not-empty");
             this.#element.classList.remove("accounting-clickable");
             delete this.#element.dataset.bsToggle;
             delete this.#element.dataset.bsTarget;
             this.#element.onclick = null;
+            this.#element.removeAttribute("role");
+            this.#element.tabIndex = -1;
+            this.#element.onkeydown = null;
         }
         setElementShown(this.#content, this.lineItems.length !== 0);
     }
@@ -985,6 +996,12 @@ class LineItemSubForm {
         this.#deleteButton.onclick = () => {
             this.#element.parentElement.removeChild(this.#element);
             this.debitCreditSubForm.deleteLineItem(this);
+        };
+        this.#control.onkeydown = (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                this.#control.click();
+            }
         };
     }
 

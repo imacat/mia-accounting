@@ -27,11 +27,11 @@ First written: 2023/3/22
   <input id="accounting-recurring-{{ expense_income }}-{{ item_index }}-description-template" type="hidden" name="recurring-{{ expense_income }}-{{ item_index }}-description_template" value="{{ form.description_template.data|accounting_default }}">
   <div class="d-flex justify-content-between">
     <div class="w-100">
-      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-control" class="form-control accounting-clickable {% if form.all_errors %} is-invalid {% endif %}" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
-        <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-account-text" class="small">{{ form.account_text|accounting_default }}</div>
-        <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-name-text">{{ form.name.data|accounting_default }}</div>
-        <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-description-template-text" class="small">{{ form.description_template.data|accounting_default }}</div>
-      </div>
+      <button id="accounting-recurring-{{ expense_income }}-{{ item_index }}-control" class="form-control text-start {% if form.all_errors %} is-invalid {% endif %}" type="button" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
+        <span id="accounting-recurring-{{ expense_income }}-{{ item_index }}-account-text" class="d-block small">{{ form.account_text|accounting_default }}</span>
+        <span id="accounting-recurring-{{ expense_income }}-{{ item_index }}-name-text" class="d-block">{{ form.name.data|accounting_default }}</span>
+        <span id="accounting-recurring-{{ expense_income }}-{{ item_index }}-description-template-text" class="d-block small">{{ form.description_template.data|accounting_default }}</span>
+      </button>
       <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-error" class="invalid-feedback">{% if form.all_errors %}{{ form.all_errors[0] }}{% endif %}</div>
     </div>
 

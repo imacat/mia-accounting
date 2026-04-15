@@ -298,6 +298,14 @@ class RecurringExpenseIncomeSubForm {
             this.#element.dataset.bsTarget = `#${this.editor.modal.id}`;
             this.#element.onclick = () => this.editor.onAddNew();
             this.#content.classList.add("d-none");
+            this.#element.role = "button";
+            this.#element.tabIndex = 0;
+            this.#element.onkeydown = (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    this.#element.click();
+                }
+            };
         } else {
             this.#element.classList.add("accounting-not-empty");
             this.#element.classList.remove("accounting-clickable");
@@ -305,6 +313,9 @@ class RecurringExpenseIncomeSubForm {
             delete this.#element.dataset.bsTarget;
             this.#element.onclick = null;
             this.#content.classList.remove("d-none");
+            this.#element.removeAttribute("role");
+            this.#element.tabIndex = -1;
+            this.#element.onkeydown = null;
         }
     }
 
@@ -375,7 +386,7 @@ class RecurringItemSubForm {
 
     /**
      * The control
-     * @type {HTMLDivElement}
+     * @type {HTMLButtonElement}
      */
     #control;
 
@@ -399,7 +410,7 @@ class RecurringItemSubForm {
 
     /**
      * The text display of the name
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #nameText;
 
@@ -411,7 +422,7 @@ class RecurringItemSubForm {
 
     /**
      * The text display of the account
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #accountText;
 
@@ -423,7 +434,7 @@ class RecurringItemSubForm {
 
     /**
      * The text display of the description template
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #descriptionTemplateText;
 
@@ -595,13 +606,13 @@ class RecurringItemEditor {
 
     /**
      * The control of the account
-     * @type {HTMLDivElement}
+     * @type {HTMLButtonElement}
      */
     #accountControl;
 
     /**
      * The text display of the account
-     * @type {HTMLDivElement}
+     * @type {HTMLSpanElement}
      */
     #accountContainer;
 
