@@ -39,36 +39,36 @@ First written: 2023/2/28
           </div>
 
           {# Tab navigation #}
-          <ul class="nav nav-tabs mb-2">
+          <ul class="nav nav-tabs mb-2" role="tablist">
             <li class="nav-item">
-              <span id="accounting-description-editor-{{ description_editor.debit_credit }}-general-tab" class="nav-link active accounting-clickable" aria-current="page">
+              <button id="accounting-description-editor-{{ description_editor.debit_credit }}-general-tab" class="nav-link active accounting-clickable" type="button" role="tab" aria-controls="accounting-description-editor-{{ description_editor.debit_credit }}-general-page" aria-selected="true" aria-current="page">
                 {{ A_("General") }}
-              </span>
+              </button>
             </li>
             <li class="nav-item">
-              <span id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tab" class="nav-link accounting-clickable" aria-current="false">
+              <button id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tab" class="nav-link accounting-clickable" type="button" role="tab" aria-controls="accounting-description-editor-{{ description_editor.debit_credit }}-travel-page" aria-selected="false" aria-current="false">
                 {{ A_("Travel") }}
-              </span>
+              </button>
             </li>
             <li class="nav-item">
-              <span id="accounting-description-editor-{{ description_editor.debit_credit }}-bus-tab" class="nav-link accounting-clickable" aria-current="false">
+              <button id="accounting-description-editor-{{ description_editor.debit_credit }}-bus-tab" class="nav-link accounting-clickable" type="button" role="tab" aria-controls="accounting-description-editor-{{ description_editor.debit_credit }}-bus-page" aria-selected="false" aria-current="false">
                 {{ A_("Bus") }}
-              </span>
+              </button>
             </li>
             <li class="nav-item">
-              <span id="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-tab" class="nav-link accounting-clickable" aria-current="false">
+              <button id="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-tab" class="nav-link accounting-clickable" type="button" role="tab" aria-controls="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-page" aria-selected="false" aria-current="false">
                 {{ A_("Recurring") }}
-              </span>
+              </button>
             </li>
             <li class="nav-item">
-              <span id="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-tab" class="nav-link accounting-clickable" aria-current="false">
+              <button id="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-tab" class="nav-link accounting-clickable" type="button" role="tab" aria-controls="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-page" aria-selected="false" aria-current="false">
                 {{ A_("Annotation") }}
-              </span>
+              </button>
             </li>
           </ul>
 
           {# A general description with a tag #}
-          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-general-page" aria-current="page" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-general-tab">
+          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-general-page" role="tabpanel" aria-current="page" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-general-tab">
             <div class="form-floating mb-2">
               <input id="accounting-description-editor-{{ description_editor.debit_credit }}-general-tag" class="form-control" type="text" value="" placeholder=" ">
               <label class="form-label" for="accounting-description-editor-{{ description_editor.debit_credit }}-general-tag">{{ A_("Tag") }}</label>
@@ -85,7 +85,7 @@ First written: 2023/2/28
           </div>
 
           {# A general trip with the origin and distination #}
-          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-page" class="d-none" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tab">
+          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-page" class="d-none" role="tabpanel" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tab">
             <div class="form-floating mb-2">
               <input id="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tag" class="form-control" type="text" value="" placeholder=" ">
               <label class="form-label" for="accounting-description-editor-{{ description_editor.debit_credit }}-travel-tag">{{ A_("Tag") }}</label>
@@ -119,7 +119,7 @@ First written: 2023/2/28
           </div>
 
           {# A bus trip with the route name or route number, the origin and distination #}
-          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-bus-page" class="d-none" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-bus-tab">
+          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-bus-page" class="d-none" role="tabpanel" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-bus-tab">
             <div class="d-flex justify-content-between mb-2">
               <div class="form-floating me-2">
                 <input id="accounting-description-editor-{{ description_editor.debit_credit }}-bus-tag" class="form-control" type="text" value="" placeholder=" ">
@@ -156,7 +156,7 @@ First written: 2023/2/28
           </div>
 
           {# A recurring transaction #}
-          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-page" class="d-none" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-tab">
+          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-page" class="d-none" role="tabpanel" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-recurring-tab">
             <div class="accounting-description-editor-buttons">
               {% for recurring in description_editor.recurring %}
                 <button class="btn btn-outline-primary accounting-description-editor-{{ description_editor.debit_credit }}-recurring-item" type="button" tabindex="-1" data-template="{{ recurring.description_template }}" data-accounts="{{ recurring.account_codes|tojson|forceescape }}">
@@ -167,7 +167,7 @@ First written: 2023/2/28
           </div>
 
           {# The annotation #}
-          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-page" class="d-none" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-tab">
+          <div id="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-page" class="d-none" role="tabpanel" aria-current="false" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-tab">
             <div class="form-floating">
               <input id="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-number" class="form-control" type="number" min="1" value="" placeholder=" ">
               <label class="form-label" for="accounting-description-editor-{{ description_editor.debit_credit }}-annotation-number">{{ A_("The Number of Items") }}</label>
