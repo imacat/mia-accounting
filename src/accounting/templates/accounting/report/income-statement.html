@@ -55,44 +55,44 @@ First written: 2023/3/7
       </h2>
     </div>
 
-    <div class="accounting-report-table accounting-income-statement-table">
+    <div class="accounting-report-table accounting-income-statement-table" role="table">
       <div class="accounting-report-table-header">
-        <div class="accounting-report-table-row">
-          <div class="accounting-amount">{{ A_("Amount") }}</div>
+        <div class="accounting-report-table-row" role="row">
+          <div class="accounting-amount" role="columnheader">{{ A_("Amount") }}</div>
         </div>
       </div>
       <div class="accounting-report-table-body">
         {% for section in report.sections %}
-          <div class="accounting-report-table-row accounting-income-statement-section">
-            <div>
+          <div class="accounting-report-table-row accounting-income-statement-section" role="row">
+            <div role="cell">
               <span class="d-none d-md-inline">{{ section.title.code }}</span>
               {{ section.title.title }}
             </div>
           </div>
           {% for subsection in section.subsections %}
-            <div class="accounting-report-table-row accounting-income-statement-subsection">
-              <div>
+            <div class="accounting-report-table-row accounting-income-statement-subsection" role="row">
+              <div role="cell">
                 <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
                 {{ subsection.title.title }}
               </div>
             </div>
             {% for account in subsection.accounts %}
-              <a class="accounting-report-table-row accounting-income-statement-account" href="{{ account.url }}">
-                <div>
+              <a class="accounting-report-table-row accounting-income-statement-account" role="row" href="{{ account.url }}">
+                <div role="cell">
                   <span class="d-none d-md-inline">{{ account.account.code }}</span>
                   {{ account.account.title }}
                 </div>
-                <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
+                <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}" role="cell">{{ account.amount|accounting_report_format_amount }}</div>
               </a>
             {% endfor %}
-            <div class="accounting-report-table-row accounting-income-statement-subtotal">
-              <div>{{ A_("Total") }}</div>
-              <div class="accounting-amount {% if subsection.total < 0 %} text-danger {% endif %}">{{ subsection.total|accounting_report_format_amount }}</div>
+            <div class="accounting-report-table-row accounting-income-statement-subtotal" role="row">
+              <div role="cell">{{ A_("Total") }}</div>
+              <div class="accounting-amount {% if subsection.total < 0 %} text-danger {% endif %}" role="cell">{{ subsection.total|accounting_report_format_amount }}</div>
             </div>
           {% endfor %}
-          <div class="accounting-report-table-row accounting-income-statement-total">
-            <div>{{ section.accumulated.title }}</div>
-            <div class="accounting-amount {% if section.accumulated.amount < 0 %} text-danger {% endif %}">{{ section.accumulated.amount|accounting_report_format_amount }}</div>
+          <div class="accounting-report-table-row accounting-income-statement-total" role="row">
+            <div role="cell">{{ section.accumulated.title }}</div>
+            <div class="accounting-amount {% if section.accumulated.amount < 0 %} text-danger {% endif %}" role="cell">{{ section.accumulated.amount|accounting_report_format_amount }}</div>
           </div>
         {% endfor %}
       </div>

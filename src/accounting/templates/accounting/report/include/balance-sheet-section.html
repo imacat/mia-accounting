@@ -19,24 +19,24 @@ balance-sheet-section.html: A section in the balance sheet.
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/8
 #}
-<div class="accounting-report-table-row accounting-balance-sheet-section">
-  <div>{{ section.title.title }}</div>
+<div class="accounting-report-table-row accounting-balance-sheet-section" role="row">
+  <div role="cell">{{ section.title.title }}</div>
 </div>
 <div class="accounting-report-table-body">
   {% for subsection in section.subsections %}
-    <div class="accounting-report-table-row accounting-balance-sheet-subsection">
-      <div>
+    <div class="accounting-report-table-row accounting-balance-sheet-subsection" role="row">
+      <div role="cell">
         <span class="d-none d-md-inline">{{ subsection.title.code }}</span>
         {{ subsection.title.title }}
       </div>
     </div>
     {% for account in subsection.accounts %}
-      <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" href="{{ account.url }}">
-        <div>
+      <a class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-account" role="row" href="{{ account.url }}">
+        <div role="cell">
           <span class="d-none d-md-inline">{{ account.account.code }}</span>
           {{ account.account.title }}
         </div>
-        <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_report_format_amount }}</div>
+        <div class="accounting-amount {% if account.amount < 0 %} text-danger {% endif %}" role="cell">{{ account.amount|accounting_report_format_amount }}</div>
       </a>
     {% endfor %}
   {% endfor %}

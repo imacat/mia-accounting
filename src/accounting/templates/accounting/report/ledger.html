@@ -49,28 +49,28 @@ First written: 2023/3/5
     {% include "accounting/include/pagination.html" %}
   {% endwith %}
 
-  <div class="d-none d-md-block accounting-report-table {% if report.account.is_real %} accounting-ledger-real-table {% else %} accounting-ledger-nominal-table {% endif %}">
+  <div class="d-none d-md-block accounting-report-table {% if report.account.is_real %} accounting-ledger-real-table {% else %} accounting-ledger-nominal-table {% endif %}" role="table">
     <div class="accounting-report-table-header">
       <div class="accounting-report-table-row">
-        <div>{{ A_("Date") }}</div>
-        <div>{{ A_("Description") }}</div>
-        <div class="accounting-amount">{{ A_("Debit") }}</div>
-        <div class="accounting-amount">{{ A_("Credit") }}</div>
+        <div role="columnheader">{{ A_("Date") }}</div>
+        <div role="columnheader">{{ A_("Description") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Debit") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Credit") }}</div>
         {% if report.account.is_real %}
-          <div class="accounting-amount">{{ A_("Balance") }}</div>
+          <div class="accounting-amount" role="columnheader">{{ A_("Balance") }}</div>
         {% endif %}
       </div>
     </div>
     <div class="accounting-report-table-body">
       {% if report.brought_forward %}
         {% with line_item = report.brought_forward %}
-          <div class="accounting-report-table-row">
+          <div class="accounting-report-table-row" role="row">
             {% include "accounting/report/include/ledger-row-desktop.html" %}
           </div>
         {% endwith %}
       {% endif %}
       {% for line_item in report.line_items %}
-        <a class="accounting-report-table-row" href="{{ line_item.url|accounting_append_next }}">
+        <a class="accounting-report-table-row" href="{{ line_item.url|accounting_append_next }}" role="row">
           {% include "accounting/report/include/ledger-row-desktop.html" %}
         </a>
       {% endfor %}
@@ -78,12 +78,12 @@ First written: 2023/3/5
     {% if report.total %}
       {% with line_item = report.total %}
         <div class="accounting-report-table-footer">
-          <div class="accounting-report-table-row">
-            <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-report-table-row" role="row">
+            <div role="cell">{{ A_("Total") }}</div>
+            <div class="accounting-amount" role="cell">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount" role="cell">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
             {% if report.account.is_real %}
-              <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}">{{ line_item.balance|accounting_report_format_amount }}</div>
+              <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}" role="cell">{{ line_item.balance|accounting_report_format_amount }}</div>
             {% endif %}
           </div>
         </div>

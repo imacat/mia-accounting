@@ -86,29 +86,29 @@ First written: 2023/4/17
     {% include "accounting/include/pagination.html" %}
   {% endwith %}
 
-  <div class="d-none d-md-block accounting-report-table accounting-unmatched-table">
+  <div class="d-none d-md-block accounting-report-table accounting-unmatched-table" role="table">
     <div class="accounting-report-table-header">
-      <div class="accounting-report-table-row">
-        <div>{{ A_("Date") }}</div>
-        <div>{{ A_("Description") }}</div>
-        <div class="accounting-amount">{{ A_("Debit") }}</div>
-        <div class="accounting-amount">{{ A_("Credit") }}</div>
-        <div class="accounting-amount">{{ A_("Balance") }}</div>
+      <div class="accounting-report-table-row" role="row">
+        <div role="columnheader">{{ A_("Date") }}</div>
+        <div role="columnheader">{{ A_("Description") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Debit") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Credit") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Balance") }}</div>
       </div>
     </div>
     <div class="accounting-report-table-body">
       {% for line_item in report.line_items %}
-        <a class="accounting-report-table-row {% if not line_item.match %} accounting-report-table-row-danger {% endif %}" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
-          <div>{{ line_item.journal_entry.date|accounting_format_date }}</div>
-          <div>
+        <a class="accounting-report-table-row {% if not line_item.match %} accounting-report-table-row-danger {% endif %}" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}" role="row">
+          <div role="cell">{{ line_item.journal_entry.date|accounting_format_date }}</div>
+          <div role="cell">
             {{ line_item.description|accounting_default }}
             {% if line_item.match %}
               <div class="small">{{ A_("Can match %(item)s", item=line_item.match) }}</div>
             {% endif %}
           </div>
-          <div class="accounting-amount">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
-          <div class="accounting-amount">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
-          <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}">{{ line_item.balance|accounting_report_format_amount }}</div>
+          <div class="accounting-amount" role="cell">{{ line_item.debit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount" role="cell">{{ line_item.credit|accounting_format_amount|accounting_default }}</div>
+          <div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}" role="cell">{{ line_item.balance|accounting_report_format_amount }}</div>
         </a>
       {% endfor %}
     </div>

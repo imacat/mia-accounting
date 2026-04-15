@@ -55,31 +55,31 @@ First written: 2023/3/5
       </h2>
     </div>
 
-    <div class="accounting-report-table accounting-trial-balance-table">
+    <div class="accounting-report-table accounting-trial-balance-table" role="table">
       <div class="accounting-report-table-header">
-        <div class="accounting-report-table-row">
-          <div>{{ A_("Account") }}</div>
-          <div class="accounting-amount">{{ A_("Debit") }}</div>
-          <div class="accounting-amount">{{ A_("Credit") }}</div>
+        <div class="accounting-report-table-row" role="row">
+          <div role="columnheader">{{ A_("Account") }}</div>
+          <div class="accounting-amount" role="columnheader">{{ A_("Debit") }}</div>
+          <div class="accounting-amount" role="columnheader">{{ A_("Credit") }}</div>
         </div>
       </div>
       <div class="accounting-report-table-body">
         {% for account in report.accounts %}
-          <a class="accounting-report-table-row" href="{{ account.url }}">
-            <div>
+          <a class="accounting-report-table-row" href="{{ account.url }}" role="row">
+            <div role="cell">
               <span class="d-none d-md-inline">{{ account.account.code }}</span>
               {{ account.account.title }}
             </div>
-            <div class="accounting-amount">{{ account.debit|accounting_format_amount|accounting_default }}</div>
-            <div class="accounting-amount">{{ account.credit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount" role="cell">{{ account.debit|accounting_format_amount|accounting_default }}</div>
+            <div class="accounting-amount" role="cell">{{ account.credit|accounting_format_amount|accounting_default }}</div>
           </a>
         {% endfor %}
       </div>
       <div class="accounting-report-table-footer">
-        <div class="accounting-report-table-row">
-          <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount">{{ report.total.debit|accounting_format_amount }}</div>
-          <div class="accounting-amount">{{ report.total.credit|accounting_format_amount }}</div>
+        <div class="accounting-report-table-row" role="row">
+          <div role="cell">{{ A_("Total") }}</div>
+          <div class="accounting-amount" role="cell">{{ report.total.debit|accounting_format_amount }}</div>
+          <div class="accounting-amount" role="cell">{{ report.total.credit|accounting_format_amount }}</div>
         </div>
       </div>
     </div>

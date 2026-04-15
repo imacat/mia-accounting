@@ -52,20 +52,20 @@ First written: 2023/4/17
       </h2>
     </div>
 
-    <div class="accounting-report-table accounting-unapplied-account-table">
+    <div class="accounting-report-table accounting-unapplied-account-table" role="table">
       <div class="accounting-report-table-header">
-        <div class="accounting-report-table-row">
-          <div class="accounting-amount">{{ A_("Count") }}</div>
+        <div class="accounting-report-table-row" role="row">
+          <div class="accounting-amount" role="columnheader">{{ A_("Count") }}</div>
         </div>
       </div>
       <div class="accounting-report-table-body">
         {% for account in report.accounts %}
-          <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unmatched", currency=report.currency, account=account, period=report.period) }}">
-            <div>
+          <a class="accounting-report-table-row" href="{{ url_for("accounting-report.unmatched", currency=report.currency, account=account, period=report.period) }}" role="row">
+            <div role="cell">
               <span class="d-none d-md-inline">{{ account.code }}</span>
               {{ account.title }}
             </div>
-            <div class="accounting-amount">{{ account.count }}</div>
+            <div class="accounting-amount" role="cell">{{ account.count }}</div>
           </a>
         {% endfor %}
       </div>

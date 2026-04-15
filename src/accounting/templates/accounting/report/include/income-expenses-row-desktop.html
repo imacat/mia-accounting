@@ -19,9 +19,9 @@ income-expenses-row-desktop.html: The row in the income and expenses log for the
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/8
 #}
-<div>{{ line_item.date|accounting_format_date }}</div>
-<div>{{ line_item.account.title }}</div>
-<div>{{ line_item.description|accounting_default }}</div>
-<div class="accounting-amount">{{ line_item.income|accounting_format_amount|accounting_default }}</div>
-<div class="accounting-amount">{{ line_item.expense|accounting_format_amount|accounting_default }}</div>
-<div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}">{{ line_item.balance|accounting_report_format_amount }}</div>
+<div role="cell">{{ line_item.date|accounting_format_date }}</div>
+<div role="cell">{{ line_item.account.title }}</div>
+<div role="cell">{{ line_item.description|accounting_default }}</div>
+<div class="accounting-amount" role="cell">{{ line_item.income|accounting_format_amount|accounting_default }}</div>
+<div class="accounting-amount" role="cell">{{ line_item.expense|accounting_format_amount|accounting_default }}</div>
+<div class="accounting-amount {% if line_item.balance < 0 %} text-danger {% endif %}" role="cell">{{ line_item.balance|accounting_report_format_amount }}</div>

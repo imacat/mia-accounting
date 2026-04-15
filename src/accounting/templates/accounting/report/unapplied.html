@@ -45,22 +45,22 @@ First written: 2023/4/7
     {% include "accounting/include/pagination.html" %}
   {% endwith %}
 
-  <div class="d-none d-md-block accounting-report-table accounting-unapplied-table">
+  <div class="d-none d-md-block accounting-report-table accounting-unapplied-table" role="table">
     <div class="accounting-report-table-header">
-      <div class="accounting-report-table-row">
-        <div>{{ A_("Date") }}</div>
-        <div>{{ A_("Description") }}</div>
-        <div class="accounting-amount">{{ A_("Amount") }}</div>
-        <div class="accounting-amount">{{ A_("Net Balance") }}</div>
+      <div class="accounting-report-table-row" role="row">
+        <div role="columnheader">{{ A_("Date") }}</div>
+        <div role="columnheader">{{ A_("Description") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Amount") }}</div>
+        <div class="accounting-amount" role="columnheader">{{ A_("Net Balance") }}</div>
       </div>
     </div>
     <div class="accounting-report-table-body">
       {% for line_item in report.line_items %}
-        <a class="accounting-report-table-row" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}">
-          <div>{{ line_item.journal_entry.date|accounting_format_date }}</div>
-          <div>{{ line_item.description|accounting_default }}</div>
-          <div class="accounting-amount">{{ line_item.amount|accounting_format_amount }}</div>
-          <div class="accounting-amount">{{ line_item.net_balance|accounting_format_amount }}</div>
+        <a class="accounting-report-table-row" href="{{ url_for("accounting.journal-entry.detail", journal_entry=line_item.journal_entry)|accounting_append_next }}" role="row">
+          <div role="cell">{{ line_item.journal_entry.date|accounting_format_date }}</div>
+          <div role="cell">{{ line_item.description|accounting_default }}</div>
+          <div class="accounting-amount" role="cell">{{ line_item.amount|accounting_format_amount }}</div>
+          <div class="accounting-amount" role="cell">{{ line_item.net_balance|accounting_format_amount }}</div>
         </a>
       {% endfor %}
     </div>

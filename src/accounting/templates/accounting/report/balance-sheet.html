@@ -55,15 +55,15 @@ First written: 2023/3/7
       </h2>
     </div>
 
-    <div class="row accounting-report-table accounting-balance-sheet-table">
+    <div class="row accounting-report-table accounting-balance-sheet-table" role="table">
       <div class="col-sm-6">
         {% if report.assets.subsections %}
           {% with section = report.assets %}
             {% include "accounting/report/include/balance-sheet-section.html" %}
           {% endwith %}
-          <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
-            <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount {% if report.assets.total < 0 %} text-danger {% endif %}">{{ report.assets.total|accounting_report_format_amount }}</div>
+          <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total" role="row">
+            <div role="cell">{{ A_("Total") }}</div>
+            <div class="accounting-amount {% if report.assets.total < 0 %} text-danger {% endif %}" role="cell">{{ report.assets.total|accounting_report_format_amount }}</div>
           </div>
         {% endif %}
       </div>
@@ -73,9 +73,9 @@ First written: 2023/3/7
           {% with section = report.liabilities %}
             {% include "accounting/report/include/balance-sheet-section.html" %}
           {% endwith %}
-          <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
-            <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}">{{ report.liabilities.total|accounting_report_format_amount }}</div>
+          <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal" role="row">
+            <div role="cell">{{ A_("Total") }}</div>
+            <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}" role="cell">{{ report.liabilities.total|accounting_report_format_amount }}</div>
           </div>
         {% endif %}
 
@@ -83,15 +83,15 @@ First written: 2023/3/7
           {% with section = report.owner_s_equity %}
             {% include "accounting/report/include/balance-sheet-section.html" %}
           {% endwith %}
-          <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal">
-            <div>{{ A_("Total") }}</div>
-            <div class="accounting-amount {% if report.owner_s_equity.total < 0 %} text-danger {% endif %}">{{ report.owner_s_equity.total|accounting_report_format_amount }}</div>
+          <div class="d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-subtotal" role="row">
+            <div role="cell">{{ A_("Total") }}</div>
+            <div class="accounting-amount {% if report.owner_s_equity.total < 0 %} text-danger {% endif %}" role="cell">{{ report.owner_s_equity.total|accounting_report_format_amount }}</div>
           </div>
         {% endif %}
 
-        <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total">
-          <div>{{ A_("Total") }}</div>
-          <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_report_format_amount }}</div>
+        <div class="d-md-none d-flex justify-content-between accounting-report-table-row accounting-balance-sheet-total" role="row">
+          <div role="cell">{{ A_("Total") }}</div>
+          <div class="accounting-amount {% if report.liabilities.total < 0 %} text-danger {% endif %}" role="cell">{{ (report.liabilities.total + report.owner_s_equity.total)|accounting_report_format_amount }}</div>
         </div>
       </div>
     </div>
