@@ -22,10 +22,10 @@ First written: 2023/1/26
 {# <ul> For SonarQube not to complain about incorrect HTML #}
 {% if accounting_can_view() %}
   <li class="nav-item dropdown">
-    <span class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+    <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
       {{ A_("Accounting") }}
-    </span>
+    </button>
     <ul class="dropdown-menu">
       <li>
         <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith("accounting-report.") %} active {% endif %}" href="{{ url_for("accounting-report.default") }}">
