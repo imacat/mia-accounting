@@ -2,7 +2,7 @@
  * period-chooser.js: The JavaScript for the period chooser
  */
 
-/*  Copyright (c) 2023 imacat.
+/*  Copyright (c) 2023-2026 imacat.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -320,7 +320,7 @@ class CustomTab extends TabPlane {
      * The confirm button
      * @type {HTMLButtonElement}
      */
-    #conform;
+    #confirm;
 
     /**
      * Constructs a tab plane.
@@ -333,7 +333,7 @@ class CustomTab extends TabPlane {
         this.#startError = document.getElementById(`${this.prefix}-start-error`);
         this.#end = document.getElementById(`${this.prefix}-end`);
         this.#endError = document.getElementById(`${this.prefix}-end-error`);
-        this.#conform = document.getElementById(`${this.prefix}-confirm`);
+        this.#confirm = document.getElementById(`${this.prefix}-confirm`);
         if (this.#start !== null) {
             this.#start.onchange = () => {
                 if (this.#validateStart()) {
@@ -345,7 +345,7 @@ class CustomTab extends TabPlane {
                     this.#start.max = this.#end.value;
                 }
             };
-            this.#conform.onclick = () => {
+            this.#confirm.onclick = () => {
                 let isValid = true;
                 isValid = this.#validateStart() && isValid;
                 isValid = this.#validateEnd() && isValid;
