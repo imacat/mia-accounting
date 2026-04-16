@@ -175,6 +175,7 @@ class OptionForm {
 /**
  * The recurring expenses or incomes sub-form.
  *
+ * @private
  */
 class RecurringExpenseIncomeSubForm {
 
@@ -350,6 +351,7 @@ class RecurringExpenseIncomeSubForm {
 /**
  * A recurring item sub-form.
  *
+ * @private
  */
 class RecurringItemSubForm {
 
@@ -551,6 +553,7 @@ class RecurringItemSubForm {
 /**
  * The recurring item editor.
  *
+ * @private
  */
 class RecurringItemEditor {
 
@@ -829,6 +832,7 @@ class RecurringItemEditor {
 /**
  * The account selector for the recurring item editor.
  *
+ * @private
  */
 class RecurringAccountSelector {
 
@@ -941,6 +945,7 @@ class RecurringAccountSelector {
 /**
  * An account in the account selector for the recurring item editor.
  *
+ * @private
  */
 class RecurringAccount {
 

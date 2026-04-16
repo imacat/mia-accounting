@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /**
  * The period chooser.
  *
+ * @private
  */
 class PeriodChooser {
 

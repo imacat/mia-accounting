@@ -344,6 +344,7 @@ class DescriptionEditor {
 /**
  * An account option in the description editor.
  *
+ * @private
  */
 class DescriptionEditorAccount extends JournalEntryAccount {
 
@@ -415,6 +416,7 @@ class DescriptionEditorAccount extends JournalEntryAccount {
 /**
  * A suggested account.
  *
+ * @private
  */
 class DescriptionEditorSuggestedAccount extends DescriptionEditorAccount {
 
@@ -432,6 +434,7 @@ class DescriptionEditorSuggestedAccount extends DescriptionEditorAccount {
 /**
  * The account option that is specified or confirmed by the user.
  *
+ * @private
  */
 class DescriptionEditorConfirmedAccount extends DescriptionEditorAccount {
 

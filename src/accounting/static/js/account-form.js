@@ -339,6 +339,7 @@ class BaseAccountSelector {
 /**
  * A base account option.
  *
+ * @private
  */
 class BaseAccountOption {
 

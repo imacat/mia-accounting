@@ -25,6 +25,7 @@
 /**
  * The original line item selector.
  *
+ * @private
  */
 class OriginalLineItemSelector {
 
@@ -190,6 +191,7 @@ class OriginalLineItemSelector {
 /**
  * An original line item.
  *
+ * @private
  */
 class OriginalLineItem {
 

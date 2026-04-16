@@ -25,6 +25,7 @@
 /**
  * The account selector.
  *
+ * @private
  */
 class JournalEntryAccountSelector {
 
@@ -187,6 +188,7 @@ class JournalEntryAccountSelector {
 /**
  * An account option
  *
+ * @private
  */
 class JournalEntryAccountOption {
 
