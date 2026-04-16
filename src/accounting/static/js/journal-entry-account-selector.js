@@ -90,7 +90,7 @@ class JournalEntryAccountSelector {
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
-        this.lineItemEditor = lineItemEditor
+        this.lineItemEditor = lineItemEditor;
         this.#debitCredit = debitCredit;
         const prefix = `accounting-account-selector-${debitCredit}`;
         this.#query = document.getElementById(`${prefix}-query`);
