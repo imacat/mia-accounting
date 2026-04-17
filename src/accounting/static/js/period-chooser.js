@@ -30,21 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
 /**
  * The period chooser.
  *
+ * @extends {BaseTablist<BasePeriodTab>}
  * @private
  */
-class PeriodChooser {
+class PeriodChooser extends BaseTablist {
 
     /**
-     * The modal of the period chooser
-     * @type {HTMLDivElement}
+     * The URL template for different periods.
+     * @type {string}
      */
-    modal;
-
-    /**
-     * The tab planes
-     * @type {{month: MonthTab, year: YearTab, day: DayTab, custom: CustomTab}}
-     */
-    tabPlanes = {};
+    urlTemplate;
 
     /**
      * Constructs the period chooser.
@@ -52,12 +47,23 @@ class PeriodChooser {
      */
     constructor() {
         const prefix = "accounting-period-chooser";
-        this.modal = document.getElementById(`${prefix}-modal`);
-        for (const cls of [MonthTab, YearTab, DayTab, CustomTab]) {
-            const tab = new cls(this);
-            this.tabPlanes[tab.tabId()] = tab;
+        super(document.getElementById(`${prefix}-tab-list`));
+        this.tabs = [new MonthTab(this), new YearTab(this), new DayTab(this), new CustomTab(this)];
+        const modal = document.getElementById(`${prefix}-modal`);
+        this.urlTemplate = modal.dataset.urlTemplate;
+        for (const tab of this.tabs) {
+            if (tab.isActive()) {
+                this.currentTab = tab;
+                break;
+            }
         }
     }
+
+    /**
+     * @inheritDoc
+     * @override
+     */
+    onTabFocus(tab) { this.switchTo(tab); }
 
     /**
      * The period chooser.
@@ -75,12 +81,12 @@ class PeriodChooser {
 }
 
 /**
- * A tab plane.
+ * A base abstract period tab.
  *
  * @abstract
  * @private
  */
-class TabPlane {
+class BasePeriodTab extends BaseTab {
 
     /**
      * The period chooser
@@ -95,62 +101,27 @@ class TabPlane {
     prefix;
 
     /**
-     * The tab
-     * @type {HTMLSpanElement}
-     */
-    #tab;
-
-    /**
-     * The page
-     * @type {HTMLDivElement}
-     */
-    #page;
-
-    /**
-     * Constructs a tab plane.
+     * Constructs a base abstract period tab.
      *
+     * @param tabID {string} the tab ID
      * @param chooser {PeriodChooser} the period chooser
      */
-    constructor(chooser) {
+    constructor(tabID, chooser) {
+        const prefix = `accounting-period-chooser-${tabID}`;
+        const tab = document.getElementById(`${prefix}-tab`);
+        const panel = document.getElementById(`${prefix}-panel`);
+        super(tab, panel, chooser.switchTo.bind(chooser));
         this.chooser = chooser;
-        this.prefix = `accounting-period-chooser-${this.tabId()}`;
-        this.#tab = document.getElementById(`${this.prefix}-tab`);
-        this.#page = document.getElementById(`${this.prefix}-page`);
-        this.#tab.onclick = () => this.#switchToMe();
-    }
-
-    /**
-     * The tab ID
-     *
-     * @return {string}
-     * @abstract
-     */
-    tabId() { throw new Error("Method not implemented.") };
-
-    /**
-     * Switches to the tab plane.
-     *
-     */
-    #switchToMe() {
-        for (const tabPlane of Object.values(this.chooser.tabPlanes)) {
-            tabPlane.#tab.classList.remove("active")
-            tabPlane.#tab.ariaCurrent = "false";
-            tabPlane.#page.classList.add("d-none");
-            tabPlane.#page.ariaCurrent = "false";
-        }
-        this.#tab.classList.add("active");
-        this.#tab.ariaCurrent = "page";
-        this.#page.classList.remove("d-none");
-        this.#page.ariaCurrent = "page";
+        this.prefix = prefix;
     }
 }
 
 /**
- * The month tab plane.
+ * The month tab.
  *
  * @private
  */
-class MonthTab extends TabPlane {
+class MonthTab extends BasePeriodTab {
 
     /**
      * The month chooser.
@@ -159,12 +130,12 @@ class MonthTab extends TabPlane {
     #monthChooser
 
     /**
-     * Constructs a tab plane.
+     * Constructs a month tab.
      *
      * @param chooser {PeriodChooser} the period chooser
      */
     constructor(chooser) {
-        super(chooser);
+        super("month", chooser);
         const monthChooser = document.getElementById(`${this.prefix}-chooser`);
         if (monthChooser !== null) {
             this.#monthChooser = new tempusDominus.TempusDominus(monthChooser, {
@@ -184,45 +155,36 @@ class MonthTab extends TabPlane {
                 const date = e.detail.date;
                 const zeroPaddedMonth = `0${date.month + 1}`.slice(-2)
                 const period = `${date.year}-${zeroPaddedMonth}`;
-                window.location = chooser.modal.dataset.urlTemplate
+                window.location = chooser.urlTemplate
                     .replaceAll("PERIOD", period);
             });
         }
     }
+}
+
+/**
+ * The year tab.
+ *
+ * @private
+ */
+class YearTab extends BasePeriodTab {
 
     /**
-     * The tab ID
+     * Constructs a year tab.
      *
-     * @return {string}
+     * @param chooser {PeriodChooser} the period chooser
      */
-    tabId() {
-        return "month";
+    constructor(chooser) {
+        super("year", chooser);
     }
 }
 
 /**
- * The year tab plane.
+ * The day tab.
  *
  * @private
  */
-class YearTab extends TabPlane {
-
-    /**
-     * The tab ID
-     *
-     * @return {string}
-     */
-    tabId() {
-        return "year";
-    }
-}
-
-/**
- * The day tab plane.
- *
- * @private
- */
-class DayTab extends TabPlane {
+class DayTab extends BasePeriodTab {
 
     /**
      * The day input
@@ -237,18 +199,18 @@ class DayTab extends TabPlane {
     #dateError;
 
     /**
-     * Constructs a tab plane.
+     * Constructs a day tab.
      *
      * @param chooser {PeriodChooser} the period chooser
      */
     constructor(chooser) {
-        super(chooser);
+        super("day", chooser);
         this.#date = document.getElementById(`${this.prefix}-date`);
         this.#dateError = document.getElementById(`${this.prefix}-date-error`);
         if (this.#date !== null) {
             this.#date.onchange = () => {
                 if (this.#validateDate()) {
-                    window.location = chooser.modal.dataset.urlTemplate
+                    window.location = chooser.urlTemplate
                         .replaceAll("PERIOD", this.#date.value);
                 }
             };
@@ -275,23 +237,14 @@ class DayTab extends TabPlane {
         this.#dateError.innerText = "";
         return true;
     }
-
-    /**
-     * The tab ID
-     *
-     * @return {string}
-     */
-    tabId() {
-        return "day";
-    }
 }
 
 /**
- * The custom tab plane.
+ * The custom tab.
  *
  * @private
  */
-class CustomTab extends TabPlane {
+class CustomTab extends BasePeriodTab {
 
     /**
      * The start of the period
@@ -324,12 +277,12 @@ class CustomTab extends TabPlane {
     #confirm;
 
     /**
-     * Constructs a tab plane.
+     * Constructs a custom tab.
      *
      * @param chooser {PeriodChooser} the period chooser
      */
     constructor(chooser) {
-        super(chooser);
+        super("custom", chooser);
         this.#start = document.getElementById(`${this.prefix}-start`);
         this.#startError = document.getElementById(`${this.prefix}-start-error`);
         this.#end = document.getElementById(`${this.prefix}-end`);
@@ -351,7 +304,7 @@ class CustomTab extends TabPlane {
                 isValid = this.#validateStart() && isValid;
                 isValid = this.#validateEnd() && isValid;
                 if (isValid) {
-                    window.location = chooser.modal.dataset.urlTemplate
+                    window.location = chooser.urlTemplate
                         .replaceAll("PERIOD", `${this.#start.value}-${this.#end.value}`);
                 }
             };
@@ -406,14 +359,5 @@ class CustomTab extends TabPlane {
         this.#end.classList.remove("is-invalid");
         this.#endError.innerText = "";
         return true;
-    }
-
-    /**
-     * The tab ID
-     *
-     * @return {string}
-     */
-    tabId() {
-        return "custom";
     }
 }

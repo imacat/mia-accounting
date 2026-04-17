@@ -28,31 +28,31 @@ First written: 2023/3/4
       </div>
       <div class="modal-body">
         {# Tab navigation #}
-        <ul class="nav nav-tabs mb-2" role="tablist">
+        <ul id="accounting-period-chooser-tab-list" class="nav nav-tabs mb-2" role="tablist" aria-label="{{ A_("Period Type") }}">
           <li class="nav-item">
-            <button id="accounting-period-chooser-month-tab" class="nav-link {% if report.period.is_type_month %} active {% endif %} accounting-clickable" type="button" role="tab" aria-controls="accounting-period-chooser-month-page" aria-selected="true" aria-current="{% if report.period.is_type_month %} page {% else %} false {% endif %}" data-tab-id="month">
+            <button id="accounting-period-chooser-month-tab" class="nav-link {% if report.period.is_type_month %} active {% endif %} accounting-clickable" type="button" tabindex="{% if report.period.is_type_month %}0{% else %}-1{% endif %}" role="tab" aria-controls="accounting-period-chooser-month-panel" aria-selected="{% if report.period.is_type_month %}true{% else %}false{% endif %}">
               {{ A_("Month") }}
             </button>
           </li>
           <li class="nav-item">
-            <button id="accounting-period-chooser-year-tab" class="nav-link {% if report.period.is_a_year %} active {% endif %} accounting-clickable" type="button" role="tab" aria-controls="accounting-period-chooser-year-page" aria-selected="false" aria-current="{% if report.period.is_a_year %} page {% else %} false {% endif %}" data-tab-id="year">
+            <button id="accounting-period-chooser-year-tab" class="nav-link {% if report.period.is_a_year %} active {% endif %} accounting-clickable" type="button" tabindex="{% if report.period.is_a_year %}0{% else %}-1{% endif %}" role="tab" aria-controls="accounting-period-chooser-year-panel" aria-selected="{% if report.period.is_a_year %}true{% else %}false{% endif %}">
               {{ A_("Year") }}
             </button>
           </li>
           <li class="nav-item">
-            <button id="accounting-period-chooser-day-tab" class="nav-link {% if report.period.is_a_day %} active {% endif %} accounting-clickable" type="button" role="tab" aria-controls="accounting-period-chooser-day-page" aria-selected="false" aria-current="{% if report.period.is_a_day %} page {% else %} false {% endif %}" data-tab-id="day">
+            <button id="accounting-period-chooser-day-tab" class="nav-link {% if report.period.is_a_day %} active {% endif %} accounting-clickable" type="button" tabindex="{% if report.period.is_a_day %}0{% else %}-1{% endif %}" role="tab" aria-controls="accounting-period-chooser-day-panel" aria-selected="{% if report.period.is_a_day %}true{% else %}false{% endif %}">
               {{ A_("Day") }}
             </button>
           </li>
           <li class="nav-item">
-            <button id="accounting-period-chooser-custom-tab" class="nav-link {% if report.period.is_type_arbitrary %} active {% endif %} accounting-clickable" type="button" role="tab" aria-controls="accounting-period-chooser-custom-page" aria-selected="false" aria-current="{% if report.period.is_type_arbitrary %} page {% else %} false {% endif %}" data-tab-id="custom">
+            <button id="accounting-period-chooser-custom-tab" class="nav-link {% if report.period.is_type_arbitrary %} active {% endif %} accounting-clickable" type="button" tabindex="{% if report.period.is_type_arbitrary %}0{% else %}-1{% endif %}" role="tab" aria-controls="accounting-period-chooser-custom-panel" aria-selected="{% if report.period.is_type_arbitrary %}true{% else %}false{% endif %}">
               {{ A_("Custom") }}
             </button>
           </li>
         </ul>
 
         {# The month periods #}
-        <div id="accounting-period-chooser-month-page" {% if report.period.is_type_month %} aria-current="page" {% else %} class="d-none" role="tabpanel" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-month-tab">
+        <div id="accounting-period-chooser-month-panel" {% if not report.period.is_type_month %} class="d-none" {% endif %} role="tabpanel" aria-labelledby="accounting-period-chooser-month-tab">
           <div>
             <a class="btn {% if report.period.is_this_month %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.this_month_url }}">
               {{ A_("This Month") }}
@@ -72,7 +72,7 @@ First written: 2023/3/4
         </div>
 
         {# The year periods #}
-        <div id="accounting-period-chooser-year-page" {% if report.period.is_a_year %} aria-current="page" {% else %} class="d-none" role="tabpanel" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-year-tab">
+        <div id="accounting-period-chooser-year-panel" {% if not report.period.is_a_year %} class="d-none" {% endif %} role="tabpanel" aria-labelledby="accounting-period-chooser-year-tab">
           <a class="btn {% if report.period.is_this_year %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.this_year_url }}">
             {{ A_("This Year") }}
           </a>
@@ -93,7 +93,7 @@ First written: 2023/3/4
         </div>
 
         {# The day periods #}
-        <div id="accounting-period-chooser-day-page" {% if report.period.is_a_day %} aria-current="page" {% else %} class="d-none" role="tabpanel" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-day-tab">
+        <div id="accounting-period-chooser-day-panel" {% if not report.period.is_a_day %} class="d-none" {% endif %} role="tabpanel" aria-labelledby="accounting-period-chooser-day-tab">
           <div>
             <a class="btn {% if report.period.is_today %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.today_url }}">
               {{ A_("Today") }}
@@ -116,7 +116,7 @@ First written: 2023/3/4
         </div>
 
         {# The custom periods #}
-        <div id="accounting-period-chooser-custom-page" {% if report.period.is_type_arbitrary %} aria-current="page" {% else %} class="d-none" role="tabpanel" aria-current="false" {% endif %} aria-labelledby="accounting-period-chooser-custom-tab">
+        <div id="accounting-period-chooser-custom-panel" {% if not report.period.is_type_arbitrary %} class="d-none" {% endif %} role="tabpanel" aria-labelledby="accounting-period-chooser-custom-tab">
           <div>
             <a class="btn {% if report.period.is_all %} btn-primary {% else %} btn-outline-primary {% endif %}" role="button" href="{{ report.period_chooser.all_url }}">
               {{ A_("All") }}

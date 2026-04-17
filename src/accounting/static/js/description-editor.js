@@ -25,8 +25,9 @@
 /**
  * A description editor.
  *
+ * @extends {BaseTablist<BaseDescriptionEditorTab>}
  */
-class DescriptionEditor {
+class DescriptionEditor extends BaseTablist {
 
     /**
      * The line item editor
@@ -57,12 +58,6 @@ class DescriptionEditor {
      * @type {string}
      */
     debitCredit;
-
-    /**
-     * The current tab
-     * @type {DescriptionEditorTabPlane}
-     */
-    currentTab;
 
     /**
      * The description input
@@ -125,10 +120,10 @@ class DescriptionEditor {
     selectedAccount = null;
 
     /**
-     * The tab planes
-     * @type {{general: DescriptionEditorGeneralTagTab, travel: DescriptionEditorGeneralTripTab, bus: DescriptionEditorBusTripTab, recurring: DescriptionEditorRecurringTab, annotation: DescriptionEditorAnnotationTab}}
+     * The tabs by their ID.
+     * @type {DescriptionEditorTabFactory}
      */
-    tabPlanes = {};
+    #tabsByID;
 
     /**
      * Constructs a description editor.
@@ -137,23 +132,23 @@ class DescriptionEditor {
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
+        const prefix = `accounting-description-editor-${debitCredit}`;
+        super(document.getElementById(`${prefix}-tab-list`));
+        this.prefix = prefix;
         this.lineItemEditor = lineItemEditor;
         this.debitCredit = debitCredit;
-        this.prefix = `accounting-description-editor-${debitCredit}`;
-        this.#form = document.getElementById(this.prefix);
-        this.#modal = document.getElementById(`${this.prefix}-modal`);
-        this.#descriptionInput = document.getElementById(`${this.prefix}-description`);
-        this.#offsetButton = document.getElementById(`${this.prefix}-offset`);
-        this.number = document.getElementById(`${this.prefix}-annotation-number`);
-        this.note = document.getElementById(`${this.prefix}-annotation-note`);
-        this.#confirmedAccountPlaceholder = new DescriptionEditorConfirmedAccount(this, document.getElementById(`${this.prefix}-account-confirmed`));
-        this.#allSuggestedAccounts = Array.from(document.getElementsByClassName(`${this.prefix}-account`)).map((button) => new DescriptionEditorSuggestedAccount(this, button));
+        this.#form = document.getElementById(prefix);
+        this.#modal = document.getElementById(`${prefix}-modal`);
+        this.#descriptionInput = document.getElementById(`${prefix}-description`);
+        this.#offsetButton = document.getElementById(`${prefix}-offset`);
+        this.number = document.getElementById(`${prefix}-annotation-number`);
+        this.note = document.getElementById(`${prefix}-annotation-note`);
+        this.#confirmedAccountPlaceholder = new DescriptionEditorConfirmedAccount(this, document.getElementById(`${prefix}-account-confirmed`));
+        this.#allSuggestedAccounts = Array.from(document.getElementsByClassName(`${prefix}-account`)).map((button) => new DescriptionEditorSuggestedAccount(this, button));
 
-        for (const cls of [DescriptionEditorGeneralTagTab, DescriptionEditorGeneralTripTab, DescriptionEditorBusTripTab, DescriptionEditorRecurringTab, DescriptionEditorAnnotationTab]) {
-            const tab = new cls(this);
-            this.tabPlanes[tab.tabId()] = tab;
-        }
-        this.currentTab = this.tabPlanes.general;
+        this.#tabsByID = new DescriptionEditorTabFactory(this);
+        this.tabs = [this.#tabsByID.general, this.#tabsByID.travel, this.#tabsByID.bus, this.#tabsByID.recurring, this.#tabsByID.annotation];
+        this.currentTab = this.tabs[0];
         this.#descriptionInput.onchange = () => this.#onDescriptionChange();
         this.#offsetButton.onclick = () => this.lineItemEditor.originalLineItemSelector.onOpen();
         this.#form.onsubmit = () => {
@@ -199,26 +194,26 @@ class DescriptionEditor {
      *
      */
     #onDescriptionChange() {
-        this.#resetTabPlanes();
+        this.#resetTabs();
         this.selectedAccount = null;
         this.description = this.description.trim();
-        for (const tabPlane of [this.tabPlanes.recurring, this.tabPlanes.bus, this.tabPlanes.travel, this.tabPlanes.general]) {
-            if (tabPlane.populate()) {
+        for (const tab of [this.#tabsByID.recurring, this.#tabsByID.bus, this.#tabsByID.travel, this.#tabsByID.general]) {
+            if (tab.populate()) {
                 break;
             }
         }
-        this.tabPlanes.annotation.populate();
+        this.#tabsByID.annotation.populate();
     }
 
     /**
-     * Resets the tab planes.
+     * Resets the tabs.
      *
      */
-    #resetTabPlanes() {
-        for (const tabPlane of Object.values(this.tabPlanes)) {
-            tabPlane.reset();
+    #resetTabs() {
+        for (const tab of this.tabs) {
+            tab.reset();
         }
-        this.tabPlanes.general.switchToMe();
+        this.switchTo(this.tabs[0]);
     }
 
     /**
@@ -463,12 +458,63 @@ class DescriptionEditorConfirmedAccount extends DescriptionEditorAccount {
 }
 
 /**
- * A tab plane.
+ * The tab factory.
+ *
+ * @private
+ */
+class DescriptionEditorTabFactory {
+
+    /**
+     * The general tag tab
+     * @type {GeneralTagTab}
+     */
+    general;
+
+    /**
+     * The general trip tab
+     * @type {GeneralTripTab}
+     */
+    travel;
+
+    /**
+     * The bus trip tab
+     * @type {BusTripTab}
+     */
+    bus;
+
+    /**
+     * The recurring transactions tab
+     * @type {RecurringTab}
+     */
+    recurring;
+
+    /**
+     * The annotation tab
+     * @type {AnnotationTab}
+     */
+    annotation;
+
+    /**
+     * Constructs the tab factory
+     *
+     * @param editor {DescriptionEditor} the parent description editor
+     */
+    constructor(editor) {
+        this.general = new GeneralTagTab(editor);
+        this.travel = new GeneralTripTab(editor);
+        this.bus = new BusTripTab(editor);
+        this.recurring = new RecurringTab(editor);
+        this.annotation = new AnnotationTab(editor);
+    }
+}
+
+/**
+ * The base abstract tab in the description editor.
  *
  * @abstract
  * @private
  */
-class DescriptionEditorTabPlane {
+class BaseDescriptionEditorTab extends BaseTab {
 
     /**
      * The parent description editor
@@ -483,47 +529,29 @@ class DescriptionEditorTabPlane {
     prefix;
 
     /**
-     * The tab
-     * @type {HTMLSpanElement}
-     */
-    #tab;
-
-    /**
-     * The page
-     * @type {HTMLDivElement}
-     */
-    #page;
-
-    /**
-     * Constructs a tab plane.
+     * Constructs a base abstract tab in the description editor.
      *
+     * @param tabID {string} the tab ID
      * @param editor {DescriptionEditor} the parent description editor
      */
-    constructor(editor) {
+    constructor(tabID, editor) {
+        const prefix = `${editor.prefix}-${tabID}`;
+        const tab = document.getElementById(`${prefix}-tab`);
+        const panel = document.getElementById(`${prefix}-panel`);
+        super(tab, panel, editor.switchTo.bind(editor));
         this.editor = editor;
-        this.prefix = `${this.editor.prefix}-${this.tabId()}`;
-        this.#tab = document.getElementById(`${this.prefix}-tab`);
-        this.#page = document.getElementById(`${this.prefix}-page`);
-        this.#tab.onclick = () => this.switchToMe();
+        this.prefix = prefix;
     }
 
     /**
-     * The tab ID
-     *
-     * @return {string}
-     * @abstract
-     */
-    tabId() { throw new Error("Method not implemented.") };
-
-    /**
-     * Resets the tab plane input.
+     * Resets the tab panel input.
      *
      * @abstract
      */
     reset() { throw new Error("Method not implemented."); }
 
     /**
-     * Populates the tab plane with the description input.
+     * Populates the tab panel with the description input.
      *
      * @return {boolean} true if the description input matches this tab, or false otherwise
      * @abstract
@@ -531,39 +559,21 @@ class DescriptionEditorTabPlane {
     populate() { throw new Error("Method not implemented."); }
 
     /**
-     * Validates the input in the tab plane.
+     * Validates the input in the tab panel.
      *
      * @return {boolean} true if valid, or false otherwise
      * @abstract
      */
     validate() { throw new Error("Method not implemented."); }
-
-    /**
-     * Switches to the tab plane.
-     *
-     */
-    switchToMe() {
-        for (const tabPlane of Object.values(this.editor.tabPlanes)) {
-            tabPlane.#tab.classList.remove("active")
-            tabPlane.#tab.ariaCurrent = "false";
-            tabPlane.#page.classList.add("d-none");
-            tabPlane.#page.ariaCurrent = "false";
-        }
-        this.#tab.classList.add("active");
-        this.#tab.ariaCurrent = "page";
-        this.#page.classList.remove("d-none");
-        this.#page.ariaCurrent = "page";
-        this.editor.currentTab = this;
-    }
 }
 
 /**
- * A tag plane with selectable tags.
+ * The base abstract tab with selectable tags.
  *
  * @abstract
  * @private
  */
-class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
+class BaseTagTab extends BaseDescriptionEditorTab {
 
     /**
      * The tag input
@@ -581,20 +591,21 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
      * The tag buttons
      * @type {HTMLButtonElement[]}
      */
-    tagButtons;
+    #tagButtons;
 
     /**
-     * Constructs a tab plane.
+     * Constructs a base abstract tab with selectable tags.
      *
+     * @param tabID {string} the tab ID
      * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
-    constructor(editor) {
-        super(editor);
+    constructor(tabID, editor) {
+        super(tabID, editor);
         this.tag = document.getElementById(`${this.prefix}-tag`);
         this.tagError = document.getElementById(`${this.prefix}-tag-error`);
         // noinspection JSValidateTypes
-        this.tagButtons = Array.from(document.getElementsByClassName(`${this.prefix}-btn-tag`));
+        this.#tagButtons = Array.from(document.getElementsByClassName(`${this.prefix}-btn-tag`));
         this.initializeTagButtons();
         this.tag.onchange = () => {
             this.onTagChange();
@@ -609,7 +620,7 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
     onTagChange() {
         this.tag.value = this.tag.value.trim();
         let isMatched = false;
-        for (const tagButton of this.tagButtons) {
+        for (const tagButton of this.#tagButtons) {
             if (tagButton.dataset.value === this.tag.value) {
                 tagButton.classList.remove("btn-outline-primary");
                 tagButton.classList.add("btn-primary");
@@ -627,19 +638,18 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Updates the description according to the input in the tab plane.
+     * Updates the description according to the input in the tab panel.
      *
      * @abstract
      */
     updateDescription() { throw new Error("Method not implemented."); }
 
     /**
-     * Switches to the tab plane.
-     *
+     * @inheritDoc
+     * @override
      */
-    switchToMe() {
-        super.switchToMe();
-        for (const tagButton of this.tagButtons) {
+    onActivated() {
+        for (const tagButton of this.#tagButtons) {
             if (tagButton.classList.contains("btn-primary")) {
                 this.editor.updateCurrentSuggestedAccounts(tagButton);
                 return;
@@ -653,9 +663,9 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
      *
      */
     initializeTagButtons() {
-        for (const tagButton of this.tagButtons) {
+        for (const tagButton of this.#tagButtons) {
             tagButton.onclick = () => {
-                for (const otherButton of this.tagButtons) {
+                for (const otherButton of this.#tagButtons) {
                     otherButton.classList.remove("btn-primary");
                     otherButton.classList.add("btn-outline-primary");
                 }
@@ -701,7 +711,7 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Resets the tab plane input.
+     * Resets the tab panel input.
      *
      * @override
      */
@@ -709,7 +719,7 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
         this.tag.value = "";
         this.tag.classList.remove("is-invalid");
         this.tagError.innerText = "";
-        for (const tagButton of this.tagButtons) {
+        for (const tagButton of this.#tagButtons) {
             tagButton.classList.remove("btn-primary");
             tagButton.classList.add("btn-outline-primary");
         }
@@ -717,24 +727,24 @@ class DescriptionEditorTagTabPlane extends DescriptionEditorTabPlane {
 }
 
 /**
- * The general tag tab plane.
+ * The general tag tab.
  *
  * @private
  */
-class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
+class GeneralTagTab extends BaseTagTab {
 
     /**
-     * The tab ID
+     * Constructs a general tag tab.
      *
-     * @return {string}
-     * @abstract
+     * @param editor {DescriptionEditor} the parent description editor
+     * @override
      */
-    tabId() {
-        return "general";
-    };
+    constructor(editor) {
+        super("general", editor);
+    }
 
     /**
-     * Updates the description according to the input in the tab plane.
+     * Updates the description according to the input in the tab panel.
      *
      * @override
      */
@@ -749,7 +759,7 @@ class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * Populates the tab plane with the description input.
+     * Populates the tab panel with the description input.
      *
      * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
@@ -763,12 +773,12 @@ class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
             this.tag.value = found[1];
             this.onTagChange();
         }
-        this.switchToMe();
+        this.editor.switchTo(this);
         return true;
     }
 
     /**
-     * Validates the input in the tab plane.
+     * Validates the input in the tab panel.
      *
      * @return {boolean} true if valid, or false otherwise
      */
@@ -778,11 +788,11 @@ class DescriptionEditorGeneralTagTab extends DescriptionEditorTagTabPlane {
 }
 
 /**
- * The general trip tab plane.
+ * The general trip tab.
  *
  * @private
  */
-class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
+class GeneralTripTab extends BaseTagTab {
 
     /**
      * The origin
@@ -815,13 +825,13 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
     #directionButtons;
 
     /**
-     * Constructs a tab plane.
+     * Constructs a general trip tab.
      *
      * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
-        super(editor);
+        super("travel", editor);
         this.#from = document.getElementById(`${this.prefix}-from`);
         this.#fromError = document.getElementById(`${this.prefix}-from-error`);
         this.#to = document.getElementById(`${this.prefix}-to`);
@@ -852,17 +862,7 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * The tab ID
-     *
-     * @return {string}
-     * @abstract
-     */
-    tabId() {
-        return "travel";
-    };
-
-    /**
-     * Updates the description according to the input in the tab plane.
+     * Updates the description according to the input in the tab panel.
      *
      * @override
      */
@@ -878,7 +878,7 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * Resets the tab plane input.
+     * Resets the tab panel input.
      *
      * @override
      */
@@ -902,7 +902,7 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * Populates the tab plane with the description input.
+     * Populates the tab panel with the description input.
      *
      * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
@@ -927,12 +927,12 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
             }
         }
         this.#to.value = found[4];
-        this.switchToMe();
+        this.editor.switchTo(this);
         return true;
     }
 
     /**
-     * Validates the input in the tab plane.
+     * Validates the input in the tab panel.
      *
      * @return {boolean} true if valid, or false otherwise
      * @override
@@ -977,11 +977,11 @@ class DescriptionEditorGeneralTripTab extends DescriptionEditorTagTabPlane {
 }
 
 /**
- * The bus trip tab plane.
+ * The bus trip tab.
  *
  * @private
  */
-class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
+class BusTripTab extends BaseTagTab {
 
     /**
      * The route
@@ -1020,13 +1020,13 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
     #toError;
 
     /**
-     * Constructs a tab plane.
+     * Constructs a bus trip tab.
      *
      * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
-        super(editor);
+        super("bus", editor);
         this.#route = document.getElementById(`${this.prefix}-route`);
         this.#routeError = document.getElementById(`${this.prefix}-route-error`);
         this.#from = document.getElementById(`${this.prefix}-from`);
@@ -1051,17 +1051,7 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * The tab ID
-     *
-     * @return {string}
-     * @abstract
-     */
-    tabId() {
-        return "bus";
-    };
-
-    /**
-     * Updates the description according to the input in the tab plane.
+     * Updates the description according to the input in the tab panel.
      *
      * @override
      */
@@ -1070,7 +1060,7 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * Resets the tab plane input.
+     * Resets the tab panel input.
      *
      * @override
      */
@@ -1088,7 +1078,7 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
     }
 
     /**
-     * Populates the tab plane with the description input.
+     * Populates the tab panel with the description input.
      *
      * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
@@ -1105,12 +1095,12 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
         this.#route.value = found[2];
         this.#from.value = found[3];
         this.#to.value = found[4];
-        this.switchToMe();
+        this.editor.switchTo(this);
         return true;
     }
 
     /**
-     * Validates the input in the tab plane.
+     * Validates the input in the tab panel.
      *
      * @return {boolean} true if valid, or false otherwise
      */
@@ -1165,11 +1155,11 @@ class DescriptionEditorBusTripTab extends DescriptionEditorTagTabPlane {
 }
 
 /**
- * The recurring transaction tab plane.
+ * The recurring transaction tab.
  *
  * @private
  */
-class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
+class RecurringTab extends BaseDescriptionEditorTab {
 
     /**
      * The month names
@@ -1184,13 +1174,13 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
     #itemButtons;
 
     /**
-     * Constructs a tab plane.
+     * Constructs a recurring transaction tab.
      *
      * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
-        super(editor);
+        super("recurring", editor);
         this.#monthNames = [
             "",
             A_("January"), A_("February"), A_("March"), A_("April"),
@@ -1232,17 +1222,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * The tab ID
-     *
-     * @return {string}
-     * @abstract
-     */
-    tabId() {
-        return "recurring";
-    };
-
-    /**
-     * Resets the tab plane input.
+     * Resets the tab panel input.
      *
      * @override
      */
@@ -1254,7 +1234,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Populates the tab plane with the description input.
+     * Populates the tab panel with the description input.
      *
      * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
@@ -1264,7 +1244,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
             if (this.#getDescription(itemButton) === this.editor.description) {
                 itemButton.classList.add("btn-primary");
                 itemButton.classList.remove("btn-outline-primary");
-                this.switchToMe();
+                this.editor.switchTo(this);
                 return true;
             }
         }
@@ -1272,11 +1252,10 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Switches to the tab plane.
-     *
+     * @inheritDoc
+     * @override
      */
-    switchToMe() {
-        super.switchToMe();
+    onActivated() {
         for (const itemButton of this.#itemButtons) {
             if (itemButton.classList.contains("btn-primary")) {
                 this.editor.updateCurrentSuggestedAccounts(itemButton);
@@ -1287,7 +1266,7 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Validates the input in the tab plane.
+     * Validates the input in the tab panel.
      *
      * @return {boolean} true if valid, or false otherwise
      * @override
@@ -1298,20 +1277,20 @@ class DescriptionEditorRecurringTab extends DescriptionEditorTabPlane {
 }
 
 /**
- * The annotation tab plane.
+ * The annotation tab.
  *
  * @private
  */
-class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
+class AnnotationTab extends BaseDescriptionEditorTab {
 
     /**
-     * Constructs a tab plane.
+     * Constructs an annotation tab.
      *
      * @param editor {DescriptionEditor} the parent description editor
      * @override
      */
     constructor(editor) {
-        super(editor);
+        super("annotation", editor);
         this.editor.number.onchange = () => this.updateDescription();
         this.editor.note.onchange = () => {
             this.editor.note.value = this.editor.note.value.trim();
@@ -1320,17 +1299,7 @@ class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * The tab ID
-     *
-     * @return {string}
-     * @abstract
-     */
-    tabId() {
-        return "annotation";
-    };
-
-    /**
-     * Updates the description according to the input in the tab plane.
+     * Updates the description according to the input in the tab panel.
      *
      * @override
      */
@@ -1348,7 +1317,7 @@ class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Resets the tab plane input.
+     * Resets the tab panel input.
      *
      * @override
      */
@@ -1358,7 +1327,7 @@ class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Populates the tab plane with the description input.
+     * Populates the tab panel with the description input.
      *
      * @return {boolean} true if the description input matches this tab, or false otherwise
      * @override
@@ -1382,7 +1351,7 @@ class DescriptionEditorAnnotationTab extends DescriptionEditorTabPlane {
     }
 
     /**
-     * Validates the input in the tab plane.
+     * Validates the input in the tab panel.
      *
      * @return {boolean} true if valid, or false otherwise
      * @override
