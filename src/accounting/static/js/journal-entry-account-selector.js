@@ -25,15 +25,16 @@
 /**
  * The account selector.
  *
+ * @extends {BaseCombobox<BaseJournalEntryAccountOption>}
  * @private
  */
-class JournalEntryAccountSelector {
+class JournalEntryAccountSelector extends BaseCombobox {
 
     /**
      * The line item editor
      * @type {JournalEntryLineItemEditor}
      */
-    lineItemEditor;
+    #lineItemEditor;
 
     /**
      * Either "debit" or "credit"
@@ -48,12 +49,6 @@ class JournalEntryAccountSelector {
     #clearButton
 
     /**
-     * The query input
-     * @type {HTMLInputElement}
-     */
-    #query;
-
-    /**
      * The error message when the query has no result
      * @type {HTMLParagraphElement}
      */
@@ -66,14 +61,8 @@ class JournalEntryAccountSelector {
     #optionList;
 
     /**
-     * The options
-     * @type {JournalEntryAccountOption[]}
-     */
-    #options;
-
-    /**
      * The more item to show all accounts
-     * @type {HTMLLIElement}
+     * @type {MoreItems}
      */
     #more;
 
@@ -90,39 +79,46 @@ class JournalEntryAccountSelector {
      * @param debitCredit {string} either "debit" or "credit"
      */
     constructor(lineItemEditor, debitCredit) {
-        this.lineItemEditor = lineItemEditor;
-        this.#debitCredit = debitCredit;
         const prefix = `accounting-account-selector-${debitCredit}`;
-        this.#query = document.getElementById(`${prefix}-query`);
+        const query = document.getElementById(`${prefix}-query`);
+        const options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new JournalEntryAccountOption(element, lineItemEditor.saveAccount.bind(lineItemEditor)));
+        super(query, options);
+        this.#lineItemEditor = lineItemEditor;
+        this.#debitCredit = debitCredit;
         this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
         this.#optionList = document.getElementById(`${prefix}-option-list`);
-        this.#options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new JournalEntryAccountOption(this, element));
-        this.#more = document.getElementById(`${prefix}-more`);
-        this.#clearButton = document.getElementById(`${prefix}-btn-clear`);
-
-        this.#more.onclick = () => {
+        const moreElement = document.getElementById(`${prefix}-more`);
+        this.#more = new MoreItems(moreElement);
+        moreElement.onclick = () => {
             this.#isShowMore = true;
-            this.#more.classList.add("d-none");
-            this.#filterOptions();
+            this.#more.setShown(false);
+            this.filterOptions();
         };
-        this.#query.oninput = () => this.#filterOptions();
-        this.#clearButton.onclick = () => this.lineItemEditor.clearAccount();
+
+        this.#clearButton = document.getElementById(`${prefix}-btn-clear`);
+        this.#clearButton.onclick = () => this.#lineItemEditor.clearAccount();
     }
 
     /**
      * Filters the options.
      *
+     * @override
      */
-    #filterOptions() {
+    filterOptions() {
+        this.shownOptions = [];
         const codesInUse = this.#getCodesUsedInForm();
         let isAnyMatched = false;
-        for (const option of this.#options) {
-            if (option.isMatched(this.#isShowMore, codesInUse, this.#query.value)) {
+        for (const option of this.options) {
+            if (option.isMatched(this.#isShowMore, codesInUse, this.query.value)) {
                 option.setShown(true);
+                this.shownOptions.push(option);
                 isAnyMatched = true;
             } else {
                 option.setShown(false);
             }
+        }
+        if (!this.#isShowMore) {
+            this.shownOptions.push(this.#more);
         }
         if (!isAnyMatched && this.#isShowMore) {
             this.#optionList.classList.add("d-none");
@@ -139,9 +135,9 @@ class JournalEntryAccountSelector {
      * @return {string[]} the account codes that are used in the form
      */
     #getCodesUsedInForm() {
-        const inUse = this.lineItemEditor.form.getAccountCodesUsed(this.#debitCredit);
-        if (this.lineItemEditor.account !== null) {
-            inUse.push(this.lineItemEditor.account.code);
+        const inUse = this.#lineItemEditor.form.getAccountCodesUsed(this.#debitCredit);
+        if (this.#lineItemEditor.account !== null) {
+            inUse.push(this.#lineItemEditor.account.code);
         }
         return inUse
     }
@@ -151,14 +147,13 @@ class JournalEntryAccountSelector {
      *
      */
     onOpen() {
-        this.#query.value = "";
+        this.query.value = "";
         this.#isShowMore = false;
-        this.#more.classList.remove("d-none");
-        this.#filterOptions();
-        for (const option of this.#options) {
-            option.setActive(this.lineItemEditor.account !== null && option.code === this.lineItemEditor.account.code);
-        }
-        if (this.lineItemEditor.account === null) {
+        this.#more.setShown(true);
+        this.filterOptions();
+        this.query.removeAttribute("aria-activedescendant");
+        this.selectOption(this.shownOptions.find((option) => this.#lineItemEditor.account !== null && option.code === this.#lineItemEditor.account.code));
+        if (this.#lineItemEditor.account === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
@@ -167,6 +162,17 @@ class JournalEntryAccountSelector {
             this.#clearButton.classList.remove("btn-secondary");
             this.#clearButton.disabled = false;
         }
+    }
+
+    /**
+     * Selects an option.
+     *
+     * @param option {BaseJournalEntryAccountOption|undefined} the option.
+     * @override
+     */
+    selectOption(option) {
+        this.#more.setActive(false);
+        super.selectOption(option);
     }
 
     /**
@@ -186,23 +192,37 @@ class JournalEntryAccountSelector {
 }
 
 /**
- * An account option
+ * The base abstract account option
  *
  * @private
  */
-class JournalEntryAccountOption {
-
-    /**
-     * The element
-     * @type {HTMLLIElement}
-     */
-    #element;
+class BaseJournalEntryAccountOption extends BaseOption {
 
     /**
      * The account code
      * @type {string}
      */
-    code;
+    code = "";
+
+    /**
+     * Returns whether the account matches the query.
+     *
+     * @param isShowMore {boolean} true to show all accounts, or false to show only those in use
+     * @param codesInUse {string[]} the account codes that are used in the form
+     * @param query {string} the query term
+     * @return {boolean} true if the option matches, or false otherwise
+     */
+    isMatched(isShowMore, codesInUse, query) {
+        return false;
+    }
+}
+
+/**
+ * An account option
+ *
+ * @private
+ */
+class JournalEntryAccountOption extends BaseJournalEntryAccountOption {
 
     /**
      * The account title
@@ -237,11 +257,11 @@ class JournalEntryAccountOption {
     /**
      * Constructs the account in the account selector.
      *
-     * @param selector {JournalEntryAccountSelector} the account selector
      * @param element {HTMLLIElement} the element
+     * @param save {function(JournalEntryAccountOption): void} the callback to save the option
      */
-    constructor(selector, element) {
-        this.#element = element;
+    constructor(element, save) {
+        super(element);
         this.code = element.dataset.code;
         this.title = element.dataset.title;
         this.text = element.dataset.text;
@@ -249,7 +269,7 @@ class JournalEntryAccountOption {
         this.isNeedOffset = element.classList.contains("accounting-account-is-need-offset");
         this.#queryValues = JSON.parse(element.dataset.queryValues);
 
-        this.#element.onclick = () => selector.lineItemEditor.saveAccount(this);
+        element.onclick = () => save(this);
     }
 
     /**
@@ -259,6 +279,7 @@ class JournalEntryAccountOption {
      * @param codesInUse {string[]} the account codes that are used in the form
      * @param query {string} the query term
      * @return {boolean} true if the option matches, or false otherwise
+     * @override
      */
     isMatched(isShowMore, codesInUse, query) {
         return this.#isInUseMatched(isShowMore, codesInUse) && this.#isQueryMatched(query);
@@ -292,30 +313,12 @@ class JournalEntryAccountOption {
         }
         return false;
     }
+}
 
-    /**
-     * Sets whether the option is shown.
-     *
-     * @param isShown {boolean} true to show, or false otherwise
-     */
-    setShown(isShown) {
-        if (isShown) {
-            this.#element.classList.remove("d-none");
-        } else {
-            this.#element.classList.add("d-none");
-        }
-    }
-
-    /**
-     * Sets whether the option is active.
-     *
-     * @param isActive {boolean} true if active, or false otherwise
-     */
-    setActive(isActive) {
-        if (isActive) {
-            this.#element.classList.add("active");
-        } else {
-            this.#element.classList.remove("active");
-        }
-    }
+/**
+ * The more item to show all accounts.
+ *
+ * @private
+ */
+class MoreItems extends BaseJournalEntryAccountOption {
 }

@@ -843,27 +843,22 @@ class RecurringItemEditor {
 /**
  * The account selector for the recurring item editor.
  *
+ * @extends {BaseCombobox<RecurringAccount>}
  * @private
  */
-class RecurringAccountSelector {
+class RecurringAccountSelector extends BaseCombobox {
 
     /**
      * The recurring item editor
      * @type {RecurringItemEditor}
      */
-    editor;
+    #editor;
 
     /**
      * Either "expense" or "income"
      * @type {string}
      */
     #expenseIncome;
-
-    /**
-     * The query input
-     * @type {HTMLInputElement}
-     */
-    #query;
 
     /**
      * The error message when the query has no result
@@ -878,12 +873,6 @@ class RecurringAccountSelector {
     #optionList;
 
     /**
-     * The account options
-     * @type {RecurringAccount[]}
-     */
-    #options;
-
-    /**
      * The button to clear the account
      * @type {HTMLButtonElement}
      */
@@ -895,28 +884,31 @@ class RecurringAccountSelector {
      * @param editor {RecurringItemEditor} the recurring item editor
      */
     constructor(editor) {
-        this.editor = editor;
-        this.#expenseIncome = editor.expenseIncome;
         const prefix = `accounting-recurring-accounting-selector-${editor.expenseIncome}`;
-        this.#query = document.getElementById(`${prefix}-query`);
+        const query = document.getElementById(`${prefix}-query`);
+        const options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new RecurringAccount(element, editor.saveAccount.bind(editor)));
+        super(query, options);
+        this.#editor = editor;
+        this.#expenseIncome = editor.expenseIncome;
         this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
         this.#optionList = document.getElementById(`${prefix}-option-list`);
-        this.#options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new RecurringAccount(this, element));
-        this.#clearButton = document.getElementById(`${prefix}-clear`);
 
-        this.#query.oninput = () => this.#filterOptions();
-        this.#clearButton.onclick = () => this.editor.clearAccount();
+        this.#clearButton = document.getElementById(`${prefix}-clear`);
+        this.#clearButton.onclick = () => this.#editor.clearAccount();
     }
 
     /**
      * Filters the options.
      *
+     * @override
      */
-    #filterOptions() {
+    filterOptions() {
+        this.shownOptions = [];
         let isAnyMatched = false;
-        for (const option of this.#options) {
-            if (option.isMatched(this.#query.value)) {
+        for (const option of this.options) {
+            if (option.isMatched(this.query.value)) {
                 option.setShown(true);
+                this.shownOptions.push(option);
                 isAnyMatched = true;
             } else {
                 option.setShown(false);
@@ -936,12 +928,11 @@ class RecurringAccountSelector {
      *
      */
     onOpen() {
-        this.#query.value = "";
-        this.#filterOptions();
-        for (const option of this.#options) {
-            option.setActive(option.code === this.editor.accountCode);
-        }
-        if (this.editor.accountCode === null) {
+        this.query.value = "";
+        this.filterOptions();
+        this.query.removeAttribute("aria-activedescendant");
+        this.selectOption(this.shownOptions.find((option) => option.code === this.#editor.accountCode));
+        if (this.#editor.accountCode === null) {
             this.#clearButton.classList.add("btn-secondary");
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
@@ -958,13 +949,7 @@ class RecurringAccountSelector {
  *
  * @private
  */
-class RecurringAccount {
-
-    /**
-     * The element
-     * @type {HTMLLIElement}
-     */
-    #element;
+class RecurringAccount extends BaseOption {
 
     /**
      * The account code
@@ -987,16 +972,16 @@ class RecurringAccount {
     /**
      * Constructs the account in the account selector for the recurring item editor.
      *
-     * @param selector {RecurringAccountSelector} the account selector
      * @param element {HTMLLIElement} the element
+     * @param save {function(RecurringAccount): void} the callback to save the option
      */
-    constructor(selector, element) {
-        this.#element = element;
+    constructor(element, save) {
+        super(element);
         this.code = element.dataset.code;
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
 
-        this.#element.onclick = () => selector.editor.saveAccount(this);
+        element.onclick = () => save(this);
     }
 
     /**
@@ -1015,31 +1000,5 @@ class RecurringAccount {
             }
         }
         return false;
-    }
-
-    /**
-     * Sets whether the option is shown.
-     *
-     * @param isShown {boolean} true to show, or false otherwise
-     */
-    setShown(isShown) {
-        if (isShown) {
-            this.#element.classList.remove("d-none");
-        } else {
-            this.#element.classList.add("d-none");
-        }
-    }
-
-    /**
-     * Sets whether the option is active.
-     *
-     * @param isActive {boolean} true if active, or false otherwise
-     */
-    setActive(isActive) {
-        if (isActive) {
-            this.#element.classList.add("active");
-        } else {
-            this.#element.classList.remove("active");
-        }
     }
 }

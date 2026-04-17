@@ -28,16 +28,16 @@ First written: 2023/3/22
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">
-          <input id="accounting-recurring-accounting-selector-{{ expense_income }}-query" class="form-control form-control-sm" type="search" placeholder=" " required="required">
+          <input id="accounting-recurring-accounting-selector-{{ expense_income }}-query" class="form-control form-control-sm" type="search" placeholder=" " required="required" role="combobox" aria-expanded="true" aria-controls="accounting-recurring-accounting-selector-{{ expense_income }}-option-list" aria-autocomplete="list" aria-activedescendant="">
           <label class="input-group-text" for="accounting-recurring-accounting-selector-{{ expense_income }}-query">
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             {{ A_("Search") }}
           </label>
         </div>
 
-        <ul id="accounting-recurring-accounting-selector-{{ expense_income }}-option-list" class="list-group accounting-selector-list">
+        <ul id="accounting-recurring-accounting-selector-{{ expense_income }}-option-list" class="list-group accounting-selector-list" role="listbox" tabindex="-1" aria-labelledby="accounting-recurring-accounting-selector-{{ expense_income }}-modal-label">
           {% for account in accounts %}
-            <li id="accounting-recurring-accounting-selector-{{ expense_income }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-recurring-accounting-selector-{{ expense_income }}-option" data-code="{{ account.code }}" data-text="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
+            <li id="accounting-recurring-accounting-selector-{{ expense_income }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-recurring-accounting-selector-{{ expense_income }}-option" data-code="{{ account.code }}" role="option" aria-selected="false" data-text="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">
               {{ account }}
             </li>
           {% endfor %}

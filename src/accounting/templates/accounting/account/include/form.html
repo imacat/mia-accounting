@@ -22,6 +22,7 @@ First written: 2023/2/1
 {% extends "accounting/base.html" %}
 
 {% block accounting_scripts %}
+  <script src="{{ url_for("accounting.static", filename="js/base-combobox.js") }}"></script>
   <script src="{{ url_for("accounting.static", filename="js/account-form.js") }}"></script>
 {% endblock %}
 
@@ -92,16 +93,16 @@ First written: 2023/2/1
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">
-          <input id="accounting-base-selector-query" class="form-control form-control-sm" type="search" placeholder=" " required="required">
+          <input id="accounting-base-selector-query" class="form-control form-control-sm" type="search" placeholder=" " required="required" role="combobox" aria-expanded="true" aria-controls="accounting-base-selector-option-list" aria-autocomplete="list" aria-activedescendant="">
           <label class="input-group-text" for="accounting-base-selector-query">
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             {{ A_("Search") }}
           </label>
         </div>
 
-        <ul id="accounting-base-selector-option-list" class="list-group accounting-selector-list">
+        <ul id="accounting-base-selector-option-list" class="list-group accounting-selector-list" role="listbox" tabindex="-1" aria-labelledby="accounting-base-selector-modal-label">
           {% for base in form.base_options %}
-            <li class="list-group-item accounting-clickable accounting-base-selector-option" data-code="{{ base.code }}" data-text="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}" data-bs-dismiss="modal">
+            <li id="accounting-base-selector-option-{{ base.code }}" class="list-group-item accounting-clickable accounting-base-selector-option" role="option" aria-selected="false" data-code="{{ base.code }}" data-text="{{ base }}" data-query-values="{{ base.query_values|tojson|forceescape }}" data-bs-dismiss="modal">
               {{ base }}
             </li>
           {% endfor %}

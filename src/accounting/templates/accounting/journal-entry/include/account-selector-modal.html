@@ -28,20 +28,20 @@ First written: 2023/2/25
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">
-          <input id="accounting-account-selector-{{ debit_credit }}-query" class="form-control form-control-sm" type="search" placeholder=" " required="required">
+          <input id="accounting-account-selector-{{ debit_credit }}-query" class="form-control form-control-sm" type="search" placeholder=" " required="required" role="combobox" aria-expanded="true" aria-controls="accounting-account-selector-{{ debit_credit }}-option-list" aria-autocomplete="list" aria-activedescendant="">
           <label class="input-group-text" for="accounting-account-selector-{{ debit_credit }}-query">
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             {{ A_("Search") }}
           </label>
         </div>
 
-        <ul id="accounting-account-selector-{{ debit_credit }}-option-list" class="list-group accounting-selector-list">
+        <ul id="accounting-account-selector-{{ debit_credit }}-option-list" class="list-group accounting-selector-list" role="listbox" tabindex="-1" aria-labelledby="accounting-account-selector-{{ debit_credit }}-modal-label">
           {% for account in account_options %}
-            <li id="accounting-account-selector-{{ debit_credit }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-account-selector-{{ debit_credit }}-option {% if account.is_in_use %} accounting-account-is-in-use {% endif %} {% if account.is_need_offset %} accounting-account-is-need-offset {% endif %}" data-code="{{ account.code }}" data-title="{{ account.title }}" data-text="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
+            <li id="accounting-account-selector-{{ debit_credit }}-option-{{ account.code }}" class="list-group-item accounting-clickable accounting-account-selector-{{ debit_credit }}-option {% if account.is_in_use %} accounting-account-is-in-use {% endif %} {% if account.is_need_offset %} accounting-account-is-need-offset {% endif %}" role="option" aria-selected="false" data-code="{{ account.code }}" data-title="{{ account.title }}" data-text="{{ account }}" data-query-values="{{ account.query_values|tojson|forceescape }}" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">
               {{ account }}
             </li>
           {% endfor %}
-          <li id="accounting-account-selector-{{ debit_credit }}-more" class="list-group-item accounting-clickable">{{ A_("More…") }}</li>
+          <li id="accounting-account-selector-{{ debit_credit }}-more" class="list-group-item accounting-clickable" role="option" aria-selected="false">{{ A_("More…") }}</li>
         </ul>
         <p id="accounting-account-selector-{{ debit_credit }}-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
       </div>

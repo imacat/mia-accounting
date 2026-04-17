@@ -25,27 +25,16 @@
 /**
  * The original line item selector.
  *
+ * @extends {BaseCombobox<OriginalLineItem>}
  * @private
  */
-class OriginalLineItemSelector {
+class OriginalLineItemSelector extends BaseCombobox {
 
     /**
      * The line item editor
      * @type {JournalEntryLineItemEditor}
      */
-    lineItemEditor;
-
-    /**
-     * The prefix of the HTML ID and class names
-     * @type {string}
-     */
-    #prefix = "accounting-original-line-item-selector";
-
-    /**
-     * The query input
-     * @type {HTMLInputElement}
-     */
-    #query;
+    #lineItemEditor;
 
     /**
      * The error message when the query has no result
@@ -58,12 +47,6 @@ class OriginalLineItemSelector {
      * @type {HTMLUListElement}
      */
     #optionList;
-
-    /**
-     * The options
-     * @type {OriginalLineItem[]}
-     */
-    #options;
 
     /**
      * The options by their ID
@@ -88,16 +71,17 @@ class OriginalLineItemSelector {
      * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
      */
     constructor(lineItemEditor) {
-        this.lineItemEditor = lineItemEditor;
-        this.#query = document.getElementById(`${this.#prefix}-query`);
-        this.#queryNoResult = document.getElementById(`${this.#prefix}-option-no-result`);
-        this.#optionList = document.getElementById(`${this.#prefix}-option-list`);
-        this.#options = Array.from(document.getElementsByClassName(`${this.#prefix}-option`)).map((element) => new OriginalLineItem(this, element));
+        const prefix = "accounting-original-line-item-selector";
+        const query = document.getElementById(`${prefix}-query`);
+        const options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new OriginalLineItem(element, lineItemEditor.saveOriginalLineItem.bind(lineItemEditor), lineItemEditor.form));
+        super(query, options);
+        this.#lineItemEditor = lineItemEditor;
+        this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
+        this.#optionList = document.getElementById(`${prefix}-option-list`);
         this.#optionById = {};
-        for (const option of this.#options) {
+        for (const option of this.options) {
             this.#optionById[option.id] = option;
         }
-        this.#query.oninput = () => this.#filterOptions();
     }
 
     /**
@@ -127,7 +111,7 @@ class OriginalLineItemSelector {
      *
      */
     #updateNetBalances() {
-        const otherLineItems = this.lineItemEditor.form.getLineItems().filter((lineItem) => lineItem !== this.lineItemEditor.lineItem);
+        const otherLineItems = this.#lineItemEditor.form.getLineItems().filter((lineItem) => lineItem !== this.#lineItemEditor.lineItem);
         const otherOffsets = {}
         for (const otherLineItem of otherLineItems) {
             const otherOriginalLineItemId = otherLineItem.originalLineItemId;
@@ -140,7 +124,7 @@ class OriginalLineItemSelector {
             }
             otherOffsets[otherOriginalLineItemId] = otherOffsets[otherOriginalLineItemId].plus(amount);
         }
-        for (const option of this.#options) {
+        for (const option of this.options) {
             if (option.id in otherOffsets) {
                 option.updateNetBalance(otherOffsets[option.id]);
             } else {
@@ -152,12 +136,15 @@ class OriginalLineItemSelector {
     /**
      * Filters the options.
      *
+     * @override
      */
-    #filterOptions() {
+    filterOptions() {
+        this.shownOptions = [];
         let isAnyMatched = false;
-        for (const option of this.#options) {
-            if (option.isMatched(this.#debitCredit, this.#currencyCode, this.#query.value)) {
+        for (const option of this.options) {
+            if (option.isMatched(this.#debitCredit, this.#currencyCode, this.query.value)) {
                 option.setShown(true);
+                this.shownOptions.push(option);
                 isAnyMatched = true;
             } else {
                 option.setShown(false);
@@ -177,14 +164,13 @@ class OriginalLineItemSelector {
      *
      */
     onOpen() {
-        this.#currencyCode = this.lineItemEditor.currencyCode;
-        this.#debitCredit = this.lineItemEditor.debitCredit;
-        for (const option of this.#options) {
-            option.setActive(option.id === this.lineItemEditor.originalLineItemId);
-        }
-        this.#query.value = "";
+        this.#currencyCode = this.#lineItemEditor.currencyCode;
+        this.#debitCredit = this.#lineItemEditor.debitCredit;
+        this.query.value = "";
         this.#updateNetBalances();
-        this.#filterOptions();
+        this.filterOptions();
+        this.query.removeAttribute("aria-activedescendant");
+        this.selectOption(this.shownOptions.find((option) => option.id === this.#lineItemEditor.originalLineItemId));
     }
 }
 
@@ -193,19 +179,13 @@ class OriginalLineItemSelector {
  *
  * @private
  */
-class OriginalLineItem {
+class OriginalLineItem extends BaseOption {
 
     /**
      * The journal entry form
      * @type {JournalEntryForm}
      */
     #form;
-
-    /**
-     * The element
-     * @type {HTMLLIElement}
-     */
-    #element;
 
     /**
      * The ID
@@ -276,12 +256,13 @@ class OriginalLineItem {
     /**
      * Constructs an original line item.
      *
-     * @param selector {OriginalLineItemSelector} the original line item selector
      * @param element {HTMLLIElement} the element
+     * @param save {function(OriginalLineItem): void} the callback to save the option
+     * @param form {JournalEntryForm} the journal entry form
      */
-    constructor(selector, element) {
-        this.#form = selector.lineItemEditor.form;
-        this.#element = element;
+    constructor(element, save, form) {
+        super(element);
+        this.#form = form;
         this.id = element.dataset.id;
         this.date = element.dataset.date;
         this.#debitCredit = element.dataset.debitCredit;
@@ -293,7 +274,8 @@ class OriginalLineItem {
         this.netBalanceText = document.getElementById(`accounting-original-line-item-selector-option-${this.id}-net-balance`);
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
-        this.#element.onclick = () => selector.lineItemEditor.saveOriginalLineItem(this);
+
+        element.onclick = () => save(this);
     }
 
     /**
@@ -381,31 +363,5 @@ class OriginalLineItem {
         const frac = this.netBalance.modulo(1);
         const whole = Number(this.netBalance.minus(frac));
         return String(whole) + String(frac).substring(1);
-    }
-
-    /**
-     * Sets whether the option is shown.
-     *
-     * @param isShown {boolean} true to show, or false otherwise
-     */
-    setShown(isShown) {
-        if (isShown) {
-            this.#element.classList.remove("d-none");
-        } else {
-            this.#element.classList.add("d-none");
-        }
-    }
-
-    /**
-     * Sets whether the option is active.
-     *
-     * @param isActive {boolean} true if active, or false otherwise
-     */
-    setActive(isActive) {
-        if (isActive) {
-            this.#element.classList.add("active");
-        } else {
-            this.#element.classList.remove("active");
-        }
     }
 }

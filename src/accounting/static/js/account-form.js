@@ -225,27 +225,22 @@ class AccountForm {
 /**
  * The base account selector.
  *
+ * @extends {BaseCombobox<BaseAccountOption>}
  * @private
  */
-class BaseAccountSelector {
+class BaseAccountSelector extends BaseCombobox {
 
     /**
      * The account form
      * @type {AccountForm}
      */
-    form;
+    #form;
 
     /**
      * The selector modal
      * @type {HTMLDivElement}
      */
     #modal;
-
-    /**
-     * The query input
-     * @type {HTMLInputElement}
-     */
-    #query;
 
     /**
      * The error message when the query has no result
@@ -260,12 +255,6 @@ class BaseAccountSelector {
     #optionList;
 
     /**
-     * The options
-     * @type {BaseAccountOption[]}
-     */
-    #options;
-
-    /**
      * The button to clear the base account value
      * @type {HTMLButtonElement}
      */
@@ -277,29 +266,32 @@ class BaseAccountSelector {
      * @param form {AccountForm} the form
      */
     constructor(form) {
-        this.form = form;
         const prefix = "accounting-base-selector";
+        const query = document.getElementById(`${prefix}-query`);
+        const options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new BaseAccountOption(element, form.saveBaseAccount.bind(form)));
+        super(query, options);
+        this.#form = form;
         this.#modal = document.getElementById(`${prefix}-modal`);
-        this.#query = document.getElementById(`${prefix}-query`);
+        this.#modal.addEventListener("hidden.bs.modal", () => this.#form.onBaseAccountSelectorClosed());
         this.#queryNoResult = document.getElementById(`${prefix}-option-no-result`);
         this.#optionList = document.getElementById(`${prefix}-option-list`);
-        this.#options = Array.from(document.getElementsByClassName(`${prefix}-option`)).map((element) => new BaseAccountOption(this, element));
-        this.#clearButton = document.getElementById(`${prefix}-clear`);
 
-        this.#modal.addEventListener("hidden.bs.modal", () => this.form.onBaseAccountSelectorClosed());
-        this.#query.oninput = () => this.#filterOptions();
-        this.#clearButton.onclick = () => this.form.clearBaseAccount();
+        this.#clearButton = document.getElementById(`${prefix}-clear`);
+        this.#clearButton.onclick = () => this.#form.clearBaseAccount();
     }
 
     /**
      * Filters the options.
      *
+     * @override
      */
-    #filterOptions() {
+    filterOptions() {
+        this.shownOptions = [];
         let isAnyMatched = false;
-        for (const option of this.#options) {
-            if (option.isMatched(this.#query.value)) {
+        for (const option of this.options) {
+            if (option.isMatched(this.query.value)) {
                 option.setShown(true);
+                this.shownOptions.push(option);
                 isAnyMatched = true;
             } else {
                 option.setShown(false);
@@ -319,12 +311,11 @@ class BaseAccountSelector {
      *
      */
     onOpen() {
-        this.#query.value = "";
-        this.#filterOptions();
-        for (const option of this.#options) {
-            option.setActive(option.code === this.form.baseCode);
-        }
-        if (this.form.baseCode === null) {
+        this.query.value = "";
+        this.filterOptions();
+        this.query.removeAttribute("aria-activedescendant");
+        this.selectOption(this.shownOptions.find((option) => option.code === this.#form.baseCode));
+        if (this.#form.baseCode === null) {
             this.#clearButton.classList.add("btn-secondary")
             this.#clearButton.classList.remove("btn-danger");
             this.#clearButton.disabled = true;
@@ -341,13 +332,7 @@ class BaseAccountSelector {
  *
  * @private
  */
-class BaseAccountOption {
-
-    /**
-     * The element
-     * @type {HTMLLIElement}
-     */
-    #element;
+class BaseAccountOption extends BaseOption {
 
     /**
      * The account code
@@ -370,16 +355,16 @@ class BaseAccountOption {
     /**
      * Constructs the account in the base account selector.
      *
-     * @param selector {BaseAccountSelector} the base account selector
      * @param element {HTMLLIElement} the element
+     * @param save {function(BaseAccountOption): void} the callback to save the option
      */
-    constructor(selector, element) {
-        this.#element = element;
+    constructor(element, save) {
+        super(element);
         this.code = element.dataset.code;
         this.text = element.dataset.text;
         this.#queryValues = JSON.parse(element.dataset.queryValues);
 
-        this.#element.onclick = () => selector.form.saveBaseAccount(this);
+        element.onclick = () => save(this);
     }
 
     /**
@@ -398,31 +383,5 @@ class BaseAccountOption {
             }
         }
         return false;
-    }
-
-    /**
-     * Sets whether the option is shown.
-     *
-     * @param isShown {boolean} true to show, or false otherwise
-     */
-    setShown(isShown) {
-        if (isShown) {
-            this.#element.classList.remove("d-none");
-        } else {
-            this.#element.classList.add("d-none");
-        }
-    }
-
-    /**
-     * Sets whether the option is active.
-     *
-     * @param isActive {boolean} true if active, or false otherwise
-     */
-    setActive(isActive) {
-        if (isActive) {
-            this.#element.classList.add("active");
-        } else {
-            this.#element.classList.remove("active");
-        }
     }
 }
