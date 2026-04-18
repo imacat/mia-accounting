@@ -50,7 +50,7 @@ First written: 2023/3/22
       {% endfor %}
     </select>
     <label class="form-label" for="accounting-default-currency">{{ A_("Default Currency") }}</label>
-    <div id="accounting-default-currency-error" class="invalid-feedback">{% if form.default_currency_code.errors %}{{ form.default_currency_code.errors[0] }}{% endif %}</div>
+    <div id="accounting-default-currency-error" class="invalid-feedback" role="alert">{% if form.default_currency_code.errors %}{{ form.default_currency_code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">
@@ -60,7 +60,7 @@ First written: 2023/3/22
       {% endfor %}
     </select>
     <label class="form-label" for="accounting-default-ie-account">{{ A_("Default Account for the Income and Expenses Log") }}</label>
-    <div id="accounting-default-ie-account-error" class="invalid-feedback">{% if form.default_ie_account_code.errors %}{{ form.default_ie_account_code.errors[0] }}{% endif %}</div>
+    <div id="accounting-default-ie-account-error" class="invalid-feedback" role="alert">{% if form.default_ie_account_code.errors %}{{ form.default_ie_account_code.errors[0] }}{% endif %}</div>
   </div>
 
   {% with expense_income = "expense",

@@ -42,7 +42,7 @@ First written: 2023/3/22
             </li>
           {% endfor %}
         </ul>
-        <p id="accounting-recurring-accounting-selector-{{ expense_income }}-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
+        <p id="accounting-recurring-accounting-selector-{{ expense_income }}-option-no-result" class="d-none" role="status">{{ A_("There is no data.") }}</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal">{{ A_("Cancel") }}</button>

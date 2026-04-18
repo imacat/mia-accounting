@@ -32,7 +32,7 @@ First written: 2023/3/22
         <span id="accounting-recurring-{{ expense_income }}-{{ item_index }}-name-text" class="d-block">{{ form.name.data|accounting_default }}</span>
         <span id="accounting-recurring-{{ expense_income }}-{{ item_index }}-description-template-text" class="d-block small">{{ form.description_template.data|accounting_default }}</span>
       </button>
-      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-error" class="invalid-feedback">{% if form.all_errors %}{{ form.all_errors[0] }}{% endif %}</div>
+      <div id="accounting-recurring-{{ expense_income }}-{{ item_index }}-error" class="invalid-feedback" role="alert">{% if form.all_errors %}{{ form.all_errors[0] }}{% endif %}</div>
     </div>
 
     <div class="ms-2">

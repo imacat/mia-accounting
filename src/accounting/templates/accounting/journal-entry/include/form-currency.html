@@ -31,7 +31,7 @@ First written: 2023/3/21
           {% endfor %}
         </select>
         <label class="form-label" for="accounting-currency-{{ currency_index }}-code-select">{{ A_("Currency") }}</label>
-        <div id="accounting-currency-{{ currency_index }}-code-error" class="invalid-feedback">{% if currency_code_errors %}{{ currency_code_errors[0] }}{% endif %}</div>
+        <div id="accounting-currency-{{ currency_index }}-code-error" class="invalid-feedback" role="alert">{% if currency_code_errors %}{{ currency_code_errors[0] }}{% endif %}</div>
       </div>
 
       <div>
@@ -43,5 +43,5 @@ First written: 2023/3/21
 
     {% block line_items %}{% endblock %}
   </div>
-  <div id="accounting-currency-{{ currency_index }}-error" class="invalid-feedback">{% if currency_errors %}{{ currency_errors[0] }}{% endif %}</div>
+  <div id="accounting-currency-{{ currency_index }}-error" class="invalid-feedback" role="alert">{% if currency_errors %}{{ currency_errors[0] }}{% endif %}</div>
 </div>

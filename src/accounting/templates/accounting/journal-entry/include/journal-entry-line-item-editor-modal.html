@@ -35,7 +35,7 @@ First written: 2023/2/25
                 <span class="form-label">{{ A_("Original Line Item") }}</span>
                 <span id="accounting-line-item-editor-original-line-item"></span>
               </button>
-              <div id="accounting-line-item-editor-original-line-item-error" class="invalid-feedback"></div>
+              <div id="accounting-line-item-editor-original-line-item-error" class="invalid-feedback" role="alert"></div>
             </div>
 
             <div>
@@ -50,7 +50,7 @@ First written: 2023/2/25
               <span class="form-label">{{ A_("Description") }}</span>
               <span id="accounting-line-item-editor-description"></span>
             </button>
-            <div id="accounting-line-item-editor-description-error" class="invalid-feedback"></div>
+            <div id="accounting-line-item-editor-description-error" class="invalid-feedback" role="alert"></div>
           </div>
 
           <div class="mb-3">
@@ -58,13 +58,13 @@ First written: 2023/2/25
               <span class="form-label">{{ A_("Account") }}</span>
               <span id="accounting-line-item-editor-account"></span>
             </button>
-            <div id="accounting-line-item-editor-account-error" class="invalid-feedback"></div>
+            <div id="accounting-line-item-editor-account-error" class="invalid-feedback" role="alert"></div>
           </div>
 
           <div class="form-floating mb-3">
             <input id="accounting-line-item-editor-amount" class="form-control" type="number" value="" min="0" max="" step="0.01" placeholder=" " required="required">
             <label for="accounting-line-item-editor-amount">{{ A_("Amount") }}</label>
-            <div id="accounting-line-item-editor-amount-error" class="invalid-feedback"></div>
+            <div id="accounting-line-item-editor-amount-error" class="invalid-feedback" role="alert"></div>
           </div>
         </div>
         <div class="modal-footer">

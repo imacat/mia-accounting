@@ -32,7 +32,7 @@ First written: 2023/3/22
           <div class="form-floating mb-3">
             <input id="accounting-recurring-item-editor-{{ expense_income }}-name" class="form-control" type="text" value="" placeholder=" " required="required">
             <label for="accounting-recurring-item-editor-{{ expense_income }}-name">{{ A_("Name") }}</label>
-            <div id="accounting-recurring-item-editor-{{ expense_income }}-name-error" class="invalid-feedback"></div>
+            <div id="accounting-recurring-item-editor-{{ expense_income }}-name-error" class="invalid-feedback" role="alert"></div>
           </div>
 
           <div class="mb-3">
@@ -40,13 +40,13 @@ First written: 2023/3/22
               <span class="form-label">{{ A_("Account") }}</span>
               <span id="accounting-recurring-item-editor-{{ expense_income }}-account"></span>
             </button>
-            <div id="accounting-recurring-item-editor-{{ expense_income }}-account-error" class="invalid-feedback"></div>
+            <div id="accounting-recurring-item-editor-{{ expense_income }}-account-error" class="invalid-feedback" role="alert"></div>
           </div>
 
           <div class="form-floating mb-3">
             <input id="accounting-recurring-item-editor-{{ expense_income }}-description-template" class="form-control" type="text" value="" placeholder=" " required="required">
             <label for="accounting-recurring-item-editor-{{ expense_income }}-description-template">{{ A_("Description Template") }}</label>
-            <div id="accounting-recurring-item-editor-{{ expense_income }}-description-template-error" class="invalid-feedback"></div>
+            <div id="accounting-recurring-item-editor-{{ expense_income }}-description-template-error" class="invalid-feedback" role="alert"></div>
           </div>
 
           <div class="mb-3 border-top accounting-recurring-description-template-illustration">

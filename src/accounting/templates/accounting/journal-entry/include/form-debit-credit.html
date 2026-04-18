@@ -36,7 +36,7 @@ First written: 2023/3/21
 
       <div class="d-flex justify-content-between mt-2 mb-2">
         <div>{{ A_("Total") }}</div>
-        <div><span id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-total" class="badge rounded-pill bg-primary">{{ debit_credit_total }}</span></div>
+        <div><span id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-total" class="badge rounded-pill bg-primary" aria-live="polite">{{ debit_credit_total }}</span></div>
       </div>
 
       <div>
@@ -47,5 +47,5 @@ First written: 2023/3/21
       </div>
     </div>
   </div>
-  <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-error" class="invalid-feedback">{% if debit_credit_errors %}{{ debit_credit_errors[0] }}{% endif %}</div>
+  <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-error" class="invalid-feedback" role="alert">{% if debit_credit_errors %}{{ debit_credit_errors[0] }}{% endif %}</div>
 </div>

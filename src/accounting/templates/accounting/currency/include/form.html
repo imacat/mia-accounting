@@ -42,13 +42,13 @@ First written: 2023/2/6
   <div class="form-floating mb-3">
     <input id="accounting-code" class="form-control {% if form.code.errors %} is-invalid {% endif %}" type="text" name="code" value="{{ form.code.data|accounting_default }}" placeholder=" " required="required" data-exists-url="{{ url_for("accounting.currency-api.exists") }}" data-original="{% block original_code %}{% endblock %}" data-blocklist="{{ form.CODE_BLOCKLIST|tojson|forceescape }}">
     <label class="form-label" for="accounting-code">{{ A_("Code") }}</label>
-    <div id="accounting-code-error" class="invalid-feedback">{% if form.code.errors %}{{ form.code.errors[0] }}{% endif %}</div>
+    <div id="accounting-code-error" class="invalid-feedback" role="alert">{% if form.code.errors %}{{ form.code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">
     <input id="accounting-name" class="form-control {% if form.name.errors %} is-invalid {% endif %}" type="text" name="name" value="{{ form.name.data|accounting_default }}" placeholder=" " required="required">
     <label class="form-label" for="accounting-name">{{ A_("Name") }}</label>
-    <div id="accounting-name-error" class="invalid-feedback">{% if form.name.errors %}{{ form.name.errors[0] }}{% endif %}</div>
+    <div id="accounting-name-error" class="invalid-feedback" role="alert">{% if form.name.errors %}{{ form.name.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="d-none d-md-block">

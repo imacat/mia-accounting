@@ -43,7 +43,7 @@ First written: 2023/2/25
           {% endfor %}
           <li id="accounting-account-selector-{{ debit_credit }}-more" class="list-group-item accounting-clickable" role="option" aria-selected="false">{{ A_("More…") }}</li>
         </ul>
-        <p id="accounting-account-selector-{{ debit_credit }}-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
+        <p id="accounting-account-selector-{{ debit_credit }}-option-no-result" class="d-none" role="status">{{ A_("There is no data.") }}</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal">{{ A_("Cancel") }}</button>

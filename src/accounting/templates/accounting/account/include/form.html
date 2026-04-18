@@ -54,13 +54,13 @@ First written: 2023/2/1
         {% endif %}
       </span>
     </button>
-    <div id="accounting-base-error" class="invalid-feedback">{% if form.base_code.errors %}{{ form.base_code.errors[0] }}{% endif %}</div>
+    <div id="accounting-base-error" class="invalid-feedback" role="alert">{% if form.base_code.errors %}{{ form.base_code.errors[0] }}{% endif %}</div>
   </div>
 
   <div class="form-floating mb-3">
     <input id="accounting-title" class="form-control {% if form.title.errors %} is-invalid {% endif %}" type="text" name="title" value="{{ form.title.data|accounting_default }}" placeholder=" " required="required">
     <label class="form-label" for="accounting-title">{{ A_("Title") }}</label>
-    <div id="accounting-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
+    <div id="accounting-title-error" class="invalid-feedback" role="alert">{% if form.title.errors %}{{ form.title.errors[0] }}{% endif %}</div>
   </div>
 
   <div id="accounting-is-need-offset-control" class="form-check form-switch mb-3 {% if form.base_code.data[0] not in ["1", "2", "3"] %} d-none {% endif %}">
@@ -107,7 +107,7 @@ First written: 2023/2/1
             </li>
           {% endfor %}
         </ul>
-        <p id="accounting-base-selector-option-no-result" class="d-none">{{ A_("There is no data.") }}</p>
+        <p id="accounting-base-selector-option-no-result" class="d-none" role="status">{{ A_("There is no data.") }}</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ A_("Cancel") }}</button>

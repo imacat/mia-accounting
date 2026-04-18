@@ -65,7 +65,7 @@ First written: 2023/2/25
       </div>
       <div><span id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-amount-text" class="badge rounded-pill bg-primary">{{ form.amount.data|accounting_format_amount }}</span></div>
     </div>
-    <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-error" class="invalid-feedback">{% if form.all_errors %}{{ form.all_errors[0] }}{% endif %}</div>
+    <div id="accounting-currency-{{ currency_index }}-{{ debit_credit }}-{{ line_item_index }}-error" class="invalid-feedback" role="alert">{% if form.all_errors %}{{ form.all_errors[0] }}{% endif %}</div>
   </div>
 
   <div>
