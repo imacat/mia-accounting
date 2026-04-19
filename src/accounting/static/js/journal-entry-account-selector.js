@@ -97,6 +97,14 @@ class JournalEntryAccountSelector extends BaseCombobox {
 
         this.#clearButton = document.getElementById(`${prefix}-btn-clear`);
         this.#clearButton.onclick = () => this.#lineItemEditor.clearAccount();
+
+        const modal = document.getElementById(`${prefix}-modal`);
+        const closeButton = document.getElementById(`${prefix}-close`);
+        modal.onkeydown = (event) => {
+            if (event.key === "Escape") {
+                closeButton.click();
+            }
+        };
     }
 
     /**

@@ -19,12 +19,12 @@ original-line-item-selector-modal.html: The modal of the original line item sele
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
-<div id="accounting-original-line-item-selector-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-original-line-item-selector-modal-label" aria-hidden="true">
+<div id="accounting-original-line-item-selector-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-original-line-item-selector-modal-label" aria-hidden="true" data-bs-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="accounting-original-line-item-selector-modal-label">{{ A_("Select Original Line Item") }}</h1>
-        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
+        <button id="accounting-original-line-item-selector-close" type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">

@@ -19,12 +19,12 @@ recurring-account-selector-modal.html: The modal of the account selector for the
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/3/22
 #}
-<div id="accounting-recurring-accounting-selector-{{ expense_income }}-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-recurring-accounting-selector-{{ expense_income }}-modal-label" aria-hidden="true">
+<div id="accounting-recurring-accounting-selector-{{ expense_income }}-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-recurring-accounting-selector-{{ expense_income }}-modal-label" aria-hidden="true" data-bs-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="accounting-recurring-accounting-selector-{{ expense_income }}-modal-label">{{ A_("Select Account") }}</h1>
-        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal" aria-label="{{ A_("Close") }}"></button>
+        <button id="accounting-recurring-accounting-selector-{{ expense_income }}-close" type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-recurring-item-editor-{{ expense_income }}-modal" aria-label="{{ A_("Close") }}"></button>
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">

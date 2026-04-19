@@ -21,14 +21,14 @@ First written: 2023/2/28
 #}
 <form id="accounting-description-editor-{{ description_editor.debit_credit }}" class="accounting-description-editor" data-debit-credit="{{ description_editor.debit_credit }}">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <div id="accounting-description-editor-{{ description_editor.debit_credit }}-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-modal-label" aria-hidden="true">
+  <div id="accounting-description-editor-{{ description_editor.debit_credit }}-modal" class="modal fade" tabindex="-1" aria-labelledby="accounting-description-editor-{{ description_editor.debit_credit }}-modal-label" aria-hidden="true" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="accounting-description-editor-{{ description_editor.debit_credit }}-modal-label">
             <label for="accounting-description-editor-{{ description_editor.debit_credit }}-description">{{ A_("Description") }}</label>
           </h1>
-          <button class="btn-close" type="button" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
+          <button id="accounting-description-editor-{{ description_editor.debit_credit }}-close" class="btn-close" type="button" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
         </div>
         <div class="modal-body">
           <div class="d-flex justify-content-between mb-3">

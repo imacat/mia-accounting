@@ -19,12 +19,12 @@ account-selector-modal.html: The modal for the account selector
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2023/2/25
 #}
-<div id="accounting-account-selector-{{ debit_credit }}-modal" class="modal fade accounting-account-selector" data-debit-credit="{{ debit_credit }}" tabindex="-1" aria-labelledby="accounting-account-selector-{{ debit_credit }}-modal-label" aria-hidden="true">
+<div id="accounting-account-selector-{{ debit_credit }}-modal" class="modal fade accounting-account-selector" data-debit-credit="{{ debit_credit }}" tabindex="-1" aria-labelledby="accounting-account-selector-{{ debit_credit }}-modal-label" aria-hidden="true" data-bs-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="accounting-account-selector-{{ debit_credit }}-modal-label">{{ A_("Select Account") }}</h1>
-        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
+        <button id="accounting-account-selector-{{ debit_credit }}-close" type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#accounting-line-item-editor-modal" aria-label="{{ A_("Close") }}"></button>
       </div>
       <div class="modal-body">
         <div class="input-group mb-2">

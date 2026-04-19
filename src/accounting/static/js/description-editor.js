@@ -150,12 +150,19 @@ class DescriptionEditor extends BaseTablist {
         this.tabs = [this.#tabsByID.general, this.#tabsByID.travel, this.#tabsByID.bus, this.#tabsByID.recurring, this.#tabsByID.annotation];
         this.currentTab = this.tabs[0];
         this.#descriptionInput.onchange = () => this.#onDescriptionChange();
-        this.#offsetButton.onclick = () => this.lineItemEditor.originalLineItemSelector.onOpen();
+        this.#offsetButton.onclick = () => this.lineItemEditor.originalLineItemSelector.onOpen(this.#modal.id);
         this.#form.onsubmit = () => {
             if (this.currentTab.validate()) {
                 this.#submit();
             }
             return false;
+        };
+
+        const closeButton = document.getElementById(`${prefix}-close`);
+        this.#modal.onkeydown = (event) => {
+            if (event.key === "Escape") {
+                closeButton.click();
+            }
         };
     }
 

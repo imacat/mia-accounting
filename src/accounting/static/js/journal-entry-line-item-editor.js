@@ -228,7 +228,7 @@ class JournalEntryLineItemEditor {
         this.#accountSelectors = JournalEntryAccountSelector.getInstances(this);
         this.originalLineItemSelector = new OriginalLineItemSelector(this);
 
-        this.#originalLineItemControl.onclick = () => this.originalLineItemSelector.onOpen()
+        this.#originalLineItemControl.onclick = () => this.originalLineItemSelector.onOpen(this.modal.id)
         this.#originalLineItemDelete.onclick = () => this.clearOriginalLineItem();
         this.#descriptionControl.onclick = () => this.#descriptionEditors[this.debitCredit].onOpen();
         this.#accountControl.onclick = () => this.#accountSelectors[this.debitCredit].onOpen();

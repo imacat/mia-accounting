@@ -66,6 +66,12 @@ class OriginalLineItemSelector extends BaseCombobox {
     #debitCredit;
 
     /**
+     * The close button.
+     * @type {HTMLButtonElement}
+     */
+    #closeButton;
+
+    /**
      * Constructs an original line item selector.
      *
      * @param lineItemEditor {JournalEntryLineItemEditor} the line item editor
@@ -82,6 +88,14 @@ class OriginalLineItemSelector extends BaseCombobox {
         for (const option of this.options) {
             this.#optionById[option.id] = option;
         }
+        this.#closeButton = document.getElementById(`${prefix}-close`);
+
+        const modal = document.getElementById(`${prefix}-modal`);
+        modal.onkeydown = (event) => {
+            if (event.key === "Escape") {
+                this.#closeButton.click();
+            }
+        };
     }
 
     /**
@@ -162,8 +176,10 @@ class OriginalLineItemSelector extends BaseCombobox {
     /**
      * The callback when the original line item selector is shown.
      *
+     * @param parentID {string} the ID of the parent element
      */
-    onOpen() {
+    onOpen(parentID) {
+        this.#closeButton.dataset.bsTarget = `#${parentID}`;
         this.#currencyCode = this.#lineItemEditor.currencyCode;
         this.#debitCredit = this.#lineItemEditor.debitCredit;
         this.query.value = "";
