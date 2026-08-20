@@ -55,7 +55,7 @@ devel = [
 "Demonstration" = "https://accounting.imacat.idv.tw"
 
 [build-system]
-requires = ["setuptools>=42"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
